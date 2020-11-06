@@ -25,6 +25,8 @@ commands like updating and deleting other users.
  - Winston logging integrated for daily rotated logs and a maximum size of
  1 megabyte.
 
+ - Linting enforced with [Husky](https://github.com/typicode/husky) and [JavaScript Standard Style rules](https://www.npmjs.com/package/standard).
+
 ## Features
 This project covers basic necessities of most APIs.
 * Authentication (passport & jwt)
