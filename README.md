@@ -14,7 +14,7 @@ It makes the following modifications:
 - Replaced `bcrypt` dependency with `bcryptjs`. This improves compatibility across
   versions of node.js and across OSs.
 
-- Configured for Travis CI (continuous integration), Coveralls (code coverage), Green Keeper (automated dependency management), and Semantic Release (automated versioning).
+- Configured for Jenkins (continuous integration), Coveralls (code coverage), Green Keeper (automated dependency management), and Semantic Release (automated versioning).
 
 - 'Production' environment is targeted for packaging as a Docker container.
 
