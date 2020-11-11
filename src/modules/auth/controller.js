@@ -1,6 +1,8 @@
-const passport = require('koa-passport')
+const Passport = require('../../lib/passport')
+const passport = new Passport()
 
 let _this
+
 class Auth {
   constructor () {
     _this = this
@@ -57,46 +59,25 @@ class Auth {
    */
   async authUser (ctx, next) {
     try {
-      return _this.passport.authenticate('local', (err, user) => {
-        if (err) throw err
+      const user = await _this.passport.authUser(ctx, next)
+      if (!user) {
+        ctx.throw(401)
+      }
 
-        if (!user) {
-          ctx.throw(401)
-        }
+      const token = user.generateToken()
 
-        const token = user.generateToken()
+      const response = user.toJSON()
 
-        const response = user.toJSON()
+      delete response.password
 
-        delete response.password
-
-        ctx.body = {
-          token,
-          user: response
-        }
-      })(ctx, next)
-    } catch (error) {
+      ctx.body = {
+        token,
+        user: response
+      }
+    } catch (err) {
       ctx.throw(401)
     }
   }
-
-  // async handleAuth (err, user) {
-  //   if (err) throw err
-  //
-  //   if (!user) {
-  //     ctx.throw(401)
-  //   }
-  //
-  //   const token = user.generateToken()
-  //
-  //   const response = user.toJSON()
-  //
-  //   delete response.password
-  //
-  //   ctx.body = {
-  //     token,
-  //     user: response
-  //   }
-  // }
 }
+
 module.exports = Auth
