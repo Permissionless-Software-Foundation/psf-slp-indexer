@@ -1,6 +1,8 @@
 const Passport = require('../../lib/passport')
 const passport = new Passport()
+
 let _this
+
 class Auth {
   constructor () {
     _this = this
@@ -77,4 +79,5 @@ class Auth {
     }
   }
 }
+
 module.exports = Auth

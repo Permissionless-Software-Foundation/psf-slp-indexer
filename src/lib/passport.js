@@ -1,3 +1,7 @@
+/*
+  koa-passport is an authorization library used for different authentication schemes.
+*/
+
 const passport = require('koa-passport')
 
 let _this
@@ -11,6 +15,7 @@ class Passport {
     return new Promise((resolve, reject) => {
       try {
         if (!ctx) throw new Error('ctx is required')
+
         _this.passport.authenticate('local', (err, user) => {
           try {
             if (err) throw err
@@ -26,4 +31,5 @@ class Passport {
     })
   }
 }
+
 module.exports = Passport

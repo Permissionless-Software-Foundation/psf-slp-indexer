@@ -7,6 +7,7 @@ describe('#passport.js', () => {
   beforeEach(async () => {
     passportLib = new PassportLib()
   })
+
   describe('authUser()', () => {
     it('should throw error if ctx is not provided', async () => {
       try {
@@ -16,6 +17,7 @@ describe('#passport.js', () => {
         assert.include(err.message, 'ctx is required')
       }
     })
+
     it('Should throw error if the passport library fails', async () => {
       try {
         // This is a mock to handle the callback error
