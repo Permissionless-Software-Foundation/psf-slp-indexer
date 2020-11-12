@@ -8,8 +8,8 @@
     "test": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text --timeout 15000 ./node_modules/.bin/mocha --exit",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "nyc --reporter=html mocha --exit",
+    "coverage": "export KOA_ENV=test && npm run prep-test && nyc report --reporter=text-lcov | coveralls",
+    "coverage:report": "export KOA_ENV=test && npm run prep-test && nyc --reporter=html mocha --exit",
     "prep-test": "node util/users/delete-all-test-users.js"
   },
   "keywords": [
@@ -66,6 +66,7 @@
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
     "semantic-release": "^17.0.0",
+    "sinon": "^9.2.1",
     "standard": "^14.3.1"
   },
   "release": {

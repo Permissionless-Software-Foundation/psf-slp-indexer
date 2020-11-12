@@ -170,12 +170,18 @@ class UserController {
         user
       }
     } catch (err) {
-      if (err === 404 || err.name === 'CastError') {
+      // Handle different error types.
+      if (
+        err === 404 ||
+        err.name === 'CastError' ||
+        err.message.toString().includes('Not Found')
+      ) {
         ctx.throw(404)
       }
 
       ctx.throw(500)
     }
+
     if (next) {
       return next()
     }

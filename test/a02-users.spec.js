@@ -2,6 +2,7 @@ const testUtils = require('./utils')
 const assert = require('chai').assert
 const config = require('../config')
 const axios = require('axios').default
+const sinon = require('sinon')
 
 const util = require('util')
 util.inspect.defaultOptions = { depth: 1 }
@@ -9,6 +10,12 @@ util.inspect.defaultOptions = { depth: 1 }
 const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
+
+const UserController = require('../src/modules/users/controller')
+let uut
+let sandbox
+
+const mockContext = require('./mocks/ctx-mock').context
 
 describe('Users', () => {
   before(async () => {
@@ -37,6 +44,14 @@ describe('Users', () => {
     // const admin = await adminLib.loginAdmin()
     // console.log(`admin: ${JSON.stringify(admin, null, 2)}`)
   })
+
+  beforeEach(() => {
+    uut = new UserController()
+
+    sandbox = sinon.createSandbox()
+  })
+
+  afterEach(() => sandbox.restore())
 
   describe('POST /users', () => {
     it('should reject signup when data is incomplete', async () => {
@@ -127,6 +142,7 @@ describe('Users', () => {
         )
       }
     })
+
     it('should reject  if name property property is not string', async () => {
       try {
         const options = {
@@ -145,10 +161,7 @@ describe('Users', () => {
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'name' must be a string"
-        )
+        assert.include(err.response.data, "Property 'name' must be a string")
       }
     })
 
@@ -275,6 +288,22 @@ describe('Users', () => {
       assert.hasAnyKeys(users[0], ['type', '_id', 'email'])
       assert.isNumber(users.length)
     })
+
+    it('should catch and handle errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'find').rejects(new Error('test error'))
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        await uut.getUsers(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Not Found')
+      }
+    })
   })
 
   describe('GET /users/:id', () => {
@@ -344,6 +373,40 @@ describe('Users', () => {
         'password',
         'Password property should not be returned'
       )
+    })
+
+    it('should catch and handle errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'findById').rejects(new Error('test error'))
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Internal Server Error')
+      }
+    })
+
+    it('should handle user not found', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'findById').resolves(false)
+
+        // Mock the context object.
+        const ctx = mockContext()
+        ctx.params = { id: 1 }
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        console.log(err)
+        assert.include(err.message, 'Not Found')
+      }
     })
   })
 
@@ -544,10 +607,7 @@ describe('Users', () => {
         assert.equal(true, false, 'Unexpected behavior')
       } catch (err) {
         assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'email' must be a string!"
-        )
+        assert.include(err.response.data, "Property 'email' must be a string!")
       }
     })
     it('should not be able to update if email is wrong format', async () => {
@@ -571,7 +631,10 @@ describe('Users', () => {
         await axios(options)
       } catch (err) {
         assert.equal(err.response.status, 422)
-        assert.include(err.response.data, "Property 'email' must be email format!")
+        assert.include(
+          err.response.data,
+          "Property 'email' must be email format!"
+        )
       }
     })
     it('should not be able to update type property if is not string', async () => {
