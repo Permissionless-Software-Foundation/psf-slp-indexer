@@ -374,6 +374,40 @@ describe('Users', () => {
         'Password property should not be returned'
       )
     })
+
+    it('should catch and handle errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'findById').rejects(new Error('test error'))
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Internal Server Error')
+      }
+    })
+
+    it('should handle user not found', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'findById').resolves(false)
+
+        // Mock the context object.
+        const ctx = mockContext()
+        ctx.params = { id: 1 }
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        console.log(err)
+        assert.include(err.message, 'Not Found')
+      }
+    })
   })
 
   describe('PUT /users/:id', () => {
