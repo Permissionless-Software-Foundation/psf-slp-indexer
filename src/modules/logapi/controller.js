@@ -8,6 +8,9 @@ let _this
 class LogsApi {
   constructor () {
     _this = this
+    _this.fs = fs
+    _this.lineReader = lineReader
+    _this.config = config
   }
 
   /**
@@ -56,30 +59,29 @@ class LogsApi {
       // console.log(`password: ${password}`)
 
       // Password matches the password set in the config file.
-      if (password === config.logPass) {
+      if (password === _this.config.logPass) {
         // Generate the full path and file name for the current log file.
         const fullPath = _this.generateFileName()
+        // console.log(`fullPath: ${JSON.stringify(fullPath, null, 2)}`)
 
         // Throw an error if the file does not exist.
-        fs.stat(fullPath, (err, stat) => {
-          if (err) {
-            ctx.body = {
-              success: false,
-              data: 'file does not exist'
-            }
+        if (!_this.fs.existsSync(fullPath)) {
+          ctx.body = {
+            success: false,
+            data: 'file does not exist'
           }
-        })
+        } else {
+          // Read in the data from the log file.
+          const data = await _this.readLines(fullPath)
+          // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
-        // Read in the data from the log file.
-        const data = await _this.readLines(fullPath)
-        // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+          // Filter the logs before passing them to the front end.
+          const filteredData = _this.filterLogs(data)
 
-        // Filter the logs before passing them to the front end.
-        const filteredData = _this.filterLogs(data)
-
-        ctx.body = {
-          success: true,
-          data: filteredData
+          ctx.body = {
+            success: true,
+            data: filteredData
+          }
         }
 
         // Password does not match password in config file.
@@ -89,21 +91,23 @@ class LogsApi {
         }
       }
     } catch (err) {
-      if (err) {
+      if (err && err.message) {
         ctx.throw(500, err.message)
       } else {
         ctx.throw(500, 'Unhandled error')
-        console.log('unhandled error: ', err)
       }
     }
   }
 
   // Sorts the log data by their timestamp. Returns the LIMIT or less elements.
-  filterLogs (data) {
+  filterLogs (data, LIMIT = 100) {
     try {
+      if (!Array.isArray(data)) {
+        throw new Error('Data must be array')
+      }
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
-      const LIMIT = 100 // Max number of entries to return.
+      // const LIMIT = 100 // Max number of entries to return.
 
       // Sort the elements by date.
       data.sort(function (a, b) {
@@ -142,7 +146,7 @@ class LogsApi {
       const thisYear = now.getFullYear()
 
       const filename = `koa-${
-        config.env
+        _this.config.env
       }-${thisYear}-${thisMonth}-${thisDate}.log`
       // console.log(`filename: ${filename}`)
       const logDir = `${__dirname}/../../../logs/`
@@ -157,23 +161,33 @@ class LogsApi {
   }
 
   // Promise based read-file
-  readFile (path, opts = 'utf8') {
+  /*   readFile (path, opts = 'utf8') {
     return new Promise((resolve, reject) => {
-      fs.readFile(path, opts, (err, data) => {
+      _this.fs.readFile(path, opts, (err, data) => {
         if (err) reject(err)
         else resolve(data)
       })
     })
-  }
+  } */
 
   // Returns an array with each element containing a line of the file.
   readLines (filename) {
     return new Promise((resolve, reject) => {
       try {
+        if (!filename || typeof filename !== 'string') {
+          throw new Error('filename must be a string')
+        }
+        // Throw an error if the file does not exist.
+
+        if (!_this.fs.existsSync(filename)) {
+          throw new Error('file does not exist')
+        }
+
         const data = []
+
         // let i = 0
 
-        lineReader.eachLine(filename, function (line, last) {
+        _this.lineReader.eachLine(filename, function (line, last) {
           try {
             data.push(JSON.parse(line))
 
@@ -183,7 +197,8 @@ class LogsApi {
 
             if (last) return resolve(data)
           } catch (err) {
-            console.log('err: ', err)
+            // console.log('err: ', err)
+            if (last) return resolve(data)
           }
         })
       } catch (err) {
