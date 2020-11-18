@@ -1,4 +1,4 @@
-// Mocks representing an array of logs for the 
+// Mocks representing an array of logs for the
 // Unit tests of logapi
 
 const data = [
