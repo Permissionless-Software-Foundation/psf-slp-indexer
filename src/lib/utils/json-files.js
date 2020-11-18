@@ -1,61 +1,75 @@
 /*
   A utility file for reading and writing JSON files.
 */
-
 'use strict'
-
 const fs = require('fs')
 
-// Writes out a JSON file of any object passed to the function.
-// This is used for testing.
-function writeJSON (obj, fileName) {
-  return new Promise(function (resolve, reject) {
-    try {
-      const fileStr = JSON.stringify(obj, null, 2)
+let _this
 
-      fs.writeFile(fileName, fileStr, function (err) {
-        if (err) {
-          console.error('Error while trying to write file: ', err)
-          return reject(err)
-        } else {
-          // console.log(`${fileName} written successfully!`)
-          return resolve()
+class JsonFiles {
+  constructor () {
+    this.fs = fs
+
+    _this = this
+  }
+
+  // Writes out a JSON file of any object passed to the function.
+  // This is used for testing.
+  writeJSON (obj, fileName) {
+    return new Promise(function (resolve, reject) {
+      try {
+        if (!obj) {
+          throw new Error('obj property is required')
         }
-      })
-    } catch (err) {
-      console.error('Error trying to write out object in util.js/_writeJSON().', err)
-      return reject(err)
-    }
-  })
-}
+        if (!fileName || typeof fileName !== 'string') {
+          throw new Error('fileName property must be a string')
+        }
+        const fileStr = JSON.stringify(obj, null, 2)
 
-// Read and parse a JSON file.
-function readJSON (fileName) {
-  return new Promise(function (resolve, reject) {
-    try {
-      fs.readFile(fileName, (err, data) => {
-        if (err) {
-          if (err.code === 'ENOENT') {
-            console.log('Admin .json file not found!')
+        _this.fs.writeFile(fileName, fileStr, function (err) {
+          if (err) {
+            console.error('Error while trying to write file: ')
+            throw err
           } else {
-            console.log(`err: ${JSON.stringify(err, null, 2)}`)
+            // console.log(`${fileName} written successfully!`)
+            return resolve()
+          }
+        })
+      } catch (err) {
+        console.error('Error trying to write out object in util.js/_writeJSON().')
+        return reject(err)
+      }
+    })
+  }
+
+  readJSON (fileName) {
+    return new Promise(function (resolve, reject) {
+      try {
+        if (!fileName || typeof fileName !== 'string') {
+          throw new Error('fileName property must be a string')
+        }
+
+        _this.fs.readFile(fileName, (err, data) => {
+          if (err) {
+            if (err.code === 'ENOENT') {
+              console.log('Admin .json file not found!')
+            } else {
+              console.log(`err: ${JSON.stringify(err, null, 2)}`)
+            }
+
+            throw err
           }
 
-          return reject(err)
-        }
+          const obj = JSON.parse(data)
 
-        const obj = JSON.parse(data)
-
-        return resolve(obj)
-      })
-    } catch (err) {
-      console.error('Error trying to read JSON file in util.js/_readJSON().', err)
-      return reject(err)
-    }
-  })
+          return resolve(obj)
+        })
+      } catch (err) {
+        console.error('Error trying to read JSON file in util.js/_readJSON().')
+        return reject(err)
+      }
+    })
+  }
 }
 
-module.exports = {
-  writeJSON,
-  readJSON
-}
+module.exports = JsonFiles
