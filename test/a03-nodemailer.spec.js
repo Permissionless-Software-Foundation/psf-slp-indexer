@@ -1,9 +1,23 @@
 const assert = require('chai').assert
 
 const NodeMailer = require('../src/lib/nodemailer')
-const nodemailer = new NodeMailer()
 
+const sinon = require('sinon')
+
+const util = require('util')
+util.inspect.defaultOptions = { depth: 1 }
+
+let sandbox
+let uut
 describe('NodeMailer', () => {
+  beforeEach(() => {
+    uut = new NodeMailer()
+
+    sandbox = sinon.createSandbox()
+  })
+
+  afterEach(() => sandbox.restore())
+
   describe('sendEmail()', () => {
     it('should throw error if email property is not provided', async () => {
       try {
@@ -13,7 +27,7 @@ describe('NodeMailer', () => {
           subject: 'test subject',
           to: ['test2@email.com']
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'email\' must be a string!')
@@ -28,7 +42,7 @@ describe('NodeMailer', () => {
           subject: 'test subject',
           to: ['test2@email.com']
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'email\' must be email format!')
@@ -42,7 +56,7 @@ describe('NodeMailer', () => {
           subject: 'test subject',
           to: ['test2@email.com']
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'message\' must be a string!')
@@ -55,7 +69,7 @@ describe('NodeMailer', () => {
           name: 'test name',
           subject: 'test subject'
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'to\' must be a array!')
@@ -71,7 +85,7 @@ describe('NodeMailer', () => {
           subject: 'test subject',
           to: ['test']
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Array must contain emails format!')
@@ -86,7 +100,7 @@ describe('NodeMailer', () => {
           name: 'test name',
           to: ['test2@email.com']
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'subject\' must be a string!')
@@ -101,34 +115,53 @@ describe('NodeMailer', () => {
           subject: 'test subject',
           to: ['test2@email.com']
         }
-        await nodemailer.sendEmail(data)
+        await uut.sendEmail(data)
+        assert(false, 'Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Property \'payloadTitle\' must be a string!')
+      }
+    })
+    it('should throw error if payloadTitle property is not string', async () => {
+      try {
+        const data = {
+          email: 'test@email.com',
+          formMessage: 'test msg',
+          name: 'test name',
+          subject: 'test subject',
+          to: ['test2@email.com'],
+          payloadTitle: true
+
+        }
+        await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'payloadTitle\' must be a string!')
       }
     })
 
-    /*         it('should send email', async () => {
-            try {
-                const data = {
-                    email: 'test@email.com',
-                    formMessage: 'test msg',
-                    name: 'test name',
-                    to: 'test2@email.com',
-                    subject: 'test subject',
-                    payloadTitle: 'test title'
-                }
-                await nodemailer.sendEmail(data)
-                assert(false, 'Unexpected result')
-            } catch (err) {
-                assert.include(err.message, 'Property \'subject\' must be a string!')
-            }
-        }) */
+    it('should send email', async () => {
+      try {
+        sandbox.stub(uut.transporter, 'sendMail').resolves({ messageId: 'messageId' })
+        const data = {
+          email: 'test@email.com',
+          formMessage: 'test msg',
+          name: 'test name',
+          to: ['test2@email.com'],
+          subject: 'test subject',
+          payloadTitle: 'test title'
+        }
+        const info = await uut.sendEmail(data)
+        assert.isObject(info)
+        assert.isString(info.messageId)
+      } catch (err) {
+        assert(false, 'Unexpected result')
+      }
+    })
   })
   describe('validateEmailArray()', () => {
     it('should throw error if email list is not provided ', async () => {
       try {
-        await nodemailer.validateEmailArray()
+        await uut.validateEmailArray()
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'emailList\' must be a array!')
@@ -137,7 +170,7 @@ describe('NodeMailer', () => {
     it('should throw error if email list is empty', async () => {
       try {
         const emailList = []
-        await nodemailer.validateEmailArray(emailList)
+        await uut.validateEmailArray(emailList)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Property \'emailList\' cant be empty!')
@@ -149,7 +182,7 @@ describe('NodeMailer', () => {
           'wrongEmail',
           'bad format'
         ]
-        await nodemailer.validateEmailArray(emailList)
+        await uut.validateEmailArray(emailList)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'Array must contain emails format!')
@@ -161,7 +194,7 @@ describe('NodeMailer', () => {
           'test@email.com',
           'simple@email.com'
         ]
-        const result = await nodemailer.validateEmailArray(emailList)
+        const result = await uut.validateEmailArray(emailList)
         assert.isTrue(result)
       } catch (err) {
         assert(false, 'Unexpected result')
