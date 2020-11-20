@@ -1,4 +1,6 @@
-const validator = require('../../middleware/validators')
+const VALIDATOR = require('../../middleware/validators')
+const validator = new VALIDATOR()
+
 const CONTROLLER = require('./controller')
 const controller = new CONTROLLER()
 
