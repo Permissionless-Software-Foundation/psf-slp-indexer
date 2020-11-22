@@ -1,17 +1,24 @@
 const assert = require('chai').assert
 const PassportLib = require('../src/lib/passport')
 
-describe('#passport.js', () => {
-  let passportLib
+const sinon = require('sinon')
 
-  beforeEach(async () => {
-    passportLib = new PassportLib()
+let uut
+let sandbox
+
+describe('#passport.js', () => {
+  beforeEach(() => {
+    uut = new PassportLib()
+
+    sandbox = sinon.createSandbox()
   })
+
+  afterEach(() => sandbox.restore())
 
   describe('authUser()', () => {
     it('should throw error if ctx is not provided', async () => {
       try {
-        await passportLib.authUser()
+        await uut.authUser()
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'ctx is required')
@@ -20,17 +27,16 @@ describe('#passport.js', () => {
 
     it('Should throw error if the passport library fails', async () => {
       try {
-        // This is a mock to handle the callback error
-        // when the passport library fails or throws error
         const error = new Error('cant auth user')
         const user = null
-        const authMock = (value, callback) => {
-          callback(error, user)
-        }
-        passportLib.passport.authenticate = authMock
+
+        // Mock calls
+        // https://sinonjs.org/releases/latest/stubs/
+        // About yields
+        sandbox.stub(uut.passport, 'authenticate').yields(error, user)
 
         const ctx = {}
-        await passportLib.authUser(ctx)
+        await uut.authUser(ctx)
         assert(false, 'Unexpected result')
       } catch (err) {
         assert.include(err.message, 'cant auth user')
