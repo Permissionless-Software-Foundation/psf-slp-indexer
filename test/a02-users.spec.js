@@ -404,7 +404,7 @@ describe('Users', () => {
 
         assert.fail('Unexpected result')
       } catch (err) {
-        console.log(err)
+        // console.log(err)
         assert.include(err.message, 'Not Found')
       }
     })
