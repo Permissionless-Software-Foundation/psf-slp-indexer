@@ -42,10 +42,11 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(err.response.data, "Property 'email' must be a string!")
       }
     })
+
     it('should throw error if email property is wrong format', async () => {
       try {
         const options = {
@@ -66,13 +67,14 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(
           err.response.data,
           "Property 'email' must be email format!"
         )
       }
     })
+
     it('should throw error if formMessage property is not provided', async () => {
       try {
         const options = {
@@ -92,13 +94,14 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(
           err.response.data,
           "Property 'message' must be a string!"
         )
       }
     })
+
     it('should throw error if payloadTitle property is not provided', async () => {
       try {
         const options = {
@@ -119,13 +122,14 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(
           err.response.data,
           "Property 'payloadTitle' must be a string!"
         )
       }
     })
+
     it('should throw error if payloadTitle property is not string', async () => {
       try {
         const options = {
@@ -147,13 +151,14 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(
           err.response.data,
           "Property 'payloadTitle' must be a string!"
         )
       }
     })
+
     it('should throw error if email list provided is not a array', async () => {
       try {
         const options = {
@@ -176,13 +181,14 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(
           err.response.data,
           "Property 'emailList' must be a array of emails!"
         )
       }
     })
+
     it('should throw error if email list provided is a empty array', async () => {
       try {
         const options = {
@@ -205,19 +211,18 @@ describe('Contact', () => {
         // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.equal(err.response.status, 500)
+        assert.equal(err.response.status, 422)
         assert.include(
           err.response.data,
           "Property 'emailList' must be a array of emails!"
         )
       }
     })
+
     it('should send email with minimun input', async () => {
       try {
         // Mock live network calls.
-        sandbox.stub(
-          uut.nodemailer, 'sendEmail')
-          .resolves(true)
+        sandbox.stub(uut.nodemailer, 'sendEmail').resolves(true)
 
         // Mock the context object.
         const ctx = mockContext()
@@ -235,12 +240,11 @@ describe('Contact', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should send email with  all input', async () => {
       try {
         // Mock live network calls.
-        sandbox.stub(
-          uut.nodemailer, 'sendEmail')
-          .resolves(true)
+        sandbox.stub(uut.nodemailer, 'sendEmail').resolves(true)
 
         // Mock the context object.
         const ctx = mockContext()

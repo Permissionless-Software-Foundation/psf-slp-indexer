@@ -65,11 +65,13 @@ class Contact {
         success: true
       }
     } catch (err) {
-      ctx.body = {
-        success: false
-      }
+      // ctx.body = {
+      //   success: false
+      // }
       // console.error(`Error: `, err)
-      throw err
+      // throw err
+
+      ctx.throw(422, err.message)
     }
   }
 }
