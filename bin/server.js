@@ -12,7 +12,10 @@ const cors = require('kcors')
 
 // Local libraries
 const config = require('../config') // this first.
-const adminLib = require('../src/lib/admin')
+
+const AdminLib = require('../src/lib/admin')
+const adminLib = new AdminLib()
+
 const errorMiddleware = require('../src/middleware')
 const wlogger = require('../src/lib/wlogger')
 

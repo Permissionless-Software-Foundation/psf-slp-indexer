@@ -2,6 +2,7 @@ const testUtils = require('./utils')
 const assert = require('chai').assert
 const config = require('../config')
 const axios = require('axios').default
+const sinon = require('sinon')
 
 const util = require('util')
 util.inspect.defaultOptions = { depth: 1 }
@@ -9,6 +10,12 @@ util.inspect.defaultOptions = { depth: 1 }
 const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
+
+const UserController = require('../src/modules/users/controller')
+let uut
+let sandbox
+
+const mockContext = require('./mocks/ctx-mock').context
 
 describe('Users', () => {
   before(async () => {
@@ -38,6 +45,14 @@ describe('Users', () => {
     // console.log(`admin: ${JSON.stringify(admin, null, 2)}`)
   })
 
+  beforeEach(() => {
+    uut = new UserController()
+
+    sandbox = sinon.createSandbox()
+  })
+
+  afterEach(() => sandbox.restore())
+
   describe('POST /users', () => {
     it('should reject signup when data is incomplete', async () => {
       try {
@@ -49,11 +64,11 @@ describe('Users', () => {
           }
         }
 
-        const result = await axios(options)
+        await axios(options)
 
-        console.log(
+        /*      console.log(
           `result stringified: ${JSON.stringify(result.data, null, 2)}`
-        )
+        ) */
         assert(false, 'Unexpected result')
       } catch (err) {
         assert(err.response.status === 422, 'Error code 422 expected.')
@@ -125,6 +140,28 @@ describe('Users', () => {
           err.response.data,
           "Property 'password' must be a string"
         )
+      }
+    })
+
+    it('should reject  if name property property is not string', async () => {
+      try {
+        const options = {
+          method: 'POST',
+          url: `${LOCALHOST}/users`,
+          data: {
+            user: {
+              email: 'test322@test.com',
+              password: 'supersecretpassword',
+              name: 1234
+            }
+          }
+        }
+        await axios(options)
+
+        assert(false, 'Unexpected result')
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(err.response.data, "Property 'name' must be a string")
       }
     })
 
@@ -251,6 +288,22 @@ describe('Users', () => {
       assert.hasAnyKeys(users[0], ['type', '_id', 'email'])
       assert.isNumber(users.length)
     })
+
+    it('should catch and handle errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'find').rejects(new Error('test error'))
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        await uut.getUsers(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Not Found')
+      }
+    })
   })
 
   describe('GET /users/:id', () => {
@@ -321,6 +374,40 @@ describe('Users', () => {
         'Password property should not be returned'
       )
     })
+
+    it('should catch and handle errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'findById').rejects(new Error('test error'))
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Internal Server Error')
+      }
+    })
+
+    it('should handle user not found', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.User, 'findById').resolves(false)
+
+        // Mock the context object.
+        const ctx = mockContext()
+        ctx.params = { id: 1 }
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Not Found')
+      }
+    })
   })
 
   describe('PUT /users/:id', () => {
@@ -362,6 +449,240 @@ describe('Users', () => {
       }
     })
 
+    it('should not be able to update user type', async () => {
+      try {
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${context.user._id.toString()}`,
+          headers: {
+            Authorization: `Bearer ${context.token}`
+          },
+          data: {
+            user: {
+              name: 'new name',
+              type: 'test'
+            }
+          }
+        }
+        await axios(options)
+
+        // console.log(`Users: ${JSON.stringify(result.data, null, 2)}`)
+
+        // assert(result.status === 200, 'Status Code 200 expected.')
+        // assert(result.data.user.type === 'user', 'Type should be unchanged.')
+        assert.equal(true, false, 'Unexpected behavior')
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(
+          err.response.data,
+          "Property 'type' can only be changed by Admin user"
+        )
+      }
+    })
+
+    it('should not be able to update other user when not admin', async () => {
+      try {
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
+          headers: {
+            Authorization: `Bearer ${context.token}`
+          },
+          data: {
+            user: {
+              name: 'This should not work'
+            }
+          }
+        }
+        await axios(options)
+
+        // console.log(`result: ${JSON.stringify(result.data, null, 2)}`)
+
+        assert(false, 'Unexpected result')
+      } catch (err) {
+        assert.equal(err.response.status, 401)
+      }
+    })
+
+    it('should not be able to update if name property is wrong', async () => {
+      try {
+        const _id = context.user._id
+        const token = context.token
+
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${_id}`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          data: {
+            user: {
+              email: 'testToUpdate@test.com',
+              name: {}
+            }
+          }
+        }
+        await axios(options)
+      } catch (error) {
+        assert.equal(error.response.status, 422)
+        assert.include(error.response.data, "Property 'name' must be a string!")
+      }
+    })
+    it('should not be able to update if password property is not string', async () => {
+      const { token } = context
+      const _id = context.user._id
+      try {
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${_id}`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          data: {
+            user: {
+              password: 1234
+            }
+          }
+        }
+        await axios(options)
+
+        assert.equal(true, false, 'Unexpected behavior')
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(
+          err.response.data,
+          "Property 'password' must be a string!"
+        )
+      }
+    })
+    it('should not be able to update if project property is not array', async () => {
+      const { token } = context
+      const _id = context.user._id
+      try {
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${_id}`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          data: {
+            user: {
+              projects: 'projects'
+            }
+          }
+        }
+        await axios(options)
+
+        assert.equal(true, false, 'Unexpected behavior')
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(
+          err.response.data,
+          "Property 'projects' must be a Array!"
+        )
+      }
+    })
+    it('should not be able to update if email is not string', async () => {
+      const { token } = context
+      const _id = context.user._id
+      try {
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${_id}`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          data: {
+            user: {
+              email: 1234
+            }
+          }
+        }
+        await axios(options)
+
+        assert.equal(true, false, 'Unexpected behavior')
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(err.response.data, "Property 'email' must be a string!")
+      }
+    })
+    it('should not be able to update if email is wrong format', async () => {
+      try {
+        const _id = context.user._id
+        const token = context.token
+
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${_id}`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          data: {
+            user: {
+              email: 'badEmailFormat'
+            }
+          }
+        }
+        await axios(options)
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(
+          err.response.data,
+          "Property 'email' must be email format!"
+        )
+      }
+    })
+    it('should not be able to update type property if is not string', async () => {
+      try {
+        const _id = context.user._id
+        const token = context.token
+
+        const options = {
+          method: 'PUT',
+          url: `${LOCALHOST}/users/${_id}`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          data: {
+            user: {
+              type: 1
+            }
+          }
+        }
+        await axios(options)
+      } catch (err) {
+        assert.equal(err.response.status, 422)
+        assert.include(err.response.data, "Property 'type' must be a string!")
+      }
+    })
+
+    it('should be able to update other user when admin', async () => {
+      const adminJWT = context.adminJWT
+
+      const options = {
+        method: 'PUT',
+        url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
+        headers: {
+          Authorization: `Bearer ${adminJWT}`
+        },
+        data: {
+          user: {
+            name: 'This should work'
+          }
+        }
+      }
+      const result = await axios(options)
+      // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
+
+      const userName = result.data.user.name
+      assert.equal(userName, 'This should work')
+    })
     it('should update user with minimum inputs', async () => {
       const _id = context.user._id
       const token = context.token
@@ -434,134 +755,6 @@ describe('Users', () => {
       assert.equal(user.name, 'my name')
       assert.equal(user.email, 'testToUpdate@test.com')
       assert.equal(user.username, 'myUsername')
-    })
-
-    it('should not be able to update user type', async () => {
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${context.user._id.toString()}`,
-          headers: {
-            Authorization: `Bearer ${context.token}`
-          },
-          data: {
-            user: {
-              name: 'new name',
-              type: 'test'
-            }
-          }
-        }
-        const result = await axios(options)
-
-        console.log(`Users: ${JSON.stringify(result.data, null, 2)}`)
-
-        // assert(result.status === 200, 'Status Code 200 expected.')
-        // assert(result.data.user.type === 'user', 'Type should be unchanged.')
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'type' can only be changed by Admin user"
-        )
-      }
-    })
-
-    it('should not be able to update other user when not admin', async () => {
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
-          headers: {
-            Authorization: `Bearer ${context.token}`
-          },
-          data: {
-            user: {
-              name: 'This should not work'
-            }
-          }
-        }
-        const result = await axios(options)
-
-        console.log(`result: ${JSON.stringify(result.data, null, 2)}`)
-
-        assert(false, 'Unexpected result')
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should be able to update other user when admin', async () => {
-      const adminJWT = context.adminJWT
-
-      const options = {
-        method: 'PUT',
-        url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
-        headers: {
-          Authorization: `Bearer ${adminJWT}`
-        },
-        data: {
-          user: {
-            name: 'This should work'
-          }
-        }
-      }
-      const result = await axios(options)
-      // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
-
-      const userName = result.data.user.name
-      assert.equal(userName, 'This should work')
-    })
-
-    it('should not be able to update if name property is wrong', async () => {
-      try {
-        const _id = context.user._id
-        const token = context.token
-
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              email: 'testToUpdate@test.com',
-              name: {}
-            }
-          }
-        }
-        await axios(options)
-      } catch (error) {
-        assert.equal(error.response.status, 422)
-        assert.include(error.response.data, "Property 'name' must be a string!")
-      }
-    })
-
-    it('should not be able to update if email is wrong format', async () => {
-      try {
-        const _id = context.user._id
-        const token = context.token
-
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              email: 'badEmailFormat'
-            }
-          }
-        }
-        await axios(options)
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(err.response.data, 'not a valid Email format')
-      }
     })
   })
 

@@ -17,6 +17,20 @@ class NodeMailer {
     this.config = config
 
     _this = this
+    _this.transporter = _this.createTransporter()
+  }
+
+  createTransporter () {
+    const transporter = _this.nodemailer.createTransport({
+      host: _this.config.emailServer,
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: _this.config.emailUser, // generated ethereal user
+        pass: _this.config.emailPassword // generated ethereal password
+      }
+    })
+    return transporter
   }
 
   // Validate email
@@ -44,10 +58,7 @@ class NodeMailer {
         throw new Error("Property 'to' must be a array!")
       }
 
-      const isEmailList = await _this.validateEmailArray(data.to)
-      if (!isEmailList) {
-        throw new Error("Property 'to' must be array of email format!")
-      }
+      await _this.validateEmailArray(data.to)
 
       if (!data.formMessage || typeof data.formMessage !== 'string') {
         throw new Error("Property 'message' must be a string!")
@@ -60,18 +71,6 @@ class NodeMailer {
       if (!data.payloadTitle || typeof data.payloadTitle !== 'string') {
         throw new Error("Property 'payloadTitle' must be a string!")
       }
-
-      // create reusable transporter object using the default SMTP transport
-      const transporter = await _this.nodemailer.createTransport({
-        host: _this.config.emailServer,
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-          user: _this.config.emailUser, // generated ethereal user
-          pass: _this.config.emailPassword // generated ethereal password
-        }
-      })
-      // console.log(`transporter: ${JSON.stringify(transporter)}`)
 
       const msg = data.formMessage.replace(/(\r\n|\n|\r)/g, '<br />')
 
@@ -115,7 +114,7 @@ class NodeMailer {
                                ${htmlData}
                              </p>`
       // send mail with defined transport object
-      const info = await transporter.sendMail({
+      const info = await _this.transporter.sendMail({
         // from: `${data.email}`, // sender address
         from: 'noreply@launchpadip.net',
         to: `${to}`, // list of receivers
@@ -125,8 +124,9 @@ class NodeMailer {
         html: htmlMsg
       })
       console.log('Message sent: %s', info.messageId)
+      return info
     } catch (err) {
-      console.log('Error in sendEmail()')
+      wlogger.error('Error in lib/nodemailer.js/sendEmail()')
       throw err
     }
   }
