@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const NodeMailer = require('../src/lib/nodemailer')
+const NodeMailer = require('../../src/lib/nodemailer')
 
 const sinon = require('sinon')
 

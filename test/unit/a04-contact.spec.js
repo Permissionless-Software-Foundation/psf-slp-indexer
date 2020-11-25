@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('../../config')
 const axios = require('axios').default
 const assert = require('chai').assert
 const sinon = require('sinon')
@@ -9,7 +9,7 @@ const sinon = require('sinon')
 const LOCALHOST = `http://localhost:${config.port}`
 
 const mockContext = require('./mocks/ctx-mock').context
-const ContactController = require('../src/modules/contact/controller')
+const ContactController = require('../../src/modules/contact/controller')
 let uut
 let sandbox
 

@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('../../config')
 const assert = require('chai').assert
 
 const axios = require('axios').default
@@ -9,7 +9,7 @@ util.inspect.defaultOptions = { depth: 1 }
 
 const LOCALHOST = `http://localhost:${config.port}`
 
-const LogsController = require('../src/modules/logapi/controller')
+const LogsController = require('../../src/modules/logapi/controller')
 const mockContext = require('./mocks/ctx-mock').context
 const mockData = require('./mocks/log-api-mock')
 
