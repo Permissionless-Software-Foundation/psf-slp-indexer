@@ -5,7 +5,7 @@ const sinon = require('sinon')
 const util = require('util')
 util.inspect.defaultOptions = { depth: 1 }
 
-const JsonFiles = require('../src/lib/utils/json-files')
+const JsonFiles = require('../../src/lib/utils/json-files')
 
 const JSON_FILE = 'test-json-file.json'
 const JSON_PATH = `${__dirname}/${JSON_FILE}`

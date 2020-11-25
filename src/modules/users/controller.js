@@ -89,6 +89,8 @@ class UserController {
         token
       }
     } catch (err) {
+      // console.log(`err.message: ${err.message}`)
+      // console.log('err: ', err)
       ctx.throw(422, err.message)
     }
   }

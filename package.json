@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text --timeout 15000 ./node_modules/.bin/mocha --exit",
+    "test": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "export KOA_ENV=test && npm run prep-test && nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "export KOA_ENV=test && npm run prep-test && nyc --reporter=html mocha --exit",
+    "coverage:report": "export KOA_ENV=test && npm run prep-test && nyc --reporter=html mocha --exit --timeout 15000 test/unit/",
     "prep-test": "node util/users/delete-all-test-users.js"
   },
   "keywords": [

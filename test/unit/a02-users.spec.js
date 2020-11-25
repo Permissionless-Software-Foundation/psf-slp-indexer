@@ -1,6 +1,6 @@
 const testUtils = require('./utils')
 const assert = require('chai').assert
-const config = require('../config')
+const config = require('../../config')
 const axios = require('axios').default
 const sinon = require('sinon')
 
@@ -11,7 +11,7 @@ const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
 
-const UserController = require('../src/modules/users/controller')
+const UserController = require('../../src/modules/users/controller')
 let uut
 let sandbox
 

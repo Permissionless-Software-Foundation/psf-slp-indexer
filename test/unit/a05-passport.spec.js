@@ -1,5 +1,5 @@
 const assert = require('chai').assert
-const PassportLib = require('../src/lib/passport')
+const PassportLib = require('../../src/lib/passport')
 
 const sinon = require('sinon')
 
