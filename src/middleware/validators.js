@@ -126,9 +126,9 @@ class Validators {
 
       if (ctx.state.user._id.toString() !== targetId.toString()) {
         wlogger.verbose(
-      `Calling user and target user do not match! Calling user: ${
-        ctx.state.user._id
-      }, Target user: ${targetId}`
+          `Calling user and target user do not match! Calling user: ${
+            ctx.state.user._id
+          }, Target user: ${targetId}`
         )
 
         // If they don't match, then the calling user better be an admin.
