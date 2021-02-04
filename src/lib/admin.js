@@ -39,7 +39,7 @@ class Admin {
   // used by the Listing Manager and test scripts, in order access private API
   // functions.
   async createSystemUser () {
-  // Create the system user.
+    // Create the system user.
     try {
       context.password = _this._randomString(20)
 
@@ -81,13 +81,15 @@ class Admin {
       // Handle existing system user.
       if (err.response.status === 422) {
         try {
-        // Delete the existing user
+          // Delete the existing user
           await _this.deleteExistingSystemUser()
 
           // Call this function again.
           return _this.createSystemUser()
         } catch (err2) {
-          console.error('Error in admin.js/createSystemUser() while trying generate new system user.')
+          console.error(
+            'Error in admin.js/createSystemUser() while trying generate new system user.'
+          )
           // process.end(1)
           throw err2
         }
@@ -104,7 +106,10 @@ class Admin {
       mongoose.Promise = global.Promise
       mongoose.set('useCreateIndex', true) // Stop deprecation warning.
 
-      await mongoose.connect(config.database, { useNewUrlParser: true, useUnifiedTopology: true })
+      await mongoose.connect(
+        config.database,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      )
 
       await _this.User.deleteOne({ email: 'system@system.com' })
     } catch (err) {
@@ -148,7 +153,8 @@ class Admin {
 
   _randomString (length) {
     let text = ''
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const possible =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     for (let i = 0; i < length; i++) {
       text += possible.charAt(Math.floor(Math.random() * possible.length))
     }
