@@ -12,8 +12,8 @@ require('winston-daily-rotate-file')
 const config = require('../../config')
 
 // Configure daily-rotation transport.
-var transport = new winston.transports.DailyRotateFile({
-  filename: `${__dirname}/../../logs/koa-${config.env}-%DATE%.log`,
+const transport = new winston.transports.DailyRotateFile({
+  filename: `${__dirname.toString()}/../../logs/koa-${config.env}-%DATE%.log`,
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxSize: '1m', // 1 megabyte
@@ -29,7 +29,7 @@ transport.on('rotate', function (oldFilename, newFilename) {
 })
 
 // This controls what goes into the log FILES
-var wlogger = winston.createLogger({
+const wlogger = winston.createLogger({
   level: 'verbose',
   format: winston.format.json(),
   transports: [

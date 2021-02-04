@@ -149,7 +149,7 @@ class LogsApi {
         _this.config.env
       }-${thisYear}-${thisMonth}-${thisDate}.log`
       // console.log(`filename: ${filename}`)
-      const logDir = `${__dirname}/../../../logs/`
+      const logDir = `${__dirname.toString()}/../../../logs/`
       const fullPath = `${logDir}${filename}`
       // console.log(`fullPath: ${fullPath}`)
 

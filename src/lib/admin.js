@@ -18,7 +18,7 @@ const JsonFiles = require('./utils/json-files')
 const jsonFiles = new JsonFiles()
 
 const JSON_FILE = `system-user-${config.env}.json`
-const JSON_PATH = `${__dirname}/../../config/${JSON_FILE}`
+const JSON_PATH = `${__dirname.toString()}/../../config/${JSON_FILE}`
 
 const LOCALHOST = `http://localhost:${config.port}`
 const context = {}
@@ -147,9 +147,9 @@ class Admin {
   }
 
   _randomString (length) {
-    var text = ''
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    for (var i = 0; i < length; i++) {
+    let text = ''
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    for (let i = 0; i < length; i++) {
       text += possible.charAt(Math.floor(Math.random() * possible.length))
     }
     return text
