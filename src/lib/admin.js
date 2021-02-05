@@ -106,10 +106,10 @@ class Admin {
       mongoose.Promise = global.Promise
       mongoose.set('useCreateIndex', true) // Stop deprecation warning.
 
-      await mongoose.connect(
-        config.database,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      )
+      await mongoose.connect(config.database, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
 
       await _this.User.deleteOne({ email: 'system@system.com' })
     } catch (err) {
