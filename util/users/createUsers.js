@@ -9,7 +9,10 @@ async function addUser () {
   // Connect to the Mongo Database.
   mongoose.Promise = global.Promise
   mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-  await mongoose.connect(config.database, { useNewUrlParser: true })
+  await mongoose.connect(
+    config.database,
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
 
   const User = require('../../src/models/users')
 

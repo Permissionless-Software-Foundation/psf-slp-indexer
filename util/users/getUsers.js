@@ -8,7 +8,10 @@ async function getUsers () {
   // Connect to the Mongo Database.
   mongoose.Promise = global.Promise
   mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-  await mongoose.connect(config.database, { useNewUrlParser: true })
+  await mongoose.connect(
+    config.database,
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
 
   const users = await User.find({}, '-password')
   console.log(`users: ${JSON.stringify(users, null, 2)}`)
