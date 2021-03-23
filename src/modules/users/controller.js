@@ -1,10 +1,18 @@
+// User database model.
 const User = require('../../models/users')
+
+// User library for business logic.
+const UserLib = require('../../lib/users')
+
+const wlogger = require('../../lib/wlogger')
 
 let _this
 class UserController {
   constructor () {
     _this = this
+
     this.User = User
+    this.userLib = new UserLib()
   }
 
   /**
@@ -50,20 +58,12 @@ class UserController {
     const userObj = ctx.request.body.user
     try {
       /*
-       * ERROR HANDLERS
-       *
+       * Input Validation
        */
       // Required property
       if (!userObj.email || typeof userObj.email !== 'string') {
         throw new Error("Property 'email' must be a string!")
       }
-
-      // This validation is not permissive to different TLDs like this one:
-      // someone@somewhere.link. Removing it until it can be updated.
-      // const isEmail = await _this.validateEmail(user.email)
-      // if (!isEmail) {
-      //   throw new Error("Property 'email' must be email format!")
-      // }
 
       if (!userObj.password || typeof userObj.password !== 'string') {
         throw new Error("Property 'password' must be a string!")
@@ -74,6 +74,7 @@ class UserController {
       }
 
       const user = new _this.User(userObj)
+
       // Enforce default value of 'user'
       user.type = 'user'
 
@@ -125,10 +126,12 @@ class UserController {
    */
   async getUsers (ctx) {
     try {
-      const users = await _this.User.find({}, '-password')
+      const users = await _this.userLib.getAllUsers()
+
       ctx.body = { users }
-    } catch (error) {
-      ctx.throw(404)
+    } catch (err) {
+      wlogger.error('Error in users/controller.js/getUsers(): '.err)
+      ctx.throw(422, err.message)
     }
   }
 
@@ -160,28 +163,15 @@ class UserController {
    *
    * @apiUse TokenError
    */
-
   async getUser (ctx, next) {
     try {
-      const user = await _this.User.findById(ctx.params.id, '-password')
-      if (!user) {
-        ctx.throw(404)
-      }
+      const user = await _this.userLib.getUser(ctx.params)
 
       ctx.body = {
         user
       }
     } catch (err) {
-      // Handle different error types.
-      if (
-        err === 404 ||
-        err.name === 'CastError' ||
-        err.message.toString().includes('Not Found')
-      ) {
-        ctx.throw(404)
-      }
-
-      ctx.throw(500)
+      _this.handleError(ctx, err)
     }
 
     if (next) {
@@ -313,6 +303,21 @@ class UserController {
     ctx.status = 200
     ctx.body = {
       success: true
+    }
+  }
+
+  // DRY error handler
+  handleError (ctx, err) {
+    // If an HTTP status is specified by the buisiness logic, use that.
+    if (err.status) {
+      if (err.message) {
+        ctx.throw(err.status, err.message)
+      } else {
+        ctx.throw(err.status)
+      }
+    } else {
+      // By default use a 422 error if the HTTP status is not specified.
+      ctx.throw(422, err.message)
     }
   }
 

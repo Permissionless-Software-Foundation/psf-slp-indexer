@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "test": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/",
+    "test:unit:lib": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/biz-logic/",
+    "test:unit:rest": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/rest-api/",
+    "test:integration": "export KOA_ENV=test && npm run prep-test && nyc --reporter=text mocha --exit --timeout 15000 test/integration/rest-api/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "export KOA_ENV=test && npm run prep-test && nyc report --reporter=text-lcov | coveralls",
