@@ -1,16 +1,15 @@
-// const testUtils = require('../../utils/test-utils')
+/*
+  Unit tests for the REST API handler for the /users endpoints.
+*/
+
+// Public npm libraries
 const assert = require('chai').assert
-const config = require('../../../config')
-// const axios = require('axios').default
 const sinon = require('sinon')
 const mongoose = require('mongoose')
 
-const util = require('util')
-util.inspect.defaultOptions = { depth: 1 }
-
-// const LOCALHOST = `http://localhost:${config.port}`
-
-// const context = {}
+// Local support libraries
+const config = require('../../../config')
+const testUtils = require('../../utils/test-utils')
 
 const UserController = require('../../../src/modules/users/controller')
 let uut
@@ -28,6 +27,9 @@ describe('Users', () => {
       useUnifiedTopology: true,
       useNewUrlParser: true
     })
+
+    // Delete all previous users in the database.
+    await testUtils.deleteAllUsers()
 
     // console.log(`config: ${JSON.stringify(config, null, 2)}`)
 
@@ -68,6 +70,39 @@ describe('Users', () => {
 
   after(() => {
     mongoose.connection.close()
+  })
+
+  describe('#POST /users', () => {
+    it('should return 422 status on biz logic error', async () => {
+      try {
+        await uut.createUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+
+    it('should return 200 status on success', async () => {
+      ctx.request.body = {
+        user: {
+          email: 'test02@test.com',
+          password: 'test',
+          name: 'test02'
+        }
+      }
+
+      await uut.createUser(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that expected properties exist in the returned data.
+      assert.property(ctx.response.body, 'user')
+      assert.property(ctx.response.body, 'token')
+    })
   })
 
   describe('GET /users', () => {

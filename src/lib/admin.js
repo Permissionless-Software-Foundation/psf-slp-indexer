@@ -49,11 +49,14 @@ class Admin {
         data: {
           user: {
             email: 'system@system.com',
-            password: context.password
+            password: context.password,
+            name: 'admin'
           }
         }
       }
       const result = await _this.axios.request(options)
+      // console.log('admin.data: ', result.data)
+
       context.email = result.data.user.email
       context.id = result.data.user._id
       context.token = result.data.token
@@ -81,6 +84,7 @@ class Admin {
       // Handle existing system user.
       if (err.response.status === 422) {
         try {
+          console.log('ping03')
           // Delete the existing user
           await _this.deleteExistingSystemUser()
 

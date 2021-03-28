@@ -24,7 +24,8 @@ describe('Users', () => {
     // Create a second test user.
     const userObj = {
       email: 'test2@test.com',
-      password: 'pass2'
+      password: 'pass2',
+      name: 'test2'
     }
     const testUser = await testUtils.createUser(userObj)
     // console.log(`testUser2: ${JSON.stringify(testUser, null, 2)}`)
@@ -134,8 +135,9 @@ describe('Users', () => {
         }
         await axios(options)
 
-        assert(false, 'Unexpected result')
+        assert.fail('Unexpected result')
       } catch (err) {
+        // console.log(err)
         assert.equal(err.response.status, 422)
         assert.include(err.response.data, "Property 'name' must be a string")
       }
@@ -148,7 +150,8 @@ describe('Users', () => {
         data: {
           user: {
             email: 'test3@test.com',
-            password: 'supersecretpassword'
+            password: 'supersecretpassword',
+            name: 'test3'
           }
         }
       }
@@ -381,443 +384,443 @@ describe('Users', () => {
       )
     })
   })
-
-  describe('PUT /users/:id', () => {
-    it('should not update user if token is invalid', async () => {
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/1`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: 'Bearer 1'
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should throw 401 if non-admin updating other user', async () => {
-      const { token } = context
-
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/1`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should not be able to update user type', async () => {
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${context.user._id.toString()}`,
-          headers: {
-            Authorization: `Bearer ${context.token}`
-          },
-          data: {
-            user: {
-              name: 'new name',
-              type: 'test'
-            }
-          }
-        }
-        await axios(options)
-
-        // console.log(`Users: ${JSON.stringify(result.data, null, 2)}`)
-
-        // assert(result.status === 200, 'Status Code 200 expected.')
-        // assert(result.data.user.type === 'user', 'Type should be unchanged.')
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'type' can only be changed by Admin user"
-        )
-      }
-    })
-
-    it('should not be able to update other user when not admin', async () => {
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
-          headers: {
-            Authorization: `Bearer ${context.token}`
-          },
-          data: {
-            user: {
-              name: 'This should not work'
-            }
-          }
-        }
-        await axios(options)
-
-        // console.log(`result: ${JSON.stringify(result.data, null, 2)}`)
-
-        assert(false, 'Unexpected result')
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should not be able to update if name property is wrong', async () => {
-      try {
-        const _id = context.user._id
-        const token = context.token
-
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              email: 'testToUpdate@test.com',
-              name: {}
-            }
-          }
-        }
-        await axios(options)
-      } catch (error) {
-        assert.equal(error.response.status, 422)
-        assert.include(error.response.data, "Property 'name' must be a string!")
-      }
-    })
-    it('should not be able to update if password property is not string', async () => {
-      const { token } = context
-      const _id = context.user._id
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              password: 1234
-            }
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'password' must be a string!"
-        )
-      }
-    })
-    it('should not be able to update if project property is not array', async () => {
-      const { token } = context
-      const _id = context.user._id
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              projects: 'projects'
-            }
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'projects' must be a Array!"
-        )
-      }
-    })
-    it('should not be able to update if email is not string', async () => {
-      const { token } = context
-      const _id = context.user._id
-      try {
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              email: 1234
-            }
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(err.response.data, "Property 'email' must be a string!")
-      }
-    })
-    it('should not be able to update if email is wrong format', async () => {
-      try {
-        const _id = context.user._id
-        const token = context.token
-
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              email: 'badEmailFormat'
-            }
-          }
-        }
-        await axios(options)
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(
-          err.response.data,
-          "Property 'email' must be email format!"
-        )
-      }
-    })
-    it('should not be able to update type property if is not string', async () => {
-      try {
-        const _id = context.user._id
-        const token = context.token
-
-        const options = {
-          method: 'PUT',
-          url: `${LOCALHOST}/users/${_id}`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          data: {
-            user: {
-              type: 1
-            }
-          }
-        }
-        await axios(options)
-      } catch (err) {
-        assert.equal(err.response.status, 422)
-        assert.include(err.response.data, "Property 'type' must be a string!")
-      }
-    })
-
-    it('should be able to update other user when admin', async () => {
-      const adminJWT = context.adminJWT
-
-      const options = {
-        method: 'PUT',
-        url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
-        headers: {
-          Authorization: `Bearer ${adminJWT}`
-        },
-        data: {
-          user: {
-            name: 'This should work'
-          }
-        }
-      }
-      const result = await axios(options)
-      // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
-
-      const userName = result.data.user.name
-      assert.equal(userName, 'This should work')
-    })
-    it('should update user with minimum inputs', async () => {
-      const _id = context.user._id
-      const token = context.token
-
-      const options = {
-        method: 'PUT',
-        url: `${LOCALHOST}/users/${_id}`,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        data: {
-          user: { email: 'testToUpdate@test.com' }
-        }
-      }
-
-      const result = await axios(options)
-      const user = result.data.user
-      // console.log(`user: ${util.inspect(user)}`)
-
-      assert.property(user, 'type')
-      assert.property(user, 'email')
-
-      assert.property(user, '_id')
-      assert.equal(user._id, _id)
-
-      assert.notProperty(
-        user,
-        'password',
-        'Password property should not be returned'
-      )
-      assert.equal(user.email, 'testToUpdate@test.com')
-    })
-
-    it('should update user with all inputs', async () => {
-      const _id = context.user._id
-      const token = context.token
-
-      const options = {
-        method: 'PUT',
-        url: `${LOCALHOST}/users/${_id}`,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        data: {
-          user: {
-            email: 'testToUpdate@test.com',
-            name: 'my name',
-            username: 'myUsername'
-          }
-        }
-      }
-      const result = await axios(options)
-
-      const user = result.data.user
-      // console.log(`user: ${util.inspect(user)}`)
-
-      assert.property(user, 'type')
-      assert.property(user, 'email')
-      assert.property(user, 'name')
-
-      assert.property(user, '_id')
-      assert.equal(user._id, _id)
-      assert.notProperty(
-        user,
-        'password',
-        'Password property should not be returned'
-      )
-      assert.equal(user.name, 'my name')
-      assert.equal(user.email, 'testToUpdate@test.com')
-      assert.equal(user.username, 'myUsername')
-    })
-  })
-
-  describe('DELETE /users/:id', () => {
-    it('should not delete user if token is invalid', async () => {
-      try {
-        const options = {
-          method: 'DELETE',
-          url: `${LOCALHOST}/users/1`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: 'Bearer 1'
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should throw 401 if deleting invalid user', async () => {
-      const { token } = context
-
-      try {
-        const options = {
-          method: 'DELETE',
-          url: `${LOCALHOST}/users/1`,
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        }
-        await axios(options)
-
-        assert.equal(true, false, 'Unexpected behavior')
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should not be able to delete other users unless admin', async () => {
-      try {
-        const options = {
-          method: 'DELETE',
-          url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
-          headers: {
-            Authorization: `Bearer ${context.token}`
-          }
-        }
-        await axios(options)
-      } catch (err) {
-        assert.equal(err.response.status, 401)
-      }
-    })
-
-    it('should delete own user', async () => {
-      const _id = context.user._id
-      const token = context.token
-
-      const options = {
-        method: 'DELETE',
-        url: `${LOCALHOST}/users/${_id}`,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        }
-      }
-      const result = await axios(options)
-      // console.log(`result: ${util.inspect(result.data.success)}`)
-
-      assert.equal(result.data.success, true)
-    })
-
-    it('should be able to delete other users when admin', async () => {
-      const id = context.id2
-      const adminJWT = context.adminJWT
-
-      const options = {
-        method: 'DELETE',
-        url: `${LOCALHOST}/users/${id}`,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${adminJWT}`
-        }
-      }
-      const result = await axios(options)
-      // console.log(`result: ${util.inspect(result.data)}`)
-
-      assert.equal(result.data.success, true)
-    })
-  })
+  //
+  // describe('PUT /users/:id', () => {
+  //   it('should not update user if token is invalid', async () => {
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/1`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: 'Bearer 1'
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 401)
+  //     }
+  //   })
+  //
+  //   it('should throw 401 if non-admin updating other user', async () => {
+  //     const { token } = context
+  //
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/1`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 401)
+  //     }
+  //   })
+  //
+  //   it('should not be able to update user type', async () => {
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${context.user._id.toString()}`,
+  //         headers: {
+  //           Authorization: `Bearer ${context.token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             name: 'new name',
+  //             type: 'test'
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       // console.log(`Users: ${JSON.stringify(result.data, null, 2)}`)
+  //
+  //       // assert(result.status === 200, 'Status Code 200 expected.')
+  //       // assert(result.data.user.type === 'user', 'Type should be unchanged.')
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 422)
+  //       assert.include(
+  //         err.response.data,
+  //         "Property 'type' can only be changed by Admin user"
+  //       )
+  //     }
+  //   })
+  //
+  //   it('should not be able to update other user when not admin', async () => {
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
+  //         headers: {
+  //           Authorization: `Bearer ${context.token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             name: 'This should not work'
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       // console.log(`result: ${JSON.stringify(result.data, null, 2)}`)
+  //
+  //       assert(false, 'Unexpected result')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 401)
+  //     }
+  //   })
+  //
+  //   it('should not be able to update if name property is wrong', async () => {
+  //     try {
+  //       const _id = context.user._id
+  //       const token = context.token
+  //
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${_id}`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             email: 'testToUpdate@test.com',
+  //             name: {}
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //     } catch (error) {
+  //       assert.equal(error.response.status, 422)
+  //       assert.include(error.response.data, "Property 'name' must be a string!")
+  //     }
+  //   })
+  //   it('should not be able to update if password property is not string', async () => {
+  //     const { token } = context
+  //     const _id = context.user._id
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${_id}`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             password: 1234
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 422)
+  //       assert.include(
+  //         err.response.data,
+  //         "Property 'password' must be a string!"
+  //       )
+  //     }
+  //   })
+  //   it('should not be able to update if project property is not array', async () => {
+  //     const { token } = context
+  //     const _id = context.user._id
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${_id}`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             projects: 'projects'
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 422)
+  //       assert.include(
+  //         err.response.data,
+  //         "Property 'projects' must be a Array!"
+  //       )
+  //     }
+  //   })
+  //   it('should not be able to update if email is not string', async () => {
+  //     const { token } = context
+  //     const _id = context.user._id
+  //     try {
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${_id}`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             email: 1234
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 422)
+  //       assert.include(err.response.data, "Property 'email' must be a string!")
+  //     }
+  //   })
+  //   it('should not be able to update if email is wrong format', async () => {
+  //     try {
+  //       const _id = context.user._id
+  //       const token = context.token
+  //
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${_id}`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             email: 'badEmailFormat'
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 422)
+  //       assert.include(
+  //         err.response.data,
+  //         "Property 'email' must be email format!"
+  //       )
+  //     }
+  //   })
+  //   it('should not be able to update type property if is not string', async () => {
+  //     try {
+  //       const _id = context.user._id
+  //       const token = context.token
+  //
+  //       const options = {
+  //         method: 'PUT',
+  //         url: `${LOCALHOST}/users/${_id}`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         data: {
+  //           user: {
+  //             type: 1
+  //           }
+  //         }
+  //       }
+  //       await axios(options)
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 422)
+  //       assert.include(err.response.data, "Property 'type' must be a string!")
+  //     }
+  //   })
+  //
+  //   it('should be able to update other user when admin', async () => {
+  //     const adminJWT = context.adminJWT
+  //
+  //     const options = {
+  //       method: 'PUT',
+  //       url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
+  //       headers: {
+  //         Authorization: `Bearer ${adminJWT}`
+  //       },
+  //       data: {
+  //         user: {
+  //           name: 'This should work'
+  //         }
+  //       }
+  //     }
+  //     const result = await axios(options)
+  //     // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
+  //
+  //     const userName = result.data.user.name
+  //     assert.equal(userName, 'This should work')
+  //   })
+  //   it('should update user with minimum inputs', async () => {
+  //     const _id = context.user._id
+  //     const token = context.token
+  //
+  //     const options = {
+  //       method: 'PUT',
+  //       url: `${LOCALHOST}/users/${_id}`,
+  //       headers: {
+  //         Accept: 'application/json',
+  //         Authorization: `Bearer ${token}`
+  //       },
+  //       data: {
+  //         user: { email: 'testToUpdate@test.com' }
+  //       }
+  //     }
+  //
+  //     const result = await axios(options)
+  //     const user = result.data.user
+  //     // console.log(`user: ${util.inspect(user)}`)
+  //
+  //     assert.property(user, 'type')
+  //     assert.property(user, 'email')
+  //
+  //     assert.property(user, '_id')
+  //     assert.equal(user._id, _id)
+  //
+  //     assert.notProperty(
+  //       user,
+  //       'password',
+  //       'Password property should not be returned'
+  //     )
+  //     assert.equal(user.email, 'testToUpdate@test.com')
+  //   })
+  //
+  //   it('should update user with all inputs', async () => {
+  //     const _id = context.user._id
+  //     const token = context.token
+  //
+  //     const options = {
+  //       method: 'PUT',
+  //       url: `${LOCALHOST}/users/${_id}`,
+  //       headers: {
+  //         Accept: 'application/json',
+  //         Authorization: `Bearer ${token}`
+  //       },
+  //       data: {
+  //         user: {
+  //           email: 'testToUpdate@test.com',
+  //           name: 'my name',
+  //           username: 'myUsername'
+  //         }
+  //       }
+  //     }
+  //     const result = await axios(options)
+  //
+  //     const user = result.data.user
+  //     // console.log(`user: ${util.inspect(user)}`)
+  //
+  //     assert.property(user, 'type')
+  //     assert.property(user, 'email')
+  //     assert.property(user, 'name')
+  //
+  //     assert.property(user, '_id')
+  //     assert.equal(user._id, _id)
+  //     assert.notProperty(
+  //       user,
+  //       'password',
+  //       'Password property should not be returned'
+  //     )
+  //     assert.equal(user.name, 'my name')
+  //     assert.equal(user.email, 'testToUpdate@test.com')
+  //     assert.equal(user.username, 'myUsername')
+  //   })
+  // })
+  //
+  // describe('DELETE /users/:id', () => {
+  //   it('should not delete user if token is invalid', async () => {
+  //     try {
+  //       const options = {
+  //         method: 'DELETE',
+  //         url: `${LOCALHOST}/users/1`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: 'Bearer 1'
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 401)
+  //     }
+  //   })
+  //
+  //   it('should throw 401 if deleting invalid user', async () => {
+  //     const { token } = context
+  //
+  //     try {
+  //       const options = {
+  //         method: 'DELETE',
+  //         url: `${LOCALHOST}/users/1`,
+  //         headers: {
+  //           Accept: 'application/json',
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       }
+  //       await axios(options)
+  //
+  //       assert.equal(true, false, 'Unexpected behavior')
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 401)
+  //     }
+  //   })
+  //
+  //   it('should not be able to delete other users unless admin', async () => {
+  //     try {
+  //       const options = {
+  //         method: 'DELETE',
+  //         url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
+  //         headers: {
+  //           Authorization: `Bearer ${context.token}`
+  //         }
+  //       }
+  //       await axios(options)
+  //     } catch (err) {
+  //       assert.equal(err.response.status, 401)
+  //     }
+  //   })
+  //
+  //   it('should delete own user', async () => {
+  //     const _id = context.user._id
+  //     const token = context.token
+  //
+  //     const options = {
+  //       method: 'DELETE',
+  //       url: `${LOCALHOST}/users/${_id}`,
+  //       headers: {
+  //         Accept: 'application/json',
+  //         Authorization: `Bearer ${token}`
+  //       }
+  //     }
+  //     const result = await axios(options)
+  //     // console.log(`result: ${util.inspect(result.data.success)}`)
+  //
+  //     assert.equal(result.data.success, true)
+  //   })
+  //
+  //   it('should be able to delete other users when admin', async () => {
+  //     const id = context.id2
+  //     const adminJWT = context.adminJWT
+  //
+  //     const options = {
+  //       method: 'DELETE',
+  //       url: `${LOCALHOST}/users/${id}`,
+  //       headers: {
+  //         Accept: 'application/json',
+  //         Authorization: `Bearer ${adminJWT}`
+  //       }
+  //     }
+  //     const result = await axios(options)
+  //     // console.log(`result: ${util.inspect(result.data)}`)
+  //
+  //     assert.equal(result.data.success, true)
+  //   })
+  // })
 })

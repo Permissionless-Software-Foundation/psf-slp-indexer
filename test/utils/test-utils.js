@@ -1,6 +1,14 @@
+/*
+  Utility functions used to prepare the environment for tests.
+*/
+
+// Public NPM libraries
 const mongoose = require('mongoose')
-const config = require('../../config')
 const axios = require('axios').default
+
+// Local libraries
+const config = require('../../config')
+const User = require('../../src/models/users')
 
 const LOCALHOST = `http://localhost:${config.port}`
 
@@ -17,6 +25,24 @@ async function cleanDb () {
   }
 }
 
+// Delete all users in the database. This ensures there is no previous state
+// to confuse tests.
+async function deleteAllUsers () {
+  try {
+    // Get all the users in the DB.
+    const users = await User.find({}, '-password')
+    // console.log(`users: ${JSON.stringify(users, null, 2)}`)
+
+    // Delete each user.
+    for (let i = 0; i < users.length; i++) {
+      const thisUser = users[i]
+      await thisUser.remove()
+    }
+  } catch (err) {
+    console.error('Error in test-utils.js/deleteAllUsers()')
+  }
+}
+
 // This function is used to create new users.
 // userObj = {
 //   username,
@@ -30,7 +56,8 @@ async function createUser (userObj) {
       data: {
         user: {
           email: userObj.email,
-          password: userObj.password
+          password: userObj.password,
+          name: userObj.name
         }
       }
     }
@@ -44,7 +71,9 @@ async function createUser (userObj) {
 
     return retObj
   } catch (err) {
-    console.log('Error in utils.js/createUser(): ' + JSON.stringify(err, null, 2))
+    console.log(
+      'Error in utils.js/createUser(): ' + JSON.stringify(err, null, 2)
+    )
     throw err
   }
 }
@@ -72,7 +101,9 @@ async function loginTestUser () {
 
     return retObj
   } catch (err) {
-    console.log('Error authenticating test user: ' + JSON.stringify(err, null, 2))
+    console.log(
+      'Error authenticating test user: ' + JSON.stringify(err, null, 2)
+    )
     throw err
   }
 }
@@ -88,7 +119,8 @@ async function loginAdminUser () {
       url: `${LOCALHOST}/auth`,
       data: {
         email: adminUserData.email,
-        password: adminUserData.password
+        password: adminUserData.password,
+        name: 'admin'
       }
     }
 
@@ -104,7 +136,9 @@ async function loginAdminUser () {
 
     return retObj
   } catch (err) {
-    console.log('Error authenticating test admin user: ' + JSON.stringify(err, null, 2))
+    console.log(
+      'Error authenticating test admin user: ' + JSON.stringify(err, null, 2)
+    )
     throw err
   }
 }
@@ -131,5 +165,6 @@ module.exports = {
   createUser,
   loginTestUser,
   loginAdminUser,
-  getAdminJWT
+  getAdminJWT,
+  deleteAllUsers
 }

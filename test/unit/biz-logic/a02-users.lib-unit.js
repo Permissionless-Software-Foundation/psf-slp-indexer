@@ -9,6 +9,7 @@ const sinon = require('sinon')
 
 // Local support libraries
 const config = require('../../../config')
+const testUtils = require('../../utils/test-utils')
 
 // Unit under test (uut)
 const UserLib = require('../../../src/lib/users')
@@ -26,6 +27,9 @@ describe('#users', () => {
       useUnifiedTopology: true,
       useNewUrlParser: true
     })
+
+    // Delete all previous users in the database.
+    await testUtils.deleteAllUsers()
   })
 
   beforeEach(() => {

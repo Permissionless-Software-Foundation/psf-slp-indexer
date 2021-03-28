@@ -9,10 +9,11 @@ const wlogger = require('../../lib/wlogger')
 let _this
 class UserController {
   constructor () {
-    _this = this
-
+    // Encapsulate dependencies
     this.User = User
     this.userLib = new UserLib()
+
+    _this = this
   }
 
   /**
@@ -58,35 +59,9 @@ class UserController {
     try {
       const userObj = ctx.request.body.user
 
-      // /*
-      //  * Input Validation
-      //  */
-      // // Required property
-      // if (!userObj.email || typeof userObj.email !== 'string') {
-      //   throw new Error("Property 'email' must be a string!")
-      // }
-      //
-      // if (!userObj.password || typeof userObj.password !== 'string') {
-      //   throw new Error("Property 'password' must be a string!")
-      // }
-      //
-      // if (userObj.name && typeof userObj.name !== 'string') {
-      //   throw new Error("Property 'name' must be a string!")
-      // }
-      //
-      // const user = new _this.User(userObj)
-      //
-      // // Enforce default value of 'user'
-      // user.type = 'user'
-      //
-      // await user.save()
-      //
-      // const token = user.generateToken()
-      // const response = user.toJSON()
-      //
-      // delete response.password
-
-      const { userData, token } = this.userLib.createUser(userObj)
+      const { userData, token } = await _this.userLib.createUser(userObj)
+      // console.log('userData: ', userData)
+      // console.log('token: ', token)
 
       ctx.body = {
         user: userData,

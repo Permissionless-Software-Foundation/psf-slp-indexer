@@ -1,9 +1,17 @@
-const app = require('../../../bin/server')
-const utils = require('../../utils/test-utils')
-const config = require('../../../config')
-const assert = require('chai').assert
+/*
+  End-to-end tests for /auth endpoints.
 
+  This test sets up the environment for other e2e tests.
+*/
+
+// Public npm libraries
+const assert = require('chai').assert
 const axios = require('axios').default
+
+// Local support libraries
+const config = require('../../../config')
+const app = require('../../../bin/server')
+const testUtils = require('../../utils/test-utils')
 
 // const request = supertest.agent(app.listen())
 const context = {}
@@ -15,12 +23,16 @@ describe('Auth', () => {
     // This should be the first instruction. It starts the REST API server.
     await app.startServer()
 
+    // Delete all previous users in the database.
+    await testUtils.deleteAllUsers()
+
     const userObj = {
       email: 'test@test.com',
-      password: 'pass'
+      password: 'pass',
+      name: 'test'
     }
-    const testUser = await utils.createUser(userObj)
-    console.log('TestUser: ', testUser)
+    const testUser = await testUtils.createUser(userObj)
+    // console.log('TestUser: ', testUser)
 
     context.user = testUser.user
     context.token = testUser.token
