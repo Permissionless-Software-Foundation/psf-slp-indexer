@@ -55,44 +55,48 @@ class UserController {
    *     }
    */
   async createUser (ctx) {
-    const userObj = ctx.request.body.user
     try {
-      /*
-       * Input Validation
-       */
-      // Required property
-      if (!userObj.email || typeof userObj.email !== 'string') {
-        throw new Error("Property 'email' must be a string!")
-      }
+      const userObj = ctx.request.body.user
 
-      if (!userObj.password || typeof userObj.password !== 'string') {
-        throw new Error("Property 'password' must be a string!")
-      }
+      // /*
+      //  * Input Validation
+      //  */
+      // // Required property
+      // if (!userObj.email || typeof userObj.email !== 'string') {
+      //   throw new Error("Property 'email' must be a string!")
+      // }
+      //
+      // if (!userObj.password || typeof userObj.password !== 'string') {
+      //   throw new Error("Property 'password' must be a string!")
+      // }
+      //
+      // if (userObj.name && typeof userObj.name !== 'string') {
+      //   throw new Error("Property 'name' must be a string!")
+      // }
+      //
+      // const user = new _this.User(userObj)
+      //
+      // // Enforce default value of 'user'
+      // user.type = 'user'
+      //
+      // await user.save()
+      //
+      // const token = user.generateToken()
+      // const response = user.toJSON()
+      //
+      // delete response.password
 
-      if (userObj.name && typeof userObj.name !== 'string') {
-        throw new Error("Property 'name' must be a string!")
-      }
-
-      const user = new _this.User(userObj)
-
-      // Enforce default value of 'user'
-      user.type = 'user'
-
-      await user.save()
-
-      const token = user.generateToken()
-      const response = user.toJSON()
-
-      delete response.password
+      const { userData, token } = this.userLib.createUser(userObj)
 
       ctx.body = {
-        user: response,
+        user: userData,
         token
       }
     } catch (err) {
       // console.log(`err.message: ${err.message}`)
       // console.log('err: ', err)
-      ctx.throw(422, err.message)
+      // ctx.throw(422, err.message)
+      _this.handleError(ctx, err)
     }
   }
 
