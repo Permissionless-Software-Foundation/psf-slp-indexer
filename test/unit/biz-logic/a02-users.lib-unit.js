@@ -16,6 +16,7 @@ const UserLib = require('../../../src/lib/users')
 describe('#users', () => {
   let uut
   let sandbox
+  let testUserId = ''
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -122,6 +123,8 @@ describe('#users', () => {
 
       const { userData, token } = await uut.createUser(usrObj)
 
+      testUserId = userData._id
+
       // Assert that the user model has the expected properties with expected values.
       assert.property(userData, 'type')
       assert.equal(userData.type, 'user')
@@ -197,7 +200,15 @@ describe('#users', () => {
     })
 
     it('should return the user model', async () => {
-      console.log('TODO')
+      const params = { id: testUserId }
+      const result = await uut.getUser(params)
+      // console.log('result: ', result)
+
+      // Assert that the expected properties for the user model exist.
+      assert.property(result, 'type')
+      assert.property(result, '_id')
+      assert.property(result, 'email')
+      assert.property(result, 'name')
     })
   })
 })
