@@ -90,6 +90,51 @@ class UserLib {
       throw err
     }
   }
+
+  async updateUser (existingUser, newData) {
+    try {
+      // Input Validation
+      if (!newData.email || typeof newData.email !== 'string') {
+        throw new Error("Property 'email' must be a string!")
+      }
+      if (!newData.password || typeof newData.password !== 'string') {
+        throw new Error("Property 'password' must be a string!")
+      }
+      if (!newData.name || typeof newData.name !== 'string') {
+        throw new Error("Property 'name' must be a string!")
+      }
+
+      // Save a copy of the original user type.
+      const userType = existingUser.type
+      console.log('userType: ', userType)
+
+      // If user 'type' property is sent by the client
+      if (newData.type) {
+        if (typeof newData.type !== 'string') {
+          throw new Error("Property 'type' must be a string!")
+        }
+
+        // Unless the calling user is an admin, they can not change the user type.
+        if (userType !== 'admin') {
+          throw new Error("Property 'type' can only be changed by Admin user")
+        }
+      }
+
+      // Overwrite any existing data with the new data.
+      Object.assign(existingUser, newData)
+
+      // Save the changes to the database.
+      await existingUser.save()
+
+      // Delete the password property.
+      delete existingUser.password
+
+      return existingUser
+    } catch (err) {
+      wlogger.error('Error in lib/users.js/updateUser()')
+      throw err
+    }
+  }
 }
 
 module.exports = UserLib

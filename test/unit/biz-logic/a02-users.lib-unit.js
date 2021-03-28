@@ -1,5 +1,7 @@
 /*
   Unit tests for the src/lib/users.js business logic library.
+
+  TODO: verify that an admin can change the type of a user
 */
 
 // Public npm libraries
@@ -17,7 +19,7 @@ const UserLib = require('../../../src/lib/users')
 describe('#users', () => {
   let uut
   let sandbox
-  let testUserId = ''
+  let testUser = {}
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -127,7 +129,7 @@ describe('#users', () => {
 
       const { userData, token } = await uut.createUser(usrObj)
 
-      testUserId = userData._id
+      testUser = userData
 
       // Assert that the user model has the expected properties with expected values.
       assert.property(userData, 'type')
@@ -204,9 +206,13 @@ describe('#users', () => {
     })
 
     it('should return the user model', async () => {
-      const params = { id: testUserId }
+      const params = { id: testUser._id }
       const result = await uut.getUser(params)
       // console.log('result: ', result)
+
+      // Replace the JSON model with an actual Mongoos model. Used by later
+      // test cases.
+      testUser = result
 
       // Assert that the expected properties for the user model exist.
       assert.property(result, 'type')
@@ -214,5 +220,115 @@ describe('#users', () => {
       assert.property(result, 'email')
       assert.property(result, 'name')
     })
+  })
+
+  describe('#updateUser', () => {
+    it('should throw an error if no input is given', async () => {
+      try {
+        await uut.updateUser()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+
+    it('should throw an error if no email given', async () => {
+      try {
+        await uut.updateUser(testUser, {})
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, "Property 'email' must be a string!")
+      }
+    })
+
+    it('should throw an error if no password given', async () => {
+      try {
+        const newData = {
+          email: 'test@test.com'
+        }
+
+        await uut.updateUser(testUser, newData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, "Property 'password' must be a string!")
+      }
+    })
+
+    it('should throw an error if no name given', async () => {
+      try {
+        const newData = {
+          email: 'test@test.com',
+          password: 'password'
+        }
+
+        await uut.updateUser(testUser, newData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, "Property 'name' must be a string!")
+      }
+    })
+
+    it('should throw an error for malformed type given', async () => {
+      try {
+        const newData = {
+          email: 'test@test.com',
+          password: 'password',
+          name: 'test',
+          type: 1234
+        }
+
+        await uut.updateUser(testUser, newData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, "Property 'type' must be a string!")
+      }
+    })
+
+    it('should throw an error if normal user tries to change themselves into an admin', async () => {
+      try {
+        const newData = {
+          email: 'test@test.com',
+          password: 'password',
+          name: 'test',
+          type: 'admin'
+        }
+
+        await uut.updateUser(testUser, newData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, "Property 'type' can only be changed by Admin user")
+      }
+    })
+
+    it('should update the user model', async () => {
+      const newData = {
+        email: 'test@test.com',
+        password: 'password',
+        name: 'testy tester'
+      }
+
+      const result = await uut.updateUser(testUser, newData)
+
+      // Assert that expected properties and values exist.
+      assert.property(result, '_id')
+      assert.property(result, 'email')
+      assert.equal(result.email, 'test@test.com')
+      assert.property(result, 'name')
+      assert.equal(result.name, 'testy tester')
+    })
+
+    // TODO: verify that an admin can change the type of a user
   })
 })

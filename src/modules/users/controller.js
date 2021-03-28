@@ -200,54 +200,11 @@ class UserController {
    * @apiUse TokenError
    */
   async updateUser (ctx) {
-    // Values obtain from user request.
-    // This variable is intended to validate the properties
-    // sent by the client
-    const userObj = ctx.request.body.user
-
-    const user = ctx.body.user
     try {
-      /*
-       * ERROR HANDLERS
-       *
-       */
-      // Required property
-      if (userObj.email && typeof userObj.email !== 'string') {
-        throw new Error("Property 'email' must be a string!")
-      }
+      const existingUser = ctx.body.user
+      const newData = ctx.request.body.user
 
-      const isEmail = await _this.validateEmail(userObj.email)
-      if (userObj.email && !isEmail) {
-        throw new Error("Property 'email' must be email format!")
-      }
-      if (userObj.password && typeof userObj.password !== 'string') {
-        throw new Error("Property 'password' must be a string!")
-      }
-      if (userObj.name && typeof userObj.name !== 'string') {
-        throw new Error("Property 'name' must be a string!")
-      }
-      if (userObj.projects && !Array.isArray(userObj.projects)) {
-        throw new Error("Property 'projects' must be a Array!")
-      }
-      // Save a copy of the original user type.
-      const userType = user.type
-
-      // If user type property is sent by the client
-      if (userObj.type) {
-        if (typeof userObj.type !== 'string') {
-          throw new Error("Property 'type' must be a string!")
-        }
-        // TODO: Here we can validate the user types allowed
-
-        // Unless the calling user is an admin, they can not change the user type.
-        if (userType !== 'admin') {
-          throw new Error("Property 'type' can only be changed by Admin user")
-        }
-      }
-
-      Object.assign(user, ctx.request.body.user)
-
-      await user.save()
+      const user = await _this.userLib.updateUser(existingUser, newData)
 
       ctx.body = {
         user

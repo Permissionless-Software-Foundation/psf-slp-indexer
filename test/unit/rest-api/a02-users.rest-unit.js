@@ -10,6 +10,7 @@ const mongoose = require('mongoose')
 // Local support libraries
 const config = require('../../../config')
 const testUtils = require('../../utils/test-utils')
+const User = require('../../../src/models/users')
 
 const UserController = require('../../../src/modules/users/controller')
 let uut
@@ -19,6 +20,8 @@ let ctx
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
 describe('Users', () => {
+  let testUser = {}
+
   before(async () => {
     // Connect to the Mongo Database.
     mongoose.Promise = global.Promise
@@ -102,6 +105,10 @@ describe('Users', () => {
       // Assert that expected properties exist in the returned data.
       assert.property(ctx.response.body, 'user')
       assert.property(ctx.response.body, 'token')
+
+      // Used by downstream tests.
+      testUser = ctx.response.body.user
+      // console.log('testUser: ', testUser)
     })
   })
 
@@ -175,6 +182,45 @@ describe('Users', () => {
         assert.equal(err.status, 404)
         assert.include(err.message, 'test error')
       }
+    })
+  })
+
+  describe('PUT /users/:id', () => {
+    it('should return 422 if no input data given', async () => {
+      try {
+        await uut.updateUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+
+    it('should return 200 on success', async () => {
+      // Prep the testUser data.
+      // console.log('testUser: ', testUser)
+      testUser.password = 'password'
+      delete testUser.type
+
+      // Replace the testUser variable with an actual model from the DB.
+      const existingUser = await User.findById(testUser._id)
+
+      ctx.body = {
+        user: existingUser
+      }
+      ctx.request.body = {
+        user: testUser
+      }
+
+      await uut.updateUser(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that expected properties exist in the returned data.
+      assert.property(ctx.response.body, 'user')
     })
   })
 })
