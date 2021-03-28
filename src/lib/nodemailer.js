@@ -20,6 +20,7 @@ class NodeMailer {
     _this.transporter = _this.createTransporter()
   }
 
+  // Define an email server 'transport' for nodemailer
   createTransporter () {
     const transporter = _this.nodemailer.createTransport({
       host: _this.config.emailServer,
@@ -78,7 +79,7 @@ class NodeMailer {
 
       const subject = data.subject
       const to = data.to
-      const emailUser = data.email // email from the user who initiated the sharing email
+      // const emailUser = data.email // email from the user who initiated the sharing email
       const payload = data.payloadTitle
 
       const bodyJson = data
@@ -103,9 +104,7 @@ class NodeMailer {
       })
       // This paragraph just be added to the message for
       // emails that are not password reset ones
-      const paragraphTag = `<p>${emailUser} would like to share the document <b>${payload}</b> with you through
-      <a href="https://launchpadip.net">LaunchpadIP.net</a>.
-      </p>`
+      const paragraphTag = 'This is a test email'
 
       const htmlMsg = `<h3>${subject}:</h3>
                        ${payload === 'Email reset' ? '' : paragraphTag}
