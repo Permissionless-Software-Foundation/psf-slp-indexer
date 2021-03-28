@@ -84,7 +84,6 @@ class Admin {
       // Handle existing system user.
       if (err.response.status === 422) {
         try {
-          console.log('ping03')
           // Delete the existing user
           await _this.deleteExistingSystemUser()
 

@@ -335,4 +335,23 @@ describe('#users', () => {
 
     // TODO: verify that an admin can change the type of a user
   })
+
+  describe('#deleteUser', () => {
+    it('should throw error if no user provided', async () => {
+      try {
+        await uut.deleteUser()
+
+        assert.fail('Unexpected code path.')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+
+    it('should delete the user from the database', async () => {
+      await uut.deleteUser(testUser)
+
+      assert.isOk('Not throwing an error is a pass!')
+    })
+  })
 })

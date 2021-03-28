@@ -223,4 +223,32 @@ describe('Users', () => {
       assert.property(ctx.response.body, 'user')
     })
   })
+
+  describe('DELETE /users/:id', () => {
+    it('should return 422 if no input data given', async () => {
+      try {
+        await uut.deleteUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+
+    it('should return 200 status on success', async () => {
+      // Replace the testUser variable with an actual model from the DB.
+      const existingUser = await User.findById(testUser._id)
+
+      ctx.body = {
+        user: existingUser
+      }
+
+      await uut.deleteUser(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+    })
+  })
 })

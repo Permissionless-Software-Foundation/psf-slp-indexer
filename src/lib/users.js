@@ -107,7 +107,7 @@ class UserLib {
 
       // Save a copy of the original user type.
       const userType = existingUser.type
-      console.log('userType: ', userType)
+      // console.log('userType: ', userType)
 
       // If user 'type' property is sent by the client
       if (newData.type) {
@@ -133,6 +133,15 @@ class UserLib {
       return existingUser
     } catch (err) {
       wlogger.error('Error in lib/users.js/updateUser()')
+      throw err
+    }
+  }
+
+  async deleteUser (user) {
+    try {
+      await user.remove()
+    } catch (err) {
+      wlogger.error('Error in lib/users.js/deleteUser()')
       throw err
     }
   }

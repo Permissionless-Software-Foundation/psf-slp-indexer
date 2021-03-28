@@ -209,8 +209,8 @@ class UserController {
       ctx.body = {
         user
       }
-    } catch (error) {
-      ctx.throw(422, error.message)
+    } catch (err) {
+      ctx.throw(422, err.message)
     }
   }
 
@@ -234,11 +234,18 @@ class UserController {
    * @apiUse TokenError
    */
   async deleteUser (ctx) {
-    const user = ctx.body.user
-    await user.remove()
-    ctx.status = 200
-    ctx.body = {
-      success: true
+    try {
+      const user = ctx.body.user
+
+      // await user.remove()
+      await _this.userLib.deleteUser(user)
+
+      ctx.status = 200
+      ctx.body = {
+        success: true
+      }
+    } catch (err) {
+      ctx.throw(422, err.message)
     }
   }
 

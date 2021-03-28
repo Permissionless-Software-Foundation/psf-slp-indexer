@@ -36,7 +36,7 @@ describe('Users', () => {
 
     // Get the JWT used to log in as the admin 'system' user.
     const adminJWT = await testUtils.getAdminJWT()
-    console.log(`adminJWT: ${adminJWT}`)
+    // console.log(`adminJWT: ${admi  nJWT}`)
     context.adminJWT = adminJWT
 
     // const admin = await testUtils.loginAdminUser()
@@ -693,94 +693,94 @@ describe('Users', () => {
     })
   })
 
-  // describe('DELETE /users/:id', () => {
-  //   it('should not delete user if token is invalid', async () => {
-  //     try {
-  //       const options = {
-  //         method: 'DELETE',
-  //         url: `${LOCALHOST}/users/1`,
-  //         headers: {
-  //           Accept: 'application/json',
-  //           Authorization: 'Bearer 1'
-  //         }
-  //       }
-  //       await axios(options)
-  //
-  //       assert.equal(true, false, 'Unexpected behavior')
-  //     } catch (err) {
-  //       assert.equal(err.response.status, 401)
-  //     }
-  //   })
-  //
-  //   it('should throw 401 if deleting invalid user', async () => {
-  //     const { token } = context
-  //
-  //     try {
-  //       const options = {
-  //         method: 'DELETE',
-  //         url: `${LOCALHOST}/users/1`,
-  //         headers: {
-  //           Accept: 'application/json',
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       }
-  //       await axios(options)
-  //
-  //       assert.equal(true, false, 'Unexpected behavior')
-  //     } catch (err) {
-  //       assert.equal(err.response.status, 401)
-  //     }
-  //   })
-  //
-  //   it('should not be able to delete other users unless admin', async () => {
-  //     try {
-  //       const options = {
-  //         method: 'DELETE',
-  //         url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
-  //         headers: {
-  //           Authorization: `Bearer ${context.token}`
-  //         }
-  //       }
-  //       await axios(options)
-  //     } catch (err) {
-  //       assert.equal(err.response.status, 401)
-  //     }
-  //   })
-  //
-  //   it('should delete own user', async () => {
-  //     const _id = context.user._id
-  //     const token = context.token
-  //
-  //     const options = {
-  //       method: 'DELETE',
-  //       url: `${LOCALHOST}/users/${_id}`,
-  //       headers: {
-  //         Accept: 'application/json',
-  //         Authorization: `Bearer ${token}`
-  //       }
-  //     }
-  //     const result = await axios(options)
-  //     // console.log(`result: ${util.inspect(result.data.success)}`)
-  //
-  //     assert.equal(result.data.success, true)
-  //   })
-  //
-  //   it('should be able to delete other users when admin', async () => {
-  //     const id = context.id2
-  //     const adminJWT = context.adminJWT
-  //
-  //     const options = {
-  //       method: 'DELETE',
-  //       url: `${LOCALHOST}/users/${id}`,
-  //       headers: {
-  //         Accept: 'application/json',
-  //         Authorization: `Bearer ${adminJWT}`
-  //       }
-  //     }
-  //     const result = await axios(options)
-  //     // console.log(`result: ${util.inspect(result.data)}`)
-  //
-  //     assert.equal(result.data.success, true)
-  //   })
-  // })
+  describe('DELETE /users/:id', () => {
+    it('should not delete user if token is invalid', async () => {
+      try {
+        const options = {
+          method: 'DELETE',
+          url: `${LOCALHOST}/users/1`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer 1'
+          }
+        }
+        await axios(options)
+
+        assert.equal(true, false, 'Unexpected behavior')
+      } catch (err) {
+        assert.equal(err.response.status, 401)
+      }
+    })
+
+    it('should throw 401 if deleting invalid user', async () => {
+      const { token } = context
+
+      try {
+        const options = {
+          method: 'DELETE',
+          url: `${LOCALHOST}/users/1`,
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        }
+        await axios(options)
+
+        assert.equal(true, false, 'Unexpected behavior')
+      } catch (err) {
+        assert.equal(err.response.status, 401)
+      }
+    })
+
+    it('should not be able to delete other users unless admin', async () => {
+      try {
+        const options = {
+          method: 'DELETE',
+          url: `${LOCALHOST}/users/${context.user2._id.toString()}`,
+          headers: {
+            Authorization: `Bearer ${context.token}`
+          }
+        }
+        await axios(options)
+      } catch (err) {
+        assert.equal(err.response.status, 401)
+      }
+    })
+
+    it('should delete own user', async () => {
+      const _id = context.user._id
+      const token = context.token
+
+      const options = {
+        method: 'DELETE',
+        url: `${LOCALHOST}/users/${_id}`,
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      }
+      const result = await axios(options)
+      // console.log(`result: ${util.inspect(result.data.success)}`)
+
+      assert.equal(result.data.success, true)
+    })
+
+    it('should be able to delete other users when admin', async () => {
+      const id = context.id2
+      const adminJWT = context.adminJWT
+
+      const options = {
+        method: 'DELETE',
+        url: `${LOCALHOST}/users/${id}`,
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${adminJWT}`
+        }
+      }
+      const result = await axios(options)
+      // console.log(`result: ${util.inspect(result.data)}`)
+
+      assert.equal(result.data.success, true)
+    })
+  })
 })

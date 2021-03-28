@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "npm run test:all",
-    "test:all": "npm run set-env && nyc --reporter=text mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/rest-api/ test/e2e/automated/",
+    "test:all": "export KOA_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/rest-api/ test/e2e/automated/",
     "test:unit:lib": "export KOA_ENV=test && mocha --exit --timeout 15000 test/unit/biz-logic/",
     "test:unit:rest": "export KOA_ENV=test && mocha --exit --timeout 15000 test/unit/rest-api/",
     "test:e2e:auto": "export KOA_ENV=test && mocha --exit --timeout 15000 test/e2e/automated/",
