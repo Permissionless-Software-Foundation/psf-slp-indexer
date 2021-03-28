@@ -15,6 +15,7 @@ util.inspect.defaultOptions = { depth: 1 }
 const UserController = require('../../../src/modules/users/controller')
 let uut
 let sandbox
+let ctx
 
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
@@ -58,6 +59,9 @@ describe('Users', () => {
     uut = new UserController()
 
     sandbox = sinon.createSandbox()
+
+    // Mock the context object.
+    ctx = mockContext()
   })
 
   afterEach(() => sandbox.restore())
@@ -67,42 +71,74 @@ describe('Users', () => {
   })
 
   describe('GET /users', () => {
-    it('should catch and handle errors', async () => {
+    it('should return 422 status on arbitrary biz logic error', async () => {
       try {
         // Force an error
         sandbox
           .stub(uut.userLib, 'getAllUsers')
           .rejects(new Error('test error'))
 
-        // Mock the context object.
-        const ctx = mockContext()
-
         await uut.getUsers(ctx)
 
         assert.fail('Unexpected result')
       } catch (err) {
-        console.log('err: ', err)
-        assert.include(err.message, 'Not Found')
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'test error')
       }
+    })
+
+    it('should return 200 status on success', async () => {
+      await uut.getUsers(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that expected properties exist in the returned data.
+      assert.property(ctx.response.body, 'users')
     })
   })
 
   describe('GET /users/:id', () => {
-    it('should catch and handle errors', async () => {
+    it('should return 422 status on arbitrary biz logic error', async () => {
       try {
         // Force an error
-        sandbox
-          .stub(uut.userLib, 'getUser')
-          .rejects(new Error('test error'))
-
-        // Mock the context object.
-        const ctx = mockContext()
+        sandbox.stub(uut.userLib, 'getUser').rejects(new Error('test error'))
 
         await uut.getUser(ctx)
 
         assert.fail('Unexpected result')
       } catch (err) {
-        assert.include(err.message, 'Internal Server Error')
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'test error')
+      }
+    })
+
+    it('should return 200 status on success', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.userLib, 'getUser').resolves({ _id: '123' })
+
+      await uut.getUser(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that expected properties exist in the returned data.
+      assert.property(ctx.response.body, 'user')
+    })
+
+    it('should return other error status passed by biz logic', async () => {
+      try {
+        // Mock dependencies
+        const testErr = new Error('test error')
+        testErr.status = 404
+        sandbox.stub(uut.userLib, 'getUser').rejects(testErr)
+
+        await uut.getUser(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.status, 404)
+        assert.include(err.message, 'test error')
       }
     })
   })

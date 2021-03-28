@@ -20,7 +20,7 @@ describe('Auth', () => {
       password: 'pass'
     }
     const testUser = await utils.createUser(userObj)
-    console.log(`TestUser : ${testUser}`)
+    console.log('TestUser: ', testUser)
 
     context.user = testUser.user
     context.token = testUser.token
