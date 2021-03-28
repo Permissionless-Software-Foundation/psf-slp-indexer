@@ -120,6 +120,7 @@ class Validators {
         // console.log(`Err: Could not find user.`)
         ctx.throw(401)
       }
+      // console.log('ctx.state.user: ', ctx.state.user)
 
       // console.log(`ctx.state.user: ${JSON.stringify(ctx.state.user, null, 2)}`)
       // Ensure the calling user and the target user are the same.

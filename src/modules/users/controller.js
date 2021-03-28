@@ -1,10 +1,19 @@
+// User database model.
 const User = require('../../models/users')
+
+// User library for business logic.
+const UserLib = require('../../lib/users')
+
+const wlogger = require('../../lib/wlogger')
 
 let _this
 class UserController {
   constructor () {
-    _this = this
+    // Encapsulate dependencies
     this.User = User
+    this.userLib = new UserLib()
+
+    _this = this
   }
 
   /**
@@ -47,51 +56,22 @@ class UserController {
    *     }
    */
   async createUser (ctx) {
-    const userObj = ctx.request.body.user
     try {
-      /*
-       * ERROR HANDLERS
-       *
-       */
-      // Required property
-      if (!userObj.email || typeof userObj.email !== 'string') {
-        throw new Error("Property 'email' must be a string!")
-      }
+      const userObj = ctx.request.body.user
 
-      // This validation is not permissive to different TLDs like this one:
-      // someone@somewhere.link. Removing it until it can be updated.
-      // const isEmail = await _this.validateEmail(user.email)
-      // if (!isEmail) {
-      //   throw new Error("Property 'email' must be email format!")
-      // }
-
-      if (!userObj.password || typeof userObj.password !== 'string') {
-        throw new Error("Property 'password' must be a string!")
-      }
-
-      if (userObj.name && typeof userObj.name !== 'string') {
-        throw new Error("Property 'name' must be a string!")
-      }
-
-      const user = new _this.User(userObj)
-      // Enforce default value of 'user'
-      user.type = 'user'
-
-      await user.save()
-
-      const token = user.generateToken()
-      const response = user.toJSON()
-
-      delete response.password
+      const { userData, token } = await _this.userLib.createUser(userObj)
+      // console.log('userData: ', userData)
+      // console.log('token: ', token)
 
       ctx.body = {
-        user: response,
+        user: userData,
         token
       }
     } catch (err) {
       // console.log(`err.message: ${err.message}`)
       // console.log('err: ', err)
-      ctx.throw(422, err.message)
+      // ctx.throw(422, err.message)
+      _this.handleError(ctx, err)
     }
   }
 
@@ -125,10 +105,12 @@ class UserController {
    */
   async getUsers (ctx) {
     try {
-      const users = await _this.User.find({}, '-password')
+      const users = await _this.userLib.getAllUsers()
+
       ctx.body = { users }
-    } catch (error) {
-      ctx.throw(404)
+    } catch (err) {
+      wlogger.error('Error in users/controller.js/getUsers(): '.err)
+      ctx.throw(422, err.message)
     }
   }
 
@@ -160,28 +142,15 @@ class UserController {
    *
    * @apiUse TokenError
    */
-
   async getUser (ctx, next) {
     try {
-      const user = await _this.User.findById(ctx.params.id, '-password')
-      if (!user) {
-        ctx.throw(404)
-      }
+      const user = await _this.userLib.getUser(ctx.params)
 
       ctx.body = {
         user
       }
     } catch (err) {
-      // Handle different error types.
-      if (
-        err === 404 ||
-        err.name === 'CastError' ||
-        err.message.toString().includes('Not Found')
-      ) {
-        ctx.throw(404)
-      }
-
-      ctx.throw(500)
+      _this.handleError(ctx, err)
     }
 
     if (next) {
@@ -231,60 +200,17 @@ class UserController {
    * @apiUse TokenError
    */
   async updateUser (ctx) {
-    // Values obtain from user request.
-    // This variable is intended to validate the properties
-    // sent by the client
-    const userObj = ctx.request.body.user
-
-    const user = ctx.body.user
     try {
-      /*
-       * ERROR HANDLERS
-       *
-       */
-      // Required property
-      if (userObj.email && typeof userObj.email !== 'string') {
-        throw new Error("Property 'email' must be a string!")
-      }
+      const existingUser = ctx.body.user
+      const newData = ctx.request.body.user
 
-      const isEmail = await _this.validateEmail(userObj.email)
-      if (userObj.email && !isEmail) {
-        throw new Error("Property 'email' must be email format!")
-      }
-      if (userObj.password && typeof userObj.password !== 'string') {
-        throw new Error("Property 'password' must be a string!")
-      }
-      if (userObj.name && typeof userObj.name !== 'string') {
-        throw new Error("Property 'name' must be a string!")
-      }
-      if (userObj.projects && !Array.isArray(userObj.projects)) {
-        throw new Error("Property 'projects' must be a Array!")
-      }
-      // Save a copy of the original user type.
-      const userType = user.type
-
-      // If user type property is sent by the client
-      if (userObj.type) {
-        if (typeof userObj.type !== 'string') {
-          throw new Error("Property 'type' must be a string!")
-        }
-        // TODO: Here we can validate the user types allowed
-
-        // Unless the calling user is an admin, they can not change the user type.
-        if (userType !== 'admin') {
-          throw new Error("Property 'type' can only be changed by Admin user")
-        }
-      }
-
-      Object.assign(user, ctx.request.body.user)
-
-      await user.save()
+      const user = await _this.userLib.updateUser(existingUser, newData)
 
       ctx.body = {
         user
       }
-    } catch (error) {
-      ctx.throw(422, error.message)
+    } catch (err) {
+      ctx.throw(422, err.message)
     }
   }
 
@@ -308,11 +234,33 @@ class UserController {
    * @apiUse TokenError
    */
   async deleteUser (ctx) {
-    const user = ctx.body.user
-    await user.remove()
-    ctx.status = 200
-    ctx.body = {
-      success: true
+    try {
+      const user = ctx.body.user
+
+      // await user.remove()
+      await _this.userLib.deleteUser(user)
+
+      ctx.status = 200
+      ctx.body = {
+        success: true
+      }
+    } catch (err) {
+      ctx.throw(422, err.message)
+    }
+  }
+
+  // DRY error handler
+  handleError (ctx, err) {
+    // If an HTTP status is specified by the buisiness logic, use that.
+    if (err.status) {
+      if (err.message) {
+        ctx.throw(err.status, err.message)
+      } else {
+        ctx.throw(err.status)
+      }
+    } else {
+      // By default use a 422 error if the HTTP status is not specified.
+      ctx.throw(422, err.message)
     }
   }
 
