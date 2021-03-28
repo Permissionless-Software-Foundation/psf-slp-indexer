@@ -23,6 +23,7 @@ describe('#users', () => {
 
   before(async () => {
     // Connect to the Mongo Database.
+    console.log(`Connecting to database: ${config.database}`)
     mongoose.Promise = global.Promise
     mongoose.set('useCreateIndex', true) // Stop deprecation warning.
     await mongoose.connect(config.database, {
@@ -234,9 +235,11 @@ describe('#users', () => {
       }
     })
 
-    it('should throw an error if no email given', async () => {
+    it('should throw an error if email is not a string', async () => {
       try {
-        await uut.updateUser(testUser, {})
+        await uut.updateUser(testUser, {
+          email: 1234
+        })
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -245,26 +248,10 @@ describe('#users', () => {
       }
     })
 
-    it('should throw an error if no password given', async () => {
+    it('should throw an error if name is not a string', async () => {
       try {
         const newData = {
-          email: 'test@test.com'
-        }
-
-        await uut.updateUser(testUser, newData)
-
-        assert.fail('Unexpected code path')
-      } catch (err) {
-        // console.log(err)
-        assert.include(err.message, "Property 'password' must be a string!")
-      }
-    })
-
-    it('should throw an error if no name given', async () => {
-      try {
-        const newData = {
-          email: 'test@test.com',
-          password: 'password'
+          name: 1234
         }
 
         await uut.updateUser(testUser, newData)
@@ -273,6 +260,23 @@ describe('#users', () => {
       } catch (err) {
         // console.log(err)
         assert.include(err.message, "Property 'name' must be a string!")
+      }
+    })
+
+    it('should throw an error if non-string password given', async () => {
+      try {
+        const newData = {
+          email: 'test@test.com',
+          name: 'test',
+          password: 1234
+        }
+
+        await uut.updateUser(testUser, newData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, "Property 'password' must be a string!")
       }
     })
 

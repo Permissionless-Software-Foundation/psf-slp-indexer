@@ -36,7 +36,7 @@ describe('Users', () => {
 
     // Get the JWT used to log in as the admin 'system' user.
     const adminJWT = await testUtils.getAdminJWT()
-    // console.log(`adminJWT: ${adminJWT}`)
+    console.log(`adminJWT: ${adminJWT}`)
     context.adminJWT = adminJWT
 
     // const admin = await testUtils.loginAdminUser()
@@ -605,11 +605,12 @@ describe('Users', () => {
         data: {
           user: {
             name: 'This should work',
-            email: 'test@test.com'
-            // password: 'password'
+            email: 'test4@test.com',
+            password: 'password'
           }
         }
       }
+
       const result = await axios(options)
       // console.log(`result stringified: ${JSON.stringify(result, null, 2)}`)
 

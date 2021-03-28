@@ -94,14 +94,15 @@ class UserLib {
   async updateUser (existingUser, newData) {
     try {
       // Input Validation
-      if (!newData.email || typeof newData.email !== 'string') {
+      // Optional inputs, but they must be strings if included.
+      if (newData.email && typeof newData.email !== 'string') {
         throw new Error("Property 'email' must be a string!")
       }
-      if (!newData.password || typeof newData.password !== 'string') {
-        throw new Error("Property 'password' must be a string!")
-      }
-      if (!newData.name || typeof newData.name !== 'string') {
+      if (newData.name && typeof newData.name !== 'string') {
         throw new Error("Property 'name' must be a string!")
+      }
+      if (newData.password && typeof newData.password !== 'string') {
+        throw new Error("Property 'password' must be a string!")
       }
 
       // Save a copy of the original user type.

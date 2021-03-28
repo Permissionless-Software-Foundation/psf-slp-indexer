@@ -12,6 +12,8 @@ const axios = require('axios').default
 const config = require('../../../config')
 const app = require('../../../bin/server')
 const testUtils = require('../../utils/test-utils')
+const AdminLib = require('../../../src/lib/admin')
+const adminLib = new AdminLib()
 
 // const request = supertest.agent(app.listen())
 const context = {}
@@ -25,6 +27,9 @@ describe('Auth', () => {
 
     // Delete all previous users in the database.
     await testUtils.deleteAllUsers()
+
+    // Create a new admin user.
+    await adminLib.createSystemUser()
 
     const userObj = {
       email: 'test@test.com',
