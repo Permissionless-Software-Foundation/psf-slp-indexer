@@ -1,40 +1,30 @@
-# koa-api-boilerplate
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com) [![Coverage Status](https://coveralls.io/repos/github/christroutner/babel-free-koa2-api-boilerplate/badge.svg?branch=unstable)](https://coveralls.io/github/christroutner/babel-free-koa2-api-boilerplate?branch=unstable) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release) [![Greenkeeper badge](https://badges.greenkeeper.io/christroutner/koa-api-boilerplate.svg)](https://greenkeeper.io/)
+# ipfs-service-provider
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
+This is a 'boilerplate' repository. It's intended to be forked to start new projects. This repository has been forked from the [koa-api-boilerplate](https://github.com/christroutner/koa-api-boilerplate). It has all the same features as that boilerplate:
 
-This repository is a boilerplate for building APIs with
-[koa2](https://github.com/koajs/koa/tree/v2.x) and Mongo DB.
-This repository was originally forked from Adrian Obelmejias'
-[koa-api-boilerplate repository](https://github.com/adrianObel/koa2-api-boilerplate).
-It makes the following modifications:
+- [Koa](https://koajs.com/) framework for REST APIs
+- User management
+- Access control using [JWT tokens](https://jwt.io/).
 
-- Removes babel as a dependency. This repository is now naively compatible with
-  node v8.9 or higher.
+This boilerplate extends that code to provide the basic features required to be a 'service provider' on the IPFS network. See [this article](https://troutsblog.com/blog/ipfs-api) if you're new to the concept of service provides on IPFS. These basic features include:
 
-- Replaced `bcrypt` dependency with `bcryptjs`. This improves compatibility across
-  versions of node.js and across OSs.
+- [ipfs-coord](https://www.npmjs.com/package/ipfs-coord) for coordinating service providers and consumers across the IPFS network.
+- JSON RPC for creating an API between providers and consumers.
 
-- Configured for Jenkins (continuous integration), Coveralls (code coverage), Green Keeper (automated dependency management), and Semantic Release (automated versioning).
-
-- 'Production' environment is targeted for packaging as a Docker container.
-
-- 'admin' user type added in addition to standard 'user' type. Allows the creation
-of private vs public APIs that only be accessed by an admin. Useful for privileged
-commands like updating and deleting other users.
-
- - Winston logging integrated for daily rotated logs and a maximum size of
- 1 megabyte.
-
- - Linting enforced with [Husky](https://github.com/typicode/husky) and [JavaScript Standard Style rules](https://www.npmjs.com/package/standard).
+If you are interested in creating your own service provider on the IPFS network, fork this repository and start building.
 
 ## Features
 This project covers basic necessities of most APIs.
+* [Koa](https://koajs.com/) framework for REST APIs
 * Authentication (passport & jwt)
 * Database (mongoose)
 * Testing (mocha)
 * Doc generation with apidoc
 * Linting using standard
 * Packaged as a Docker container
+* [ipfs-coord](https://www.npmjs.com/package/ipfs-coord)
+* JSON RPC for mirroring the REST API over IPFS
 
 
 
@@ -70,6 +60,7 @@ npm start
 │   ├── modules
 │   │   ├── controller.js    # Module-specific controllers
 │   │   └── router.js        # Router definitions for module
+|   ├── rpc                  # JSON RPC over IPFS
 │   ├── models               # Mongoose models
 │   └── middleware           # Custom middleware
 │       └── validators       # Validation middleware
@@ -103,14 +94,10 @@ Visit `http://localhost:5000/docs/` to view docs
 * [Mocha](https://mochajs.org/)
 * [apidoc](http://apidocjs.com/)
 * [ESLint](http://eslint.org/)
+* [ipfs-coord](https://www.npmjs.com/package/ipfs-coord)
 
 ## IPFS
-v2.3.0 uploaded to IPFS:
-
-- Get it: `ipfs get QmUz4b2KwNLNvHZRTYcgrPCuKAhMB73XWN8vY8LLVVEYV1`
-- Pin it: `ipfs pin add -r QmUz4b2KwNLNvHZRTYcgrPCuKAhMB73XWN8vY8LLVVEYV1`
+Snapshots pinned to IPFS will be listed here.
 
 ## License
 MIT
-
-test
