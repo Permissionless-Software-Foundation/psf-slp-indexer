@@ -1,5 +1,5 @@
 /*
-  A library for controlling the sending email.
+  A library for controlling the sending of email.
 */
 
 'use strict'
@@ -34,25 +34,12 @@ class NodeMailer {
     return transporter
   }
 
-  // Validate email
-  async validateEmail (email) {
-    // eslint-disable-next-line no-useless-escape
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-      return true
-    }
-    return false
-  }
-
   // Handles the sending of data via email.
   async sendEmail (data) {
     try {
       // Validate input
       if (!data.email || typeof data.email !== 'string') {
         throw new Error("Property 'email' must be a string!")
-      }
-      const isEmail = await _this.validateEmail(data.email)
-      if (!isEmail) {
-        throw new Error("Property 'email' must be email format!")
       }
 
       if (!data.to || !Array.isArray(data.to)) {
@@ -62,66 +49,28 @@ class NodeMailer {
       await _this.validateEmailArray(data.to)
 
       if (!data.formMessage || typeof data.formMessage !== 'string') {
-        throw new Error("Property 'message' must be a string!")
+        throw new Error("Property 'formMessage' must be a string!")
       }
 
       if (!data.subject || typeof data.subject !== 'string') {
         throw new Error("Property 'subject' must be a string!")
       }
 
-      if (!data.payloadTitle || typeof data.payloadTitle !== 'string') {
-        throw new Error("Property 'payloadTitle' must be a string!")
+      // Use the provided html or use a default html generated from the input data
+
+      const html = data.htmlData || _this.getHtmlFromObject(data)
+      const sendObj = {
+        // from: `${data.email}`, // sender address
+        from: data.email,
+        to: data.to, // list of receivers
+        // subject: `Pearson ${subject}`, // Subject line
+        subject: data.subject,
+        // html: '<b>This is a test email</b>' // html body
+        html
       }
 
-      const msg = data.formMessage.replace(/(\r\n|\n|\r)/g, '<br />')
-
-      const now = new Date()
-
-      const subject = data.subject
-      const to = data.to
-      // const emailUser = data.email // email from the user who initiated the sharing email
-      const payload = data.payloadTitle
-
-      const bodyJson = data
-      delete bodyJson.to
-      delete bodyJson.subject
-      delete bodyJson.formMessage
-
-      // Prototyping email output.
-      bodyJson.email = 'noreply@launchpadip.net'
-      delete bodyJson.email
-      delete bodyJson.emailList
-      delete bodyJson.payloadTitle
-
-      bodyJson.message = msg
-
-      // Html body
-      let htmlData = ''
-
-      // maps the object and converts it into html format
-      Object.keys(bodyJson).forEach(function (key) {
-        htmlData += `${key}: ${bodyJson[key]}<br/>`
-      })
-      // This paragraph just be added to the message for
-      // emails that are not password reset ones
-      const paragraphTag = 'This is a test email'
-
-      const htmlMsg = `<h3>${subject}:</h3>
-                       ${payload === 'Email reset' ? '' : paragraphTag}
-                             <p>
-                               time: ${now.toLocaleString()}<br/>
-                               ${htmlData}
-                             </p>`
       // send mail with defined transport object
-      const info = await _this.transporter.sendMail({
-        // from: `${data.email}`, // sender address
-        from: 'noreply@launchpadip.net',
-        to: `${to}`, // list of receivers
-        // subject: `Pearson ${subject}`, // Subject line
-        subject: subject,
-        // html: '<b>This is a test email</b>' // html body
-        html: htmlMsg
-      })
+      const info = await _this.transporter.sendMail(sendObj)
       console.log('Message sent: %s', info.messageId)
       return info
     } catch (err) {
@@ -140,28 +89,62 @@ class NodeMailer {
         throw new Error("Property 'emailList' cant be empty!")
       }
 
-      // Iterates the array and validates each email format
-      const isValid = await new Promise(resolve => {
-        emailList.map(async (value, i) => {
-          const isEmail = await _this.validateEmail(value)
-
-          if (!isEmail) {
-            resolve(false)
-          }
-          if (i >= emailList.length - 1) {
-            resolve(true)
-          }
-        })
-      })
-
-      if (!isValid) {
-        throw new Error('Array must contain emails format!')
-      }
-
       return true
     } catch (err) {
       wlogger.error('Error in lib/nodemailer.js/validateEmailArray()')
       throw err
+    }
+  }
+
+  // get the email html from object
+  getHtmlFromObject (objectData) {
+    try {
+      if (!objectData || typeof objectData !== 'object') {
+        throw new Error("Property 'objectData' must be a object!")
+      }
+      if (!objectData.subject) {
+        throw new Error("Property 'subject' must be a string!")
+      }
+      if (!objectData.formMessage) {
+        throw new Error("Property 'formMessage' must be a string!")
+      }
+
+      const obj = {}
+      Object.assign(obj, objectData)
+
+      // neccesary data
+      const msg = obj.formMessage.replace(/(\r\n|\n|\r)/g, '<br />')
+      const now = new Date()
+      const subject = obj.subject
+
+      // Delete unneccesary data if it exist
+      delete obj.to
+      delete obj.subject
+      delete obj.from
+      delete obj.emailList
+      delete obj.formMessage
+
+      const bodyJson = obj
+      bodyJson.message = msg
+
+      // Html body
+      let htmlBody = ''
+
+      // maps the object and converts it into html format
+      Object.keys(bodyJson).forEach(function (key) {
+        htmlBody += `${key}: ${bodyJson[key]}<br/>`
+      })
+
+      const defaultHtmlData = `<h3>${subject}:</h3>
+       <p>
+         time: ${now.toLocaleString()}<br/>
+         ${htmlBody}
+       </p>`
+
+      return defaultHtmlData
+    } catch (error) {
+      wlogger.error('Error in lib/nodemailer.js/getHtmlFromObject()')
+      throw error
     }
   }
 }
