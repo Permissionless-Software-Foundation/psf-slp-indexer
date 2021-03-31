@@ -62,5 +62,7 @@ docs
 coverage
 database/
 system-user-*.json
+orbitdb
+ipfsdata
 
 !README.md
