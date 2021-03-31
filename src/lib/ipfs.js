@@ -14,6 +14,11 @@ class IPFSLib {
     this.IPFS = IPFS
     this.IpfsCoord = IpfsCoord
     this.bchjs = new BCHJS()
+
+    this.rpc = {}
+    if (localConfig.rpc) {
+      this.rpc = localConfig.rpc
+    }
   }
 
   // This is a 'macro' start method. It kicks off several smaller methods that
@@ -57,7 +62,8 @@ class IPFSLib {
       this.ipfsCoord = new this.IpfsCoord({
         ipfs: this.ipfs,
         type: 'node.js',
-        bchjs: this.bchjs
+        bchjs: this.bchjs,
+        privateLog: this.rpc.router
       })
 
       await this.ipfsCoord.isReady()
