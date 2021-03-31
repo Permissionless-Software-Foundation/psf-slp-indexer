@@ -21,7 +21,7 @@ class JSONRPC {
       console.log('router str: ', str)
 
       const parsedData = _this.jsonrpc.parse(str)
-      // console.log('parsedData: ', parsedData)
+      console.log('parsedData: ', parsedData)
 
       // console.log('parsedData.type: ', parsedData.type)
       // Exit quietly if the incoming string is invalid
