@@ -1,5 +1,5 @@
 /*
-  A library for controlling the sending email.
+  A library for controlling the sending of email.
 */
 
 'use strict'
