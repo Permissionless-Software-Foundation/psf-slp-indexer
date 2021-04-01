@@ -153,7 +153,7 @@ describe('Contact', () => {
       }
     })
 
-    it('should send email with  all input', async () => {
+    it('should send email with all inputs', async () => {
       try {
         // Mock live network calls.
         sandbox.stub(uut.contactLib, 'sendEmail').resolves(true)

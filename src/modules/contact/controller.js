@@ -1,3 +1,7 @@
+/*
+  Controller or the /contact REST API endpoints.
+*/
+
 /* eslint-disable no-useless-escape */
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
@@ -5,7 +9,14 @@ const ContactLib = require('../../lib/contact')
 const contactLib = new ContactLib()
 
 let _this
-/**
+
+class ContactController {
+  constructor () {
+    _this = this
+    _this.contactLib = contactLib
+  }
+
+  /**
    * @api {post} /contact/email Send Email
    * @apiName SendMail
    * @apiGroup Contact
@@ -34,12 +45,6 @@ let _this
    *       "error": "Unprocessable Entity"
    *     }
    */
-class ContactController {
-  constructor () {
-    _this = this
-    _this.contactLib = contactLib
-  }
-
   async email (ctx) {
     try {
       const data = ctx.request.body

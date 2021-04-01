@@ -1,3 +1,7 @@
+/*
+  Business logic for the /contact endpoint.
+*/
+
 /* eslint-disable no-useless-escape */
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 

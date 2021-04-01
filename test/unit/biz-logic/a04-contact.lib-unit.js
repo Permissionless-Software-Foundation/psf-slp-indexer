@@ -13,6 +13,7 @@ describe('Contact', () => {
   })
 
   afterEach(() => sandbox.restore())
+
   describe('sendEmail()', () => {
     it('should throw error if email property is not provided', async () => {
       try {
@@ -37,6 +38,7 @@ describe('Contact', () => {
         assert.include(err.message, "Property 'formMessage' must be a string!")
       }
     })
+
     it('should throw error if email list provided is not a array', async () => {
       try {
         sandbox.stub(uut.nodemailer, 'sendEmail').resolves(true)
@@ -52,6 +54,7 @@ describe('Contact', () => {
         assert.include(err.message, "Property 'emailList' must be a array of emails!")
       }
     })
+
     it('should throw error if email list provided is a empty array', async () => {
       try {
         sandbox.stub(uut.nodemailer, 'sendEmail').resolves(true)
@@ -67,6 +70,7 @@ describe('Contact', () => {
         assert.include(err.message, "Property 'emailList' must be a array of emails!")
       }
     })
+
     it('should send email to default server email', async () => {
       try {
         sandbox.stub(uut.nodemailer, 'sendEmail').resolves(true)
@@ -82,7 +86,7 @@ describe('Contact', () => {
       }
     })
 
-    it('should catch and trhow nodemailer lib error', async () => {
+    it('should catch and throw nodemailer lib error', async () => {
       try {
         // Force an error with the database.
         sandbox.stub(uut.nodemailer, 'sendEmail').throws(new Error('test error'))
