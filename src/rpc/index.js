@@ -7,6 +7,7 @@ const jsonrpc = require('jsonrpc-lite')
 
 // Local support libraries
 const UserController = require('./users')
+const wlogger = require('../lib/wlogger')
 
 let _this
 
@@ -26,11 +27,19 @@ class JSONRPC {
       console.log('router str: ', str)
       console.log('router from: ', from)
 
+      // Exit if from is not specified.
+      if (!from || typeof from !== 'string') {
+        console.warn(
+          'Warning: Can not send JSON RPC response. Can not determine which peer this message came from.'
+        )
+        return
+      }
+
+      // Attempt to parse the incoming data as a JSON RPC string.
       const parsedData = _this.jsonrpc.parse(str)
       console.log('parsedData: ', parsedData)
 
-      // console.log('parsedData.type: ', parsedData.type)
-      // Exit quietly if the incoming string is invalid
+      // Exit quietly if the incoming string is an invalid JSON RPC string.
       if (parsedData.type === 'invalid') {
         return
       }
@@ -39,12 +48,27 @@ class JSONRPC {
         case 'users':
           _this.userController.userRouter(parsedData)
           break
-        // case default:
-          // TODO: Return an error
+        default:
+          return this.defaultResponse()
       }
     } catch (err) {
-      console.error('Error in rpc router(): ', err)
+      wlogger.error('Error in rpc router(): ', err)
       // Do not throw error. This is a top-level function.
+    }
+  }
+
+  // The default JSON RPC response if the incoming command could not be routed.
+  defaultResponse () {
+    try {
+      const errorObj = this.jsonrpc.error(
+        'Can not route',
+        new jsonrpc.JsonRpcError('Input does not match routing rules', 422)
+      )
+      const errorStr = JSON.stringify(errorObj)
+      return errorStr
+    } catch (err) {
+      console.error('Error in defaultResponse()')
+      throw err
     }
   }
 }
