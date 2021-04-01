@@ -33,14 +33,11 @@ describe('#JSON RPC', () => {
       const malformedRpc = '{"jsonrpc":"2.0"}'
 
       await uut.router(malformedRpc, 'peerA')
+
+      assert.isOk('Not throwing an error is a pass.')
     })
 
     it('should return default response if routing is not possible', async () => {
-      // const request = {
-      //   'users', // id
-      //   'getAll', // method
-      //   {}
-      // }
       const json = jsonrpc.request('unknownId', 'unknownMethod', {})
 
       const str = JSON.stringify(json)
@@ -78,6 +75,19 @@ describe('#JSON RPC', () => {
       await uut.router(malformedRpc, 'peerA')
 
       assert.isOk('Not throwing an error is a pass.')
+    })
+
+    it('should route to users handler', async () => {
+      const userCall = jsonrpc.request('users', 'getAll', {})
+      const jsonStr = JSON.stringify(userCall, null, 2)
+
+      // Mock the users controller.
+      sandbox.stub(uut.userController, 'userRouter').resolves('true')
+
+      const result = await uut.router(jsonStr, 'peerA')
+      // console.log(result)
+
+      assert.equal(result, 'true')
     })
   })
 })

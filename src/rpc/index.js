@@ -22,35 +22,39 @@ class JSONRPC {
 
   // This method takes a raw string of data from IPFS, parses it, and determins
   // which controller to route the instruction to.
-  router (str, from) {
+  async router (str, from) {
     try {
       console.log('router str: ', str)
       console.log('router from: ', from)
 
       // Exit if from is not specified.
       if (!from || typeof from !== 'string') {
-        console.warn(
-          'Warning: Can not send JSON RPC response. Can not determine which peer this message came from.'
-        )
+        // console.warn(
+        //   'Warning: Can not send JSON RPC response. Can not determine which peer this message came from.'
+        // )
         return
       }
 
       // Attempt to parse the incoming data as a JSON RPC string.
       const parsedData = _this.jsonrpc.parse(str)
-      console.log('parsedData: ', parsedData)
+      // console.log('parsedData: ', parsedData)
 
       // Exit quietly if the incoming string is an invalid JSON RPC string.
       if (parsedData.type === 'invalid') {
         return
       }
 
+      // Default return string
+      let retStr = this.defaultResponse()
+
+      // Route the command to the appropriate route handler.
       switch (parsedData.payload.id) {
         case 'users':
-          _this.userController.userRouter(parsedData)
+          retStr = await _this.userController.userRouter(parsedData)
           break
-        default:
-          return this.defaultResponse()
       }
+
+      return retStr
     } catch (err) {
       wlogger.error('Error in rpc router(): ', err)
       // Do not throw error. This is a top-level function.
