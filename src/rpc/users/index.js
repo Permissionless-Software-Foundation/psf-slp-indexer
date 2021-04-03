@@ -2,9 +2,17 @@
   This is the JSON RPC router for the users API
 */
 
-class UsersRPC {
+// Public npm libraries
+const jsonrpc = require('jsonrpc-lite')
+
+// Local libraries
+const UserLib = require('../../lib/users')
+
+class UserRPC {
   constructor (localConfig) {
-    console.log('instantiating UsersRPC')
+    // Encapsulate dependencies
+    this.userLib = new UserLib()
+    this.jsonrpc = jsonrpc
   }
 
   async userRouter (rpcData) {
@@ -22,6 +30,12 @@ class UsersRPC {
   async getAll () {
     try {
       console.log('Executing get all')
+      const users = await this.userLib.getAllUsers()
+
+      const retJson = this.jsonrpc.success('getAll', users)
+      const retStr = JSON.stringify(retJson, null, 2)
+
+      return retStr
     } catch (err) {
       console.error('Error in getAll()')
       throw err
@@ -29,4 +43,4 @@ class UsersRPC {
   }
 }
 
-module.exports = UsersRPC
+module.exports = UserRPC
