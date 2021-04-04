@@ -145,6 +145,34 @@ class UserLib {
       throw err
     }
   }
+
+  // Used to authenticate a user. If the login and password salt match a user in
+  // the database, then it returns the user model. The Koa REST API uses the
+  // Passport library for this functionality. This function is used to
+  // authenticate users who login via the JSON RPC.
+  async authUser (login, passwd) {
+    try {
+      // console.log('login: ', login)
+      // console.log('passwd: ', passwd)
+
+      const user = await UserModel.findOne({ email: login })
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      const isMatch = await user.validatePassword(passwd)
+
+      if (!isMatch) {
+        throw new Error('Login credential do not match')
+      }
+
+      return user
+    } catch (err) {
+      // console.error('Error in users.js/authUser()')
+      console.log('')
+      throw err
+    }
+  }
 }
 
 module.exports = UserLib

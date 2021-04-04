@@ -59,6 +59,8 @@ class Auth {
    */
   async authUser (ctx, next) {
     try {
+      // Retrieve the user from the database after they've proven the correct
+      // password.
       const user = await _this.passport.authUser(ctx, next)
       if (!user) {
         ctx.throw(401)

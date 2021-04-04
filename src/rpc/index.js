@@ -6,8 +6,9 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local support libraries
-const UserController = require('./users')
 const wlogger = require('../lib/wlogger')
+const UserController = require('./users')
+// const AuthController = require('./auth')
 
 let _this
 
@@ -51,6 +52,9 @@ class JSONRPC {
       switch (parsedData.payload.id) {
         case 'users':
           retStr = await _this.userController.userRouter(parsedData)
+          break
+        case 'auth':
+          retStr = await _this.authController.authRouter(parsedData)
           break
       }
 

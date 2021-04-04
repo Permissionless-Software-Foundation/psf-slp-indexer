@@ -6,21 +6,21 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
-const UserLib = require('../../lib/users')
+const AuthLib = require('../../lib/auth')
 
-class UserRPC {
+class AuthRPC {
   constructor (localConfig) {
     // Encapsulate dependencies
-    this.userLib = new UserLib()
+    this.authLib = new AuthLib()
     this.jsonrpc = jsonrpc
   }
 
   // Top-level router for this library. All other methods in this class are for
   // a specific endpoint. This method routes incoming calls to one of those
   // methods.
-  async userRouter (rpcData) {
+  async authRouter (rpcData) {
     try {
-      console.log('userRouter rpcData: ', rpcData)
+      console.log('authRouter rpcData: ', rpcData)
 
       // if (rpcData.payload.method === 'getAll') return await this.getAll()
 
@@ -54,4 +54,4 @@ class UserRPC {
   }
 }
 
-module.exports = UserRPC
+module.exports = AuthRPC
