@@ -24,12 +24,13 @@ class AuthRPC {
     try {
       console.log('authRouter rpcData: ', rpcData)
 
-      // if (rpcData.payload.method === 'getAll') return await this.getAll()
+      // Default return object.
+      // let retObj = {}
 
       // Route the call based on the value of the method property.
       switch (rpcData.payload.method) {
         case 'authUser':
-          return await this.authUser()
+          return await this.authUser(rpcData)
       }
     } catch (err) {
       console.error('Error in AuthRPC/authRouter()')
@@ -51,44 +52,22 @@ class AuthRPC {
       const login = rpcData.payload.params.login
       const password = rpcData.payload.params.password
 
-      // const user = await this.passport.authUser(ctx, next)
-      // if (!user) {
-      //   // ctx.throw(401)
-      //   const retJson =
-      // }
-
       const user = await this.userLib.authUser(login, password)
-      console.log('user: ', user)
-      return user
+      // console.log('user: ', user)
 
-      // const token = user.generateToken()
-      //
-      // const response = user.toJSON()
-      //
-      // delete response.password
-      //
-      // ctx.body = {
-      //   token,
-      //   user: response
-      // }
+      const token = user.generateToken()
+
+      const response = {
+        id: user._id,
+        type: user.type,
+        name: user.name,
+        email: user.email,
+        token
+      }
+
+      return response
     } catch (err) {
       console.error('Error in authUser()')
-      throw err
-    }
-  }
-
-  // Get all Users.
-  async getAll () {
-    try {
-      console.log('Executing get all')
-      const users = await this.userLib.getAllUsers()
-
-      const retJson = this.jsonrpc.success('getAll', users)
-      const retStr = JSON.stringify(retJson, null, 2)
-
-      return retStr
-    } catch (err) {
-      console.error('Error in getAll()')
       throw err
     }
   }

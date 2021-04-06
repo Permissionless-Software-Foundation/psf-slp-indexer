@@ -5,8 +5,8 @@
 
 // Global npm libraries
 const IPFS = require('ipfs')
-// const IpfsCoord = require('ipfs-coord')
-const IpfsCoord = require('../../../ipfs-coord')
+const IpfsCoord = require('ipfs-coord')
+// const IpfsCoord = require('../../../ipfs-coord')
 const BCHJS = require('@psf/bch-js')
 
 // Local libraries
@@ -44,9 +44,9 @@ class IPFSLib {
       const ipfsOptions = {
         repo: './ipfsdata',
         start: true,
-        EXPERIMENTAL: {
-          pubsub: true
-        },
+        // EXPERIMENTAL: {
+        //   pubsub: true
+        // },
         config: {
           relay: {
             enabled: true, // enable circuit relay dialer and listener
@@ -54,12 +54,21 @@ class IPFSLib {
               enabled: true // enable circuit relay HOP (make this node a relay)
             }
           },
-          pubsub: true // enable pubsub
+          pubsub: true, // enable pubsub
+          Swarm: {
+            ConnMgr: {
+              HighWater: 30,
+              LowWater: 10
+            }
+          }
         }
       }
 
       // Create a new IPFS node.
       this.ipfs = await this.IPFS.create(ipfsOptions)
+
+      // Set the 'server' profile so the node does not scan private networks.
+      await this.ipfs.config.profiles.apply('server')
     } catch (err) {
       console.error('Error in startIpfs()')
       throw err

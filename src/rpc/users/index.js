@@ -22,19 +22,13 @@ class UserRPC {
     try {
       // console.log('userRouter rpcData: ', rpcData)
 
-      // if (rpcData.payload.method === 'getAll') return await this.getAll()
-
-      // const retObj = {
-      //   id: 'users'
-      // }
-      let retObj = {}
+      // Default return object.
+      // let retObj = {}
 
       // Route the call based on the value of the method property.
       switch (rpcData.payload.method) {
         case 'getAll':
-          // retObj.method = 'getAll'
-          retObj = await this.getAll()
-          return retObj
+          return await this.getAll()
         case 'getUser':
           return await this.getUser(rpcData)
       }
@@ -51,11 +45,6 @@ class UserRPC {
       const users = await this.userLib.getAllUsers()
 
       return users
-
-      // const retJson = this.jsonrpc.success('getAll', users)
-      // const retStr = JSON.stringify(retJson, null, 2)
-      //
-      // return retStr
     } catch (err) {
       console.error('Error in getAll()')
       throw err
