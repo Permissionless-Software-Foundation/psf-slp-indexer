@@ -13,7 +13,7 @@ let ctx
 
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
-describe('Users', () => {
+describe('Contact', () => {
   before(async () => {
   })
 
