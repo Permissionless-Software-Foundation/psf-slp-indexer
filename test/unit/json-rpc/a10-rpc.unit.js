@@ -6,6 +6,7 @@
 const assert = require('chai').assert
 const jsonrpc = require('jsonrpc-lite')
 const sinon = require('sinon')
+const { v4: uid } = require('uuid')
 
 // Set the environment variable to signal this is a test.
 process.env.SVC_ENV = 'test'
@@ -42,7 +43,8 @@ describe('#JSON RPC', () => {
     })
 
     it('should return default response if routing is not possible', async () => {
-      const json = jsonrpc.request('unknownId', 'unknownMethod', {})
+      const id = uid()
+      const json = jsonrpc.request(id, 'unknownMethod', {})
 
       const str = JSON.stringify(json)
 
@@ -63,7 +65,7 @@ describe('#JSON RPC', () => {
       assert.property(jsonObj.payload.result.value, 'message')
 
       // Assert the expected values exist.
-      assert.equal(jsonObj.payload.id, 'unknownId')
+      assert.equal(jsonObj.payload.id, id)
       assert.equal(jsonObj.payload.result.value.success, false)
       assert.equal(jsonObj.payload.result.value.status, 422)
       assert.equal(
@@ -84,7 +86,8 @@ describe('#JSON RPC', () => {
     })
 
     it('should route to users handler', async () => {
-      const userCall = jsonrpc.request('users', 'getAll', {})
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', { endpoint: 'getAll' })
       const jsonStr = JSON.stringify(userCall, null, 2)
 
       // Mock the users controller.
@@ -97,7 +100,8 @@ describe('#JSON RPC', () => {
       // console.log('obj: ', obj)
 
       assert.equal(obj.result.value, 'true')
-      assert.equal(obj.result.method, 'getAll')
+      assert.equal(obj.result.method, 'users')
+      assert.equal(obj.id, id)
     })
   })
 })

@@ -22,11 +22,10 @@ class UserRPC {
     try {
       // console.log('userRouter rpcData: ', rpcData)
 
-      // Default return object.
-      // let retObj = {}
+      const endpoint = rpcData.payload.params.endpoint
 
       // Route the call based on the value of the method property.
-      switch (rpcData.payload.method) {
+      switch (endpoint) {
         case 'getAll':
           return await this.getAll()
         case 'getUser':
@@ -44,7 +43,10 @@ class UserRPC {
       console.log('Executing get all')
       const users = await this.userLib.getAllUsers()
 
-      return users
+      return {
+        endpoint: 'getAll',
+        users
+      }
     } catch (err) {
       console.error('Error in getAll()')
       throw err

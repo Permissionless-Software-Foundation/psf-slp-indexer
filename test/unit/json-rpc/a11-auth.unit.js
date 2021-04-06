@@ -7,6 +7,7 @@ const jsonrpc = require('jsonrpc-lite')
 const mongoose = require('mongoose')
 const sinon = require('sinon')
 const assert = require('chai').assert
+const { v4: uid } = require('uuid')
 
 const config = require('../../../config')
 
@@ -49,7 +50,8 @@ describe('#AuthRPC', () => {
 
       // Generate the parsed data that the main router would pass to this
       // endpoint.
-      const authCall = jsonrpc.request('auth', 'authUser', {})
+      const id = uid()
+      const authCall = jsonrpc.request(id, 'auth', { endpoint: 'authUser' })
       const jsonStr = JSON.stringify(authCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
 
@@ -63,15 +65,24 @@ describe('#AuthRPC', () => {
     it('should return a JWT token if user successfully authenticates', async () => {
       // Generate the parsed data that the main router would pass to this
       // endpoint.
-      const authCall = jsonrpc.request('auth', 'authUser', {
+      const id = uid()
+      const authCall = jsonrpc.request(id, 'auth', {
+        endpoint: 'authUser',
         login: 'test@test.com',
         password: 'password'
       })
       const jsonStr = JSON.stringify(authCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
-      console.log(rpcData)
 
-      await uut.authUser(rpcData)
+      const response = await uut.authUser(rpcData)
+      // console.log('response: ', response)
+
+      assert.equal(response.endpoint, 'authUser')
+      assert.property(response, 'userId')
+      assert.equal(response.userType, 'user')
+      assert.property(response, 'userName')
+      assert.property(response, 'userEmail')
+      assert.property(response, 'apiToken')
     })
   })
 })

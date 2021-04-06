@@ -22,13 +22,12 @@ class AuthRPC {
   // methods.
   async authRouter (rpcData) {
     try {
-      console.log('authRouter rpcData: ', rpcData)
+      // console.log('authRouter rpcData: ', rpcData)
 
-      // Default return object.
-      // let retObj = {}
+      const endpoint = rpcData.payload.params.endpoint
 
-      // Route the call based on the value of the method property.
-      switch (rpcData.payload.method) {
+      // Route the call based on the requested endpoint.
+      switch (endpoint) {
         case 'authUser':
           return await this.authUser(rpcData)
       }
@@ -40,7 +39,7 @@ class AuthRPC {
 
   async authUser (rpcData) {
     try {
-      console.log('authUser rpcData: ', rpcData)
+      // console.log('authUser rpcData: ', rpcData)
 
       if (!rpcData.payload.params.login) {
         throw new Error('login must be specified')
@@ -58,11 +57,12 @@ class AuthRPC {
       const token = user.generateToken()
 
       const response = {
-        id: user._id,
-        type: user.type,
-        name: user.name,
-        email: user.email,
-        token
+        endpoint: 'authUser',
+        userId: user._id,
+        userType: user.type,
+        userName: user.name,
+        userEmail: user.email,
+        apiToken: token
       }
 
       return response

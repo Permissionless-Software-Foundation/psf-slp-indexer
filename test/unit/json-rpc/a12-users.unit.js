@@ -7,6 +7,7 @@ const jsonrpc = require('jsonrpc-lite')
 const mongoose = require('mongoose')
 const sinon = require('sinon')
 const assert = require('chai').assert
+const { v4: uid } = require('uuid')
 
 const config = require('../../../config')
 
@@ -49,7 +50,8 @@ describe('#UserRPC', () => {
 
       // Generate the parsed data that the main router would pass to this
       // endpoint.
-      const userCall = jsonrpc.request('users', 'getAll', {})
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', { endpoint: 'getAll' })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
 
@@ -63,6 +65,9 @@ describe('#UserRPC', () => {
     it('should return all users', async () => {
       const result = await uut.getAll()
       console.log('result: ', result)
+
+      assert.equal(result.endpoint, 'getAll')
+      assert.property(result, 'users')
     })
   })
 })

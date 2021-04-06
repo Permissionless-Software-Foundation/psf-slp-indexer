@@ -53,7 +53,7 @@ class JSONRPC {
       let retObj = _this.defaultResponse()
 
       // Route the command to the appropriate route handler.
-      switch (parsedData.payload.id) {
+      switch (parsedData.payload.method) {
         case 'users':
           retObj = await _this.userController.userRouter(parsedData)
           break

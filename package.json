@@ -56,6 +56,7 @@
     "mongoose": "^5.11.15",
     "nodemailer": "^6.4.17",
     "passport-local": "^1.0.0",
+    "uuid": "^8.3.2",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"
   },
