@@ -44,9 +44,6 @@ class IPFSLib {
       const ipfsOptions = {
         repo: './ipfsdata',
         start: true,
-        // EXPERIMENTAL: {
-        //   pubsub: true
-        // },
         config: {
           relay: {
             enabled: true, // enable circuit relay dialer and listener
@@ -69,6 +66,9 @@ class IPFSLib {
 
       // Set the 'server' profile so the node does not scan private networks.
       await this.ipfs.config.profiles.apply('server')
+
+      const nodeConfig = await this.ipfs.config.getAll()
+      console.log(`IPFS node configuration: ${JSON.stringify(nodeConfig, null, 2)}`)
     } catch (err) {
       console.error('Error in startIpfs()')
       throw err
