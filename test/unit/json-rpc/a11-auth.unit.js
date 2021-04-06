@@ -3,15 +3,18 @@
 */
 
 // Public npm libraries
-// const jsonrpc = require('jsonrpc-lite')
+const jsonrpc = require('jsonrpc-lite')
 const mongoose = require('mongoose')
+const sinon = require('sinon')
+const assert = require('chai').assert
 
 const config = require('../../../config')
 
-// const AuthRPC = require('../../../src/rpc/auth')
+const AuthRPC = require('../../../src/rpc/auth')
 
 describe('#AuthRPC', () => {
-  // let uut
+  let uut
+  let sandbox
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -28,21 +31,47 @@ describe('#AuthRPC', () => {
   })
 
   beforeEach(() => {
-    // sandbox = sinon.createSandbox()
+    sandbox = sinon.createSandbox()
 
-    // uut = new AuthRPC()
+    uut = new AuthRPC()
   })
+
+  afterEach(() => sandbox.restore())
 
   after(() => {
     mongoose.connection.close()
   })
 
+  describe('#authRouter', () => {
+    it('should route to the authUser method', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'authUser').resolves(true)
+
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const authCall = jsonrpc.request('auth', 'authUser', {})
+      const jsonStr = JSON.stringify(authCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.authRouter(rpcData)
+
+      assert.equal(result, true)
+    })
+  })
+
   describe('#authUser', () => {
     it('should return a JWT token if user successfully authenticates', async () => {
-      const rpcData = 'placeholder'
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const authCall = jsonrpc.request('auth', 'authUser', {
+        login: 'test@test.com',
+        password: 'password'
+      })
+      const jsonStr = JSON.stringify(authCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
       console.log(rpcData)
 
-      // await uut.authUser(rpcData)
+      await uut.authUser(rpcData)
     })
   })
 })

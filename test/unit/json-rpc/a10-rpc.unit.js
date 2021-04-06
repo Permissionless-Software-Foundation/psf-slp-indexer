@@ -7,6 +7,10 @@ const assert = require('chai').assert
 const jsonrpc = require('jsonrpc-lite')
 const sinon = require('sinon')
 
+// Set the environment variable to signal this is a test.
+process.env.SVC_ENV = 'test'
+
+// Local libraries.
 const JSONRPC = require('../../../src/rpc')
 
 describe('#JSON RPC', () => {
@@ -53,17 +57,19 @@ describe('#JSON RPC', () => {
       assert.property(jsonObj, 'type')
       assert.property(jsonObj.payload, 'jsonrpc')
       assert.property(jsonObj.payload, 'id')
-      assert.property(jsonObj.payload, 'error')
-      assert.property(jsonObj.payload.error, 'message')
-      assert.property(jsonObj.payload.error, 'code')
+      assert.property(jsonObj.payload, 'result')
+      assert.property(jsonObj.payload.result, 'reciever')
+      assert.property(jsonObj.payload.result.value, 'success')
+      assert.property(jsonObj.payload.result.value, 'message')
 
       // Assert the expected values exist.
-      assert.equal(jsonObj.payload.id, 'Can not route')
+      assert.equal(jsonObj.payload.id, 'unknownId')
+      assert.equal(jsonObj.payload.result.value.success, false)
+      assert.equal(jsonObj.payload.result.value.status, 422)
       assert.equal(
-        jsonObj.payload.error.message,
-        'Input does not match routing rules'
+        jsonObj.payload.result.value.message,
+        'Input does not match routing rules.'
       )
-      assert.equal(jsonObj.payload.error.code, 422)
     })
 
     it('should catch and handle errors', async () => {
@@ -87,7 +93,11 @@ describe('#JSON RPC', () => {
       const result = await uut.router(jsonStr, 'peerA')
       // console.log(result)
 
-      assert.equal(result.retStr, 'true')
+      const obj = JSON.parse(result.retStr)
+      // console.log('obj: ', obj)
+
+      assert.equal(obj.result.value, 'true')
+      assert.equal(obj.result.method, 'getAll')
     })
   })
 })

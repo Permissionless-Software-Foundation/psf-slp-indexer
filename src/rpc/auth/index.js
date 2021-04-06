@@ -39,13 +39,26 @@ class AuthRPC {
 
   async authUser (rpcData) {
     try {
+      console.log('authUser rpcData: ', rpcData)
+
+      if (!rpcData.payload.params.login) {
+        throw new Error('login must be specified')
+      }
+      if (!rpcData.payload.params.password) {
+        throw new Error('password must be specified')
+      }
+
+      const login = rpcData.payload.params.login
+      const password = rpcData.payload.params.password
+
       // const user = await this.passport.authUser(ctx, next)
       // if (!user) {
       //   // ctx.throw(401)
       //   const retJson =
       // }
 
-      const user = await this.userLib.authUser()
+      const user = await this.userLib.authUser(login, password)
+      console.log('user: ', user)
       return user
 
       // const token = user.generateToken()

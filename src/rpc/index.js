@@ -50,20 +50,31 @@ class JSONRPC {
       }
 
       // Default return string
-      let retStr = _this.defaultResponse()
+      let retObj = _this.defaultResponse()
 
       // Route the command to the appropriate route handler.
       switch (parsedData.payload.id) {
         case 'users':
-          retStr = await _this.userController.userRouter(parsedData)
+          retObj = await _this.userController.userRouter(parsedData)
           break
         case 'auth':
-          retStr = await _this.authController.authRouter(parsedData)
+          retObj = await _this.authController.authRouter(parsedData)
           break
       }
 
+      // console.log('retObj: ', retObj)
+
+      // Convert the returned object into a JSON RPC response string.
+      const retJson = _this.jsonrpc.success(parsedData.payload.id, {
+        method: parsedData.payload.method,
+        reciever: from,
+        value: retObj
+      })
+      const retStr = JSON.stringify(retJson, null, 2)
+      // console.log('retStr: ', retStr)
+
       // Encrypt and publish the response to the originators private OrbitDB,
-      // if ipfs-coord has been initialized and the peers orbitdb is registered.
+      // if ipfs-coord has been initialized and the peers ID is registered.
       if (_this.ipfsCoord.ipfs) {
         await _this.ipfsCoord.ipfs.orbitdb.sendToDb(from, retStr)
       }
@@ -80,13 +91,20 @@ class JSONRPC {
   // The default JSON RPC response if the incoming command could not be routed.
   defaultResponse () {
     try {
-      const errorObj = this.jsonrpc.error(
-        'Can not route',
-        new jsonrpc.JsonRpcError('Input does not match routing rules', 422)
-      )
-      const errorStr = JSON.stringify(errorObj)
+      // const errorObj = this.jsonrpc.error(
+      //   'Can not route',
+      //   new jsonrpc.JsonRpcError('Input does not match routing rules', 422)
+      // )
+      // const errorStr = JSON.stringify(errorObj)
+      // return errorStr
 
-      return errorStr
+      const errorObj = {
+        success: false,
+        status: 422,
+        message: 'Input does not match routing rules.'
+      }
+
+      return errorObj
     } catch (err) {
       console.error('Error in defaultResponse()')
       throw err
