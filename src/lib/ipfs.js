@@ -5,8 +5,12 @@
 
 // Global npm libraries
 const IPFS = require('ipfs')
-const IpfsCoord = require('ipfs-coord')
+// const IpfsCoord = require('ipfs-coord')
+const IpfsCoord = require('../../../ipfs-coord')
 const BCHJS = require('@psf/bch-js')
+
+// Local libraries
+const JSONRPC = require('../rpc')
 
 class IPFSLib {
   constructor (localConfig) {
@@ -14,11 +18,12 @@ class IPFSLib {
     this.IPFS = IPFS
     this.IpfsCoord = IpfsCoord
     this.bchjs = new BCHJS()
+    this.rpc = new JSONRPC()
 
-    this.rpc = {}
-    if (localConfig.rpc) {
-      this.rpc = localConfig.rpc
-    }
+    // this.rpc = {}
+    // if (localConfig.rpc) {
+    //   this.rpc = localConfig.rpc
+    // }
   }
 
   // This is a 'macro' start method. It kicks off several smaller methods that
@@ -26,6 +31,10 @@ class IPFSLib {
   async start () {
     await this.startIpfs()
     await this.startIpfsCoord()
+
+    // Update the RPC instance with the instance of ipfs-coord.
+    this.rpc.ipfsCoord = this.ipfsCoord
+
     console.log('IPFS is ready.')
   }
 

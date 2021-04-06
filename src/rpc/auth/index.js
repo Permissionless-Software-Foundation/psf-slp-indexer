@@ -6,13 +6,15 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
-const AuthLib = require('../../lib/auth')
+// const AuthLib = require('../../lib/auth')
+const UserLib = require('../../lib/users')
 
 class AuthRPC {
   constructor (localConfig) {
     // Encapsulate dependencies
-    this.authLib = new AuthLib()
+    // this.authLib = new AuthLib()
     this.jsonrpc = jsonrpc
+    this.userLib = new UserLib()
   }
 
   // Top-level router for this library. All other methods in this class are for
@@ -26,13 +28,38 @@ class AuthRPC {
 
       // Route the call based on the value of the method property.
       switch (rpcData.payload.method) {
-        case 'getAll':
-          return await this.getAll()
-        case 'getUser':
-          return await this.getUser(rpcData)
+        case 'authUser':
+          return await this.authUser()
       }
     } catch (err) {
-      console.error('Error in UsersRPC/rpcRouter()')
+      console.error('Error in AuthRPC/authRouter()')
+      throw err
+    }
+  }
+
+  async authUser (rpcData) {
+    try {
+      // const user = await this.passport.authUser(ctx, next)
+      // if (!user) {
+      //   // ctx.throw(401)
+      //   const retJson =
+      // }
+
+      const user = await this.userLib.authUser()
+      return user
+
+      // const token = user.generateToken()
+      //
+      // const response = user.toJSON()
+      //
+      // delete response.password
+      //
+      // ctx.body = {
+      //   token,
+      //   user: response
+      // }
+    } catch (err) {
+      console.error('Error in authUser()')
       throw err
     }
   }
