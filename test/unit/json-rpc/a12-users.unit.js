@@ -47,17 +47,20 @@ describe('#UserRPC', () => {
       // Mock dependencies
       sandbox.stub(uut, 'getAll').resolves(true)
 
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
       const userCall = jsonrpc.request('users', 'getAll', {})
       const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
 
-      const result = await uut.userRouter(jsonStr)
+      const result = await uut.userRouter(rpcData)
 
       assert.equal(result, true)
     })
   })
 
   describe('#getAll', () => {
-    it('should do something', async () => {
+    it('should return all users', async () => {
       const result = await uut.getAll()
       console.log('result: ', result)
     })

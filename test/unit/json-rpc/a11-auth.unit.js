@@ -8,10 +8,10 @@ const mongoose = require('mongoose')
 
 const config = require('../../../config')
 
-const AuthRPC = require('../../../src/rpc/auth')
+// const AuthRPC = require('../../../src/rpc/auth')
 
 describe('#AuthRPC', () => {
-  let uut
+  // let uut
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -30,7 +30,7 @@ describe('#AuthRPC', () => {
   beforeEach(() => {
     // sandbox = sinon.createSandbox()
 
-    uut = new AuthRPC()
+    // uut = new AuthRPC()
   })
 
   after(() => {
@@ -40,8 +40,9 @@ describe('#AuthRPC', () => {
   describe('#authUser', () => {
     it('should return a JWT token if user successfully authenticates', async () => {
       const rpcData = 'placeholder'
+      console.log(rpcData)
 
-      await uut.authUser(rpcData)
+      // await uut.authUser(rpcData)
     })
   })
 })

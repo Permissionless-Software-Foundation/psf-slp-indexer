@@ -45,7 +45,7 @@ describe('#JSON RPC', () => {
       const result = await uut.router(str, 'peerA')
       // console.log('result: ', result)
 
-      const jsonObj = jsonrpc.parse(result)
+      const jsonObj = jsonrpc.parse(result.retStr)
       // console.log(`jsonObj: ${JSON.stringify(jsonObj, null, 2)}`)
 
       // Assert the expected properties exist on the returned object.
@@ -87,7 +87,7 @@ describe('#JSON RPC', () => {
       const result = await uut.router(jsonStr, 'peerA')
       // console.log(result)
 
-      assert.equal(result, 'true')
+      assert.equal(result.retStr, 'true')
     })
   })
 })

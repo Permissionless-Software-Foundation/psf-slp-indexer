@@ -20,7 +20,7 @@ class UserRPC {
   // methods.
   async userRouter (rpcData) {
     try {
-      console.log('userRouter rpcData: ', rpcData)
+      // console.log('userRouter rpcData: ', rpcData)
 
       // if (rpcData.payload.method === 'getAll') return await this.getAll()
 
