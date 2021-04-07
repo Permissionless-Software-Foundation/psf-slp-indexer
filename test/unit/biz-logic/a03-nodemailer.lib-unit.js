@@ -101,13 +101,16 @@ describe('NodeMailer', () => {
         sandbox
           .stub(uut.transporter, 'sendMail')
           .resolves({ messageId: 'messageId' })
+
         const data = {
           email: 'test@email.com',
           formMessage: 'test msg',
           to: ['test2@email.com'],
           subject: 'test subject'
         }
+
         const info = await uut.sendEmail(data)
+
         assert.isObject(info)
         assert.isString(info.messageId)
       } catch (err) {
