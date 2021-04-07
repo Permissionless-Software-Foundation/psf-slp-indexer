@@ -7,12 +7,14 @@ const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
 const UserLib = require('../../lib/users')
+const Validators = require('../validators')
 
 class UserRPC {
   constructor (localConfig) {
     // Encapsulate dependencies
     this.userLib = new UserLib()
     this.jsonrpc = jsonrpc
+    this.validators = new Validators()
   }
 
   // Top-level router for this library. All other methods in this class are for
@@ -27,7 +29,8 @@ class UserRPC {
       // Route the call based on the value of the method property.
       switch (endpoint) {
         case 'getAll':
-          return await this.getAll()
+          // await this.validators.ensureUser(rpcData)
+          return await this.getAll(rpcData)
         case 'getUser':
           return await this.getUser(rpcData)
       }

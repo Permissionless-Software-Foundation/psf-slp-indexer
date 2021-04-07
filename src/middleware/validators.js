@@ -1,3 +1,7 @@
+/*
+  REST API validator middleware.
+*/
+
 const User = require('../models/users')
 const config = require('../../config')
 const getToken = require('../lib/auth')
