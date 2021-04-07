@@ -30,11 +30,12 @@ describe('#LogsApiLib', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should return log', async () => {
       try {
         const pass = 'test'
         const result = await uut.getLogs(pass)
-        console.log('result', result)
+        // console.log('result', result)
 
         assert.isTrue(result.success)
         assert.isArray(result.data)
@@ -45,6 +46,7 @@ describe('#LogsApiLib', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should return false if files are not found!', async () => {
       try {
         sandbox.stub(uut, 'generateFileName').resolves('bad router')
@@ -52,7 +54,7 @@ describe('#LogsApiLib', () => {
         const password = 'test'
 
         const result = await uut.getLogs(password)
-        console.log(result)
+        // console.log(result)
 
         assert.isFalse(result.success)
         assert.include(result.data, 'file does not exist')
@@ -61,6 +63,7 @@ describe('#LogsApiLib', () => {
         assert.fail('Unexpected result')
       }
     })
+
     it('should catch and handle errors', async () => {
       try {
         // Force an error
@@ -74,6 +77,7 @@ describe('#LogsApiLib', () => {
         assert.include(err.message, 'test error')
       }
     })
+
     it('should throw unhandled error', async () => {
       try {
         // Force an error
@@ -88,6 +92,7 @@ describe('#LogsApiLib', () => {
       }
     })
   })
+
   describe('#filterLogs()', () => {
     it('should throw error if data is not provided', async () => {
       try {
@@ -98,6 +103,7 @@ describe('#LogsApiLib', () => {
         assert.include(err.message, 'Data must be array')
       }
     })
+
     it('should throw error if data provided is not an array', async () => {
       try {
         const data = 'data'
@@ -108,6 +114,7 @@ describe('#LogsApiLib', () => {
         assert.include(err.message, 'Data must be array')
       }
     })
+
     it('should sort the log data', async () => {
       try {
         const data = mockData.data
@@ -120,6 +127,7 @@ describe('#LogsApiLib', () => {
         assert.fail('Unexpected result')
       }
     })
+
     it('should sort the log data with a limit', async () => {
       try {
         const data = mockData.data
@@ -146,6 +154,7 @@ describe('#LogsApiLib', () => {
         assert.fail('Unexpected result')
       }
     })
+
     it('should throw error if something fails', async () => {
       try {
         uut.config = null
@@ -157,6 +166,7 @@ describe('#LogsApiLib', () => {
       }
     })
   })
+
   describe('#readLines()', () => {
     it('should throw error if fileName is not provided', async () => {
       try {
@@ -167,6 +177,7 @@ describe('#LogsApiLib', () => {
         assert.include(err.message, 'filename must be a string')
       }
     })
+
     it('should throw error if fileName provided is not string', async () => {
       try {
         const fileName = true
@@ -177,6 +188,7 @@ describe('#LogsApiLib', () => {
         assert.include(err.message, 'filename must be a string')
       }
     })
+
     it('should throw error if the file does not exist', async () => {
       try {
         const fileName = 'test/logs/'
@@ -187,6 +199,7 @@ describe('#LogsApiLib', () => {
         assert.include(err.message, 'file does not exist')
       }
     })
+
     it('should ignore fileReader callback errors', async () => {
       try {
         // https://sinonjs.org/releases/latest/stubs/
@@ -200,6 +213,7 @@ describe('#LogsApiLib', () => {
         assert.fail('Unexpected result')
       }
     })
+
     it('should return data', async () => {
       try {
         const fileName = context.fileName
