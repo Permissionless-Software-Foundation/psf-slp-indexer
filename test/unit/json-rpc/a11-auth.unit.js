@@ -9,13 +9,19 @@ const sinon = require('sinon')
 const assert = require('chai').assert
 const { v4: uid } = require('uuid')
 
-const config = require('../../../config')
+// Set the environment variable to signal this is a test.
+process.env.SVC_ENV = 'test'
 
+// Local libraries
+const config = require('../../../config')
 const AuthRPC = require('../../../src/rpc/auth')
+const UserLib = require('../../../src/lib/users')
+const userLib = new UserLib()
 
 describe('#AuthRPC', () => {
   let uut
   let sandbox
+  let testUser
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -29,6 +35,13 @@ describe('#AuthRPC', () => {
         useNewUrlParser: true
       }
     )
+
+    // Create a test user.
+    testUser = await userLib.createUser({
+      email: 'test543@test.com',
+      name: 'tester543',
+      password: 'password'
+    })
   })
 
   beforeEach(() => {
@@ -39,7 +52,11 @@ describe('#AuthRPC', () => {
 
   afterEach(() => sandbox.restore())
 
-  after(() => {
+  after(async () => {
+    // Delete the test user.
+    testUser = await userLib.getUser({ id: testUser.userData._id })
+    await userLib.deleteUser(testUser)
+
     mongoose.connection.close()
   })
 
@@ -68,7 +85,7 @@ describe('#AuthRPC', () => {
       const id = uid()
       const authCall = jsonrpc.request(id, 'auth', {
         endpoint: 'authUser',
-        login: 'test@test.com',
+        login: 'test543@test.com',
         password: 'password'
       })
       const jsonStr = JSON.stringify(authCall, null, 2)
@@ -83,6 +100,69 @@ describe('#AuthRPC', () => {
       assert.property(response, 'userName')
       assert.property(response, 'userEmail')
       assert.property(response, 'apiToken')
+      assert.equal(response.status, 200)
+      assert.equal(response.success, true)
+      assert.property(response, 'message')
+    })
+
+    it('should return an error for invalid credentials', async () => {
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const authCall = jsonrpc.request(id, 'auth', {
+        endpoint: 'authUser',
+        login: 'test543@test.com',
+        password: 'badpassword'
+      })
+      const jsonStr = JSON.stringify(authCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const response = await uut.authUser(rpcData)
+      // console.log('response: ', response)
+
+      assert.equal(response.success, false)
+      assert.equal(response.status, 422)
+      assert.equal(response.message, 'Login credential do not match')
+      assert.equal(response.endpoint, 'authUser')
+    })
+
+    it('should throw an error if login is not provided', async () => {
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const authCall = jsonrpc.request(id, 'auth', {
+        endpoint: 'authUser'
+      })
+      const jsonStr = JSON.stringify(authCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const response = await uut.authUser(rpcData)
+      // console.log('response: ', response)
+
+      assert.equal(response.success, false)
+      assert.equal(response.status, 422)
+      assert.equal(response.message, 'login must be specified')
+      assert.equal(response.endpoint, 'authUser')
+    })
+
+    it('should throw an error if password is not provided', async () => {
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const authCall = jsonrpc.request(id, 'auth', {
+        endpoint: 'authUser',
+        login: 'test543@test.com'
+      })
+      const jsonStr = JSON.stringify(authCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const response = await uut.authUser(rpcData)
+      // console.log('response: ', response)
+
+      assert.equal(response.success, false)
+      assert.equal(response.status, 422)
+      assert.equal(response.message, 'password must be specified')
+      assert.equal(response.endpoint, 'authUser')
     })
   })
 })

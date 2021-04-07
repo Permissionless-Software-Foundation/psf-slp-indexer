@@ -9,8 +9,11 @@ const sinon = require('sinon')
 const assert = require('chai').assert
 const { v4: uid } = require('uuid')
 
-const config = require('../../../config')
+// Set the environment variable to signal this is a test.
+process.env.SVC_ENV = 'test'
 
+// Local libraries
+const config = require('../../../config')
 const UserRPC = require('../../../src/rpc/users')
 
 describe('#UserRPC', () => {

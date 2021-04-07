@@ -8,6 +8,7 @@ const jsonrpc = require('jsonrpc-lite')
 // Local libraries
 // const AuthLib = require('../../lib/auth')
 const UserLib = require('../../lib/users')
+const wlogger = require('../../lib/wlogger')
 
 class AuthRPC {
   constructor (localConfig) {
@@ -62,13 +63,25 @@ class AuthRPC {
         userType: user.type,
         userName: user.name,
         userEmail: user.email,
-        apiToken: token
+        apiToken: token,
+        status: 200,
+        success: true,
+        message: ''
       }
 
       return response
     } catch (err) {
-      console.error('Error in authUser()')
-      throw err
+      // console.error('Error in authUser()')
+      wlogger.error('Error in authUser(): ', err)
+      // throw err
+
+      // Return an error response
+      return {
+        success: false,
+        status: 422,
+        message: err.message,
+        endpoint: 'authUser'
+      }
     }
   }
 }
