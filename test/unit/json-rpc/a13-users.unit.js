@@ -20,7 +20,7 @@ const UserModel = require('../../../src/models/users')
 describe('#UserRPC', () => {
   let uut
   let sandbox
-  let testUserId
+  let testUser
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -48,40 +48,6 @@ describe('#UserRPC', () => {
     mongoose.connection.close()
   })
 
-  describe('#userRouter', () => {
-    it('should route to the createUser method', async () => {
-      // Mock dependencies
-      sandbox.stub(uut, 'createUser').resolves(true)
-
-      // Generate the parsed data that the main router would pass to this
-      // endpoint.
-      const id = uid()
-      const userCall = jsonrpc.request(id, 'users', { endpoint: 'createUser' })
-      const jsonStr = JSON.stringify(userCall, null, 2)
-      const rpcData = jsonrpc.parse(jsonStr)
-
-      const result = await uut.userRouter(rpcData)
-
-      assert.equal(result, true)
-    })
-
-    it('should route to the getAllUsers method', async () => {
-      // Mock dependencies
-      sandbox.stub(uut, 'getAll').resolves(true)
-
-      // Generate the parsed data that the main router would pass to this
-      // endpoint.
-      const id = uid()
-      const userCall = jsonrpc.request(id, 'users', { endpoint: 'getAllUsers' })
-      const jsonStr = JSON.stringify(userCall, null, 2)
-      const rpcData = jsonrpc.parse(jsonStr)
-
-      const result = await uut.userRouter(rpcData)
-
-      assert.equal(result, true)
-    })
-  })
-
   describe('#createUser', () => {
     it('should create a new user', async () => {
       // Generate the parsed data that the main router would pass to this
@@ -107,14 +73,72 @@ describe('#UserRPC', () => {
       assert.property(result, 'token')
 
       // Save the user ID for future tests.
-      testUserId = result.userData._id
+      testUser = result
+    })
+  })
+
+  describe('#userRouter', () => {
+    it('should route to the createUser method', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'createUser').resolves(true)
+
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', { endpoint: 'createUser' })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.userRouter(rpcData)
+
+      assert.equal(result, true)
+    })
+
+    it('should route to the getAllUsers method', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getAll').resolves(true)
+
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', {
+        endpoint: 'getAllUsers',
+        apiToken: testUser.token
+      })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.userRouter(rpcData)
+
+      assert.equal(result, true)
+    })
+
+    it('should route to the deleteUsers method', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'deleteUser').resolves(true)
+
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', {
+        endpoint: 'deleteUser',
+        apiToken: testUser.token,
+        userId: testUser.userData._id
+      })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.userRouter(rpcData)
+      // console.log('result: ', result)
+
+      assert.equal(result, true)
     })
   })
 
   describe('#getAllUsers', () => {
     it('should return all users', async () => {
       const result = await uut.getAll()
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       assert.equal(result.endpoint, 'getAllUsers')
       assert.property(result, 'users')
@@ -125,12 +149,14 @@ describe('#UserRPC', () => {
     it('should delete a user', async () => {
       // Get the user model for the test user.
       const testUserModel = await UserModel.findById(
-        testUserId,
+        testUser.userData._id,
         '-password'
       )
 
-      const result = await uut.deleteUser({}, testUserModel)
-      console.log(result)
+      await uut.deleteUser({}, testUserModel)
+      // console.log(result)
+
+      assert.isOk('Not throwing an error is a success')
     })
   })
 })

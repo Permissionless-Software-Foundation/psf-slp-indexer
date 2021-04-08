@@ -22,7 +22,7 @@ class UserRPC {
   // methods.
   async userRouter (rpcData) {
     try {
-      console.log('userRouter rpcData: ', rpcData)
+      // console.log('userRouter rpcData: ', rpcData)
 
       const endpoint = rpcData.payload.params.endpoint
       let user
@@ -31,14 +31,17 @@ class UserRPC {
       switch (endpoint) {
         case 'createUser':
           return await this.createUser(rpcData)
+
+        case 'getAllUsers':
+          await this.validators.ensureUser(rpcData)
+          return await this.getAll(rpcData)
+
+        case 'getUser':
+          return await this.getUser(rpcData)
+
         case 'deleteUser':
           user = await this.validators.ensureTargetUserOrAdmin(rpcData)
           return await this.deleteUser(rpcData, user)
-        case 'getAllUsers':
-          // await this.validators.ensureUser(rpcData)
-          return await this.getAll(rpcData)
-        case 'getUser':
-          return await this.getUser(rpcData)
       }
     } catch (err) {
       console.error('Error in UsersRPC/rpcRouter()')
@@ -49,7 +52,7 @@ class UserRPC {
   // Create a new user
   async createUser (rpcData) {
     try {
-      console.log('createUser rpcData: ', rpcData)
+      // console.log('createUser rpcData: ', rpcData)
 
       const retObj = await this.userLib.createUser(rpcData.payload.params)
 
@@ -79,7 +82,7 @@ class UserRPC {
 
   async deleteUser (rpcData, userModel) {
     try {
-      console.log('deleteUser rpcData: ', rpcData)
+      // console.log('deleteUser rpcData: ', rpcData)
 
       await this.userLib.deleteUser(userModel)
 
