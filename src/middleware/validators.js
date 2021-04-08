@@ -94,7 +94,6 @@ class Validators {
   // the ID used in the JWT, or failing that, the ID used in the JWT matches
   // an Admin user. This prevents situations like users updating other users
   // profiles or non-admins deleting users.
-  // TODO Tests must be developed before developing this function.
   async ensureTargetUserOrAdmin (ctx, next) {
     try {
       // console.log(`getToken: ${typeof (getToken)}`)

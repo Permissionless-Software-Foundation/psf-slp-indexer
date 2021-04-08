@@ -30,6 +30,7 @@ class UserLib {
 
       // Enforce default value of 'user'
       user.type = 'user'
+      // console.log('user: ', user)
 
       // Save the new user model to the database.
       await user.save()
@@ -39,6 +40,7 @@ class UserLib {
 
       // Convert the database model to a JSON object.
       const userData = user.toJSON()
+      // console.log('userData: ', userData)
 
       // Delete the password property.
       delete userData.password

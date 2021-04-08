@@ -1,5 +1,7 @@
 /*
   Unit tests for the JSON RPC validator middleware.
+
+  TODO: ensureTargetUserOrAdmin: it should exit quietly if user is an admin.
 */
 
 // Public npm libraries
@@ -62,7 +64,7 @@ describe('#validators', () => {
   })
 
   describe('#ensureUser', () => {
-    it('should return quietly for valid JWT token', async () => {
+    it('should return user model for valid JWT token', async () => {
       // Generate the parsed data that the main router would pass to this
       // endpoint.
       const id = uid()
@@ -73,9 +75,13 @@ describe('#validators', () => {
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
 
-      await uut.ensureUser(rpcData)
+      const user = await uut.ensureUser(rpcData)
+      // console.log('user: ', user)
 
-      assert.isOk('Not throwing an error is a success!')
+      assert.property(user, 'type')
+      assert.property(user, '_id')
+      assert.property(user, 'email')
+      assert.property(user, 'name')
     })
 
     it('should throw an error if JWT token is not included', async () => {
@@ -145,5 +151,120 @@ describe('#validators', () => {
         assert.include(err.message, 'User not found!')
       }
     })
+  })
+
+  describe('#ensureTargetUserOrAdmin', () => {
+    it('should return user model for valid JWT token', async () => {
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', {
+        endpoint: 'deleteUser',
+        apiToken: testUser.token,
+        userId: testUser.userData._id.toString()
+      })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const user = await uut.ensureTargetUserOrAdmin(rpcData)
+
+      assert.property(user, 'type')
+      assert.property(user, '_id')
+      assert.property(user, 'email')
+      assert.property(user, 'name')
+    })
+
+    it('should throw error if JWT token is not provided', async () => {
+      try {
+        // Generate the parsed data that the main router would pass to this
+        // endpoint.
+        const id = uid()
+        const userCall = jsonrpc.request(id, 'users', {
+          endpoint: 'deleteUser'
+        })
+        const jsonStr = JSON.stringify(userCall, null, 2)
+        const rpcData = jsonrpc.parse(jsonStr)
+
+        await uut.ensureTargetUserOrAdmin(rpcData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'apiToken JWT required as a parameter')
+      }
+    })
+
+    it('should throw error if user ID is not specified', async () => {
+      try {
+        // Generate the parsed data that the main router would pass to this
+        // endpoint.
+        const id = uid()
+        const userCall = jsonrpc.request(id, 'users', {
+          endpoint: 'deleteUser',
+          apiToken: testUser.token
+        })
+        const jsonStr = JSON.stringify(userCall, null, 2)
+        const rpcData = jsonrpc.parse(jsonStr)
+
+        await uut.ensureTargetUserOrAdmin(rpcData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'userId must be specified')
+      }
+    })
+
+    it('should throw error if JWT token can not be decoded', async () => {
+      try {
+        const token =
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNmU0YzkxYzdlYWNjN2Q4NWJjOGI0NCIsImlhdCI6MTYxNzg0MTI5N30.n1sas7YlqtmhBlNDBY_IXxQCrIQTiE8UITqy0PJAFFF'
+
+        // Generate the parsed data that the main router would pass to this
+        // endpoint.
+        const id = uid()
+        const userCall = jsonrpc.request(id, 'users', {
+          endpoint: 'deleteUser',
+          apiToken: token,
+          userId: testUser.userData._id.toString()
+        })
+        const jsonStr = JSON.stringify(userCall, null, 2)
+        const rpcData = jsonrpc.parse(jsonStr)
+
+        await uut.ensureTargetUserOrAdmin(rpcData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'invalid signature')
+      }
+    })
+
+    it('should throw an error if user can not be found', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.UserModel, 'findById').rejects(new Error('test error'))
+
+        // Generate the parsed data that the main router would pass to this
+        // endpoint.
+        const id = uid()
+        const userCall = jsonrpc.request(id, 'users', {
+          endpoint: 'deleteUser',
+          apiToken: testUser.token,
+          userId: testUser.userData._id.toString()
+        })
+        const jsonStr = JSON.stringify(userCall, null, 2)
+        const rpcData = jsonrpc.parse(jsonStr)
+
+        await uut.ensureTargetUserOrAdmin(rpcData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'test error')
+      }
+    })
+
+    // TODO: it should exit quietly if user is an admin.
   })
 })
