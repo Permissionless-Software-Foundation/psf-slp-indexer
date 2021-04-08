@@ -65,15 +65,47 @@ describe('#UserRPC', () => {
       const result = await uut.createUser(rpcData)
       // console.log('result: ', result)
 
-      assert.equal(result.endpoint, 'createUser')
+      // CreateUser() specific return values.
       assert.equal(result.userData.type, 'user')
       assert.equal(result.userData.email, 'test973@test.com')
       assert.equal(result.userData.name, 'test973')
       assert.property(result.userData, '_id')
       assert.property(result, 'token')
 
+      // Generic JSON RPC return values
+      assert.equal(result.endpoint, 'createUser')
+      assert.equal(result.success, true)
+      assert.equal(result.status, 200)
+      assert.equal(result.message, '')
+
       // Save the user ID for future tests.
       testUser = result
+    })
+
+    it('should return error data if biz logic throws an error', async () => {
+      // Force an error
+      sandbox.stub(uut.userLib, 'createUser').rejects(new Error('test error'))
+
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', {
+        endpoint: 'createUser',
+        email: 'test973@test.com',
+        name: 'test973',
+        password: 'password'
+      })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.createUser(rpcData)
+      // console.log('result: ', result)
+
+      // Generic JSON RPC return values
+      assert.equal(result.endpoint, 'createUser')
+      assert.equal(result.success, false)
+      assert.equal(result.status, 422)
+      assert.equal(result.message, 'test error')
     })
   })
 
@@ -140,8 +172,71 @@ describe('#UserRPC', () => {
       const result = await uut.getAll()
       // console.log('result: ', result)
 
-      assert.equal(result.endpoint, 'getAllUsers')
+      // Endpoint specific properties
       assert.property(result, 'users')
+      assert.isArray(result.users)
+
+      // Generic JSON RPC return values
+      assert.equal(result.endpoint, 'getAllUsers')
+      assert.equal(result.success, true)
+      assert.equal(result.status, 200)
+      assert.equal(result.message, '')
+    })
+
+    it('should return error data if biz logic throws an error', async () => {
+      // Force an error
+      sandbox.stub(uut.userLib, 'getAllUsers').rejects(new Error('test error'))
+
+      const result = await uut.getAll()
+      // console.log('result: ', result)
+
+      // Generic JSON RPC return values
+      assert.equal(result.endpoint, 'getAllUsers')
+      assert.equal(result.success, false)
+      assert.equal(result.status, 422)
+      assert.equal(result.message, 'test error')
+    })
+  })
+
+  describe('#getUser', () => {
+    it('should return a specific user', async () => {
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', {
+        endpoint: 'getUser',
+        userId: testUser.userData._id.toString()
+      })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.getUser(rpcData)
+      // console.log('result: ', result)
+
+      // Endpoint specific properties
+      assert.property(result, 'user')
+      assert.property(result.user, 'type')
+      assert.property(result.user, '_id')
+      assert.property(result.user, 'email')
+      assert.property(result.user, 'name')
+
+      // Generic JSON RPC return values
+      assert.equal(result.endpoint, 'getUser')
+      assert.equal(result.success, true)
+      assert.equal(result.status, 200)
+      assert.equal(result.message, '')
+    })
+
+    it('should return error data if biz logic throws an error', async () => {
+      // Force an error by not specifying an user ID.
+      const result = await uut.getUser()
+      // console.log('result: ', result)
+
+      // Generic JSON RPC return values
+      assert.equal(result.endpoint, 'getUser')
+      assert.equal(result.success, false)
+      assert.equal(result.status, 422)
+      assert.include(result.message, 'Cannot read property')
     })
   })
 

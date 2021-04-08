@@ -37,7 +37,8 @@ class UserRPC {
           return await this.getAll(rpcData)
 
         case 'getUser':
-          return await this.getUser(rpcData)
+          user = await this.validators.ensureUser(rpcData)
+          return await this.getUser(rpcData, user)
 
         case 'deleteUser':
           user = await this.validators.ensureTargetUserOrAdmin(rpcData)
@@ -56,12 +57,24 @@ class UserRPC {
 
       const retObj = await this.userLib.createUser(rpcData.payload.params)
 
+      // Add generic JSON RPC properties that every entry gets.
       retObj.endpoint = 'createUser'
+      retObj.success = true
+      retObj.status = 200
+      retObj.message = ''
 
       return retObj
     } catch (err) {
-      console.error('Error in createUser()')
-      throw err
+      // console.error('Error in createUser()')
+      // throw err
+
+      // Return an error response
+      return {
+        success: false,
+        status: 422,
+        message: err.message,
+        endpoint: 'createUser'
+      }
     }
   }
 
@@ -71,12 +84,54 @@ class UserRPC {
       const users = await this.userLib.getAllUsers()
 
       return {
+        users,
         endpoint: 'getAllUsers',
-        users
+        success: true,
+        status: 200,
+        message: ''
       }
     } catch (err) {
-      console.error('Error in getAll()')
-      throw err
+      // console.error('Error in getAll()')
+      // throw err
+
+      // Return an error response
+      return {
+        success: false,
+        status: 422,
+        message: err.message,
+        endpoint: 'getAllUsers'
+      }
+    }
+  }
+
+  // Get a specific user.
+  async getUser (rpcData, userModel) {
+    try {
+      // console.log('getUser rpcData: ', rpcData)
+
+      // Throw error if rpcData does not include 'userId' property for target user.
+      const userId = rpcData.payload.params.userId
+
+      const user = await this.userLib.getUser({ id: userId })
+
+      return {
+        user,
+        endpoint: 'getUser',
+        success: true,
+        status: 200,
+        message: ''
+      }
+    } catch (err) {
+      // console.error('Error in getUser()')
+      // throw err
+
+      // Return an error response
+      return {
+        success: false,
+        status: 422,
+        message: err.message,
+        endpoint: 'getUser'
+      }
     }
   }
 
