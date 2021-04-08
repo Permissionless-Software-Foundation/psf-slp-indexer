@@ -95,6 +95,9 @@ class UserLib {
 
   async updateUser (existingUser, newData) {
     try {
+      // console.log('existingUser: ', existingUser)
+      // console.log('newData: ', newData)
+
       // Input Validation
       // Optional inputs, but they must be strings if included.
       if (newData.email && typeof newData.email !== 'string') {

@@ -14,7 +14,7 @@
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/rest-api/ test/e2e/automated/"
+    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/json-rpc/ test/unit/rest-api/ test/e2e/automated/"
   },
   "keywords": [
     "koa-api-boilerplate",
