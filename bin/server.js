@@ -12,9 +12,11 @@ const cors = require('kcors')
 
 // Local libraries
 const config = require('../config') // this first.
-
+const IPFSLib = require('../src/lib/ipfs')
 const AdminLib = require('../src/lib/admin')
 const adminLib = new AdminLib()
+// const JSONRPC = require('../src/rpc')
+// const rpc = new JSONRPC()
 
 const errorMiddleware = require('../src/middleware')
 const wlogger = require('../src/lib/wlogger')
@@ -69,6 +71,10 @@ async function startServer () {
   // Create the system admin user.
   const success = await adminLib.createSystemUser()
   if (success) console.log('System admin user created.')
+
+  // Start the IPFS node.
+  const ipfsLib = new IPFSLib()
+  await ipfsLib.start()
 
   return app
 }

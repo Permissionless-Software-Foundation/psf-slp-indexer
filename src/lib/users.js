@@ -30,6 +30,7 @@ class UserLib {
 
       // Enforce default value of 'user'
       user.type = 'user'
+      // console.log('user: ', user)
 
       // Save the new user model to the database.
       await user.save()
@@ -39,6 +40,7 @@ class UserLib {
 
       // Convert the database model to a JSON object.
       const userData = user.toJSON()
+      // console.log('userData: ', userData)
 
       // Delete the password property.
       delete userData.password
@@ -93,6 +95,9 @@ class UserLib {
 
   async updateUser (existingUser, newData) {
     try {
+      // console.log('existingUser: ', existingUser)
+      // console.log('newData: ', newData)
+
       // Input Validation
       // Optional inputs, but they must be strings if included.
       if (newData.email && typeof newData.email !== 'string') {
@@ -142,6 +147,34 @@ class UserLib {
       await user.remove()
     } catch (err) {
       wlogger.error('Error in lib/users.js/deleteUser()')
+      throw err
+    }
+  }
+
+  // Used to authenticate a user. If the login and password salt match a user in
+  // the database, then it returns the user model. The Koa REST API uses the
+  // Passport library for this functionality. This function is used to
+  // authenticate users who login via the JSON RPC.
+  async authUser (login, passwd) {
+    try {
+      // console.log('login: ', login)
+      // console.log('passwd: ', passwd)
+
+      const user = await UserModel.findOne({ email: login })
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      const isMatch = await user.validatePassword(passwd)
+
+      if (!isMatch) {
+        throw new Error('Login credential do not match')
+      }
+
+      return user
+    } catch (err) {
+      // console.error('Error in users.js/authUser()')
+      console.log('')
       throw err
     }
   }

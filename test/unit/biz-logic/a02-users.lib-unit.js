@@ -26,10 +26,13 @@ describe('#users', () => {
     console.log(`Connecting to database: ${config.database}`)
     mongoose.Promise = global.Promise
     mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(config.database, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
+    await mongoose.connect(
+      config.database,
+      {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+      }
+    )
 
     // Delete all previous users in the database.
     await testUtils.deleteAllUsers()
@@ -312,7 +315,10 @@ describe('#users', () => {
         assert.fail('Unexpected code path')
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, "Property 'type' can only be changed by Admin user")
+        assert.include(
+          err.message,
+          "Property 'type' can only be changed by Admin user"
+        )
       }
     })
 
@@ -334,6 +340,39 @@ describe('#users', () => {
     })
 
     // TODO: verify that an admin can change the type of a user
+  })
+
+  describe('#authUser', () => {
+    it('should return a user db model after successful authentication', async () => {
+      const user = await uut.authUser('test@test.com', 'password')
+      // console.log('user: ', user)
+
+      assert.property(user, '_id')
+      assert.property(user, 'email')
+      assert.property(user, 'name')
+    })
+
+    it('should throw an error if no user matches the login', async () => {
+      try {
+        await uut.authUser('noone@nowhere.com', 'password')
+        // console.log('user: ', user)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'User not found')
+      }
+    })
+
+    it('should throw an error if password does not match', async () => {
+      try {
+        await uut.authUser('test@test.com', 'badpassword')
+        // console.log('user: ', user)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'Login credential do not match')
+      }
+    })
   })
 
   describe('#deleteUser', () => {
