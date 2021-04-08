@@ -22,10 +22,12 @@ class AuthRPC {
   // a specific endpoint. This method routes incoming calls to one of those
   // methods.
   async authRouter (rpcData) {
+    let endpoint = 'unknown'
+
     try {
       // console.log('authRouter rpcData: ', rpcData)
 
-      const endpoint = rpcData.payload.params.endpoint
+      endpoint = rpcData.payload.params.endpoint
 
       // Route the call based on the requested endpoint.
       switch (endpoint) {
@@ -34,7 +36,14 @@ class AuthRPC {
       }
     } catch (err) {
       console.error('Error in AuthRPC/authRouter()')
-      throw err
+      // throw err
+
+      return {
+        success: false,
+        status: 500,
+        message: err.message,
+        endpoint
+      }
     }
   }
 

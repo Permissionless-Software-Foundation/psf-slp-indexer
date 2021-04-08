@@ -76,6 +76,25 @@ describe('#AuthRPC', () => {
 
       assert.equal(result, true)
     })
+
+    it('should return 500 status on routing issue', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'authUser').rejects(new Error('test error'))
+
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const authCall = jsonrpc.request(id, 'auth', { endpoint: 'authUser' })
+      const jsonStr = JSON.stringify(authCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      const result = await uut.authRouter(rpcData)
+
+      assert.equal(result.success, false)
+      assert.equal(result.status, 500)
+      assert.equal(result.message, 'test error')
+      assert.equal(result.endpoint, 'authUser')
+    })
   })
 
   describe('#authUser', () => {

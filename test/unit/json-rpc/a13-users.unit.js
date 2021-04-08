@@ -220,7 +220,6 @@ describe('#UserRPC', () => {
       const result = await uut.userRouter(rpcData)
       // console.log('result: ', result)
 
-      // assert.equal(result, true)
       assert.equal(result.success, false)
       assert.equal(result.status, 500)
       assert.equal(result.message, 'test error')
