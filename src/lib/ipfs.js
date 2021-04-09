@@ -10,6 +10,7 @@ const IpfsCoord = require('ipfs-coord')
 const BCHJS = require('@psf/bch-js')
 
 // Local libraries
+const config = require('../../config')
 const JSONRPC = require('../rpc')
 
 class IPFSLib {
@@ -19,6 +20,7 @@ class IPFSLib {
     this.IpfsCoord = IpfsCoord
     this.bchjs = new BCHJS()
     this.rpc = new JSONRPC()
+    this.config = config
 
     // this.rpc = {}
     // if (localConfig.rpc) {
@@ -81,7 +83,8 @@ class IPFSLib {
         ipfs: this.ipfs,
         type: 'node.js',
         bchjs: this.bchjs,
-        privateLog: this.rpc.router
+        privateLog: this.rpc.router,
+        isCircuitRelay: this.config.isCircuitRelay
       })
 
       await this.ipfsCoord.isReady()
