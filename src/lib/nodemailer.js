@@ -72,6 +72,7 @@ class NodeMailer {
       // send mail with defined transport object
       const info = await _this.transporter.sendMail(sendObj)
       console.log('Message sent: %s', info.messageId)
+
       return info
     } catch (err) {
       wlogger.error('Error in lib/nodemailer.js/sendEmail()')
