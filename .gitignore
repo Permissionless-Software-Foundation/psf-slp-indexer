@@ -64,5 +64,6 @@ database/
 system-user-*.json
 orbitdb
 ipfsdata
+ipfs-service-provider.sh
 
 !README.md
