@@ -6,19 +6,19 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const ContactController = require('../../../src/modules/contact/controller')
+const LogsApiController = require('../../../src/modules/logapi/controller')
 let uut
 let sandbox
 let ctx
 
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
-describe('Contact', () => {
+describe('Logapi', () => {
   before(async () => {
   })
 
   beforeEach(() => {
-    uut = new ContactController()
+    uut = new LogsApiController()
 
     sandbox = sinon.createSandbox()
 
@@ -28,28 +28,41 @@ describe('Contact', () => {
 
   afterEach(() => sandbox.restore())
 
-  describe('#POST /contact', () => {
+  describe('#POST /logapi', () => {
     it('should return 422 status on biz logic error', async () => {
       try {
-        await uut.email(ctx)
+        await uut.getLogs(ctx)
 
         assert.fail('Unexpected result')
       } catch (err) {
-        // console.log(err)
         assert.equal(err.status, 422)
         assert.include(err.message, 'Cannot read property')
       }
     })
+    it('should return 500 status on biz logic Unhandled error', async () => {
+      try {
+        // eslint-disable
+        sandbox.stub(uut.logsApiLib, 'getLogs').returns(Promise.reject(new Error()))
+
+        ctx.request.body = {
+          password: 'test'
+        }
+
+        await uut.getLogs(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.status, 500)
+        assert.include(err.message, 'Unhandled error')
+      }
+    })
 
     it('should return 200 status on success', async () => {
-      sandbox.stub(uut.contactLib, 'sendEmail').resolves(true)
-
       ctx.request.body = {
-        email: 'test02@test.com',
-        formMessage: 'test'
+        password: 'test'
       }
 
-      await uut.email(ctx)
+      await uut.getLogs(ctx)
 
       // Assert the expected HTTP response
       assert.equal(ctx.status, 200)
