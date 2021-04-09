@@ -33,7 +33,7 @@
     "title": "ipfs-service-provider",
     "url": "localhost:5000"
   },
-  "repository": "christroutner/ipfs-service-provider",
+  "repository": "Permissionless-Software-Foundation/ipfs-service-provider",
   "dependencies": {
     "@psf/bch-js": "^4.17.6",
     "axios": "^0.21.1",
