@@ -20,14 +20,15 @@ class UserController {
    * @api {post} /users Create a new user
    * @apiPermission user
    * @apiName CreateUser
-   * @apiGroup Users
+   * @apiGroup REST Users
    *
    * @apiExample Example usage:
-   * curl -H "Content-Type: application/json" -X POST -d '{ "user": { "email": "email@format.com", "password": "secretpasas" } }' localhost:5001/users
+   * curl -H "Content-Type: application/json" -X POST -d '{ "user": { "email": "email@format.com", "name": "my name", "password": "secretpasas" } }' localhost:5001/users
    *
    * @apiParam {Object} user          User object (required)
-   * @apiParam {String} user.email Email.
-   * @apiParam {String} user.password Password.
+   * @apiParam {String} user.email Email
+   * @apiParam {String} user.password Password
+   * @apiParam {String} user.name name or handle
    *
    * @apiSuccess {Object}   users           User object
    * @apiSuccess {ObjectId} users._id       User id
@@ -42,7 +43,8 @@ class UserController {
    *       "user": {
    *          "_id": "56bd1da600a526986cf65c80"
    *          "name": "John Doe"
-   *          "email": "email@format.com"
+   *          "email": "email@format.com",
+   *          "password": "somestrongpassword"
    *       }
    *     }
    *
@@ -79,7 +81,7 @@ class UserController {
    * @api {get} /users Get all users
    * @apiPermission user
    * @apiName GetUsers
-   * @apiGroup Users
+   * @apiGroup REST Users
    *
    * @apiExample Example usage:
    * curl -H "Content-Type: application/json" -X GET localhost:5000/users
@@ -118,7 +120,7 @@ class UserController {
    * @api {get} /users/:id Get user by id
    * @apiPermission user
    * @apiName GetUser
-   * @apiGroup Users
+   * @apiGroup REST Users
    *
    * @apiExample Example usage:
    * curl -H "Content-Type: application/json" -X GET localhost:5000/users/56bd1da600a526986cf65c80
@@ -162,14 +164,15 @@ class UserController {
    * @api {put} /users/:id Update a user
    * @apiPermission user
    * @apiName UpdateUser
-   * @apiGroup Users
+   * @apiGroup REST Users
    *
    * @apiExample Example usage:
    * curl -H "Content-Type: application/json" -X PUT -d '{ "user": { "name": "Cool new Name" } }' localhost:5000/users/56bd1da600a526986cf65c80
    *
    * @apiParam {Object} user          User object (required)
    * @apiParam {String} user.name     Name.
-   * @apiParam {String} user.email Email.
+   * @apiParam {String} user.email    Email.
+   * @apiParam {String} user.password Password. (optional)
    *
    * @apiSuccess {Object}   users           User object
    * @apiSuccess {ObjectId} users._id       User id
@@ -218,7 +221,7 @@ class UserController {
    * @api {delete} /users/:id Delete a user
    * @apiPermission user
    * @apiName DeleteUser
-   * @apiGroup Users
+   * @apiGroup REST Users
    *
    * @apiExample Example usage:
    * curl -H "Content-Type: application/json" -X DELETE localhost:5000/users/56bd1da600a526986cf65c80
