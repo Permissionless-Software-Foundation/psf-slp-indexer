@@ -62,7 +62,46 @@ class UserRPC {
     }
   }
 
-  // Create a new user
+  /**
+   * @api {JSON} /users Create a new user
+   * @apiPermission public
+   * @apiName CreateUser
+   * @apiGroup JSON Users
+   *
+   * @apiExample Example usage:
+   * {"jsonrpc":"2.0","id":"555","method":"users","params":{ "endpoint": "createUser", "email": "test555@test.com", "name": "testy tester", "password": "password"}}
+   *
+   * @apiParam {Object} user          User object (required)
+   * @apiParam {String} user.email Email.
+   * @apiParam {String} user.password Password.
+   * @apiParam {String} user.name name or handle
+   *
+   * @apiSuccess {Object}   users           User object
+   * @apiSuccess {ObjectId} users._id       User id
+   * @apiSuccess {String}   user.type       User type (admin or user)
+   * @apiSuccess {String}   users.name      User name
+   * @apiSuccess {String}   users.username  User username
+   * @apiSuccess {String}   users.email     User email
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *       "user": {
+   *          "_id": "56bd1da600a526986cf65c80"
+   *          "name": "John Doe"
+   *          "email": "email@format.com"
+   *       }
+   *     }
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *     HTTP/1.1 422 Unprocessable Entity
+   *     {
+   *       "status": 422,
+   *       "error": "Unprocessable Entity"
+   *     }
+   */
   async createUser (rpcData) {
     try {
       // console.log('createUser rpcData: ', rpcData)
