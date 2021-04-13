@@ -82,6 +82,7 @@ class IPFSLib {
       this.ipfsCoord = new this.IpfsCoord({
         ipfs: this.ipfs,
         type: 'node.js',
+        // type: 'browser',
         bchjs: this.bchjs,
         privateLog: this.rpc.router,
         isCircuitRelay: this.config.isCircuitRelay
