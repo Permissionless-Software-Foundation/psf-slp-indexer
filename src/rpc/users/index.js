@@ -129,6 +129,16 @@ class UserRPC {
     }
   }
 
+  /**
+   * @api {JSON} /users Get all users
+   * @apiPermission public
+   * @apiName GetAllUsers
+   * @apiGroup JSON Users
+   *
+   * @apiExample Example usage:
+   * {"jsonrpc":"2.0","id":"555","method":"users","params":{ "endpoint": "getAllUsers", "apiToken": "<JWT>"}}
+   *
+   */
   // Get all Users.
   async getAll () {
     try {
@@ -155,6 +165,16 @@ class UserRPC {
     }
   }
 
+  /**
+   * @api {JSON} /users Get a user
+   * @apiPermission public
+   * @apiName GetAUser
+   * @apiGroup JSON Users
+   *
+   * @apiExample Example usage:
+   * {"jsonrpc":"2.0","id":"123","method":"users","params":{ "endpoint": "getUser", "apiToken": "<JWT>", "userId": "<_id>"}}
+   *
+   */
   // Get a specific user.
   async getUser (rpcData, userModel) {
     try {
@@ -186,6 +206,16 @@ class UserRPC {
     }
   }
 
+  /**
+   * @api {JSON} /users Update a user
+   * @apiPermission public
+   * @apiName UpdateAUser
+   * @apiGroup JSON Users
+   *
+   * @apiExample Example usage:
+   * {"jsonrpc":"2.0","id":"123","method":"users","params":{ "endpoint": "updateUser", "apiToken": "<JWT>", "userId": "<_id>", "name": "test999"}}
+   *
+   */
   async updateUser (rpcData, userModel) {
     try {
       // console.log('updateUser rpcData: ', rpcData)
@@ -214,6 +244,16 @@ class UserRPC {
     }
   }
 
+  /**
+   * @api {JSON} /users Delete a user
+   * @apiPermission public
+   * @apiName DeleteAUser
+   * @apiGroup JSON Users
+   *
+   * @apiExample Example usage:
+   * {"jsonrpc":"2.0","id":"123","method":"users","params":{ "endpoint": "deleteUser", "userId": "<_id>", "apiToken": "<JWT>"}}
+   *
+   */
   async deleteUser (rpcData, userModel) {
     try {
       // console.log('deleteUser rpcData: ', rpcData)

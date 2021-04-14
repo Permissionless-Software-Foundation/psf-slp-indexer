@@ -47,6 +47,16 @@ class AuthRPC {
     }
   }
 
+  /**
+   * @api {JSON} /auth Get JWT Token
+   * @apiPermission public
+   * @apiName AuthUser
+   * @apiGroup JSON Auth
+   *
+   * @apiExample Example usage:
+   * {"jsonrpc":"2.0","id":"556","method":"auth","params":{ "endpoint": "authUser", "login": "test555@test.com", "password": "password"}}
+   *
+   */
   async authUser (rpcData) {
     try {
       // console.log('authUser rpcData: ', rpcData)
