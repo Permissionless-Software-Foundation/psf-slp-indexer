@@ -9,6 +9,7 @@ const jsonrpc = require('jsonrpc-lite')
 const wlogger = require('../lib/wlogger')
 const UserController = require('./users')
 const AuthController = require('./auth')
+const AboutController = require('./about')
 
 let _this
 
@@ -18,6 +19,7 @@ class JSONRPC {
     this.jsonrpc = jsonrpc
     this.userController = new UserController()
     this.authController = new AuthController()
+    this.aboutController = new AboutController()
 
     // This will be replaced once the ipfs-coord lib finishes initializing.
     this.ipfsCoord = {}
@@ -60,6 +62,8 @@ class JSONRPC {
         case 'auth':
           retObj = await _this.authController.authRouter(parsedData)
           break
+        case 'about':
+          retObj = await _this.aboutController.aboutRouter(parsedData)
       }
 
       // console.log('retObj: ', retObj)
