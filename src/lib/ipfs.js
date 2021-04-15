@@ -86,7 +86,8 @@ class IPFSLib {
         bchjs: this.bchjs,
         privateLog: this.rpc.router,
         isCircuitRelay: this.config.isCircuitRelay,
-        apiInfo: 'https://ipfs-service-provider.fullstack.cash/'
+        apiInfo: this.config.apiInfo,
+        announceJsonLd: this.config.announceJsonLd
       })
 
       await this.ipfsCoord.isReady()
