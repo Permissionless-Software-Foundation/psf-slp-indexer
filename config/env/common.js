@@ -18,5 +18,22 @@ module.exports = {
   emailPassword: process.env.EMAILPASS ? process.env.EMAILPASS : 'emailpassword',
 
   // IPFS settings.
-  isCircuitRelay: process.env.ENABLE_CIRCUIT_RELAY ? true : false
+  isCircuitRelay: process.env.ENABLE_CIRCUIT_RELAY ? true : false,
+
+  // Information passed to other IPFS peers about this node.
+  apiInfo: 'https://ipfs-service-provider.fullstack.cash/',
+
+  // JSON-LD and Schema.org schema with info about this app.
+  announceJsonLd: {
+    '@context': 'https://schema.org/',
+    '@type': 'WebAPI',
+    name: 'ipfs-service-provider',
+    description: 'This is a generic IPFS Serivice Provider that uses JSON RPC over IPFS to communicate with it. This instance has not been customized. Source code: https://github.com/Permissionless-Software-Foundation/ipfs-service-provider',
+    documentation: 'https://ipfs-service-provider.fullstack.cash/',
+    provider: {
+      '@type': 'Organization',
+      name: 'Permissionless Software Foundation',
+      url: 'https://PSFoundation.cash'
+    }
+  }
 }
