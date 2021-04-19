@@ -71,11 +71,11 @@ class UserRPC {
    * @apiExample Example usage:
    * {"jsonrpc":"2.0","id":"555","method":"users","params":{ "endpoint": "createUser", "email": "test555@test.com", "name": "testy tester", "password": "password"}}
    *
-   * @apiParam {Object} user          User object (required)
-   * @apiParam {String} user.email Email.
-   * @apiParam {String} user.password Password.
-   * @apiParam {String} user.name name or handle
-   *
+   * @apiParam {String} email Email(required).
+   * @apiParam {String} password Password(required).
+   * @apiParam {String} name name or handle(optional).
+   * @apiParam {string} endpoint      (required)
+
    * @apiSuccess {Object}   users           User object
    * @apiSuccess {ObjectId} users._id       User id
    * @apiSuccess {String}   user.type       User type (admin or user)
@@ -84,23 +84,48 @@ class UserRPC {
    * @apiSuccess {String}   users.email     User email
    *
    * @apiSuccessExample {json} Success-Response:
-   *     HTTP/1.1 200 OK
-   *     {
-   *       "user": {
-   *          "_id": "56bd1da600a526986cf65c80"
-   *          "name": "John Doe"
-   *          "email": "email@format.com"
-   *       }
-   *     }
+   *  HTTP/1.1 200 OK
+   *  {
+   *  "jsonrpc": "2.0",
+   *  "id": "555",
+   *  "result": {
+   *    "method": "users",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "userData": {
+   *        "type": "user",
+   *        "_id": "607dd3e6426f3d3148b3a466",
+   *        "email": "test555@test.com",
+   *        "name": "testy tester",
+   *        "__v": 0
+   *      },
+   *      "token": "eyJhbGciOiJIUzI1NiIs1nR5cCI6IkpXVTJ9.eyJpZCI6IjYwN2RkM2U2NDI2ZjNkMzE0OGIzYTQ2NiIsImlhdCI6MTYxODg1ODk4Mn0.in4vzxDqqyCd7LpuhG3xlXeBqrJ5bp9GJPwhaoVzldI",
+   *      "endpoint": "createUser",
+   *      "success": true,
+   *      "status": 200,
+   *      "message": ""
+   *    }
+   *  }
+   *}
    *
    * @apiError UnprocessableEntity Missing required parameters
    *
    * @apiErrorExample {json} Error-Response:
-   *     HTTP/1.1 422 Unprocessable Entity
-   *     {
-   *       "status": 422,
-   *       "error": "Unprocessable Entity"
-   *     }
+   *  HTTP/1.1 422 Unprocessable Entity
+   * {
+   *  "jsonrpc": "2.0",
+   *  "id": "123",
+   *  "result": {
+   *    "method": "users",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "success": false,
+   *      "status": 422,
+   *      "message": "Unprocessable Entity",
+   *      "endpoint": "getUser"
+   *    }
+   *  }
+   *}
    */
   async createUser (rpcData) {
     try {
@@ -138,6 +163,55 @@ class UserRPC {
    * @apiExample Example usage:
    * {"jsonrpc":"2.0","id":"555","method":"users","params":{ "endpoint": "getAllUsers", "apiToken": "<JWT>"}}
    *
+   * @apiParam {String} apiToken      (required)
+   * @apiParam {string} endpoint      (required)
+   *
+   * @apiSuccess {Object[]} users           Array of user objects
+   * @apiSuccess {ObjectId} users._id       User id
+   * @apiSuccess {String}   user.type       User type (admin or user)
+   * @apiSuccess {String}   users.name      User name
+   * @apiSuccess {String}   users.username  User username
+   * @apiSuccess {String}   users.email     User email
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  result": {
+   *  "method": "users",
+   *  "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *  "value": {
+   *   "users": [
+   *     {
+   *       "type": "user",
+   *       "_id": "6070bc6da931e73d4d9e108d",
+   *       "email": "test678@test.com",
+   *       "name": "testy tester",
+   *       "__v": 0
+   *     }
+   *   ],
+   *   "endpoint": "getAllUsers",
+   *   "success": true,
+   *   "status": 200,
+   *   "message": ""
+   *  }
+   * }
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *     HTTP/1.1 422 Unprocessable Entity
+   *     {
+   *     "jsonrpc": "2.0",
+   *     "id": "123",
+   *     "result": {
+   *       "method": "users",
+   *       "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *       "value": {
+   *         "success": false,
+   *         "status": 422,
+   *         "message": "",
+   *         "endpoint": "getAllUsers"
+   *       }
+   *     }
    */
   // Get all Users.
   async getAll () {
@@ -173,6 +247,59 @@ class UserRPC {
    *
    * @apiExample Example usage:
    * {"jsonrpc":"2.0","id":"123","method":"users","params":{ "endpoint": "getUser", "apiToken": "<JWT>", "userId": "<_id>"}}
+   *
+   * @apiParam {String} apiToken      (required)
+   * @apiParam {String} userId       (required)
+   * @apiParam {string} endpoint      (required)
+   *
+   * @apiSuccess {Object[]} users           Array of user objects
+   * @apiSuccess {ObjectId} users._id       User id
+   * @apiSuccess {String}   user.type       User type (admin or user)
+   * @apiSuccess {String}   users.name      User name
+   * @apiSuccess {String}   users.username  User username
+   * @apiSuccess {String}   users.email     User email
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  result": {
+   *  "jsonrpc": "2.0",
+   *  "id": "123",
+   *  "result": {
+   *    "method": "users",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "user": {
+   *        "type": "user",
+   *        "_id": "607dd3e6426f3d3148b3a466",
+   *        "email": "test555@test.com",
+   *        "name": "testy tester",
+   *        "__v": 0
+   *      },
+   *      "endpoint": "getUser",
+   *      "success": true,
+   *      "status": 200,
+   *      "message": ""
+   *  }
+   *}
+   *
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *     HTTP/1.1 422 Unprocessable Entity
+   *     {
+   *     "jsonrpc": "2.0",
+   *     "id": "123",
+   *     "result": {
+   *       "method": "users",
+   *       "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *       "value": {
+   *         "success": false,
+   *         "status": 422,
+   *         "message": "Unprocessable Entity",
+   *         "endpoint": "getUser"
+   *       }
+   *     }
    *
    */
   // Get a specific user.
@@ -215,6 +342,64 @@ class UserRPC {
    * @apiExample Example usage:
    * {"jsonrpc":"2.0","id":"123","method":"users","params":{ "endpoint": "updateUser", "apiToken": "<JWT>", "userId": "<_id>", "name": "test999"}}
    *
+   * @apiParam {String} apiToken      (required)
+   * @apiParam {String} userId       (required)
+   * @apiParam {string} endpoint      (required)
+   * @apiParam {String} email Email(Optional).
+   * @apiParam {String} password Password(Optional).
+   * @apiParam {String} name name or handle(Optional).
+   *
+   *
+   * @apiSuccess {Object}   users           User object
+   * @apiSuccess {ObjectId} users._id       User id
+   * @apiSuccess {String}   user.type      User type (admin or user)
+   * @apiSuccess {String}   users.name      Updated name
+   * @apiSuccess {String}   users.username  Updated username
+   * @apiSuccess {String}   users.email     Updated email
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  result": {
+   *  "jsonrpc": "2.0",
+   *  "id": "123",
+   *  "result": {
+   *    "method": "users",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "user": {
+   *        "type": "user",
+   *        "_id": "607dd3e6426f3d3148b3a466",
+   *        "email": "test555@test.com",
+   *        "name": "test001",
+   *        "__v": 0
+   *      },
+   *      "endpoint": "updateUser",
+   *      "success": true,
+   *      "status": 200,
+   *      "message": ""
+   *    }
+   *  }
+   *}
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *  HTTP/1.1 422 Unprocessable Entity
+   *  {
+   *    "jsonrpc": "2.0",
+   *    "id": "123",
+   *    "result": {
+   *      "method": "users",
+   *      "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *      "value": {
+   *        "success": false,
+   *        "status": 422,
+   *        "message": "Unprocessable Entity.",
+   *        "endpoint": "updateUser"
+   *      }
+   *    }
+   *  }
+   *
    */
   async updateUser (rpcData, userModel) {
     try {
@@ -250,8 +435,50 @@ class UserRPC {
    * @apiName DeleteAUser
    * @apiGroup JSON Users
    *
+   *
    * @apiExample Example usage:
    * {"jsonrpc":"2.0","id":"123","method":"users","params":{ "endpoint": "deleteUser", "userId": "<_id>", "apiToken": "<JWT>"}}
+   *
+   * @apiParam {String} apiToken      (required)
+   * @apiParam {String} userId       (required)
+   * @apiParam {string} endpoint      (required)
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  result":  {
+   *  "jsonrpc": "2.0",
+   *  "id": "123",
+   *  "result": {
+   *    "method": "users",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "endpoint": "deleteUser",
+   *      "success": true,
+   *      "status": 200,
+   *      "message": ""
+   *    }
+   *  }
+   *}
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *  HTTP/1.1 422 Unprocessable Entity
+   * {
+   *  "jsonrpc": "2.0",
+   *  "id": "123",
+   *  "result": {
+   *    "method": "users",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "success": false,
+   *      "status": 422,
+   *      "message": "Unprocessable Entity",
+   *      "endpoint": "deleteUser"
+   *    }
+   *  }
+   *}
+   *
    *
    */
   async deleteUser (rpcData, userModel) {

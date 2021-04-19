@@ -56,6 +56,57 @@ class AuthRPC {
    * @apiExample Example usage:
    * {"jsonrpc":"2.0","id":"556","method":"auth","params":{ "endpoint": "authUser", "login": "test555@test.com", "password": "password"}}
    *
+   * @apiParam {String} login Email(required).
+   * @apiParam {String} password Password(required).
+   * @apiParam {string} endpoint      (required)
+   *
+   * @apiSuccess {Object}   users           User object
+   * @apiSuccess {ObjectId} users._id       User id
+   * @apiSuccess {String}   user.type       User type (admin or user)
+   * @apiSuccess {String}   users.name      User name
+   * @apiSuccess {String}   users.email     User email
+   * @apiSuccess {String}   token           JWT.
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   *  {
+   *  "jsonrpc": "2.0",
+   *  "id": "556",
+   *  "result": {
+   *    "method": "auth",
+   *    "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *    "value": {
+   *      "endpoint": "authUser",
+   *      "userId": "607de52d426f3d3148b3a467",
+   *      "userType": "user",
+   *      "userName": "testy tester",
+   *      "userEmail": "test555@test.com",
+   *      "apiToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2RlNTJkNDI2ZjNkMzE0OGIzYTQ2NyIsImlhdCI6MTYxODg2NTcwM30.acGe5ZiBAAcbOcPQDIhvc3z0KjnuYZd1Y5pJJJC9mJQ",
+   *      "status": 200,
+   *      "success": true,
+   *      "message": ""
+   *    }
+   *  }
+   *}
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *  HTTP/1.1 422 Unprocessable Entity
+   * {
+   *   "jsonrpc": "2.0",
+   *   "id": "556",
+   *   "result": {
+   *     "method": "auth",
+   *     "reciever": "Qmc2uJhg7yrqaNaoTJRDkzrAyVe82e9JMFQcxrBUjbdXyC",
+   *     "value": {
+   *       "success": false,
+   *       "status": 422,
+   *       "message": "User not found",
+   *       "endpoint": "authUser"
+   *     }
+   *   }
+   * }
    */
   async authUser (rpcData) {
     try {
