@@ -50,7 +50,9 @@ class JSONRPC {
       if (parsedData.type === 'invalid') {
         return
       }
-
+      // Added the property "from" to parsed data
+      // necessary to the rate limits
+      parsedData.from = from
       // Default return string
       let retObj = _this.defaultResponse()
 

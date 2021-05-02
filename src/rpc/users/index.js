@@ -8,6 +8,7 @@ const jsonrpc = require('jsonrpc-lite')
 // Local libraries
 const UserLib = require('../../lib/users')
 const Validators = require('../validators')
+const RateLimit = require('../rate-limit')
 
 class UserRPC {
   constructor (localConfig) {
@@ -15,6 +16,7 @@ class UserRPC {
     this.userLib = new UserLib()
     this.jsonrpc = jsonrpc
     this.validators = new Validators()
+    this.rateLimit = new RateLimit()
   }
 
   // Top-level router for this library. All other methods in this class are for
@@ -35,6 +37,7 @@ class UserRPC {
 
         case 'getAllUsers':
           await this.validators.ensureUser(rpcData)
+          await this.rateLimit.limiter(rpcData.from)
           return await this.getAll(rpcData)
 
         case 'getUser':
@@ -55,7 +58,7 @@ class UserRPC {
 
       return {
         success: false,
-        status: 500,
+        status: err.status || 500,
         message: err.message,
         endpoint
       }
