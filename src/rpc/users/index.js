@@ -33,6 +33,7 @@ class UserRPC {
       // Route the call based on the value of the method property.
       switch (endpoint) {
         case 'createUser':
+          await this.rateLimit.limiter(rpcData.from)
           return await this.createUser(rpcData)
 
         case 'getAllUsers':
@@ -42,14 +43,17 @@ class UserRPC {
 
         case 'getUser':
           user = await this.validators.ensureUser(rpcData)
+          await this.rateLimit.limiter(rpcData.from)
           return await this.getUser(rpcData, user)
 
         case 'updateUser':
           user = await this.validators.ensureTargetUserOrAdmin(rpcData)
+          await this.rateLimit.limiter(rpcData.from)
           return await this.updateUser(rpcData, user)
 
         case 'deleteUser':
           user = await this.validators.ensureTargetUserOrAdmin(rpcData)
+          await this.rateLimit.limiter(rpcData.from)
           return await this.deleteUser(rpcData, user)
       }
     } catch (err) {

@@ -7,12 +7,12 @@
 const RateLimitLib = require('koa2-ratelimit').RateLimit
 
 class RateLimit {
-  constructor () {
+  constructor (options) {
     // Encapsulate dependencies
     this.RateLimitLib = RateLimitLib
-    this.options = {
+    this.defaultOptions = {
       interval: { min: 1 },
-      max: 2,
+      max: 1,
       onLimitReached: this.onLimitReached
     }
 
@@ -27,12 +27,15 @@ class RateLimit {
       user: '',
       set: () => { }
     }
+    // Stasblish provided options as the default options
+    this.rateLimitOptions = Object.assign({}, this.defaultOptions, options)
+    this.rateLimit = this.RateLimitLib.middleware(this.rateLimitOptions)
   }
 
   onLimitReached () {
     try {
       const error = new Error()
-      error.message = 'limit per minute reached!'
+      error.message = 'Too many requests, please try again later.'
       error.status = 429
       throw error
     } catch (error) {
@@ -46,16 +49,16 @@ class RateLimit {
       if (!from || typeof from !== 'string') {
         throw new Error('from must be a string')
       }
-      const rateLimit = this.RateLimitLib.middleware(this.options)
 
       // Set context
       this.context.state.user = from
       this.context.request.ip = from
       this.context.user = from
 
-      await rateLimit(this.context, () => { })
+      await this.rateLimit(this.context, () => { })
+      return true
     } catch (error) {
-      console.error('Error in limiter()', error)
+      console.error('Error in limiter()')
       throw error
     }
   }

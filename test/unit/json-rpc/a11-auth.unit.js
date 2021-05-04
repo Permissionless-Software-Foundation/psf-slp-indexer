@@ -15,6 +15,7 @@ process.env.SVC_ENV = 'test'
 // Local libraries
 const config = require('../../../config')
 const AuthRPC = require('../../../src/rpc/auth')
+const RateLimit = require('../../../src/rpc/rate-limit')
 const UserLib = require('../../../src/lib/users')
 const userLib = new UserLib()
 
@@ -48,6 +49,7 @@ describe('#AuthRPC', () => {
     sandbox = sinon.createSandbox()
 
     uut = new AuthRPC()
+    uut.rateLimit = new RateLimit({ max: 100 })
   })
 
   afterEach(() => sandbox.restore())
@@ -71,6 +73,7 @@ describe('#AuthRPC', () => {
       const authCall = jsonrpc.request(id, 'auth', { endpoint: 'authUser' })
       const jsonStr = JSON.stringify(authCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.authRouter(rpcData)
 
@@ -87,6 +90,7 @@ describe('#AuthRPC', () => {
       const authCall = jsonrpc.request(id, 'auth', { endpoint: 'authUser' })
       const jsonStr = JSON.stringify(authCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.authRouter(rpcData)
 
