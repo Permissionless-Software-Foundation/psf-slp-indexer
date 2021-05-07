@@ -33,10 +33,14 @@ describe('#rate-limit', () => {
         assert.fail('unexpected error')
       } catch (error) {
         assert.equal(error.status, 429)
-        assert.include(error.message, 'Too many requests, please try again later.')
+        assert.include(
+          error.message,
+          'Too many requests, please try again later.'
+        )
       }
     })
   })
+
   describe('#limiter', () => {
     it('should throw error if "from" input is not provider', async () => {
       try {
@@ -46,18 +50,25 @@ describe('#rate-limit', () => {
         assert.include(error.message, 'from must be a string')
       }
     })
+
     it('should throw error 429', async () => {
       try {
         const _uut = new RateLimit({ max: 1 })
         const from = 'Origin request'
 
-        const firtsRequest = await _uut.limiter(from)
-        assert.isTrue(firtsRequest)
+        const firstRequest = await _uut.limiter(from)
+        assert.isTrue(firstRequest)
+
+        const secondRequest = await _uut.limiter(from)
+        assert.isTrue(secondRequest)
 
         await _uut.limiter(from)
         assert.fail('unexpected error')
       } catch (error) {
-        assert.include(error.message, 'Too many requests, please try again later.')
+        assert.include(
+          error.message,
+          'Too many requests, please try again later.'
+        )
       }
     })
   })

@@ -10,9 +10,11 @@ class RateLimit {
   constructor (options) {
     // Encapsulate dependencies
     this.RateLimitLib = RateLimitLib
+
+    // Set default rate limit options.
     this.defaultOptions = {
       interval: { min: 1 },
-      max: 1,
+      max: 60,
       onLimitReached: this.onLimitReached
     }
 
@@ -25,16 +27,27 @@ class RateLimit {
         ip: ''
       },
       user: '',
-      set: () => { }
+      set: () => {}
     }
-    // Stasblish provided options as the default options
+
+    console.log(
+      `this.defaultOptions: ${JSON.stringify(this.defaultOptions, null, 2)}`
+    )
+    console.log(`options: ${JSON.stringify(options, null, 2)}`)
+
+    // Set rate limit settings. Default values are overwritten if user passes
+    // in an options object.
     this.rateLimitOptions = Object.assign({}, this.defaultOptions, options)
-    this.rateLimit = this.RateLimitLib.middleware(this.rateLimitOptions)
+    console.log(
+      `this.rateLimitOptions: ${JSON.stringify(this.rateLimitOptions, null, 2)}`
+    )
+    this.rateLimit = this.RateLimitLib.middleware(this.rateLimitOptiolimiterns)
   }
 
+  // This function is called when the user hits their rate limits.
   onLimitReached () {
     try {
-      const error = new Error()
+      const error = new Error() // Establish provided options as the default options.
       error.message = 'Too many requests, please try again later.'
       error.status = 429
       throw error
@@ -44,21 +57,24 @@ class RateLimit {
     }
   }
 
+  // This is the middleware function called by the router.
   async limiter (from) {
     try {
       if (!from || typeof from !== 'string') {
         throw new Error('from must be a string')
       }
 
-      // Set context
+      // Set context.limiter
+      // This overrides the default koa behavior and adapts the rate limiter
+      // to work with the JSON RPC over IPFS.
       this.context.state.user = from
       this.context.request.ip = from
       this.context.user = from
 
-      await this.rateLimit(this.context, () => { })
+      await this.rateLimit(this.context, () => {})
       return true
     } catch (error) {
-      console.error('Error in limiter()')
+      console.error('Error in rate-limit.js/limiter()')
       throw error
     }
   }
