@@ -25,7 +25,42 @@ describe('#rate-limit', () => {
   })
 
   afterEach(() => sandbox.restore())
+  describe('#constructor', () => {
+    it('should use the options provided', async () => {
+      try {
+        const options = {
+          interval: { min: 10 },
+          delayAfter: 1,
+          timeWait: { sec: 5 },
+          max: 2,
+          onLimitReached: () => {
+            throw new Error('custom message error')
+          }
+        }
+        const _uut = new RateLimit(options)
 
+        // Assert  options
+        assert.equal(_uut.rateLimitOptions.interval.min, options.interval.min)
+        assert.equal(_uut.rateLimitOptions.delayAfter, options.delayAfter)
+        assert.equal(_uut.rateLimitOptions.timeWait.sec, options.timeWait.sec)
+
+        const from = 'constructor test'
+        const firstRequest = await _uut.limiter(from)
+        assert.isTrue(firstRequest)
+
+        const secondRequest = await _uut.limiter(from)
+        assert.isTrue(secondRequest)
+
+        await _uut.limiter(from)
+        assert.fail('unexpected error')
+      } catch (error) {
+        assert.include(
+          error.message,
+          'custom message error'
+        )
+      }
+    })
+  })
   describe('#onLimitReached', () => {
     it('should throw error', async () => {
       try {

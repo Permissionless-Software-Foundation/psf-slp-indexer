@@ -41,7 +41,7 @@ class RateLimit {
     console.log(
       `this.rateLimitOptions: ${JSON.stringify(this.rateLimitOptions, null, 2)}`
     )
-    this.rateLimit = this.RateLimitLib.middleware(this.rateLimitOptiolimiterns)
+    this.rateLimit = this.RateLimitLib.middleware(this.rateLimitOptions)
   }
 
   // This function is called when the user hits their rate limits.
