@@ -25,6 +25,7 @@ describe('#rate-limit', () => {
   })
 
   afterEach(() => sandbox.restore())
+
   describe('#constructor', () => {
     it('should use the options provided', async () => {
       try {
@@ -54,10 +55,7 @@ describe('#rate-limit', () => {
         await _uut.limiter(from)
         assert.fail('unexpected error')
       } catch (error) {
-        assert.include(
-          error.message,
-          'custom message error'
-        )
+        assert.include(error.message, 'custom message error')
       }
     })
   })
