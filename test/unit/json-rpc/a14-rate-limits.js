@@ -59,6 +59,7 @@ describe('#rate-limit', () => {
       }
     })
   })
+
   describe('#onLimitReached', () => {
     it('should throw error', async () => {
       try {
