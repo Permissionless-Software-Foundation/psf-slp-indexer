@@ -11,22 +11,12 @@
     "test:unit:rest": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/rest-api/",
     "test:unit:jsonrpc": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/json-rpc/",
     "test:e2e:auto": "export SVC_ENV=test && mocha --exit --timeout 15000 test/e2e/automated/",
+    "test:temp": "export SVC_ENV=test && mocha --exit --timeout 15000 -g '#rate-limit' test/unit/json-rpc/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/json-rpc/ test/unit/rest-api/ test/e2e/automated/"
   },
-  "keywords": [
-    "koa-api-boilerplate",
-    "api",
-    "koa",
-    "koa2",
-    "boilerplate",
-    "es6",
-    "mongoose",
-    "passportjs",
-    "apidoc"
-  ],
   "author": "Chris Troutner <chris.troutner@gmail.com>",
   "license": "MIT",
   "apidoc": {
@@ -53,6 +43,7 @@
     "koa-passport": "^4.1.3",
     "koa-router": "^10.0.0",
     "koa-static": "^5.0.0",
+    "koa2-ratelimit": "^0.9.0",
     "line-reader": "^0.4.0",
     "mongoose": "^5.11.15",
     "nodemailer": "^6.4.17",

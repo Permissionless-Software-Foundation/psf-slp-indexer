@@ -15,6 +15,7 @@ process.env.SVC_ENV = 'test'
 // Local libraries
 const config = require('../../../config')
 const UserRPC = require('../../../src/rpc/users')
+const RateLimit = require('../../../src/rpc/rate-limit')
 const UserModel = require('../../../src/models/users')
 
 describe('#UserRPC', () => {
@@ -40,6 +41,7 @@ describe('#UserRPC', () => {
     sandbox = sinon.createSandbox()
 
     uut = new UserRPC()
+    uut.rateLimit = new RateLimit({ max: 100 })
   })
 
   afterEach(() => sandbox.restore())
@@ -120,6 +122,7 @@ describe('#UserRPC', () => {
       const userCall = jsonrpc.request(id, 'users', { endpoint: 'createUser' })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.userRouter(rpcData)
 
@@ -139,9 +142,10 @@ describe('#UserRPC', () => {
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.userRouter(rpcData)
-
+      console.log('result', result)
       assert.equal(result, true)
     })
 
@@ -159,6 +163,7 @@ describe('#UserRPC', () => {
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.userRouter(rpcData)
       // console.log('result: ', result)
@@ -179,7 +184,7 @@ describe('#UserRPC', () => {
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
-
+      rpcData.from = 'Origin request'
       const result = await uut.userRouter(rpcData)
 
       assert.equal(result, true)
@@ -199,6 +204,7 @@ describe('#UserRPC', () => {
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.userRouter(rpcData)
       // console.log('result: ', result)
@@ -216,6 +222,7 @@ describe('#UserRPC', () => {
       const userCall = jsonrpc.request(id, 'users', { endpoint: 'createUser' })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+      rpcData.from = 'Origin request'
 
       const result = await uut.userRouter(rpcData)
       // console.log('result: ', result)

@@ -9,6 +9,7 @@ const jsonrpc = require('jsonrpc-lite')
 // const AuthLib = require('../../lib/auth')
 const UserLib = require('../../lib/users')
 const wlogger = require('../../lib/wlogger')
+const RateLimit = require('../rate-limit')
 
 class AuthRPC {
   constructor (localConfig) {
@@ -16,6 +17,7 @@ class AuthRPC {
     // this.authLib = new AuthLib()
     this.jsonrpc = jsonrpc
     this.userLib = new UserLib()
+    this.rateLimit = new RateLimit()
   }
 
   // Top-level router for this library. All other methods in this class are for
@@ -32,6 +34,7 @@ class AuthRPC {
       // Route the call based on the requested endpoint.
       switch (endpoint) {
         case 'authUser':
+          await this.rateLimit.limiter(rpcData.from)
           return await this.authUser(rpcData)
       }
     } catch (err) {
