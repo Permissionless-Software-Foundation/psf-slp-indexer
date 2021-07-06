@@ -7,7 +7,7 @@ const Router = require('koa-router')
 
 // Local libraries.
 const UserRESTControllerLib = require('./controller')
-const Validators = require('../../../middleware/validators')
+const Validators = require('../middleware/validators')
 
 let _this
 
