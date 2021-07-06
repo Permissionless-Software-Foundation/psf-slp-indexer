@@ -6,7 +6,7 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const LogsApiController = require('../../../src/modules/logapi/controller')
+const LogsApiController = require('../../../src/controllers/rest-api/logs/controller')
 let uut
 let sandbox
 let ctx
@@ -14,8 +14,7 @@ let ctx
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
 describe('Logapi', () => {
-  before(async () => {
-  })
+  before(async () => {})
 
   beforeEach(() => {
     uut = new LogsApiController()
@@ -42,7 +41,9 @@ describe('Logapi', () => {
     it('should return 500 status on biz logic Unhandled error', async () => {
       try {
         // eslint-disable
-        sandbox.stub(uut.logsApiLib, 'getLogs').returns(Promise.reject(new Error()))
+        sandbox
+          .stub(uut.logsApiLib, 'getLogs')
+          .returns(Promise.reject(new Error()))
 
         ctx.request.body = {
           password: 'test'

@@ -57,8 +57,8 @@ async function startServer () {
   restApi.attachControllers(app)
 
   // Custom Middleware Modules
-  const modules = require('../src/modules')
-  modules(app)
+  // const modules = require('../src/modules')
+  // modules(app)
 
   // Enable CORS for testing
   // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION

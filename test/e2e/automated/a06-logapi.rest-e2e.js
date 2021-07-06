@@ -9,7 +9,7 @@ util.inspect.defaultOptions = { depth: 1 }
 
 const LOCALHOST = `http://localhost:${config.port}`
 
-const LogsController = require('../../../src/modules/logapi/controller')
+const LogsController = require('../../../src/controllers/rest-api/logs/controller')
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
 let sandbox
@@ -23,12 +23,12 @@ describe('LogsApi', () => {
 
   afterEach(() => sandbox.restore())
 
-  describe('POST /logapi', () => {
+  describe('POST /logs', () => {
     it('should return false if password is not provided', async () => {
       try {
         const options = {
           method: 'post',
-          url: `${LOCALHOST}/logapi`,
+          url: `${LOCALHOST}/logs`,
           data: {}
         }
 
@@ -38,11 +38,12 @@ describe('LogsApi', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should return log', async () => {
       try {
         const options = {
           method: 'post',
-          url: `${LOCALHOST}/logapi`,
+          url: `${LOCALHOST}/logs`,
           data: {
             password: 'test'
           }
@@ -59,6 +60,7 @@ describe('LogsApi', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should return false if files are not found!', async () => {
       try {
         sandbox.stub(uut.logsApiLib, 'getLogs').resolves({
@@ -80,10 +82,13 @@ describe('LogsApi', () => {
         assert.fail('Unexpected result')
       }
     })
+
     it('should catch and handle errors', async () => {
       try {
         // Force an error
-        sandbox.stub(uut.logsApiLib.fs, 'existsSync').throws(new Error('test error'))
+        sandbox
+          .stub(uut.logsApiLib.fs, 'existsSync')
+          .throws(new Error('test error'))
 
         // Mock the context object.
         const ctx = mockContext()
@@ -101,6 +106,7 @@ describe('LogsApi', () => {
         assert.include(err.message, 'test error')
       }
     })
+
     it('should throw unhandled error', async () => {
       try {
         // Force an error
