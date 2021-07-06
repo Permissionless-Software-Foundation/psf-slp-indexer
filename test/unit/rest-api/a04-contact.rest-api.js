@@ -6,7 +6,7 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const ContactController = require('../../../src/modules/contact/controller')
+const ContactController = require('../../../src/controllers/rest-api/contact/controller')
 let uut
 let sandbox
 let ctx
@@ -14,8 +14,7 @@ let ctx
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
 describe('Contact', () => {
-  before(async () => {
-  })
+  before(async () => {})
 
   beforeEach(() => {
     uut = new ContactController()

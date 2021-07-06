@@ -1,11 +1,11 @@
 /*
-  Controller or the /contact REST API endpoints.
+  Controller for the /contact REST API endpoints.
 */
 
 /* eslint-disable no-useless-escape */
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-const ContactLib = require('../../lib/contact')
+const ContactLib = require('../../../lib/contact')
 const contactLib = new ContactLib()
 
 let _this
