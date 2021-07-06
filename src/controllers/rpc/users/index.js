@@ -6,7 +6,7 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
-const UserLib = require('../../lib/users')
+const UserLib = require('../../../lib/users')
 const Validators = require('../validators')
 const RateLimit = require('../rate-limit')
 

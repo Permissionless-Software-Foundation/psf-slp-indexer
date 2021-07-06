@@ -12,7 +12,7 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries.
-const JSONRPC = require('../../../src/rpc')
+const JSONRPC = require('../../../src/controllers/rpc')
 
 describe('#JSON RPC', () => {
   let uut

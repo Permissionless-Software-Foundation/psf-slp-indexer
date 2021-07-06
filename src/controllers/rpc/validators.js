@@ -7,8 +7,8 @@
 const jwt = require('jsonwebtoken')
 
 // Local libraries
-const config = require('../../config')
-const UserModel = require('../models/users')
+const config = require('../../../config')
+const UserModel = require('../../models/users')
 
 class Validators {
   constructor () {
@@ -71,7 +71,10 @@ class Validators {
       }
 
       // Get the user model for the targeted User
-      const targetedUser = await this.UserModel.findById(targetUserId, '-password')
+      const targetedUser = await this.UserModel.findById(
+        targetUserId,
+        '-password'
+      )
 
       // Return the user model.
       return targetedUser

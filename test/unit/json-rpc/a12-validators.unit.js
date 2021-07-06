@@ -16,7 +16,7 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries
 const config = require('../../../config')
-const Validators = require('../../../src/rpc/validators')
+const Validators = require('../../../src/controllers/rpc/validators')
 const UserLib = require('../../../src/lib/users')
 const userLib = new UserLib()
 
@@ -30,13 +30,10 @@ describe('#validators', () => {
     console.log(`Connecting to database: ${config.database}`)
     mongoose.Promise = global.Promise
     mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(
-      config.database,
-      {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-      }
-    )
+    await mongoose.connect(config.database, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    })
 
     // Create a test user.
     testUser = await userLib.createUser({

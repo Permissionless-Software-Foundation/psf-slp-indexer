@@ -6,7 +6,7 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
-const aboutStr = require('../../../config/about')
+const aboutStr = require('../../../../config/about')
 
 class AuthRPC {
   constructor (localConfig) {

@@ -5,7 +5,7 @@
 // Public npm libraries
 const jsonrpc = require('jsonrpc-lite')
 
-const JSONRPC = require('../../../src/rpc')
+const JSONRPC = require('../../../src/controllers/rpc')
 
 describe('#JSON RPC', () => {
   let uut

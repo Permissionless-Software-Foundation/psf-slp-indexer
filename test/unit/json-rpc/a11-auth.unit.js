@@ -14,8 +14,8 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries
 const config = require('../../../config')
-const AuthRPC = require('../../../src/rpc/auth')
-const RateLimit = require('../../../src/rpc/rate-limit')
+const AuthRPC = require('../../../src/controllers/rpc/auth')
+const RateLimit = require('../../../src/controllers/rpc/rate-limit')
 const UserLib = require('../../../src/lib/users')
 const userLib = new UserLib()
 
@@ -29,13 +29,10 @@ describe('#AuthRPC', () => {
     console.log(`Connecting to database: ${config.database}`)
     mongoose.Promise = global.Promise
     mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(
-      config.database,
-      {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-      }
-    )
+    await mongoose.connect(config.database, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    })
 
     // Create a test user.
     testUser = await userLib.createUser({

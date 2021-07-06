@@ -7,8 +7,8 @@ const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
 // const AuthLib = require('../../lib/auth')
-const UserLib = require('../../lib/users')
-const wlogger = require('../../lib/wlogger')
+const UserLib = require('../../../lib/users')
+const wlogger = require('../../../lib/wlogger')
 const RateLimit = require('../rate-limit')
 
 class AuthRPC {

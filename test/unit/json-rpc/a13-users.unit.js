@@ -14,8 +14,8 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries
 const config = require('../../../config')
-const UserRPC = require('../../../src/rpc/users')
-const RateLimit = require('../../../src/rpc/rate-limit')
+const UserRPC = require('../../../src/controllers/rpc/users')
+const RateLimit = require('../../../src/controllers/rpc/rate-limit')
 const UserModel = require('../../../src/models/users')
 
 describe('#UserRPC', () => {
@@ -28,13 +28,10 @@ describe('#UserRPC', () => {
     console.log(`Connecting to database: ${config.database}`)
     mongoose.Promise = global.Promise
     mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(
-      config.database,
-      {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-      }
-    )
+    await mongoose.connect(config.database, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    })
   })
 
   beforeEach(() => {
