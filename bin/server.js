@@ -52,6 +52,10 @@ async function startServer () {
   app.use(passport.initialize())
   app.use(passport.session())
 
+  // Attach boilerplate REST API endpoints.
+  const restApi = require('../src/controllers/rest-api')
+  restApi.attachControllers(app)
+
   // Custom Middleware Modules
   const modules = require('../src/modules')
   modules(app)
