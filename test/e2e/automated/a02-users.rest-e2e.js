@@ -11,7 +11,7 @@ const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
 
-const UserController = require('../../../src/modules/users/controller')
+const UserController = require('../../../src/controllers/rest-api/users/controller')
 let uut
 let sandbox
 

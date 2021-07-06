@@ -12,7 +12,7 @@ const config = require('../../../config')
 const testUtils = require('../../utils/test-utils')
 const User = require('../../../src/models/users')
 
-const UserController = require('../../../src/modules/users/controller')
+const UserController = require('../../../src/controllers/rest-api/users/controller')
 let uut
 let sandbox
 let ctx

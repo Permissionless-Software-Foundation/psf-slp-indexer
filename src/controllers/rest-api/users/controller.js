@@ -1,16 +1,21 @@
+/*
+  REST API Controller library for the /user route
+*/
+
 // User database model.
-const User = require('../../models/users')
+const UserModel = require('../../../models/users')
 
 // User library for business logic.
-const UserLib = require('../../lib/users')
+const UserLib = require('../../../lib/users')
 
-const wlogger = require('../../lib/wlogger')
+const wlogger = require('../../../lib/wlogger')
 
 let _this
-class UserController {
+
+class UserRESTControllerLib {
   constructor () {
     // Encapsulate dependencies
-    this.User = User
+    this.UserModel = UserModel
     this.userLib = new UserLib()
 
     _this = this
@@ -277,4 +282,4 @@ class UserController {
   }
 }
 
-module.exports = UserController
+module.exports = UserRESTControllerLib

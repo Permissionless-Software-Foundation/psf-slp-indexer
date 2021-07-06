@@ -11,6 +11,7 @@
 // const WebhookRESTController = require('./rest/webhook')
 // const PostWebhook = require('./rest/post-webhook')
 const AuthRESTController = require('./auth')
+const UserRESTController = require('./users')
 
 // Load the Clean Architecture Adapters library
 // const adapters = require('../adapters')
@@ -42,6 +43,10 @@ function attachRESTControllers (app) {
   // Attach the REST API Controllers associated with the /auth route
   const authRESTController = new AuthRESTController()
   authRESTController.attach(app)
+
+  // Attach the REST API Controllers associated with the /user route
+  const userRESTController = new UserRESTController()
+  userRESTController.attach(app)
 }
 
 // Add the JSON RPC router to the ipfs-coord adapter.
