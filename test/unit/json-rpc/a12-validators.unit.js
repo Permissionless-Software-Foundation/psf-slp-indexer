@@ -16,7 +16,7 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries
 const config = require('../../../config')
-const Validators = require('../../../src/controllers/rpc/validators')
+const Validators = require('../../../src/controllers/json-rpc/validators')
 const UserLib = require('../../../src/lib/users')
 const userLib = new UserLib()
 

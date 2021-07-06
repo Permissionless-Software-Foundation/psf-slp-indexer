@@ -12,7 +12,7 @@ const assert = require('chai').assert
 process.env.SVC_ENV = 'test'
 
 // Local libraries
-const RateLimit = require('../../../src/controllers/rpc/rate-limit')
+const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
 
 describe('#rate-limit', () => {
   let uut

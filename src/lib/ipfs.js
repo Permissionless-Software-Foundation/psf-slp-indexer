@@ -11,7 +11,7 @@ const BCHJS = require('@psf/bch-js')
 
 // Local libraries
 const config = require('../../config')
-const JSONRPC = require('../controllers/rpc')
+const JSONRPC = require('../controllers/json-rpc')
 
 class IPFSLib {
   constructor (localConfig) {

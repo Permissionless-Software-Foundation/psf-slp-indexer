@@ -14,8 +14,8 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries
 const config = require('../../../config')
-const UserRPC = require('../../../src/controllers/rpc/users')
-const RateLimit = require('../../../src/controllers/rpc/rate-limit')
+const UserRPC = require('../../../src/controllers/json-rpc/users')
+const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
 const UserModel = require('../../../src/models/users')
 
 describe('#UserRPC', () => {
