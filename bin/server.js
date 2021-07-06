@@ -18,7 +18,7 @@ const adminLib = new AdminLib()
 // const JSONRPC = require('../src/rpc')
 // const rpc = new JSONRPC()
 
-const errorMiddleware = require('../src/middleware')
+const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
 const wlogger = require('../src/lib/wlogger')
 
 async function startServer () {
