@@ -26,27 +26,27 @@ class Validators {
       const token = _this.getToken(ctx)
 
       if (!token) {
-      // console.log(`Err: Token not provided.`)
+        // console.log(`Err: Token not provided.`)
         ctx.throw(401)
       }
 
       let decoded = null
       try {
-      // console.log(`token: ${JSON.stringify(token, null, 2)}`)
-      // console.log(`config: ${JSON.stringify(config, null, 2)}`)
+        // console.log(`token: ${JSON.stringify(token, null, 2)}`)
+        // console.log(`config: ${JSON.stringify(config, null, 2)}`)
         decoded = _this.jwt.verify(token, config.token)
       } catch (err) {
-      // console.log(`Err: Token could not be decoded: ${err}`)
+        // console.log(`Err: Token could not be decoded: ${err}`)
         ctx.throw(401)
       }
 
       ctx.state.user = await _this.User.findById(decoded.id, '-password')
       if (!ctx.state.user) {
-      // console.log(`Err: Could not find user.`)
+        // console.log(`Err: Could not find user.`)
         ctx.throw(401)
       }
 
-      return next()
+      // return next()
     } catch (error) {
       ctx.throw(401)
     }
@@ -84,7 +84,7 @@ class Validators {
         ctx.throw(401, 'not admin')
       }
 
-      return next()
+      // return next()
     } catch (error) {
       ctx.throw(401, error.message)
     }
@@ -130,20 +130,18 @@ class Validators {
 
       if (ctx.state.user._id.toString() !== targetId.toString()) {
         wlogger.verbose(
-          `Calling user and target user do not match! Calling user: ${
-            ctx.state.user._id
-          }, Target user: ${targetId}`
+          `Calling user and target user do not match! Calling user: ${ctx.state.user._id}, Target user: ${targetId}`
         )
 
         // If they don't match, then the calling user better be an admin.
         if (ctx.state.user.type !== 'admin') {
           ctx.throw(401, 'not admin')
         } else {
-          wlogger.verbose('It\'s ok. The user is an admin.')
+          wlogger.verbose("It's ok. The user is an admin.")
         }
       }
 
-      return next()
+      // return next()
     } catch (error) {
       ctx.throw(401, error.message)
     }
