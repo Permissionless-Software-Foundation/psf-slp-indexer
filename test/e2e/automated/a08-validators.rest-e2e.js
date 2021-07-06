@@ -1,7 +1,7 @@
 const assert = require('chai').assert
 const testUtils = require('../../utils/test-utils')
 
-const Validators = require('../../../src/middleware/validators')
+const Validators = require('../../../src/controllers/rest-api/middleware/validators')
 
 const sinon = require('sinon')
 const mockContext = require('../../unit/mocks/ctx-mock').context
@@ -52,7 +52,7 @@ describe('Validators', () => {
   describe('ensureUser()', () => {
     it('should throw 401 if user cant be found', async () => {
       try {
-      // Force an error
+        // Force an error
         sandbox.stub(uut.User, 'findById').resolves(false)
 
         // Mock the context object.
@@ -71,6 +71,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if token not found', async () => {
       try {
         // Mock the context object.
@@ -84,6 +85,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if token is invalid', async () => {
       try {
         // Mock the context object.
@@ -101,28 +103,21 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
-    it('should trigger the "next" function if user is admin', async () => {
-      try {
-        // Mock the context object.
-        const ctx = mockContext()
-        ctx.params = { id: context.id }
 
-        ctx.request = {
-          header: {
-            authorization: `Bearer ${context.adminJWT}`
-          }
+    it('should return true if user is admin', async () => {
+      // Mock the context object.
+      const ctx = mockContext()
+      ctx.params = { id: context.id }
+
+      ctx.request = {
+        header: {
+          authorization: `Bearer ${context.adminJWT}`
         }
-        // Function that execute if the validations
-        // are successful
-        const next = () => { return 'next function' }
-
-        const result = await uut.ensureUser(ctx, next)
-
-        assert.isString(result)
-        assert.equal(result, 'next function')
-      } catch (err) {
-        assert(false, 'Unexpected result')
       }
+
+      const result = await uut.ensureUser(ctx)
+
+      assert.equal(result, true)
     })
   })
 
@@ -140,6 +135,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if token is invalid', async () => {
       try {
         // Mock the context object.
@@ -157,6 +153,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if user cant be found', async () => {
       try {
         // Force an error
@@ -177,6 +174,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if user is not admin type', async () => {
       try {
         // Mock the context object.
@@ -194,26 +192,19 @@ describe('Validators', () => {
         assert.include(err.message, 'not admin')
       }
     })
-    it('should trigger the "next" function if user is admin', async () => {
-      try {
-        // Mock the context object.
-        const ctx = mockContext()
-        ctx.request = {
-          header: {
-            authorization: `Bearer ${context.adminJWT}`
-          }
+
+    it('should return true if user is admin', async () => {
+      // Mock the context object.
+      const ctx = mockContext()
+      ctx.request = {
+        header: {
+          authorization: `Bearer ${context.adminJWT}`
         }
-        // Function that execute if the validations
-        // are successful
-        const next = () => { return 'next function' }
-
-        const result = await uut.ensureAdmin(ctx, next)
-
-        assert.isString(result)
-        assert.equal(result, 'next function')
-      } catch (err) {
-        assert(false, 'Unexpected result')
       }
+
+      const result = await uut.ensureAdmin(ctx)
+
+      assert.equal(result, true)
     })
   })
 
@@ -231,6 +222,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if token is invalid', async () => {
       try {
         // Mock the context object.
@@ -250,6 +242,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if user cant be found', async () => {
       try {
         // Force an error
@@ -272,6 +265,7 @@ describe('Validators', () => {
         assert.include(err.message, 'Unauthorized')
       }
     })
+
     it('should throw 401 if user is not admin type', async () => {
       try {
         // Mock the context object.
@@ -291,28 +285,21 @@ describe('Validators', () => {
         assert.include(err.message, 'not admin')
       }
     })
-    it('should trigger the "next" function if user is admin', async () => {
-      try {
-        // Mock the context object.
-        const ctx = mockContext()
-        ctx.params = { id: context.id }
 
-        ctx.request = {
-          header: {
-            authorization: `Bearer ${context.adminJWT}`
-          }
+    it('should return true if user is admin', async () => {
+      // Mock the context object.
+      const ctx = mockContext()
+      ctx.params = { id: context.id }
+
+      ctx.request = {
+        header: {
+          authorization: `Bearer ${context.adminJWT}`
         }
-        // Function that execute if the validations
-        // are successful
-        const next = () => { return 'next function' }
-
-        const result = await uut.ensureTargetUserOrAdmin(ctx, next)
-
-        assert.isString(result)
-        assert.equal(result, 'next function')
-      } catch (err) {
-        assert(false, 'Unexpected result')
       }
+
+      const result = await uut.ensureTargetUserOrAdmin(ctx)
+
+      assert.equal(result, true)
     })
   })
 })
