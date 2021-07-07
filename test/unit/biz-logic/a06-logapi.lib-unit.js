@@ -5,7 +5,7 @@ const sinon = require('sinon')
 const util = require('util')
 util.inspect.defaultOptions = { depth: 1 }
 
-const LogsApiLib = require('../../../src/lib/logapi')
+const LogsApiLib = require('../../../src/adapters/logapi')
 const mockData = require('../mocks/log-api-mock')
 
 const context = {}

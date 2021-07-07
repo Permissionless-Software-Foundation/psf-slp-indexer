@@ -1,4 +1,4 @@
-const LogsApiLib = require('../../../lib/logapi')
+const LogsApiLib = require('../../../adapters/logapi')
 const logsApiLib = new LogsApiLib()
 let _this
 

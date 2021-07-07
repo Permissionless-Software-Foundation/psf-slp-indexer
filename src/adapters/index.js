@@ -7,9 +7,11 @@
 // Load individual adapter libraries.
 const IPFSAdapter = require('./ipfs')
 const LocalDB = require('./localdb')
+const LogsAPI = require('./logapi')
 
 // Instantiate adapter libraries.
 const ipfs = new IPFSAdapter()
 const localdb = new LocalDB()
+const logapi = new LogsAPI()
 
-module.exports = { ipfs, localdb }
+module.exports = { ipfs, localdb, logapi }
