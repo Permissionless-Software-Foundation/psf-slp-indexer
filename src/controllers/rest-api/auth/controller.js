@@ -1,4 +1,4 @@
-const Passport = require('../../../lib/passport')
+const Passport = require('../../../adapters/passport')
 const passport = new Passport()
 
 let _this
