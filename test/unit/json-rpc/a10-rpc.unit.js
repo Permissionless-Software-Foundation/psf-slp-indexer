@@ -13,6 +13,8 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries.
 const JSONRPC = require('../../../src/controllers/json-rpc')
+const adapters = require('../mocks/adapters')
+const UseCasesMock = require('../mocks/use-cases')
 
 describe('#JSON RPC', () => {
   let uut
@@ -21,7 +23,8 @@ describe('#JSON RPC', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
 
-    uut = new JSONRPC()
+    const useCases = new UseCasesMock()
+    uut = new JSONRPC({ adapters, useCases })
   })
 
   afterEach(() => sandbox.restore())

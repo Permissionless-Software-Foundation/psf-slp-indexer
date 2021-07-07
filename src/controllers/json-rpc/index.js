@@ -15,14 +15,26 @@ let _this
 
 class JSONRPC {
   constructor (localConfig) {
+    // Dependency Injection.
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of Adapters library required when instantiating PostEntry REST Controller.'
+      )
+    }
+    this.useCases = localConfig.useCases
+    if (!this.useCases) {
+      throw new Error(
+        'Instance of Use Cases library required when instantiating PostEntry REST Controller.'
+      )
+    }
+
     // Encapsulate dependencies
+    this.ipfsCoord = this.adapters.ipfs.ipfsCoordAdapter.ipfsCoord
     this.jsonrpc = jsonrpc
     this.userController = new UserController()
     this.authController = new AuthController()
     this.aboutController = new AboutController()
-
-    // This will be replaced once the ipfs-coord lib finishes initializing.
-    this.ipfsCoord = {}
 
     _this = this
   }

@@ -12,7 +12,7 @@ const cors = require('kcors')
 
 // Local libraries
 const config = require('../config') // this first.
-const IPFSLib = require('../src/lib/ipfs')
+// const IPFSLib = require('../src/lib/ipfs')
 const AdminLib = require('../src/lib/admin')
 const adminLib = new AdminLib()
 // const JSONRPC = require('../src/rpc')
@@ -52,13 +52,9 @@ async function startServer () {
   app.use(passport.initialize())
   app.use(passport.session())
 
-  // Attach boilerplate REST API endpoints.
-  const restApi = require('../src/controllers/rest-api')
-  restApi.attachControllers(app)
-
-  // Custom Middleware Modules
-  // const modules = require('../src/modules')
-  // modules(app)
+  // Attach REST API and JSON RPC controllers to the app.
+  const controllers = require('../src/controllers')
+  controllers.attachControllers(app)
 
   // Enable CORS for testing
   // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
@@ -75,10 +71,6 @@ async function startServer () {
   // Create the system admin user.
   const success = await adminLib.createSystemUser()
   if (success) console.log('System admin user created.')
-
-  // Start the IPFS node.
-  const ipfsLib = new IPFSLib()
-  await ipfsLib.start()
 
   return app
 }
