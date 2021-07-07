@@ -12,22 +12,45 @@ const UserRESTController = require('./users')
 const ContactRESTController = require('./contact')
 const LogsRESTController = require('./logs')
 
-function attachRESTControllers (app) {
-  // Attach the REST API Controllers associated with the /auth route
-  const authRESTController = new AuthRESTController()
-  authRESTController.attach(app)
+class RESTControllers {
+  constructor (localConfig) {
+    // Dependency Injection.
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of Adapters library required when instantiating PostEntry REST Controller.'
+      )
+    }
+    this.useCases = localConfig.useCases
+    if (!this.useCases) {
+      throw new Error(
+        'Instance of Use Cases library required when instantiating PostEntry REST Controller.'
+      )
+    }
+  }
 
-  // Attach the REST API Controllers associated with the /user route
-  const userRESTController = new UserRESTController()
-  userRESTController.attach(app)
+  attachRESTControllers (app) {
+    const dependencies = {
+      adapters: this.adapters,
+      useCases: this.useCases
+    }
 
-  // Attach the REST API Controllers associated with the /contact route
-  const contactRESTController = new ContactRESTController()
-  contactRESTController.attach(app)
+    // Attach the REST API Controllers associated with the /auth route
+    const authRESTController = new AuthRESTController(dependencies)
+    authRESTController.attach(app)
 
-  // Attach the REST API Controllers associated with the /logs route
-  const logsRESTController = new LogsRESTController()
-  logsRESTController.attach(app)
+    // Attach the REST API Controllers associated with the /user route
+    const userRESTController = new UserRESTController(dependencies)
+    userRESTController.attach(app)
+
+    // Attach the REST API Controllers associated with the /contact route
+    const contactRESTController = new ContactRESTController(dependencies)
+    contactRESTController.attach(app)
+
+    // Attach the REST API Controllers associated with the /logs route
+    const logsRESTController = new LogsRESTController(dependencies)
+    logsRESTController.attach(app)
+  }
 }
 
-module.exports = { attachRESTControllers }
+module.exports = RESTControllers
