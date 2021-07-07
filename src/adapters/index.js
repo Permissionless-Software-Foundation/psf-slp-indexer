@@ -8,10 +8,15 @@
 const IPFSAdapter = require('./ipfs')
 const LocalDB = require('./localdb')
 const LogsAPI = require('./logapi')
+const Passport = require('./passport')
+const Nodemailer = require('./nodemailer')
+const wlogger = require('./wlogger')
 
 // Instantiate adapter libraries.
 const ipfs = new IPFSAdapter()
 const localdb = new LocalDB()
 const logapi = new LogsAPI()
+const passport = new Passport()
+const nodemailer = new Nodemailer()
 
-module.exports = { ipfs, localdb, logapi }
+module.exports = { ipfs, localdb, logapi, passport, nodemailer, wlogger }
