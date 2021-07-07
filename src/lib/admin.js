@@ -14,7 +14,7 @@ const axios = require('axios').default
 const mongoose = require('mongoose')
 const User = require('../adapters/localdb/models/users')
 const config = require('../../config')
-const JsonFiles = require('./utils/json-files')
+const JsonFiles = require('../adapters/json-files')
 const jsonFiles = new JsonFiles()
 
 const JSON_FILE = `system-user-${config.env}.json`
