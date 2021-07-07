@@ -4,8 +4,12 @@
   https://troutsblog.com/blog/clean-architecture
 */
 
-// Individual adapter libraries.
+// Load individual adapter libraries.
 const IPFSAdapter = require('./ipfs')
-const ipfs = new IPFSAdapter()
+const LocalDB = require('./localdb')
 
-module.exports = { ipfs }
+// Instantiate adapter libraries.
+const ipfs = new IPFSAdapter()
+const localdb = new LocalDB()
+
+module.exports = { ipfs, localdb }

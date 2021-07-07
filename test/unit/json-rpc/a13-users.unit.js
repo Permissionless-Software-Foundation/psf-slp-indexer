@@ -16,7 +16,7 @@ process.env.SVC_ENV = 'test'
 const config = require('../../../config')
 const UserRPC = require('../../../src/controllers/json-rpc/users')
 const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
-const UserModel = require('../../../src/models/users')
+const UserModel = require('../../../src/adapters/localdb/models/users')
 
 describe('#UserRPC', () => {
   let uut

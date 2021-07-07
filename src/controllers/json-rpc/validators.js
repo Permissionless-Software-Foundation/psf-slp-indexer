@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken')
 
 // Local libraries
 const config = require('../../../config')
-const UserModel = require('../../models/users')
+const UserModel = require('../../adapters/localdb/models/users')
 
 class Validators {
   constructor () {

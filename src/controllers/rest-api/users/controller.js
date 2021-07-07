@@ -3,7 +3,7 @@
 */
 
 // User database model.
-const UserModel = require('../../../models/users')
+const UserModel = require('../../../adapters/localdb/models/users')
 
 // User library for business logic.
 const UserLib = require('../../../lib/users')

@@ -8,7 +8,7 @@ const axios = require('axios').default
 
 // Local libraries
 const config = require('../../config')
-const User = require('../../src/models/users')
+const User = require('../../src/adapters/localdb/models/users')
 
 const LOCALHOST = `http://localhost:${config.port}`
 

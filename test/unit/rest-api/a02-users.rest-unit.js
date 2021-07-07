@@ -10,7 +10,7 @@ const mongoose = require('mongoose')
 // Local support libraries
 const config = require('../../../config')
 const testUtils = require('../../utils/test-utils')
-const User = require('../../../src/models/users')
+const User = require('../../../src/adapters/localdb/models/users')
 
 const UserController = require('../../../src/controllers/rest-api/users/controller')
 let uut

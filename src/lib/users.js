@@ -3,7 +3,7 @@
   functions are called by the /user REST API endpoints.
 */
 
-const UserModel = require('../models/users')
+const UserModel = require('../adapters/localdb/models/users')
 const wlogger = require('./wlogger')
 
 class UserLib {
