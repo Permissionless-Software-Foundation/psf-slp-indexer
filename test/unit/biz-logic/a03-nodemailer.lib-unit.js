@@ -6,7 +6,7 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const NodeMailer = require('../../../src/lib/nodemailer')
+const NodeMailer = require('../../../src/adapters/nodemailer')
 
 let sandbox
 let uut

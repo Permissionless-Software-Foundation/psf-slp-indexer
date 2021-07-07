@@ -19,7 +19,7 @@ const adminLib = new AdminLib()
 // const rpc = new JSONRPC()
 
 const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
-const wlogger = require('../src/lib/wlogger')
+const wlogger = require('../src/adapters/wlogger')
 
 async function startServer () {
   // Create a Koa instance.

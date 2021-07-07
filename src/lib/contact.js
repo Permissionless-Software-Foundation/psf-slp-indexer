@@ -7,9 +7,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const config = require('../../config')
 
-const NodeMailer = require('../lib/nodemailer')
+const NodeMailer = require('../adapters/nodemailer')
 const nodemailer = new NodeMailer()
-const wlogger = require('./wlogger')
+const wlogger = require('../adapters/wlogger')
 
 let _this
 

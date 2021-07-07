@@ -6,7 +6,7 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local support libraries
-const wlogger = require('../../lib/wlogger')
+const wlogger = require('../../adapters/wlogger')
 const UserController = require('./users')
 const AuthController = require('./auth')
 const AboutController = require('./about')
