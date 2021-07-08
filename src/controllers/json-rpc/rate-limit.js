@@ -30,10 +30,10 @@ class RateLimit {
       set: () => {}
     }
 
-    console.log(
-      `this.defaultOptions: ${JSON.stringify(this.defaultOptions, null, 2)}`
-    )
-    console.log(`options: ${JSON.stringify(options, null, 2)}`)
+    // console.log(
+    //   `this.defaultOptions: ${JSON.stringify(this.defaultOptions, null, 2)}`
+    // )
+    // console.log(`options: ${JSON.stringify(options, null, 2)}`)
 
     // Set rate limit settings. Default values are overwritten if user passes
     // in an options object.

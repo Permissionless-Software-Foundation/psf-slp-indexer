@@ -1,7 +1,7 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const ContactLib = require('../../../src/lib/contact')
+const ContactLib = require('../../../src/adapters/contact')
 let uut
 let sandbox
 
@@ -51,7 +51,10 @@ describe('Contact', () => {
         await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.include(err.message, "Property 'emailList' must be a array of emails!")
+        assert.include(
+          err.message,
+          "Property 'emailList' must be a array of emails!"
+        )
       }
     })
 
@@ -67,7 +70,10 @@ describe('Contact', () => {
         await uut.sendEmail(data)
         assert(false, 'Unexpected result')
       } catch (err) {
-        assert.include(err.message, "Property 'emailList' must be a array of emails!")
+        assert.include(
+          err.message,
+          "Property 'emailList' must be a array of emails!"
+        )
       }
     })
 
@@ -89,7 +95,9 @@ describe('Contact', () => {
     it('should catch and throw nodemailer lib error', async () => {
       try {
         // Force an error with the database.
-        sandbox.stub(uut.nodemailer, 'sendEmail').throws(new Error('test error'))
+        sandbox
+          .stub(uut.nodemailer, 'sendEmail')
+          .throws(new Error('test error'))
 
         const data = {
           formMessage: 'test msg',
