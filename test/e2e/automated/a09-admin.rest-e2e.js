@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const Admin = require('../../../src/lib/admin')
+const Admin = require('../../../src/adapters/admin')
 
 const sinon = require('sinon')
 

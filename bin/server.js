@@ -13,7 +13,7 @@ const cors = require('kcors')
 // Local libraries
 const config = require('../config') // this first.
 // const IPFSLib = require('../src/lib/ipfs')
-const AdminLib = require('../src/lib/admin')
+const AdminLib = require('../src/adapters/admin')
 const adminLib = new AdminLib()
 // const JSONRPC = require('../src/rpc')
 // const rpc = new JSONRPC()

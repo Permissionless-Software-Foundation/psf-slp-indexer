@@ -7,6 +7,10 @@
   and JWT token for the admin account is written to a JSON file, for easy
   retrieval by other apps running on the server that may need admin privledges
   to access private APIs.
+
+  This library is really more of an Adapter to the internal systems default
+  admin user. It's not really a central Entity, which is why this library lives
+  in the Adapter directory.
 */
 
 'use strict'

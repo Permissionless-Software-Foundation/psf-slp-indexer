@@ -22,6 +22,7 @@ const User = new mongoose.Schema({
   }
 })
 
+// Before saving, convert the password to a hash.
 User.pre('save', function preSave (next) {
   const user = this
 
@@ -51,6 +52,7 @@ User.pre('save', function preSave (next) {
     .catch(err => next(err))
 })
 
+// Validate the password by comparing to the saved hash.
 User.methods.validatePassword = function validatePassword (password) {
   const user = this
 
@@ -65,6 +67,7 @@ User.methods.validatePassword = function validatePassword (password) {
   })
 }
 
+// Generate a JWT token.
 User.methods.generateToken = function generateToken () {
   const user = this
 
