@@ -14,7 +14,7 @@ const config = require('../../../config')
 const testUtils = require('../../utils/test-utils')
 
 // Unit under test (uut)
-const UserLib = require('../../../src/lib/users')
+const UserLib = require('../../../src/use-cases/user')
 
 describe('#users', () => {
   let uut
@@ -26,13 +26,10 @@ describe('#users', () => {
     console.log(`Connecting to database: ${config.database}`)
     mongoose.Promise = global.Promise
     mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(
-      config.database,
-      {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-      }
-    )
+    await mongoose.connect(config.database, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    })
 
     // Delete all previous users in the database.
     await testUtils.deleteAllUsers()

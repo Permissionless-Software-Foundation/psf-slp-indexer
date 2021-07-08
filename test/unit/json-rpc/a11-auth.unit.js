@@ -16,7 +16,7 @@ process.env.SVC_ENV = 'test'
 const config = require('../../../config')
 const AuthRPC = require('../../../src/controllers/json-rpc/auth')
 const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
-const UserLib = require('../../../src/lib/users')
+const UserLib = require('../../../src/use-cases/user')
 const userLib = new UserLib()
 
 describe('#AuthRPC', () => {

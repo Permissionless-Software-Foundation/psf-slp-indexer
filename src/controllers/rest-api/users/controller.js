@@ -6,7 +6,7 @@
 const UserModel = require('../../../adapters/localdb/models/users')
 
 // User library for business logic.
-const UserLib = require('../../../lib/users')
+const UserLib = require('../../../use-cases/user')
 
 const wlogger = require('../../../adapters/wlogger')
 
