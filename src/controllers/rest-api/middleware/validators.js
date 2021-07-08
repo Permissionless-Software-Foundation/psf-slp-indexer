@@ -4,7 +4,6 @@
 
 const User = require('../../../adapters/localdb/models/users')
 const config = require('../../../../config')
-const getToken = require('../../../lib/auth')
 const jwt = require('jsonwebtoken')
 const wlogger = require('../../../adapters/wlogger')
 
@@ -13,7 +12,6 @@ let _this
 class Validators {
   constructor () {
     this.User = User
-    this.getToken = getToken
     this.jwt = jwt
     this.config = config
 
@@ -148,6 +146,23 @@ class Validators {
     } catch (error) {
       ctx.throw(401, error.message)
     }
+  }
+
+  getToken (ctx) {
+    const header = ctx.request.header.authorization
+    if (!header) {
+      return null
+    }
+    const parts = header.split(' ')
+    if (parts.length !== 2) {
+      return null
+    }
+    const scheme = parts[0]
+    const token = parts[1]
+    if (/^Bearer$/i.test(scheme)) {
+      return token
+    }
+    return null
   }
 }
 
