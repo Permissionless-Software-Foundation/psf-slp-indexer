@@ -38,9 +38,9 @@ class RateLimit {
     // Set rate limit settings. Default values are overwritten if user passes
     // in an options object.
     this.rateLimitOptions = Object.assign({}, this.defaultOptions, options)
-    console.log(
-      `this.rateLimitOptions: ${JSON.stringify(this.rateLimitOptions, null, 2)}`
-    )
+    // console.log(
+    //   `this.rateLimitOptions: ${JSON.stringify(this.rateLimitOptions, null, 2)}`
+    // )
     this.rateLimit = this.RateLimitLib.middleware(this.rateLimitOptions)
   }
 
