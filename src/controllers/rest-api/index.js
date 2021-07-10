@@ -27,6 +27,8 @@ class RESTControllers {
         'Instance of Use Cases library required when instantiating PostEntry REST Controller.'
       )
     }
+
+    // console.log('Controllers localConfig: ', localConfig)
   }
 
   attachRESTControllers (app) {

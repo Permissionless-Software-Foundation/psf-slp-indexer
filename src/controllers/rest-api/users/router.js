@@ -13,8 +13,26 @@ let _this
 
 class UserRESTRouter {
   constructor (localConfig = {}) {
+    // Dependency Injection.
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of Adapters library required when instantiating /users REST Controller.'
+      )
+    }
+    this.useCases = localConfig.useCases
+    if (!this.useCases) {
+      throw new Error(
+        'Instance of Use Cases library required when instantiating /users REST Controller.'
+      )
+    }
+    const dependencies = {
+      adapters: this.adapters,
+      useCases: this.useCases
+    }
+
     // Encapsulate dependencies.
-    this.userRESTController = new UserRESTControllerLib()
+    this.userRESTController = new UserRESTControllerLib(dependencies)
     this.validators = new Validators()
 
     // Instantiate the router and set the base route.

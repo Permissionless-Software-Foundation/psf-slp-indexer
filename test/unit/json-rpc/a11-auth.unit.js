@@ -1,5 +1,5 @@
 /*
-  Unit tests for the rpc/auth/index.js file.
+  Unit tests for the json-rpc/auth/index.js file.
 */
 
 // Public npm libraries
@@ -16,13 +16,15 @@ process.env.SVC_ENV = 'test'
 const config = require('../../../config')
 const AuthRPC = require('../../../src/controllers/json-rpc/auth')
 const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
-const UserLib = require('../../../src/use-cases/user')
-const userLib = new UserLib()
+// const UserLib = require('../../../src/use-cases/user')
+// const userLib = new UserLib()
+const adapters = require('../mocks/adapters')
+const UseCasesMock = require('../mocks/use-cases')
 
 describe('#AuthRPC', () => {
   let uut
   let sandbox
-  let testUser
+  // let testUser
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -35,17 +37,19 @@ describe('#AuthRPC', () => {
     })
 
     // Create a test user.
-    testUser = await userLib.createUser({
-      email: 'test543@test.com',
-      name: 'tester543',
-      password: 'password'
-    })
+    // testUser = await userLib.createUser({
+    //   email: 'test543@test.com',
+    //   name: 'tester543',
+    //   password: 'password'
+    // })
   })
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
 
-    uut = new AuthRPC()
+    const useCases = new UseCasesMock()
+
+    uut = new AuthRPC({ adapters, useCases })
     uut.rateLimit = new RateLimit({ max: 100 })
   })
 
@@ -53,8 +57,8 @@ describe('#AuthRPC', () => {
 
   after(async () => {
     // Delete the test user.
-    testUser = await userLib.getUser({ id: testUser.userData._id })
-    await userLib.deleteUser(testUser)
+    // testUser = await userLib.getUser({ id: testUser.userData._id })
+    // await userLib.deleteUser(testUser)
 
     mongoose.connection.close()
   })

@@ -7,16 +7,30 @@ const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
 // const AuthLib = require('../../lib/auth')
-const UserLib = require('../../../use-cases/user')
+// const UserLib = require('../../../use-cases/user')
 const wlogger = require('../../../adapters/wlogger')
 const RateLimit = require('../rate-limit')
 
 class AuthRPC {
-  constructor (localConfig) {
+  constructor (localConfig = {}) {
+    // Dependency Injection.
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of Adapters library required when instantiating Auth JSON RPC Controller.'
+      )
+    }
+    this.useCases = localConfig.useCases
+    if (!this.useCases) {
+      throw new Error(
+        'Instance of Use Cases library required when instantiating Auth JSON RPC Controller.'
+      )
+    }
+
     // Encapsulate dependencies
     // this.authLib = new AuthLib()
     this.jsonrpc = jsonrpc
-    this.userLib = new UserLib()
+    this.userLib = this.useCases.user
     this.rateLimit = new RateLimit()
   }
 

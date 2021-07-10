@@ -3,13 +3,21 @@
   functions are called by the /user REST API endpoints.
 */
 
-const UserModel = require('../adapters/localdb/models/users')
+// const UserModel = require('../adapters/localdb/models/users')
 const wlogger = require('../adapters/wlogger')
 
 class UserLib {
-  constructor (configObj) {
+  constructor (localConfig = {}) {
+    // console.log('User localConfig: ', localConfig)
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of adapters must be passed in when instantiating User Use Cases library.'
+      )
+    }
+
     // Encapsulate dependencies
-    this.UserModel = UserModel
+    this.UserModel = this.adapters.localdb.Users
   }
 
   // Create a new user model and add it to the Mongo database.
@@ -160,7 +168,7 @@ class UserLib {
       // console.log('login: ', login)
       // console.log('passwd: ', passwd)
 
-      const user = await UserModel.findOne({ email: login })
+      const user = await this.UserModel.findOne({ email: login })
       if (!user) {
         throw new Error('User not found')
       }

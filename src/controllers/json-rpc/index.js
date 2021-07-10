@@ -14,26 +14,26 @@ const AboutController = require('./about')
 let _this
 
 class JSONRPC {
-  constructor (localConfig) {
+  constructor (localConfig = {}) {
     // Dependency Injection.
     this.adapters = localConfig.adapters
     if (!this.adapters) {
       throw new Error(
-        'Instance of Adapters library required when instantiating PostEntry REST Controller.'
+        'Instance of Adapters library required when instantiating JSON RPC Controllers.'
       )
     }
     this.useCases = localConfig.useCases
     if (!this.useCases) {
       throw new Error(
-        'Instance of Use Cases library required when instantiating PostEntry REST Controller.'
+        'Instance of Use Cases library required when instantiating JSON RPC Controllers.'
       )
     }
 
     // Encapsulate dependencies
     this.ipfsCoord = this.adapters.ipfs.ipfsCoordAdapter.ipfsCoord
     this.jsonrpc = jsonrpc
-    this.userController = new UserController()
-    this.authController = new AuthController()
+    this.userController = new UserController(localConfig)
+    this.authController = new AuthController(localConfig)
     this.aboutController = new AboutController()
 
     _this = this

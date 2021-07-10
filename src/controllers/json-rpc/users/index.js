@@ -6,14 +6,28 @@
 const jsonrpc = require('jsonrpc-lite')
 
 // Local libraries
-const UserLib = require('../../../use-cases/user')
+// const UserLib = require('../../../use-cases/user')
 const Validators = require('../validators')
 const RateLimit = require('../rate-limit')
 
 class UserRPC {
-  constructor (localConfig) {
+  constructor (localConfig = {}) {
+    // Dependency Injection.
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of Adapters library required when instantiating User JSON RPC Controller.'
+      )
+    }
+    this.useCases = localConfig.useCases
+    if (!this.useCases) {
+      throw new Error(
+        'Instance of Use Cases library required when instantiating User JSON RPC Controller.'
+      )
+    }
+
     // Encapsulate dependencies
-    this.userLib = new UserLib()
+    this.userLib = this.useCases.user
     this.jsonrpc = jsonrpc
     this.validators = new Validators()
     this.rateLimit = new RateLimit()
