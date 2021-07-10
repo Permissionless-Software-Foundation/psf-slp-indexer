@@ -11,4 +11,10 @@ const ipfs = {
   }
 }
 
-module.exports = { ipfs }
+const localdb = {
+  Users: class Users {
+    static findById () {}
+  }
+}
+
+module.exports = { ipfs, localdb }

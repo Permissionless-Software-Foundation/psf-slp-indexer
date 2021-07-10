@@ -6,7 +6,6 @@
 
 // Public npm libraries
 const jsonrpc = require('jsonrpc-lite')
-const mongoose = require('mongoose')
 const sinon = require('sinon')
 const assert = require('chai').assert
 const { v4: uid } = require('uuid')
@@ -15,49 +14,34 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries
-const config = require('../../../config')
 const Validators = require('../../../src/controllers/json-rpc/validators')
-const UserLib = require('../../../src/use-cases/user')
-const userLib = new UserLib()
+const adapters = require('../mocks/adapters')
 
 describe('#validators', () => {
-  let testUser
   let uut
   let sandbox
-
-  before(async () => {
-    // Connect to the Mongo Database.
-    console.log(`Connecting to database: ${config.database}`)
-    mongoose.Promise = global.Promise
-    mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(config.database, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
-
-    // Create a test user.
-    testUser = await userLib.createUser({
-      email: 'test544@test.com',
-      name: 'tester544',
-      password: 'password'
-    })
-    // console.log('testUser: ', testUser)
-  })
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
 
-    uut = new Validators()
+    uut = new Validators({ adapters })
   })
 
   afterEach(() => sandbox.restore())
 
-  after(async () => {
-    // Delete the test user.
-    testUser = await userLib.getUser({ id: testUser.userData._id })
-    await userLib.deleteUser(testUser)
+  describe('#constructor', () => {
+    it('should throw an error if adapters is not passed in.', () => {
+      try {
+        uut = new Validators()
 
-    mongoose.connection.close()
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Adapters library required when instantiating JSON RPC Validators library.'
+        )
+      }
+    })
   })
 
   describe('#ensureUser', () => {
@@ -67,18 +51,20 @@ describe('#validators', () => {
       const id = uid()
       const userCall = jsonrpc.request(id, 'users', {
         endpoint: 'getAll',
-        apiToken: testUser.token
+        apiToken: 'fakeJWTToken'
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
 
+      // Mock external dependencies.
+      sandbox.stub(uut.jwt, 'verify').returns(true)
+      sandbox.stub(uut.UserModel, 'findById').resolves(true)
+
       const user = await uut.ensureUser(rpcData)
       // console.log('user: ', user)
 
-      assert.property(user, 'type')
-      assert.property(user, '_id')
-      assert.property(user, 'email')
-      assert.property(user, 'name')
+      // For this test, we return a value of 'true' instead of actual user data.
+      assert.equal(user, true)
     })
 
     it('should throw an error if JWT token is not included', async () => {
@@ -129,13 +115,14 @@ describe('#validators', () => {
       try {
         // Force 'error not found' error
         sandbox.stub(uut.UserModel, 'findById').resolves(null)
+        sandbox.stub(uut.jwt, 'verify').returns(true)
 
         // Generate the parsed data that the main router would pass to this
         // endpoint.
         const id = uid()
         const userCall = jsonrpc.request(id, 'users', {
           endpoint: 'getAll',
-          apiToken: testUser.token
+          apiToken: 'fakeJWTToken'
         })
         const jsonStr = JSON.stringify(userCall, null, 2)
         const rpcData = jsonrpc.parse(jsonStr)
@@ -157,18 +144,21 @@ describe('#validators', () => {
       const id = uid()
       const userCall = jsonrpc.request(id, 'users', {
         endpoint: 'deleteUser',
-        apiToken: testUser.token,
-        userId: testUser.userData._id.toString()
+        apiToken: 'fakeJWTToken',
+        userId: 'abc123'
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
 
-      const user = await uut.ensureTargetUserOrAdmin(rpcData)
+      // Mock external dependencies.
+      sandbox.stub(uut.jwt, 'verify').returns(true)
+      sandbox.stub(uut.UserModel, 'findById').resolves({ _id: 'abc123' })
 
-      assert.property(user, 'type')
-      assert.property(user, '_id')
-      assert.property(user, 'email')
-      assert.property(user, 'name')
+      const user = await uut.ensureTargetUserOrAdmin(rpcData)
+      // console.log('user: ', user)
+
+      // Assert that the mocked data expected is returned.
+      assert.equal(user._id, 'abc123')
     })
 
     it('should throw error if JWT token is not provided', async () => {
@@ -198,7 +188,7 @@ describe('#validators', () => {
         const id = uid()
         const userCall = jsonrpc.request(id, 'users', {
           endpoint: 'deleteUser',
-          apiToken: testUser.token
+          apiToken: 'fakeJWTToken'
         })
         const jsonStr = JSON.stringify(userCall, null, 2)
         const rpcData = jsonrpc.parse(jsonStr)
@@ -223,7 +213,7 @@ describe('#validators', () => {
         const userCall = jsonrpc.request(id, 'users', {
           endpoint: 'deleteUser',
           apiToken: token,
-          userId: testUser.userData._id.toString()
+          userId: 'abc123'
         })
         const jsonStr = JSON.stringify(userCall, null, 2)
         const rpcData = jsonrpc.parse(jsonStr)
@@ -247,11 +237,14 @@ describe('#validators', () => {
         const id = uid()
         const userCall = jsonrpc.request(id, 'users', {
           endpoint: 'deleteUser',
-          apiToken: testUser.token,
-          userId: testUser.userData._id.toString()
+          apiToken: 'fakeJWTToken',
+          userId: 'abc123'
         })
         const jsonStr = JSON.stringify(userCall, null, 2)
         const rpcData = jsonrpc.parse(jsonStr)
+
+        // Mock external dependencies.
+        sandbox.stub(uut.jwt, 'verify').returns(true)
 
         await uut.ensureTargetUserOrAdmin(rpcData)
 
@@ -262,6 +255,29 @@ describe('#validators', () => {
       }
     })
 
-    // TODO: it should exit quietly if user is an admin.
+    it('should return true if user is an admin', async () => {
+      // Generate the parsed data that the main router would pass to this
+      // endpoint.
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'users', {
+        endpoint: 'deleteUser',
+        apiToken: 'fakeJWTToken',
+        userId: 'abc123'
+      })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+      const rpcData = jsonrpc.parse(jsonStr)
+
+      // Mock external dependencies.
+      sandbox.stub(uut.jwt, 'verify').returns(true)
+      sandbox
+        .stub(uut.UserModel, 'findById')
+        .resolves({ _id: 'abc123', type: 'admin' })
+
+      const user = await uut.ensureTargetUserOrAdmin(rpcData)
+      // console.log('user: ', user)
+
+      // Assert that the mocked data expected is returned.
+      assert.equal(user, true)
+    })
   })
 })

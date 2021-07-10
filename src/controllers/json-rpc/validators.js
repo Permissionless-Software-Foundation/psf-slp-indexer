@@ -8,14 +8,22 @@ const jwt = require('jsonwebtoken')
 
 // Local libraries
 const config = require('../../../config')
-const UserModel = require('../../adapters/localdb/models/users')
+// const UserModel = require('../../adapters/localdb/models/users')
 
 class Validators {
-  constructor () {
+  constructor (localConfig = {}) {
+    // Dependency Injection.
+    this.adapters = localConfig.adapters
+    if (!this.adapters) {
+      throw new Error(
+        'Instance of Adapters library required when instantiating JSON RPC Validators library.'
+      )
+    }
+
     // Encapsulate dependencies
     this.config = config
-    this.UserModel = UserModel
     this.jwt = jwt
+    this.UserModel = this.adapters.localdb.Users
   }
 
   // Returns if user passes a valid JWT token that resolves to a valid user.
@@ -63,7 +71,7 @@ class Validators {
       if (!user) throw new Error('User not found!')
 
       // If this current user is an admin, then quietly exit.
-      if (user.type === 'admin') return
+      if (user.type === 'admin') return true
 
       // Throw an error if the JWT token does not match the targeted user.
       if (user._id.toString() !== targetUserId) {

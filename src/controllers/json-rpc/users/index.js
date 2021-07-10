@@ -29,7 +29,7 @@ class UserRPC {
     // Encapsulate dependencies
     this.userLib = this.useCases.user
     this.jsonrpc = jsonrpc
-    this.validators = new Validators()
+    this.validators = new Validators(localConfig)
     this.rateLimit = new RateLimit()
   }
 
