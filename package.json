@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "npm run test:all",
-    "test:all": "export SVC_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/json-rpc/ test/unit/rest-api/ test/e2e/automated/",
+    "test:all": "export SVC_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 --recursive test/unit test/e2e/automated/",
     "test:unit:lib": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/biz-logic/",
     "test:unit:rest": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/rest-api/",
     "test:unit:jsonrpc": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/json-rpc/",
