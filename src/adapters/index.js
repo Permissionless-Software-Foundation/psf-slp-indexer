@@ -10,7 +10,7 @@ const LocalDB = require('./localdb')
 const LogsAPI = require('./logapi')
 const Passport = require('./passport')
 const Nodemailer = require('./nodemailer')
-const wlogger = require('./wlogger')
+const { wlogger } = require('./wlogger')
 const JSONFiles = require('./json-files')
 
 // Instantiate adapter libraries.

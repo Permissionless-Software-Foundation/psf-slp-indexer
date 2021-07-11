@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer')
 
 const config = require('../../config')
 
-const wlogger = require('./wlogger')
+const { wlogger } = require('./wlogger')
 
 let _this
 

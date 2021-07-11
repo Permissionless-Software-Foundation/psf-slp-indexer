@@ -9,7 +9,7 @@ const config = require('../../config')
 
 const NodeMailer = require('../adapters/nodemailer')
 const nodemailer = new NodeMailer()
-const wlogger = require('../adapters/wlogger')
+const { wlogger } = require('../adapters/wlogger')
 
 let _this
 

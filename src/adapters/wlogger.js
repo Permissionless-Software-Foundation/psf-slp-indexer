@@ -24,9 +24,11 @@ const transport = new winston.transports.DailyRotateFile({
   )
 })
 
-transport.on('rotate', function (oldFilename, newFilename) {
+transport.on('rotate', notifyRotation)
+
+function notifyRotation (oldFilename, newFilename) {
   wlogger.info('Rotating log files')
-})
+}
 
 // This controls what goes into the log FILES
 const wlogger = winston.createLogger({
@@ -43,8 +45,7 @@ const wlogger = winston.createLogger({
   ]
 })
 
-// This controls the logs to CONSOLE
-if (config.env !== 'test') {
+function outputToConsole () {
   wlogger.add(
     new winston.transports.Console({
       format: winston.format.simple(),
@@ -53,4 +54,9 @@ if (config.env !== 'test') {
   )
 }
 
-module.exports = wlogger
+// This controls the logs to CONSOLE
+if (config.env !== 'test') {
+  outputToConsole()
+}
+
+module.exports = { wlogger, notifyRotation, outputToConsole }

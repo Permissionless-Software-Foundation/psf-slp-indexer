@@ -4,7 +4,7 @@
 */
 
 // const UserModel = require('../adapters/localdb/models/users')
-const wlogger = require('../adapters/wlogger')
+const { wlogger } = require('../adapters/wlogger')
 
 class UserLib {
   constructor (localConfig = {}) {
