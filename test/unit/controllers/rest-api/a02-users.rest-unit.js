@@ -8,17 +8,17 @@ const sinon = require('sinon')
 const mongoose = require('mongoose')
 
 // Local support libraries
-const config = require('../../../config')
-const testUtils = require('../../utils/test-utils')
-const adapters = require('../mocks/adapters')
-const UseCasesMock = require('../mocks/use-cases')
+const config = require('../../../../config')
+const testUtils = require('../../../utils/test-utils')
+const adapters = require('../../mocks/adapters')
+const UseCasesMock = require('../../mocks/use-cases')
 
-const UserController = require('../../../src/controllers/rest-api/users/controller')
+const UserController = require('../../../../src/controllers/rest-api/users/controller')
 let uut
 let sandbox
 let ctx
 
-const mockContext = require('../../unit/mocks/ctx-mock').context
+const mockContext = require('../../../unit/mocks/ctx-mock').context
 
 describe('Users', () => {
   // const testUser = {}

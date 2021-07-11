@@ -6,18 +6,18 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const LogsApiController = require('../../../src/controllers/rest-api/logs/controller')
+const ContactController = require('../../../../src/controllers/rest-api/contact/controller')
 let uut
 let sandbox
 let ctx
 
-const mockContext = require('../../unit/mocks/ctx-mock').context
+const mockContext = require('../../../unit/mocks/ctx-mock').context
 
-describe('Logapi', () => {
+describe('Contact', () => {
   before(async () => {})
 
   beforeEach(() => {
-    uut = new LogsApiController()
+    uut = new ContactController()
 
     sandbox = sinon.createSandbox()
 
@@ -27,43 +27,28 @@ describe('Logapi', () => {
 
   afterEach(() => sandbox.restore())
 
-  describe('#POST /logapi', () => {
+  describe('#POST /contact', () => {
     it('should return 422 status on biz logic error', async () => {
       try {
-        await uut.getLogs(ctx)
+        await uut.email(ctx)
 
         assert.fail('Unexpected result')
       } catch (err) {
+        // console.log(err)
         assert.equal(err.status, 422)
         assert.include(err.message, 'Cannot read property')
       }
     })
-    it('should return 500 status on biz logic Unhandled error', async () => {
-      try {
-        // eslint-disable
-        sandbox
-          .stub(uut.logsApiLib, 'getLogs')
-          .returns(Promise.reject(new Error()))
-
-        ctx.request.body = {
-          password: 'test'
-        }
-
-        await uut.getLogs(ctx)
-
-        assert.fail('Unexpected result')
-      } catch (err) {
-        assert.equal(err.status, 500)
-        assert.include(err.message, 'Unhandled error')
-      }
-    })
 
     it('should return 200 status on success', async () => {
+      sandbox.stub(uut.contactLib, 'sendEmail').resolves(true)
+
       ctx.request.body = {
-        password: 'test'
+        email: 'test02@test.com',
+        formMessage: 'test'
       }
 
-      await uut.getLogs(ctx)
+      await uut.email(ctx)
 
       // Assert the expected HTTP response
       assert.equal(ctx.status, 200)
