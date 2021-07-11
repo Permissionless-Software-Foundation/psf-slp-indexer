@@ -5,12 +5,10 @@
 */
 
 // Public npm libraries
-const mongoose = require('mongoose')
 const assert = require('chai').assert
 const sinon = require('sinon')
 
 // Local support libraries
-const config = require('../../../config')
 const testUtils = require('../../utils/test-utils')
 
 // Unit under test (uut)
@@ -23,15 +21,6 @@ describe('#users', () => {
   let testUser = {}
 
   before(async () => {
-    // Connect to the Mongo Database.
-    console.log(`Connecting to database: ${config.database}`)
-    mongoose.Promise = global.Promise
-    mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(config.database, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
-
     // Delete all previous users in the database.
     await testUtils.deleteAllUsers()
   })
@@ -44,8 +33,19 @@ describe('#users', () => {
 
   afterEach(() => sandbox.restore())
 
-  after(() => {
-    mongoose.connection.close()
+  describe('#constructor', () => {
+    it('should throw an error if adapters are not passed in', () => {
+      try {
+        uut = new UserLib()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of adapters must be passed in when instantiating User Use Cases library.'
+        )
+      }
+    })
   })
 
   describe('#createUser', () => {
@@ -133,6 +133,8 @@ describe('#users', () => {
 
       testUser = userData
 
+      // Commented out because there is some sophisticated mocking required that
+      // I didn't have time to figure out. -CT 6/11/21
       // Assert that the user model has the expected properties with expected values.
       // assert.property(userData, 'type')
       // assert.equal(userData.type, 'user')
