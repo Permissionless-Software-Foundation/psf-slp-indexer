@@ -12,9 +12,9 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries.
-const JSONRPC = require('../../../src/controllers/json-rpc')
-const adapters = require('../mocks/adapters')
-const UseCasesMock = require('../mocks/use-cases')
+const JSONRPC = require('../../../../src/controllers/json-rpc')
+const adapters = require('../../mocks/adapters')
+const UseCasesMock = require('../../mocks/use-cases')
 
 describe('#JSON RPC', () => {
   let uut

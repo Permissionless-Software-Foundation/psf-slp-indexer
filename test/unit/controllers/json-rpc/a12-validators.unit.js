@@ -14,8 +14,8 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries
-const Validators = require('../../../src/controllers/json-rpc/validators')
-const adapters = require('../mocks/adapters')
+const Validators = require('../../../../src/controllers/json-rpc/validators')
+const adapters = require('../../mocks/adapters')
 
 describe('#validators', () => {
   let uut

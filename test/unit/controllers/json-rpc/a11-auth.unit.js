@@ -13,11 +13,11 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries
-const config = require('../../../config')
-const AuthRPC = require('../../../src/controllers/json-rpc/auth')
-const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
-const adapters = require('../mocks/adapters')
-const UseCasesMock = require('../mocks/use-cases')
+const config = require('../../../../config')
+const AuthRPC = require('../../../../src/controllers/json-rpc/auth')
+const RateLimit = require('../../../../src/controllers/json-rpc/rate-limit')
+const adapters = require('../../mocks/adapters')
+const UseCasesMock = require('../../mocks/use-cases')
 
 describe('#AuthRPC', () => {
   let uut
