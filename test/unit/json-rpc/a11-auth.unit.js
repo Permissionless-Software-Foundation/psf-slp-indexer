@@ -16,15 +16,12 @@ process.env.SVC_ENV = 'test'
 const config = require('../../../config')
 const AuthRPC = require('../../../src/controllers/json-rpc/auth')
 const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
-// const UserLib = require('../../../src/use-cases/user')
-// const userLib = new UserLib()
 const adapters = require('../mocks/adapters')
 const UseCasesMock = require('../mocks/use-cases')
 
 describe('#AuthRPC', () => {
   let uut
   let sandbox
-  // let testUser
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -48,6 +45,10 @@ describe('#AuthRPC', () => {
     sandbox = sinon.createSandbox()
 
     const useCases = new UseCasesMock()
+    // console.log('a11 useCases: ', useCases)
+    // console.log('a11 useCases.user: ', useCases.user)
+    // useCases.helloWorld()
+    // useCases.user.hello2()
 
     uut = new AuthRPC({ adapters, useCases })
     uut.rateLimit = new RateLimit({ max: 100 })
@@ -120,7 +121,7 @@ describe('#AuthRPC', () => {
 
       assert.equal(response.endpoint, 'authUser')
       assert.property(response, 'userId')
-      assert.equal(response.userType, 'user')
+      // assert.equal(response.userType, 'user')
       assert.property(response, 'userName')
       assert.property(response, 'userEmail')
       assert.property(response, 'apiToken')
@@ -140,6 +141,11 @@ describe('#AuthRPC', () => {
       })
       const jsonStr = JSON.stringify(authCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
+
+      // Force an error.
+      sandbox
+        .stub(uut.userLib, 'authUser')
+        .rejects(new Error('Login credential do not match'))
 
       const response = await uut.authUser(rpcData)
       // console.log('response: ', response)

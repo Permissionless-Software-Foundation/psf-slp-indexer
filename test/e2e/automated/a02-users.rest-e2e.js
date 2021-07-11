@@ -12,6 +12,8 @@ const LOCALHOST = `http://localhost:${config.port}`
 const context = {}
 
 const UserController = require('../../../src/controllers/rest-api/users/controller')
+const adapters = require('../../../src/adapters')
+const UseCases = require('../../../src/use-cases/')
 let uut
 let sandbox
 
@@ -47,7 +49,8 @@ describe('Users', () => {
   })
 
   beforeEach(() => {
-    uut = new UserController()
+    const useCases = new UseCases({ adapters })
+    uut = new UserController({ adapters, useCases })
 
     sandbox = sinon.createSandbox()
   })
@@ -274,7 +277,7 @@ describe('Users', () => {
 
         // Force an error
         sandbox
-          .stub(uut.userLib, 'getAllUsers')
+          .stub(uut.useCases.user, 'getAllUsers')
           .rejects(new Error('test error'))
 
         const options = {
@@ -289,6 +292,7 @@ describe('Users', () => {
 
         assert.fail('Unexpected code path!')
       } catch (err) {
+        console.log(err)
         assert.equal(err.response.status, 422)
         assert.equal(err.response.data, 'test error')
       }

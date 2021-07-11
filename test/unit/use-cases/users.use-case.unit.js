@@ -15,6 +15,8 @@ const testUtils = require('../../utils/test-utils')
 
 // Unit under test (uut)
 const UserLib = require('../../../src/use-cases/user')
+const adapters = require('../mocks/adapters')
+const UseCasesMock = require('../mocks/use-cases')
 
 describe('#users', () => {
   let uut
@@ -38,7 +40,9 @@ describe('#users', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
 
-    uut = new UserLib()
+    const useCases = new UseCasesMock()
+
+    uut = new UserLib({ adapters, useCases })
   })
 
   afterEach(() => sandbox.restore())

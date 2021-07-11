@@ -10,7 +10,8 @@ const mongoose = require('mongoose')
 // Local support libraries
 const config = require('../../../config')
 const testUtils = require('../../utils/test-utils')
-const User = require('../../../src/adapters/localdb/models/users')
+const adapters = require('../mocks/adapters')
+const UseCasesMock = require('../mocks/use-cases')
 
 const UserController = require('../../../src/controllers/rest-api/users/controller')
 let uut
@@ -20,7 +21,7 @@ let ctx
 const mockContext = require('../../unit/mocks/ctx-mock').context
 
 describe('Users', () => {
-  let testUser = {}
+  // const testUser = {}
 
   before(async () => {
     // Connect to the Mongo Database.
@@ -61,7 +62,8 @@ describe('Users', () => {
   })
 
   beforeEach(() => {
-    uut = new UserController()
+    const useCases = new UseCasesMock()
+    uut = new UserController({ adapters, useCases })
 
     sandbox = sinon.createSandbox()
 
@@ -107,7 +109,7 @@ describe('Users', () => {
       assert.property(ctx.response.body, 'token')
 
       // Used by downstream tests.
-      testUser = ctx.response.body.user
+      // testUser = ctx.response.body.user
       // console.log('testUser: ', testUser)
     })
   })
@@ -117,7 +119,7 @@ describe('Users', () => {
       try {
         // Force an error
         sandbox
-          .stub(uut.userLib, 'getAllUsers')
+          .stub(uut.useCases.user, 'getAllUsers')
           .rejects(new Error('test error'))
 
         await uut.getUsers(ctx)
@@ -144,7 +146,9 @@ describe('Users', () => {
     it('should return 422 status on arbitrary biz logic error', async () => {
       try {
         // Force an error
-        sandbox.stub(uut.userLib, 'getUser').rejects(new Error('test error'))
+        sandbox
+          .stub(uut.useCases.user, 'getUser')
+          .rejects(new Error('test error'))
 
         await uut.getUser(ctx)
 
@@ -157,7 +161,7 @@ describe('Users', () => {
 
     it('should return 200 status on success', async () => {
       // Mock dependencies
-      sandbox.stub(uut.userLib, 'getUser').resolves({ _id: '123' })
+      sandbox.stub(uut.useCases.user, 'getUser').resolves({ _id: '123' })
 
       await uut.getUser(ctx)
 
@@ -173,7 +177,7 @@ describe('Users', () => {
         // Mock dependencies
         const testErr = new Error('test error')
         testErr.status = 404
-        sandbox.stub(uut.userLib, 'getUser').rejects(testErr)
+        sandbox.stub(uut.useCases.user, 'getUser').rejects(testErr)
 
         await uut.getUser(ctx)
 
@@ -201,18 +205,21 @@ describe('Users', () => {
     it('should return 200 on success', async () => {
       // Prep the testUser data.
       // console.log('testUser: ', testUser)
-      testUser.password = 'password'
-      delete testUser.type
+      // testUser.password = 'password'
+      // delete testUser.type
 
       // Replace the testUser variable with an actual model from the DB.
-      const existingUser = await User.findById(testUser._id)
+      // const existingUser = await User.findById(testUser._id)
 
       ctx.body = {
-        user: existingUser
+        user: {}
       }
       ctx.request.body = {
-        user: testUser
+        user: {}
       }
+
+      // Mock dependencies
+      sandbox.stub(uut.useCases.user, 'updateUser').resolves({})
 
       await uut.updateUser(ctx)
 
@@ -239,7 +246,7 @@ describe('Users', () => {
 
     it('should return 200 status on success', async () => {
       // Replace the testUser variable with an actual model from the DB.
-      const existingUser = await User.findById(testUser._id)
+      const existingUser = {}
 
       ctx.body = {
         user: existingUser

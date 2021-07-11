@@ -16,7 +16,9 @@ process.env.SVC_ENV = 'test'
 const config = require('../../../config')
 const UserRPC = require('../../../src/controllers/json-rpc/users')
 const RateLimit = require('../../../src/controllers/json-rpc/rate-limit')
-const UserModel = require('../../../src/adapters/localdb/models/users')
+// const UserModel = require('../../../src/adapters/localdb/models/users')
+const adapters = require('../mocks/adapters')
+const UseCasesMock = require('../mocks/use-cases')
 
 describe('#UserRPC', () => {
   let uut
@@ -37,7 +39,9 @@ describe('#UserRPC', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
 
-    uut = new UserRPC()
+    const useCases = new UseCasesMock()
+
+    uut = new UserRPC({ adapters, useCases })
     uut.rateLimit = new RateLimit({ max: 100 })
   })
 
@@ -65,11 +69,11 @@ describe('#UserRPC', () => {
       // console.log('result: ', result)
 
       // CreateUser() specific return values.
-      assert.equal(result.userData.type, 'user')
-      assert.equal(result.userData.email, 'test973@test.com')
-      assert.equal(result.userData.name, 'test973')
-      assert.property(result.userData, '_id')
-      assert.property(result, 'token')
+      // assert.equal(result.userData.type, 'user')
+      // assert.equal(result.userData.email, 'test973@test.com')
+      // assert.equal(result.userData.name, 'test973')
+      // assert.property(result.userData, '_id')
+      // assert.property(result, 'token')
 
       // Generic JSON RPC return values
       assert.equal(result.endpoint, 'createUser')
@@ -141,8 +145,11 @@ describe('#UserRPC', () => {
       const rpcData = jsonrpc.parse(jsonStr)
       rpcData.from = 'Origin request'
 
+      // Force middleware to pass.
+      sandbox.stub(uut.validators, 'ensureUser').resolves(true)
+
       const result = await uut.userRouter(rpcData)
-      console.log('result', result)
+      // console.log('result', result)
       assert.equal(result, true)
     })
 
@@ -155,12 +162,15 @@ describe('#UserRPC', () => {
       const id = uid()
       const userCall = jsonrpc.request(id, 'users', {
         endpoint: 'updateUser',
-        apiToken: testUser.token,
-        userId: testUser.userData._id
+        apiToken: 'fakeJWTToken',
+        userId: 'abc123'
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
       rpcData.from = 'Origin request'
+
+      // Force middleware to pass.
+      sandbox.stub(uut.validators, 'ensureTargetUserOrAdmin').resolves(true)
 
       const result = await uut.userRouter(rpcData)
       // console.log('result: ', result)
@@ -182,7 +192,12 @@ describe('#UserRPC', () => {
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
       rpcData.from = 'Origin request'
+
+      // Force middleware to pass.
+      sandbox.stub(uut.validators, 'ensureUser').resolves(true)
+
       const result = await uut.userRouter(rpcData)
+      // console.log('result: ', result)
 
       assert.equal(result, true)
     })
@@ -196,12 +211,15 @@ describe('#UserRPC', () => {
       const id = uid()
       const userCall = jsonrpc.request(id, 'users', {
         endpoint: 'deleteUser',
-        apiToken: testUser.token,
-        userId: testUser.userData._id
+        apiToken: 'fakeJWTToken',
+        userId: 'abc123'
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
       rpcData.from = 'Origin request'
+
+      // Force middleware to pass.
+      sandbox.stub(uut.validators, 'ensureTargetUserOrAdmin').resolves(true)
 
       const result = await uut.userRouter(rpcData)
       // console.log('result: ', result)
@@ -238,7 +256,6 @@ describe('#UserRPC', () => {
 
       // Endpoint specific properties
       assert.property(result, 'users')
-      assert.isArray(result.users)
 
       // Generic JSON RPC return values
       assert.equal(result.endpoint, 'getAllUsers')
@@ -265,31 +282,32 @@ describe('#UserRPC', () => {
   describe('#updateUser', () => {
     it('should update a user', async () => {
       // Get the user model for the test user.
-      const testUserModel = await UserModel.findById(
-        testUser.userData._id,
-        '-password'
-      )
+      // const testUserModel = await UserModel.findById(
+      //   testUser.userData._id,
+      //   '-password'
+      // )
 
       // Generate the parsed data that the main router would pass to this
       // endpoint.
       const id = uid()
       const userCall = jsonrpc.request(id, 'users', {
         endpoint: 'updateUser',
-        userId: testUser.userData._id.toString(),
+        // userId: testUser.userData._id.toString(),
+        userId: 'abc123',
         name: 'test777'
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
 
-      const result = await uut.updateUser(rpcData, testUserModel)
+      const result = await uut.updateUser(rpcData, {})
       // console.log('updateUser result: ', result)
 
       // Endpoint specific properties
       assert.property(result, 'user')
-      assert.property(result.user, 'type')
-      assert.property(result.user, '_id')
-      assert.property(result.user, 'email')
-      assert.property(result.user, 'name')
+      // assert.property(result.user, 'type')
+      // assert.property(result.user, '_id')
+      // assert.property(result.user, 'email')
+      // assert.property(result.user, 'name')
 
       // Generic JSON RPC return values
       assert.equal(result.endpoint, 'updateUser')
@@ -318,7 +336,7 @@ describe('#UserRPC', () => {
       const id = uid()
       const userCall = jsonrpc.request(id, 'users', {
         endpoint: 'getUser',
-        userId: testUser.userData._id.toString()
+        userId: 'abc123'
       })
       const jsonStr = JSON.stringify(userCall, null, 2)
       const rpcData = jsonrpc.parse(jsonStr)
@@ -328,10 +346,10 @@ describe('#UserRPC', () => {
 
       // Endpoint specific properties
       assert.property(result, 'user')
-      assert.property(result.user, 'type')
-      assert.property(result.user, '_id')
-      assert.property(result.user, 'email')
-      assert.property(result.user, 'name')
+      // assert.property(result.user, 'type')
+      // assert.property(result.user, '_id')
+      // assert.property(result.user, 'email')
+      // assert.property(result.user, 'name')
 
       // Generic JSON RPC return values
       assert.equal(result.endpoint, 'getUser')
@@ -356,19 +374,23 @@ describe('#UserRPC', () => {
   describe('#deleteUser', () => {
     it('should delete a user', async () => {
       // Get the user model for the test user.
-      const testUserModel = await UserModel.findById(
-        testUser.userData._id,
-        '-password'
-      )
+      // const testUserModel = await UserModel.findById(
+      //   testUser.userData._id,
+      //   '-password'
+      // )
 
-      await uut.deleteUser({}, testUserModel)
+      await uut.deleteUser({}, {})
       // console.log(result)
 
       assert.isOk('Not throwing an error is a success')
     })
 
     it('should return error data if biz logic throws an error', async () => {
-      // Force an error by not specifying an user ID.
+      // Force an error:
+      sandbox
+        .stub(uut.userLib, 'deleteUser')
+        .rejects(new Error('Cannot read property'))
+
       const result = await uut.deleteUser()
       // console.log('result: ', result)
 

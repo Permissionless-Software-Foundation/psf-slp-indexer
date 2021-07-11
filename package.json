@@ -81,5 +81,10 @@
     "hooks": {
       "pre-commit": "npm run lint"
     }
+  },
+  "standard": {
+    "ignore": [
+      "/test/unit/mocks/**/*.js"
+    ]
   }
 }
