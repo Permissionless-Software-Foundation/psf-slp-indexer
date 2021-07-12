@@ -6,9 +6,10 @@ const IpfsAdapter = require('./ipfs')
 const IpfsCoordAdapter = require('./ipfs-coord')
 
 class IPFS {
-  constructor (localConfig) {
+  constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.ipfsAdapter = new IpfsAdapter()
+    this.IpfsCoordAdapter = IpfsCoordAdapter
 
     this.ipfsCoordAdapter = {} // placeholder
 
@@ -28,11 +29,13 @@ class IPFS {
       this.ipfs = this.ipfsAdapter.ipfs
 
       // Start ipfs-coord
-      this.ipfsCoordAdapter = new IpfsCoordAdapter({
+      this.ipfsCoordAdapter = new this.IpfsCoordAdapter({
         ipfs: this.ipfs
       })
       await this.ipfsCoordAdapter.start()
       console.log('ipfs-coord is ready.')
+
+      return true
     } catch (err) {
       console.error('Error in adapters/ipfs/index.js/start()')
       throw err

@@ -26,6 +26,7 @@ class IpfsCoordAdapter {
 
     // Encapsulate dependencies
     this.IpfsCoord = IpfsCoord
+    this.ipfsCoord = {}
     this.bchjs = new BCHJS()
     // this.rpc = new JSONRPC()
     this.config = config
