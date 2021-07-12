@@ -229,8 +229,9 @@ describe('#validators', () => {
 
     it('should throw an error if user can not be found', async () => {
       try {
-        // Force an error
-        sandbox.stub(uut.UserModel, 'findById').rejects(new Error('test error'))
+        // Mock external dependencies.
+        sandbox.stub(uut.jwt, 'verify').returns(true)
+        sandbox.stub(uut.UserModel, 'findById').resolves(null)
 
         // Generate the parsed data that the main router would pass to this
         // endpoint.
@@ -243,15 +244,38 @@ describe('#validators', () => {
         const jsonStr = JSON.stringify(userCall, null, 2)
         const rpcData = jsonrpc.parse(jsonStr)
 
+        await uut.ensureTargetUserOrAdmin(rpcData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'User not found!')
+      }
+    })
+
+    it('should throw an error if JWT is from a different user', async () => {
+      try {
         // Mock external dependencies.
         sandbox.stub(uut.jwt, 'verify').returns(true)
+        sandbox.stub(uut.UserModel, 'findById').resolves({ _id: 'badId' })
+
+        // Generate the parsed data that the main router would pass to this
+        // endpoint.
+        const id = uid()
+        const userCall = jsonrpc.request(id, 'users', {
+          endpoint: 'deleteUser',
+          apiToken: 'fakeJWTToken',
+          userId: 'abc123'
+        })
+        const jsonStr = JSON.stringify(userCall, null, 2)
+        const rpcData = jsonrpc.parse(jsonStr)
 
         await uut.ensureTargetUserOrAdmin(rpcData)
 
         assert.fail('Unexpected code path')
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, 'test error')
+        assert.include(err.message, 'User is neither admin nor target user.')
       }
     })
 

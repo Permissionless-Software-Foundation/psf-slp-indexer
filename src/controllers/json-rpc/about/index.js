@@ -8,7 +8,7 @@ const jsonrpc = require('jsonrpc-lite')
 // Local libraries
 const aboutStr = require('../../../../config/about')
 
-class AuthRPC {
+class AboutRPC {
   constructor (localConfig) {
     // Encapsulate dependencies
     this.jsonrpc = jsonrpc
@@ -42,4 +42,4 @@ class AuthRPC {
   }
 }
 
-module.exports = AuthRPC
+module.exports = AboutRPC
