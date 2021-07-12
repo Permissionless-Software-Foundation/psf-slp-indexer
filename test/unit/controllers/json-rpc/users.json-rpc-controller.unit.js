@@ -4,7 +4,6 @@
 
 // Public npm libraries
 const jsonrpc = require('jsonrpc-lite')
-const mongoose = require('mongoose')
 const sinon = require('sinon')
 const assert = require('chai').assert
 const { v4: uid } = require('uuid')
@@ -13,7 +12,6 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries
-const config = require('../../../../config')
 const UserRPC = require('../../../../src/controllers/json-rpc/users')
 const RateLimit = require('../../../../src/controllers/json-rpc/rate-limit')
 // const UserModel = require('../../../src/adapters/localdb/models/users')
@@ -24,17 +22,6 @@ describe('#UserRPC', () => {
   let uut
   let sandbox
   let testUser
-
-  before(async () => {
-    // Connect to the Mongo Database.
-    console.log(`Connecting to database: ${config.database}`)
-    mongoose.Promise = global.Promise
-    mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(config.database, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
-  })
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
@@ -47,8 +34,32 @@ describe('#UserRPC', () => {
 
   afterEach(() => sandbox.restore())
 
-  after(() => {
-    mongoose.connection.close()
+  describe('#constructor', () => {
+    it('should throw an error if adapters are not passed in', () => {
+      try {
+        uut = new UserRPC()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Adapters library required when instantiating User JSON RPC Controller.'
+        )
+      }
+    })
+
+    it('should throw an error if useCases are not passed in', () => {
+      try {
+        uut = new UserRPC({ adapters })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Use Cases library required when instantiating User JSON RPC Controller.'
+        )
+      }
+    })
   })
 
   describe('#createUser', () => {
