@@ -4,7 +4,6 @@
 
 // Public npm libraries
 const jsonrpc = require('jsonrpc-lite')
-const mongoose = require('mongoose')
 const sinon = require('sinon')
 const assert = require('chai').assert
 const { v4: uid } = require('uuid')
@@ -13,7 +12,6 @@ const { v4: uid } = require('uuid')
 process.env.SVC_ENV = 'test'
 
 // Local libraries
-const config = require('../../../../config')
 const AuthRPC = require('../../../../src/controllers/json-rpc/auth')
 const RateLimit = require('../../../../src/controllers/json-rpc/rate-limit')
 const adapters = require('../../mocks/adapters')
@@ -23,32 +21,10 @@ describe('#AuthRPC', () => {
   let uut
   let sandbox
 
-  before(async () => {
-    // Connect to the Mongo Database.
-    console.log(`Connecting to database: ${config.database}`)
-    mongoose.Promise = global.Promise
-    mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(config.database, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
-
-    // Create a test user.
-    // testUser = await userLib.createUser({
-    //   email: 'test543@test.com',
-    //   name: 'tester543',
-    //   password: 'password'
-    // })
-  })
-
   beforeEach(() => {
     sandbox = sinon.createSandbox()
 
     const useCases = new UseCasesMock()
-    // console.log('a11 useCases: ', useCases)
-    // console.log('a11 useCases.user: ', useCases.user)
-    // useCases.helloWorld()
-    // useCases.user.hello2()
 
     uut = new AuthRPC({ adapters, useCases })
     uut.rateLimit = new RateLimit({ max: 100 })
@@ -56,12 +32,32 @@ describe('#AuthRPC', () => {
 
   afterEach(() => sandbox.restore())
 
-  after(async () => {
-    // Delete the test user.
-    // testUser = await userLib.getUser({ id: testUser.userData._id })
-    // await userLib.deleteUser(testUser)
+  describe('#constructor', () => {
+    it('should throw an error if adapters are not passed in', () => {
+      try {
+        uut = new AuthRPC()
 
-    mongoose.connection.close()
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Adapters library required when instantiating Auth JSON RPC Controller.'
+        )
+      }
+    })
+
+    it('should throw an error if useCases are not passed in', () => {
+      try {
+        uut = new AuthRPC({ adapters })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Use Cases library required when instantiating Auth JSON RPC Controller.'
+        )
+      }
+    })
   })
 
   describe('#authRouter', () => {
