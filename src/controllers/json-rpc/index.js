@@ -110,25 +110,13 @@ class JSONRPC {
 
   // The default JSON RPC response if the incoming command could not be routed.
   defaultResponse () {
-    try {
-      // const errorObj = this.jsonrpc.error(
-      //   'Can not route',
-      //   new jsonrpc.JsonRpcError('Input does not match routing rules', 422)
-      // )
-      // const errorStr = JSON.stringify(errorObj)
-      // return errorStr
-
-      const errorObj = {
-        success: false,
-        status: 422,
-        message: 'Input does not match routing rules.'
-      }
-
-      return errorObj
-    } catch (err) {
-      console.error('Error in defaultResponse()')
-      throw err
+    const errorObj = {
+      success: false,
+      status: 422,
+      message: 'Input does not match routing rules.'
     }
+
+    return errorObj
   }
 }
 

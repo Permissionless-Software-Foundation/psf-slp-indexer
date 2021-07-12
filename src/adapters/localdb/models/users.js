@@ -11,60 +11,33 @@ const User = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
-    validate: {
-      validator: function (email) {
-        // eslint-disable-next-line no-useless-escape
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
-      },
-      message: props => `${props.value} is not a valid Email format!`
-    }
+    unique: true
   }
 })
 
 // Before saving, convert the password to a hash.
-User.pre('save', function preSave (next) {
+User.pre('save', async function preSave (next) {
   const user = this
 
   if (!user.isModified('password')) {
     return next()
   }
 
-  new Promise((resolve, reject) => {
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) {
-        return reject(err)
-      }
-      resolve(salt)
-    })
-  })
-    .then(salt => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        if (err) {
-          throw new Error(err)
-        }
+  const salt = await bcrypt.genSalt(10)
+  const hash = await bcrypt.hash(user.password, salt)
 
-        user.password = hash
+  user.password = hash
 
-        next(null)
-      })
-    })
-    .catch(err => next(err))
+  next(null)
 })
 
 // Validate the password by comparing to the saved hash.
-User.methods.validatePassword = function validatePassword (password) {
+User.methods.validatePassword = async function validatePassword (password) {
   const user = this
 
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) {
-        return reject(err)
-      }
+  const isMatch = await bcrypt.compare(password, user.password)
 
-      resolve(isMatch)
-    })
-  })
+  return isMatch
 }
 
 // Generate a JWT token.

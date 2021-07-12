@@ -29,6 +29,34 @@ describe('#JSON RPC', () => {
 
   afterEach(() => sandbox.restore())
 
+  describe('#constructor', () => {
+    it('should throw an error if adapters are not passed in', () => {
+      try {
+        uut = new JSONRPC()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Adapters library required when instantiating JSON RPC Controllers.'
+        )
+      }
+    })
+
+    it('should throw an error if useCases are not passed in', () => {
+      try {
+        uut = new JSONRPC({ adapters })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Use Cases library required when instantiating JSON RPC Controllers.'
+        )
+      }
+    })
+  })
+
   describe('#router', () => {
     it('should exit quietly if given a random string', async () => {
       const str = 'random string message'
@@ -104,6 +132,51 @@ describe('#JSON RPC', () => {
 
       assert.equal(obj.result.value, 'true')
       assert.equal(obj.result.method, 'users')
+      assert.equal(obj.id, id)
+    })
+
+    it('should route to auth handler', async () => {
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'auth', { endpoint: 'getAll' })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+
+      // Mock the controller.
+      sandbox.stub(uut.authController, 'authRouter').resolves('true')
+
+      const result = await uut.router(jsonStr, 'peerA')
+      // console.log(result)
+
+      const obj = JSON.parse(result.retStr)
+      // console.log('obj: ', obj)
+
+      assert.equal(obj.result.value, 'true')
+      assert.equal(obj.result.method, 'auth')
+      assert.equal(obj.id, id)
+    })
+
+    it('should route to about handler', async () => {
+      const id = uid()
+      const userCall = jsonrpc.request(id, 'about', { endpoint: 'getAll' })
+      const jsonStr = JSON.stringify(userCall, null, 2)
+
+      // Mock the controller.
+      sandbox.stub(uut.aboutController, 'aboutRouter').resolves('true')
+
+      // Force ipfs-coord communication.
+      uut.ipfsCoord.ipfs = {
+        orbitdb: {
+          sendToDb: () => {}
+        }
+      }
+
+      const result = await uut.router(jsonStr, 'peerA')
+      // console.log(result)
+
+      const obj = JSON.parse(result.retStr)
+      // console.log('obj: ', obj)
+
+      assert.equal(obj.result.value, 'true')
+      assert.equal(obj.result.method, 'about')
       assert.equal(obj.id, id)
     })
   })
