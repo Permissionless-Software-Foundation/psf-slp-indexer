@@ -6,12 +6,12 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const ContactController = require('../../../../src/controllers/rest-api/contact/controller')
+const ContactController = require('../../../../../src/controllers/rest-api/contact/controller')
 let uut
 let sandbox
 let ctx
 
-const mockContext = require('../../../unit/mocks/ctx-mock').context
+const mockContext = require('../../../../unit/mocks/ctx-mock').context
 
 describe('Contact', () => {
   before(async () => {})
@@ -56,6 +56,33 @@ describe('Contact', () => {
       // Assert that expected properties exist in the returned data.
       assert.property(ctx.response.body, 'success')
       assert.isTrue(ctx.response.body.success)
+    })
+  })
+
+  describe('#handleError', () => {
+    it('should pass an error message', () => {
+      try {
+        const err = {
+          status: 422,
+          message: 'Unprocessable Entity'
+        }
+
+        uut.handleError(ctx, err)
+      } catch (err) {
+        assert.include(err.message, 'Unprocessable Entity')
+      }
+    })
+
+    it('should still throw error if there is no message', () => {
+      try {
+        const err = {
+          status: 404
+        }
+
+        uut.handleError(ctx, err)
+      } catch (err) {
+        assert.include(err.message, 'Not Found')
+      }
     })
   })
 })
