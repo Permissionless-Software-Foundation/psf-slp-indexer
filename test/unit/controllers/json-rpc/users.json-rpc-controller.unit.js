@@ -13,8 +13,6 @@ process.env.SVC_ENV = 'test'
 
 // Local libraries
 const UserRPC = require('../../../../src/controllers/json-rpc/users')
-const RateLimit = require('../../../../src/controllers/json-rpc/rate-limit')
-// const UserModel = require('../../../src/adapters/localdb/models/users')
 const adapters = require('../../mocks/adapters')
 const UseCasesMock = require('../../mocks/use-cases')
 
@@ -29,7 +27,6 @@ describe('#UserRPC', () => {
     const useCases = new UseCasesMock()
 
     uut = new UserRPC({ adapters, useCases })
-    uut.rateLimit = new RateLimit({ max: 100 })
   })
 
   afterEach(() => sandbox.restore())

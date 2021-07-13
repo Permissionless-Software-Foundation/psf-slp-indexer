@@ -8,23 +8,23 @@
 
 // Load the REST API Controllers.
 const AuthRESTController = require('./auth')
-const UserRESTController = require('./users')
+const UserRouter = require('./users')
 const ContactRESTController = require('./contact')
 const LogsRESTController = require('./logs')
 
 class RESTControllers {
-  constructor (localConfig) {
+  constructor (localConfig = {}) {
     // Dependency Injection.
     this.adapters = localConfig.adapters
     if (!this.adapters) {
       throw new Error(
-        'Instance of Adapters library required when instantiating PostEntry REST Controller.'
+        'Instance of Adapters library required when instantiating REST Controller libraries.'
       )
     }
     this.useCases = localConfig.useCases
     if (!this.useCases) {
       throw new Error(
-        'Instance of Use Cases library required when instantiating PostEntry REST Controller.'
+        'Instance of Use Cases library required when instantiating REST Controller libraries.'
       )
     }
 
@@ -42,8 +42,8 @@ class RESTControllers {
     authRESTController.attach(app)
 
     // Attach the REST API Controllers associated with the /user route
-    const userRESTController = new UserRESTController(dependencies)
-    userRESTController.attach(app)
+    const userRouter = new UserRouter(dependencies)
+    userRouter.attach(app)
 
     // Attach the REST API Controllers associated with the /contact route
     const contactRESTController = new ContactRESTController(dependencies)

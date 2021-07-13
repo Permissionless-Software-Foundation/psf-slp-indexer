@@ -2,12 +2,6 @@
   REST API Controller library for the /user route
 */
 
-// User database model.
-// const UserModel = require('../../../adapters/localdb/models/users')
-
-// User library for business logic.
-// const UserLib = require('../../../use-cases/user')
-
 const { wlogger } = require('../../../adapters/wlogger')
 
 let _this

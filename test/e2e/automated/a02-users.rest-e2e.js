@@ -292,7 +292,7 @@ describe('Users', () => {
 
         assert.fail('Unexpected code path!')
       } catch (err) {
-        console.log(err)
+        // console.log(err)
         assert.equal(err.response.status, 422)
         assert.equal(err.response.data, 'test error')
       }

@@ -5,61 +5,20 @@
 // Public npm libraries
 const assert = require('chai').assert
 const sinon = require('sinon')
-const mongoose = require('mongoose')
 
 // Local support libraries
-const config = require('../../../../config')
-const testUtils = require('../../../utils/test-utils')
-const adapters = require('../../mocks/adapters')
-const UseCasesMock = require('../../mocks/use-cases')
+const adapters = require('../../../mocks/adapters')
+const UseCasesMock = require('../../../mocks/use-cases')
 
-const UserController = require('../../../../src/controllers/rest-api/users/controller')
+const UserController = require('../../../../../src/controllers/rest-api/users/controller')
 let uut
 let sandbox
 let ctx
 
-const mockContext = require('../../../unit/mocks/ctx-mock').context
+const mockContext = require('../../../../unit/mocks/ctx-mock').context
 
-describe('Users', () => {
+describe('#Users-REST-Controller', () => {
   // const testUser = {}
-
-  before(async () => {
-    // Connect to the Mongo Database.
-    mongoose.Promise = global.Promise
-    mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-    await mongoose.connect(config.database, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    })
-
-    // Delete all previous users in the database.
-    await testUtils.deleteAllUsers()
-
-    // console.log(`config: ${JSON.stringify(config, null, 2)}`)
-
-    // Create a second test user.
-    // const userObj = {
-    //   email: 'test2@test.com',
-    //   password: 'pass2'
-    // }
-    // const testUser = await testUtils.createUser(userObj)
-    // console.log(`testUser2: ${JSON.stringify(testUser, null, 2)}`)
-
-    // context.user2 = testUser.user
-    // context.token2 = testUser.token
-    // context.id2 = testUser.user._id
-
-    // Get the JWT used to log in as the admin 'system' user.
-    // const adminJWT = await testUtils.getAdminJWT()
-    // // console.log(`adminJWT: ${adminJWT}`)
-    // context.adminJWT = adminJWT
-
-    // const admin = await testUtils.loginAdminUser()
-    // context.adminJWT = admin.token
-
-    // const admin = await adminLib.loginAdmin()
-    // console.log(`admin: ${JSON.stringify(admin, null, 2)}`)
-  })
 
   beforeEach(() => {
     const useCases = new UseCasesMock()
@@ -73,8 +32,32 @@ describe('Users', () => {
 
   afterEach(() => sandbox.restore())
 
-  after(() => {
-    mongoose.connection.close()
+  describe('#constructor', () => {
+    it('should throw an error if adapters are not passed in', () => {
+      try {
+        uut = new UserController()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Adapters library required when instantiating /users REST Controller.'
+        )
+      }
+    })
+
+    it('should throw an error if useCases are not passed in', () => {
+      try {
+        uut = new UserController({ adapters })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Instance of Use Cases library required when instantiating /users REST Controller.'
+        )
+      }
+    })
   })
 
   describe('#POST /users', () => {
@@ -256,6 +239,20 @@ describe('Users', () => {
 
       // Assert the expected HTTP response
       assert.equal(ctx.status, 200)
+    })
+  })
+
+  describe('#handleError', () => {
+    it('should still throw error if there is no message', () => {
+      try {
+        const err = {
+          status: 404
+        }
+
+        uut.handleError(ctx, err)
+      } catch (err) {
+        assert.include(err.message, 'Not Found')
+      }
     })
   })
 })
