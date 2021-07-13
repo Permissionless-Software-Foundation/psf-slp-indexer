@@ -7,7 +7,6 @@ const Router = require('koa-router')
 
 // Local libraries.
 const ContactRESTControllerLib = require('./controller')
-const Validators = require('../middleware/validators')
 
 class ContactRouter {
   constructor (localConfig = {}) {
@@ -32,7 +31,6 @@ class ContactRouter {
 
     // Encapsulate dependencies.
     this.contactRESTController = new ContactRESTControllerLib(dependencies)
-    this.validators = new Validators()
 
     // Instantiate the router and set the base route.
     const baseUrl = '/contact'

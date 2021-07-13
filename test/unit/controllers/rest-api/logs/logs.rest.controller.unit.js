@@ -6,12 +6,12 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const LogsApiController = require('../../../../src/controllers/rest-api/logs/controller')
+const LogsApiController = require('../../../../../src/controllers/rest-api/logs/controller')
 let uut
 let sandbox
 let ctx
 
-const mockContext = require('../../../unit/mocks/ctx-mock').context
+const mockContext = require('../../../../unit/mocks/ctx-mock').context
 
 describe('Logapi', () => {
   before(async () => {})
@@ -38,6 +38,7 @@ describe('Logapi', () => {
         assert.include(err.message, 'Cannot read property')
       }
     })
+
     it('should return 500 status on biz logic Unhandled error', async () => {
       try {
         // eslint-disable
@@ -59,18 +60,16 @@ describe('Logapi', () => {
     })
 
     it('should return 200 status on success', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.logsApiLib, 'getLogs').resolves({})
+
       ctx.request.body = {
         password: 'test'
       }
 
       await uut.getLogs(ctx)
 
-      // Assert the expected HTTP response
-      assert.equal(ctx.status, 200)
-
-      // Assert that expected properties exist in the returned data.
-      assert.property(ctx.response.body, 'success')
-      assert.isTrue(ctx.response.body.success)
+      assert.isOk(ctx.body)
     })
   })
 })

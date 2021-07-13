@@ -36,6 +36,10 @@ const localdb = {
     async remove () {
       return true
     }
+
+    async validatePassword () {
+      return true
+    }
   },
 
   validatePassword: () => {
