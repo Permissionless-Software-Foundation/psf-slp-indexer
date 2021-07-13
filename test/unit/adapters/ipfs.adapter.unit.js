@@ -8,7 +8,7 @@ const sinon = require('sinon')
 const IPFSLib = require('../../../src/adapters/ipfs/ipfs')
 const IPFSMock = require('../mocks/ipfs-mock')
 
-describe('#IPFS', () => {
+describe('#IPFS-adapter', () => {
   let uut
   let sandbox
 
@@ -42,7 +42,7 @@ describe('#IPFS', () => {
 
         assert.fail('Unexpected code path.')
       } catch (err) {
-        console.log(err)
+        // console.log(err)
         assert.include(err.message, 'test error')
       }
     })

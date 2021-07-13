@@ -7,7 +7,7 @@ const assert = require('chai').assert
 const sinon = require('sinon')
 
 // Local support libraries
-const testUtils = require('../../utils/test-utils')
+// const testUtils = require('../../utils/test-utils')
 
 // Unit under test (uut)
 const UseCases = require('../../../src/use-cases')
@@ -19,7 +19,7 @@ describe('#use-cases', () => {
 
   before(async () => {
     // Delete all previous users in the database.
-    await testUtils.deleteAllUsers()
+    // await testUtils.deleteAllUsers()
   })
 
   beforeEach(() => {

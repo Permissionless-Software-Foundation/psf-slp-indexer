@@ -55,8 +55,8 @@ function outputToConsole () {
 }
 
 // This controls the logs to CONSOLE
-if (config.env !== 'test') {
-  outputToConsole()
-}
+// if (config.env !== 'test') {
+//   outputToConsole()
+// }
 
 module.exports = { wlogger, notifyRotation, outputToConsole }

@@ -9,7 +9,7 @@ const IPFSLib = require('../../../src/adapters/ipfs')
 const IPFSMock = require('../mocks/ipfs-mock')
 const IPFSCoordMock = require('../mocks/ipfs-coord-mock')
 
-describe('#IPFS', () => {
+describe('#IPFS-adapter-index', () => {
   let uut
   let sandbox
 
@@ -41,7 +41,7 @@ describe('#IPFS', () => {
 
         assert.fail('Unexpected code path.')
       } catch (err) {
-        console.log(err)
+        // console.log(err)
         assert.include(err.message, 'test error')
       }
     })
