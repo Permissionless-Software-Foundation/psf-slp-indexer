@@ -9,7 +9,7 @@ const sinon = require('sinon')
 const LOCALHOST = `http://localhost:${config.port}`
 
 const mockContext = require('../../unit/mocks/ctx-mock').context
-const ContactController = require('../../../src/modules/contact/controller')
+const ContactController = require('../../../src/controllers/rest-api/contact/controller')
 let uut
 let sandbox
 

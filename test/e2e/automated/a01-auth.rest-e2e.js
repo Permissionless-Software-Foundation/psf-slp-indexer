@@ -12,7 +12,7 @@ const axios = require('axios').default
 const config = require('../../../config')
 const app = require('../../../bin/server')
 const testUtils = require('../../utils/test-utils')
-const AdminLib = require('../../../src/lib/admin')
+const AdminLib = require('../../../src/adapters/admin')
 const adminLib = new AdminLib()
 
 // const request = supertest.agent(app.listen())

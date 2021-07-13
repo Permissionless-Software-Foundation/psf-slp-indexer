@@ -6,16 +6,14 @@
   "scripts": {
     "start": "node index.js",
     "test": "npm run test:all",
-    "test:all": "export SVC_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/json-rpc/ test/unit/rest-api/ test/e2e/automated/",
-    "test:unit:lib": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/biz-logic/",
-    "test:unit:rest": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/rest-api/",
-    "test:unit:jsonrpc": "export SVC_ENV=test && mocha --exit --timeout 15000 test/unit/json-rpc/",
+    "test:all": "export SVC_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 --recursive test/unit test/e2e/automated/",
+    "test:unit": "export SVC_ENV=test && mocha --exit --timeout 15000 --recursive test/unit/",
     "test:e2e:auto": "export SVC_ENV=test && mocha --exit --timeout 15000 test/e2e/automated/",
     "test:temp": "export SVC_ENV=test && mocha --exit --timeout 15000 -g '#rate-limit' test/unit/json-rpc/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 test/unit/biz-logic/ test/unit/json-rpc/ test/unit/rest-api/ test/e2e/automated/"
+    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/ test/e2e/automated/"
   },
   "author": "Chris Troutner <chris.troutner@gmail.com>",
   "license": "MIT",
@@ -25,12 +23,12 @@
   },
   "repository": "Permissionless-Software-Foundation/ipfs-service-provider",
   "dependencies": {
-    "@psf/bch-js": "^4.18.0",
+    "@psf/bch-js": "^4.20.1",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "glob": "^7.1.6",
     "ipfs": "^0.54.4",
-    "ipfs-coord": "^2.1.13",
+    "ipfs-coord": "^3.2.0",
     "jsonrpc-lite": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
     "kcors": "^2.2.2",
@@ -48,7 +46,6 @@
     "mongoose": "^5.11.15",
     "nodemailer": "^6.4.17",
     "passport-local": "^1.0.0",
-    "uuid": "^8.3.2",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"
   },
@@ -65,9 +62,10 @@
     "husky": "^4.3.8",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
-    "semantic-release": "^17.4.2",
+    "semantic-release": "^17.4.4",
     "sinon": "^9.2.4",
-    "standard": "^16.0.3"
+    "standard": "^16.0.3",
+    "uuid": "^8.3.2"
   },
   "release": {
     "publish": [
@@ -81,5 +79,10 @@
     "hooks": {
       "pre-commit": "npm run lint"
     }
+  },
+  "standard": {
+    "ignore": [
+      "/test/unit/mocks/**/*.js"
+    ]
   }
 }

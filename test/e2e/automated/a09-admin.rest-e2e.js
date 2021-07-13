@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const Admin = require('../../../src/lib/admin')
+const Admin = require('../../../src/adapters/admin')
 
 const sinon = require('sinon')
 
@@ -17,6 +17,7 @@ describe('Admin', () => {
   })
 
   afterEach(() => sandbox.restore())
+
   describe('loginAdmin()', () => {
     it('should logind admin', async () => {
       try {
@@ -42,12 +43,12 @@ describe('Admin', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should handle axios error', async () => {
       try {
         // Returns an erroneous password to force
         // an auth error
-        sandbox
-          .stub(uut.jsonFiles, 'readJSON').resolves({ password: 'wrong' })
+        sandbox.stub(uut.jsonFiles, 'readJSON').resolves({ password: 'wrong' })
 
         await uut.loginAdmin()
         assert(false, 'Unexpected result')
@@ -57,6 +58,7 @@ describe('Admin', () => {
       }
     })
   })
+
   describe('createSystemUser()', () => {
     it('should create admin', async () => {
       try {
@@ -70,6 +72,7 @@ describe('Admin', () => {
         assert(false, 'Unexpected result')
       }
     })
+
     it('should handle axios error', async () => {
       try {
         const error1 = new Error('test error')
@@ -95,16 +98,15 @@ describe('Admin', () => {
         assert.include(err.message, 'test error')
       }
     })
+
     it('should handle errors when remove user', async () => {
       try {
         const error1 = new Error('test error')
         error1.response = {
           status: 422
         }
-        sandbox
-          .stub(uut.axios, 'request').throws(error1)
-        sandbox
-          .stub(uut.User, 'deleteOne').throws(new Error('test error'))
+        sandbox.stub(uut.axios, 'request').throws(error1)
+        sandbox.stub(uut.User, 'deleteOne').throws(new Error('test error'))
 
         await uut.createSystemUser()
         assert(false, 'Unexpected result')

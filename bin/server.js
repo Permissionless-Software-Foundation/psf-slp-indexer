@@ -12,14 +12,14 @@ const cors = require('kcors')
 
 // Local libraries
 const config = require('../config') // this first.
-const IPFSLib = require('../src/lib/ipfs')
-const AdminLib = require('../src/lib/admin')
+// const IPFSLib = require('../src/lib/ipfs')
+const AdminLib = require('../src/adapters/admin')
 const adminLib = new AdminLib()
 // const JSONRPC = require('../src/rpc')
 // const rpc = new JSONRPC()
 
-const errorMiddleware = require('../src/middleware')
-const wlogger = require('../src/lib/wlogger')
+const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
+const { wlogger } = require('../src/adapters/wlogger')
 
 async function startServer () {
   // Create a Koa instance.
@@ -52,9 +52,9 @@ async function startServer () {
   app.use(passport.initialize())
   app.use(passport.session())
 
-  // Custom Middleware Modules
-  const modules = require('../src/modules')
-  modules(app)
+  // Attach REST API and JSON RPC controllers to the app.
+  const controllers = require('../src/controllers')
+  controllers.attachControllers(app)
 
   // Enable CORS for testing
   // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
@@ -71,10 +71,6 @@ async function startServer () {
   // Create the system admin user.
   const success = await adminLib.createSystemUser()
   if (success) console.log('System admin user created.')
-
-  // Start the IPFS node.
-  const ipfsLib = new IPFSLib()
-  await ipfsLib.start()
 
   return app
 }
