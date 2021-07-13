@@ -6,9 +6,9 @@ This is a 'boilerplate' repository. It's intended to be forked to start new proj
 
 - [Koa](https://koajs.com/) framework for REST APIs
 - User management
-- Access control using [JWT tokens](https://jwt.io/).
+- Access and rate-limit control using [JWT tokens](https://jwt.io/).
 
-This boilerplate extends that code to provide the basic features required to be a 'service provider' on the IPFS network. See [this article](https://troutsblog.com/blog/ipfs-api) if you're new to the concept of service providers on IPFS. These basic features include:
+This boilerplate extends that code to provide the basic features required to be a 'service provider' on the [IPFS](https://ipfs.io) network. See [this article](https://troutsblog.com/blog/ipfs-api) if you're new to the concept of service providers on IPFS. These basic features include:
 
 - [ipfs-coord](https://www.npmjs.com/package/ipfs-coord) for coordinating service providers and consumers across the IPFS network.
 - JSON RPC for creating an API between providers and consumers.
@@ -24,9 +24,9 @@ This project covers basic necessities of most APIs.
 - Database (mongoose)
 - Testing (mocha)
 - Doc generation with apidoc
-- Linting using standard
-- Packaged as a Docker container
-- [ipfs-coord](https://www.npmjs.com/package/ipfs-coord)
+- Linting using [Standard](https://github.com/standard/standard)
+- Packaged for production environment as a Docker container
+- [ipfs-coord](https://www.npmjs.com/package/ipfs-coord) for coordinating peers over IPFS
 - JSON RPC for mirroring the REST API over IPFS
 
 ## Requirements
