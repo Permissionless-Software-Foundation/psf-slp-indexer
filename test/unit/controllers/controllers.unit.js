@@ -7,14 +7,17 @@
 const sinon = require('sinon')
 
 const adapters = require('../../../src/adapters')
-const { attachControllers } = require('../../../src/controllers')
+// const { attachControllers } = require('../../../src/controllers')
+const Controllers = require('../../../src/controllers')
 
 describe('#Controllers', () => {
-  // let uut
+  let uut
   let sandbox
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
+
+    uut = new Controllers()
   })
 
   afterEach(() => sandbox.restore())
@@ -31,7 +34,7 @@ describe('#Controllers', () => {
         use: () => {}
       }
 
-      await attachControllers(app)
+      await uut.attachControllers(app)
     })
   })
 })
