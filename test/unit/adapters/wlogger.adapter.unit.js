@@ -1,30 +1,40 @@
-// const assert = require('chai').assert
-const {
-  notifyRotation,
-  outputToConsole
-} = require('../../../src/adapters/wlogger')
+const assert = require('chai').assert
+const { Wlogger } = require('../../../src/adapters/wlogger')
 
 const sinon = require('sinon')
 
-// let uut
+let uut
 let sandbox
 
-describe('#wlogger.js', () => {
+describe('#wlogger', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
   })
 
-  afterEach(() => sandbox.restore())
+  afterEach(() => {
+    sandbox.restore()
+
+    uut = new Wlogger()
+  })
+
+  describe('#constructor', () => {
+    it('should create a new wlogger instance', () => {
+      uut = new Wlogger()
+      // console.log('uut: ', uut)
+
+      assert.property(uut, 'transport')
+    })
+  })
 
   describe('#notifyRotation', () => {
     it('should notify of a log rotation', () => {
-      notifyRotation()
+      uut.notifyRotation()
     })
   })
 
   describe('#envronment', () => {
     it('should write to console in non-test environment', () => {
-      outputToConsole()
+      uut.outputToConsole()
     })
   })
 })
