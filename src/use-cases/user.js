@@ -3,7 +3,7 @@
   functions are called by the /user REST API endpoints.
 */
 
-// const UserModel = require('../adapters/localdb/models/users')
+const UserEntity = require('../entities/user')
 const { wlogger } = require('../adapters/wlogger')
 
 class UserLib {
@@ -17,6 +17,7 @@ class UserLib {
     }
 
     // Encapsulate dependencies
+    this.UserEntity = new UserEntity()
     this.UserModel = this.adapters.localdb.Users
   }
 
@@ -24,17 +25,9 @@ class UserLib {
   async createUser (userObj) {
     try {
       // Input Validation
-      if (!userObj.email || typeof userObj.email !== 'string') {
-        throw new Error("Property 'email' must be a string!")
-      }
-      if (!userObj.password || typeof userObj.password !== 'string') {
-        throw new Error("Property 'password' must be a string!")
-      }
-      if (!userObj.name || typeof userObj.name !== 'string') {
-        throw new Error("Property 'name' must be a string!")
-      }
 
-      const user = new this.UserModel(userObj)
+      const userEntity = this.UserEntity.validate(userObj)
+      const user = new this.UserModel(userEntity)
 
       // Enforce default value of 'user'
       user.type = 'user'
