@@ -5,6 +5,14 @@
 
 /* eslint  no-unneeded-ternary:0 */
 
+// Get the version from the package.json file.
+const pkgInfo = require('../../package.json')
+const version = pkgInfo.version
+
+const ipfsCoordName = process.env.COORD_NAME
+  ? process.env.COORD_NAME
+  : 'ipfs-bch-wallet-service'
+
 module.exports = {
   // Configure TCP port.
   port: process.env.PORT || 5001,
@@ -13,9 +21,15 @@ module.exports = {
   logPass: 'test',
 
   // Email server settings if nodemailer email notifications are used.
-  emailServer: process.env.EMAILSERVER ? process.env.EMAILSERVER : 'mail.someserver.com',
-  emailUser: process.env.EMAILUSER ? process.env.EMAILUSER : 'noreply@someserver.com',
-  emailPassword: process.env.EMAILPASS ? process.env.EMAILPASS : 'emailpassword',
+  emailServer: process.env.EMAILSERVER
+    ? process.env.EMAILSERVER
+    : 'mail.someserver.com',
+  emailUser: process.env.EMAILUSER
+    ? process.env.EMAILUSER
+    : 'noreply@someserver.com',
+  emailPassword: process.env.EMAILPASS
+    ? process.env.EMAILPASS
+    : 'emailpassword',
 
   // IPFS settings.
   isCircuitRelay: process.env.ENABLE_CIRCUIT_RELAY ? true : false,
@@ -27,8 +41,10 @@ module.exports = {
   announceJsonLd: {
     '@context': 'https://schema.org/',
     '@type': 'WebAPI',
-    name: 'ipfs-service-provider',
-    description: 'This is a generic IPFS Serivice Provider that uses JSON RPC over IPFS to communicate with it. This instance has not been customized. Source code: https://github.com/Permissionless-Software-Foundation/ipfs-service-provider',
+    name: ipfsCoordName,
+    version,
+    description:
+      'This is a generic IPFS Serivice Provider that uses JSON RPC over IPFS to communicate with it. This instance has not been customized. Source code: https://github.com/Permissionless-Software-Foundation/ipfs-service-provider',
     documentation: 'https://ipfs-service-provider.fullstack.cash/',
     provider: {
       '@type': 'Organization',
