@@ -43,6 +43,7 @@ module.exports = {
     '@type': 'WebAPI',
     name: ipfsCoordName,
     version,
+    protocol: 'generic-service',
     description:
       'This is a generic IPFS Serivice Provider that uses JSON RPC over IPFS to communicate with it. This instance has not been customized. Source code: https://github.com/Permissionless-Software-Foundation/ipfs-service-provider',
     documentation: 'https://ipfs-service-provider.fullstack.cash/',
