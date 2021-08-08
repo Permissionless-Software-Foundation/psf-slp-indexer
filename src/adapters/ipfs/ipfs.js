@@ -25,7 +25,7 @@ class IpfsAdapter {
     try {
       // Ipfs Options
       const ipfsOptions = {
-        repo: './ipfsdata',
+        repo: './.ipfsdata/ipfs',
         start: true,
         config: {
           relay: {
