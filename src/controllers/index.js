@@ -7,7 +7,7 @@
 // Public npm libraries.
 
 // Load the Clean Architecture Adapters library
-const adapters = require('../adapters')
+const Adapters = require('../adapters')
 
 // Load the JSON RPC Controller.
 const JSONRPC = require('./json-rpc')
@@ -21,16 +21,16 @@ const RESTControllers = require('./rest-api')
 
 class Controllers {
   constructor (localConfig = {}) {
-    this.adapters = adapters
-    this.useCases = new UseCases({ adapters })
+    this.adapters = new Adapters()
+    this.useCases = new UseCases({ adapters: this.adapters })
   }
 
   async attachControllers (app) {
+    // Wait for any startup processes to complete for the Adapters libraries.
+    await this.adapters.start()
+
     // Attach the REST controllers to the Koa app.
     this.attachRESTControllers(app)
-
-    // Start IPFS.
-    await this.adapters.ipfs.start()
 
     this.attachRPCControllers()
   }

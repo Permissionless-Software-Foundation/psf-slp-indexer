@@ -23,7 +23,7 @@
   },
   "repository": "Permissionless-Software-Foundation/ipfs-service-provider",
   "dependencies": {
-    "@psf/bch-js": "^4.20.1",
+    "@psf/bch-js": "^4.20.3",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "glob": "^7.1.6",
@@ -31,6 +31,7 @@
     "ipfs-coord": "^3.2.0",
     "jsonrpc-lite": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
+    "jwt-bch-lib": "^1.3.0",
     "kcors": "^2.2.2",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
