@@ -10,7 +10,7 @@ const axios = require('axios').default
 
 // Local support libraries
 const config = require('../../../config')
-const app = require('../../../bin/server')
+const Server = require('../../../bin/server')
 const testUtils = require('../../utils/test-utils')
 const AdminLib = require('../../../src/adapters/admin')
 const adminLib = new AdminLib()
@@ -22,8 +22,13 @@ const LOCALHOST = `http://localhost:${config.port}`
 
 describe('Auth', () => {
   before(async () => {
+    const app = new Server()
+
     // This should be the first instruction. It starts the REST API server.
     await app.startServer()
+
+    // Stop the IPFS node for the rest of the e2e tests.
+    // await app.controllers.adapters.ipfs.stop()
 
     // Delete all previous users in the database.
     await testUtils.deleteAllUsers()

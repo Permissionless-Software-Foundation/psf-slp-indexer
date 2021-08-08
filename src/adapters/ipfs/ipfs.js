@@ -25,7 +25,7 @@ class IpfsAdapter {
     try {
       // Ipfs Options
       const ipfsOptions = {
-        repo: './ipfsdata',
+        repo: './.ipfsdata/ipfs',
         start: true,
         config: {
           relay: {
@@ -56,16 +56,6 @@ class IpfsAdapter {
       // Set the 'server' profile so the node does not scan private networks.
       await this.ipfs.config.profiles.apply('server')
 
-      // const nodeConfig = await this.ipfs.config.getAll()
-      // console.log(
-      //   `IPFS node configuration: ${JSON.stringify(nodeConfig, null, 2)}`
-      // )
-
-      // Stop the IPFS node if we're running tests.
-      if (this.config.env === 'test') {
-        await this.ipfs.stop()
-      }
-
       // Signal that this adapter is ready.
       this.isReady = true
 
@@ -74,6 +64,10 @@ class IpfsAdapter {
       console.error('Error in ipfs.js/start()')
       throw err
     }
+  }
+
+  async stop () {
+    await this.ipfs.stop()
   }
 }
 
