@@ -1,3 +1,12 @@
+/*
+  This Koa server has two interfaces:
+  - REST API over HTTP
+  - JSON RPC over IPFS
+
+  The architecture of the code follows the Clean Architecture pattern:
+  https://troutsblog.com/blog/clean-architecture
+*/
+
 // npm libraries
 const Koa = require('koa')
 const bodyParser = require('koa-bodyparser')
@@ -12,75 +21,75 @@ const cors = require('kcors')
 
 // Local libraries
 const config = require('../config') // this first.
-// const IPFSLib = require('../src/lib/ipfs')
 const AdminLib = require('../src/adapters/admin')
-const adminLib = new AdminLib()
-// const JSONRPC = require('../src/rpc')
-// const rpc = new JSONRPC()
-
 const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
 const { wlogger } = require('../src/adapters/wlogger')
 
-async function startServer () {
-  // Create a Koa instance.
-  const app = new Koa()
-  app.keys = [config.session]
+class Server {
+  constructor () {
+    this.adminLib = new AdminLib()
+  }
 
-  // Connect to the Mongo Database.
-  mongoose.Promise = global.Promise
-  mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-  await mongoose.connect(config.database, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-  })
+  async startServer () {
+    try {
+      // Create a Koa instance.
+      const app = new Koa()
+      app.keys = [config.session]
 
-  // MIDDLEWARE START
+      // Connect to the Mongo Database.
+      mongoose.Promise = global.Promise
+      mongoose.set('useCreateIndex', true) // Stop deprecation warning.
+      await mongoose.connect(config.database, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+      })
 
-  app.use(convert(logger()))
-  app.use(bodyParser())
-  app.use(session())
-  app.use(errorMiddleware())
+      // MIDDLEWARE START
 
-  // Used to generate the docs.
-  app.use(mount('/', serve(`${process.cwd()}/docs`)))
+      app.use(convert(logger()))
+      app.use(bodyParser())
+      app.use(session())
+      app.use(errorMiddleware())
 
-  // Mount the page for displaying logs.
-  app.use(mount('/logs', serve(`${process.cwd()}/config/logs`)))
+      // Used to generate the docs.
+      app.use(mount('/', serve(`${process.cwd()}/docs`)))
 
-  // User Authentication
-  require('../config/passport')
-  app.use(passport.initialize())
-  app.use(passport.session())
+      // Mount the page for displaying logs.
+      app.use(mount('/logs', serve(`${process.cwd()}/config/logs`)))
 
-  // Attach REST API and JSON RPC controllers to the app.
-  const Controllers = require('../src/controllers')
-  const controllers = new Controllers()
-  await controllers.attachControllers(app)
+      // User Authentication
+      require('../config/passport')
+      app.use(passport.initialize())
+      app.use(passport.session())
 
-  app.controllers = controllers
+      // Attach REST API and JSON RPC controllers to the app.
+      const Controllers = require('../src/controllers')
+      const controllers = new Controllers()
+      await controllers.attachControllers(app)
 
-  // Enable CORS for testing
-  // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
-  app.use(cors({ origin: '*' }))
+      app.controllers = controllers
 
-  // MIDDLEWARE END
+      // Enable CORS for testing
+      // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
+      app.use(cors({ origin: '*' }))
 
-  console.log(`Running server in environment: ${config.env}`)
-  wlogger.info(`Running server in environment: ${config.env}`)
+      // MIDDLEWARE END
 
-  await app.listen(config.port)
-  console.log(`Server started on ${config.port}`)
+      console.log(`Running server in environment: ${config.env}`)
+      wlogger.info(`Running server in environment: ${config.env}`)
 
-  // Create the system admin user.
-  const success = await adminLib.createSystemUser()
-  if (success) console.log('System admin user created.')
+      await app.listen(config.port)
+      console.log(`Server started on ${config.port}`)
 
-  return app
+      // Create the system admin user.
+      const success = await this.adminLib.createSystemUser()
+      if (success) console.log('System admin user created.')
+
+      return app
+    } catch (err) {
+      console.error('Could not start server. Error: ', err)
+    }
+  }
 }
-// startServer()
 
-// export default app
-// module.exports = app
-module.exports = {
-  startServer
-}
+module.exports = Server
