@@ -18,8 +18,8 @@ describe('#FullStackJWT', () => {
     const localConfig = {
       authServer: 'someserver',
       apiServer: 'someserver',
-      login: 'somelogin',
-      password: 'somepassword'
+      fullstackLogin: 'somelogin',
+      fullstackPassword: 'somepassword'
     }
     uut = new FullStackJWT(localConfig)
   })
@@ -81,7 +81,7 @@ describe('#FullStackJWT', () => {
         const localConfig = {
           authServer: 'someserver',
           apiServer: 'someserver',
-          login: 'somelogin'
+          fullstackLogin: 'somelogin'
         }
         uut = new FullStackJWT(localConfig)
 

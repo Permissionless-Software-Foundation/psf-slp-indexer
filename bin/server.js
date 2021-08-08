@@ -57,6 +57,8 @@ async function startServer () {
   const controllers = new Controllers()
   await controllers.attachControllers(app)
 
+  app.controllers = controllers
+
   // Enable CORS for testing
   // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
   app.use(cors({ origin: '*' }))

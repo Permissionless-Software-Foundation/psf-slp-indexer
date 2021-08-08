@@ -25,6 +25,9 @@ describe('Auth', () => {
     // This should be the first instruction. It starts the REST API server.
     await app.startServer()
 
+    // Stop the IPFS node for the rest of the e2e tests.
+    // await app.controllers.adapters.ipfs.stop()
+
     // Delete all previous users in the database.
     await testUtils.deleteAllUsers()
 

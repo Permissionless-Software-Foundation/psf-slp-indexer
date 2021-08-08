@@ -12,7 +12,8 @@ const LOCALHOST = `http://localhost:${config.port}`
 const context = {}
 
 const UserController = require('../../../src/controllers/rest-api/users/controller')
-const adapters = require('../../../src/adapters')
+const Adapters = require('../../../src/adapters')
+const adapters = new Adapters()
 const UseCases = require('../../../src/use-cases/')
 let uut
 let sandbox

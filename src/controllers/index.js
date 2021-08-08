@@ -38,13 +38,13 @@ class Controllers {
   // Top-level function for this library.
   // Start the various Controllers and attach them to the app.
   attachRESTControllers (app) {
-    const rESTControllers = new RESTControllers({
+    const restControllers = new RESTControllers({
       adapters: this.adapters,
       useCases: this.useCases
     })
 
     // Attach the REST API Controllers associated with the boilerplate code to the Koa app.
-    rESTControllers.attachRESTControllers(app)
+    restControllers.attachRESTControllers(app)
   }
 
   // Add the JSON RPC router to the ipfs-coord adapter.

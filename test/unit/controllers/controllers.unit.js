@@ -6,8 +6,6 @@
 // const assert = require('chai').assert
 const sinon = require('sinon')
 
-const adapters = require('../../../src/adapters')
-// const { attachControllers } = require('../../../src/controllers')
 const Controllers = require('../../../src/controllers')
 
 describe('#Controllers', () => {
@@ -25,8 +23,8 @@ describe('#Controllers', () => {
   describe('#attachControllers', () => {
     it('should attach the controllers', async () => {
       // mock IPFS
-      sandbox.stub(adapters.ipfs, 'start').resolves({})
-      adapters.ipfs.ipfsCoordAdapter = {
+      sandbox.stub(uut.adapters, 'start').resolves({})
+      uut.adapters.ipfs.ipfsCoordAdapter = {
         attachRPCRouter: () => {}
       }
 

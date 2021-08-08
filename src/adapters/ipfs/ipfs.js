@@ -62,9 +62,9 @@ class IpfsAdapter {
       // )
 
       // Stop the IPFS node if we're running tests.
-      if (this.config.env === 'test') {
-        await this.ipfs.stop()
-      }
+      // if (this.config.env === 'test') {
+      //   await this.ipfs.stop()
+      // }
 
       // Signal that this adapter is ready.
       this.isReady = true
@@ -74,6 +74,10 @@ class IpfsAdapter {
       console.error('Error in ipfs.js/start()')
       throw err
     }
+  }
+
+  async stop () {
+    await this.ipfs.stop()
   }
 }
 
