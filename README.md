@@ -39,6 +39,7 @@ This project covers basic necessities of most APIs.
 ```bash
 git clone https://github.com/Permissionless-Software-Foundation/ipfs-service-provider
 cd ipfs-service-provider
+sudo npm install -g node-pre-gyp
 npm install
 npm start
 ```
