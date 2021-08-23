@@ -43,8 +43,8 @@ class JSONRPC {
   // which controller to route the instruction to.
   async router (str, from) {
     try {
-      console.log('router str: ', str)
-      console.log('router from: ', from)
+      // console.log('router str: ', str)
+      // console.log('router from: ', from)
 
       // Exit quietly if 'from' is not specified.
       if (!from || typeof from !== 'string') {
@@ -95,11 +95,10 @@ class JSONRPC {
 
       // Encrypt and publish the response to the originators private OrbitDB,
       // if ipfs-coord has been initialized and the peers ID is registered.
-      // if (_this.ipfsCoord.ipfs) {
-      // await _this.ipfsCoord.ipfs.orbitdb.sendToDb(from, retStr)
-      console.log('responding to JSON RPC command')
+
+      // console.log('responding to JSON RPC command')
       const thisNode = _this.ipfsCoord.thisNode
-      console.log('thisNode: ', thisNode)
+      // console.log('thisNode: ', thisNode)
 
       try {
         await _this.ipfsCoord.useCases.peer.sendPrivateMessage(
@@ -108,9 +107,8 @@ class JSONRPC {
           thisNode
         )
       } catch (err) {
-        console.log('err: ', err)
+        console.log('sendPrivateMessage() err: ', err)
       }
-      // }
 
       // Return the response and originator. Useful for testing.
       return { from, retStr }
