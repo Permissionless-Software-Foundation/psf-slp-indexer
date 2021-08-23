@@ -95,16 +95,16 @@ class JSONRPC {
 
       // Encrypt and publish the response to the originators private OrbitDB,
       // if ipfs-coord has been initialized and the peers ID is registered.
-      if (_this.ipfsCoord.ipfs) {
-        // await _this.ipfsCoord.ipfs.orbitdb.sendToDb(from, retStr)
-        console.log('responding to JSON RPC command')
-        const thisNode = _this.ipfsCoord.thisNode
-        await _this.ipfsCoord.useCases.peer.sendPrivateMessage(
-          from,
-          retStr,
-          thisNode
-        )
-      }
+      // if (_this.ipfsCoord.ipfs) {
+      // await _this.ipfsCoord.ipfs.orbitdb.sendToDb(from, retStr)
+      console.log('responding to JSON RPC command')
+      const thisNode = _this.ipfsCoord.thisNode
+      await _this.ipfsCoord.useCases.peer.sendPrivateMessage(
+        from,
+        retStr,
+        thisNode
+      )
+      // }
 
       // Return the response and originator. Useful for testing.
       return { from, retStr }
