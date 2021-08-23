@@ -99,11 +99,15 @@ class JSONRPC {
       // await _this.ipfsCoord.ipfs.orbitdb.sendToDb(from, retStr)
       console.log('responding to JSON RPC command')
       const thisNode = _this.ipfsCoord.thisNode
-      await _this.ipfsCoord.useCases.peer.sendPrivateMessage(
-        from,
-        retStr,
-        thisNode
-      )
+      try {
+        await _this.ipfsCoord.useCases.peer.sendPrivateMessage(
+          from,
+          retStr,
+          thisNode
+        )
+      } catch (err) {
+        console.log('err: ', err)
+      }
       // }
 
       // Return the response and originator. Useful for testing.
