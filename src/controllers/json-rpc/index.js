@@ -44,7 +44,7 @@ class JSONRPC {
   async router (str, from) {
     try {
       // console.log('router str: ', str)
-      // console.log('router from: ', from)
+      console.log('router from: ', from)
 
       // Exit quietly if 'from' is not specified.
       if (!from || typeof from !== 'string') {
