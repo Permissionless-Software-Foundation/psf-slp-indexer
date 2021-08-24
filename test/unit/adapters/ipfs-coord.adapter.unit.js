@@ -58,6 +58,11 @@ describe('#IPFS', () => {
           orbitdb: {
             privateLog: {}
           }
+        },
+        adapters: {
+          orbit: {
+            privateLog: () => {}
+          }
         }
       }
 
