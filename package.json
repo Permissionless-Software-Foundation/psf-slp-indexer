@@ -45,6 +45,7 @@
     "koa2-ratelimit": "^0.9.0",
     "line-reader": "^0.4.0",
     "mongoose": "^5.11.15",
+    "node-fetch": "npm:@achingbrain/node-fetch@^2.6.7",
     "nodemailer": "^6.4.17",
     "passport-local": "^1.0.0",
     "winston": "^3.3.3",
