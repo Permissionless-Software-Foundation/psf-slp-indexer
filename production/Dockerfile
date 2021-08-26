@@ -23,9 +23,9 @@ WORKDIR /home/safeuser
 #RUN runuser -l safeuser -c "npm config set prefix '~/.npm-global'"
 
 # Switch to user account.
-USER safeuser
+#USER safeuser
 # Prep 'sudo' commands.
-RUN echo 'abcd8765' | sudo -S pwd
+#RUN echo 'abcd8765' | sudo -S pwd
 
 # Clone the rest.bitcoin.com repository
 WORKDIR /home/safeuser
@@ -39,7 +39,7 @@ WORKDIR /home/safeuser/ipfs-service-provider
 RUN git checkout ct-unstable
 
 # Install dependencies
-RUN mkdir .ipfsdata
+#RUN mkdir .ipfsdata
 RUN npm install -g @mapbox/node-pre-gyp
 RUN npm install
 
