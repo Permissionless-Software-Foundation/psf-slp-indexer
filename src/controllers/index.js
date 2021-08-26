@@ -30,7 +30,7 @@ class Controllers {
     await this.adapters.start()
 
     // Attach the REST controllers to the Koa app.
-    this.attachRESTControllers(app)
+    // this.attachRESTControllers(app)
 
     this.attachRPCControllers()
   }

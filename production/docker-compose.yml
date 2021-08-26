@@ -1,0 +1,26 @@
+# Start the testnet server with the command 'docker-compose up -d'
+
+mongo-ipfs-service:
+  image: mongo
+  container_name: mongo-ipfs-service
+  ports:
+    - '5555:27017' # <host port>:<container port>
+  volumes:
+    - ./database:/data/db
+  command: mongod --logpath=/dev/null # -- quiet
+  restart: always
+
+ipfs-service:
+  build: .
+  dockerfile: Dockerfile
+  container_name: ipfs-service
+  links:
+    - mongo-ipfs-service
+  ports:
+    - '5001:5001' # <host port>:<container port>
+  volumes:
+    #    - ./logs:/home/coinjoin/consolidating-coinjoin/logs
+    #- ./keys:/home/safeuser/keys
+    - ../.ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+
+  restart: always

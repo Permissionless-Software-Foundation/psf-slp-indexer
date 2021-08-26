@@ -39,10 +39,16 @@ class Server {
       // Connect to the Mongo Database.
       mongoose.Promise = global.Promise
       mongoose.set('useCreateIndex', true) // Stop deprecation warning.
+      console.log(
+        `Connecting to MongoDB with this connection string: ${config.database}`
+      )
       await mongoose.connect(config.database, {
         useUnifiedTopology: true,
         useNewUrlParser: true
       })
+
+      console.log(`Starting environment: ${config.env}`)
+      console.log(`Debug level: ${config.debugLevel}`)
 
       // MIDDLEWARE START
 
@@ -65,7 +71,7 @@ class Server {
       // Attach REST API and JSON RPC controllers to the app.
       const Controllers = require('../src/controllers')
       const controllers = new Controllers()
-      await controllers.attachControllers(app)
+      await controllers.attachRESTControllers(app)
 
       app.controllers = controllers
 
@@ -84,6 +90,9 @@ class Server {
       // Create the system admin user.
       const success = await this.adminLib.createSystemUser()
       if (success) console.log('System admin user created.')
+
+      // Attach the other IPFS controllers
+      await controllers.attachControllers(app)
 
       return app
     } catch (err) {
