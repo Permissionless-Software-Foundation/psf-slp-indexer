@@ -71,5 +71,10 @@ module.exports = {
 
   // IPFS Ports
   ipfsTcpPort: process.env.IPFS_TCP_PORT ? process.env.IPFS_TCP_PORT : 4001,
-  ipfsWsPort: process.env.IPFS_WS_PORT ? process.env.IPFS_WS_PORT : 4003
+  ipfsWsPort: process.env.IPFS_WS_PORT ? process.env.IPFS_WS_PORT : 4003,
+
+  // BCH Mnemonic for generating encryption keys and payment address
+  mnemonic: process.env.MNEMONIC ? process.env.MNEMONIC : '',
+
+  debugLevel: process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 2
 }

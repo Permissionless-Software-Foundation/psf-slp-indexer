@@ -10,6 +10,9 @@
 module.exports = {
   session: 'secret-boilerplate-token',
   token: 'secret-jwt-token',
-  database: 'mongodb://172.17.0.1:5555/ipfs-service-prod',
+  // database: 'mongodb://172.17.0.1:5555/ipfs-service-prod',
+  database: process.env.DBURL
+    ? process.env.DBURL
+    : 'mongodb://172.17.0.1:5555/ipfs-service-prod',
   env: 'prod'
 }

@@ -39,10 +39,16 @@ class Server {
       // Connect to the Mongo Database.
       mongoose.Promise = global.Promise
       mongoose.set('useCreateIndex', true) // Stop deprecation warning.
+      console.log(
+        `Connecting to MongoDB with this connection string: ${config.database}`
+      )
       await mongoose.connect(config.database, {
         useUnifiedTopology: true,
         useNewUrlParser: true
       })
+
+      console.log(`Starting environment: ${config.env}`)
+      console.log(`Debug level: ${config.debugLevel}`)
 
       // MIDDLEWARE START
 
