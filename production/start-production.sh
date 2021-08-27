@@ -13,7 +13,7 @@ export COORD_NAME=ipfs-service-provider-generic
 #export ENABLE_CIRCUIT_RELAY=true
 
 # Debug level. 0 = minimal info. 2 = max info.
-export DEBUG_LEVEL=2
+export DEBUG_LEVEL=1
 
 # END: Optional configuration settings
 

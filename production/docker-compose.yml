@@ -6,7 +6,7 @@ mongo-ipfs-service:
   ports:
     - '5555:27017' # <host port>:<container port>
   volumes:
-    - ./database:/data/db
+    - ./data/database:/data/db
   command: mongod --logpath=/dev/null # -- quiet
   restart: always
 
@@ -21,6 +21,6 @@ ipfs-service:
   volumes:
     #    - ./logs:/home/coinjoin/consolidating-coinjoin/logs
     #- ./keys:/home/safeuser/keys
-    - ../.ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+    - ./data/.ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
 
   restart: always
