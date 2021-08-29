@@ -18,6 +18,8 @@ ipfs-service:
     - mongo-ipfs-service
   ports:
     - '5001:5001' # <host port>:<container port>
+    - '4001:4001' # IPFS TCP
+    - '4003:4003' # IPFS WS
   volumes:
     #    - ./logs:/home/coinjoin/consolidating-coinjoin/logs
     #- ./keys:/home/safeuser/keys
