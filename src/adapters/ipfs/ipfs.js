@@ -5,7 +5,8 @@
 */
 
 // Global npm libraries
-const IPFS = require('ipfs')
+// const IPFS = require('ipfs')
+const IPFS = require('@chris.troutner/ipfs')
 
 // Local libraries
 const config = require('../../../config')
