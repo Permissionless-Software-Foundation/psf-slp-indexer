@@ -1,28 +1,32 @@
-# Start the testnet server with the command 'docker-compose up -d'
+# Start the service with the command 'docker-compose up -d'
 
-mongo-ipfs-service:
-  image: mongo
-  container_name: mongo-ipfs-service
-  ports:
-    - '5555:27017' # <host port>:<container port>
-  volumes:
-    - ../data/database:/data/db
-  command: mongod --logpath=/dev/null # -- quiet
-  restart: always
+version: '2'
 
-ipfs-service:
-  build: .
-  dockerfile: Dockerfile
-  container_name: ipfs-service
-  links:
-    - mongo-ipfs-service
-  ports:
-    - '5001:5001' # <host port>:<container port>
-    - '4001:4001' # IPFS TCP
-    - '4003:4003' # IPFS WS
-  volumes:
-    #    - ./logs:/home/coinjoin/consolidating-coinjoin/logs
-    #- ./keys:/home/safeuser/keys
-    - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+services:
+  mongo-ipfs-service:
+    image: mongo
+    container_name: mongo-ipfs-service
+    ports:
+      - '5555:27017' # <host port>:<container port>
+    volumes:
+      - ../data/database:/data/db
+    command: mongod --logpath=/dev/null # -- quiet
+    restart: always
 
-  restart: always
+  ipfs-service:
+    build: .
+    container_name: ipfs-service
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '10'
+    links:
+      - mongo-ipfs-service
+    ports:
+      - '5001:5001' # <host port>:<container port>
+      - '4001:4001' # IPFS TCP
+      - '4003:4003' # IPFS WS
+    volumes:
+      - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+    restart: always
