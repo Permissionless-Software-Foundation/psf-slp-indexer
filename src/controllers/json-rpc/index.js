@@ -56,7 +56,7 @@ class JSONRPC {
 
       // Attempt to parse the incoming data as a JSON RPC string.
       const parsedData = _this.jsonrpc.parse(str)
-      console.log('parsedData: ', parsedData)
+      // console.log('parsedData: ', parsedData)
 
       // Exit quietly if the incoming string is an invalid JSON RPC string.
       if (parsedData.type === 'invalid') {
