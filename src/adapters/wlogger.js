@@ -62,42 +62,11 @@ class Wlogger {
   }
 }
 
-// transport.on('rotate', notifyRotation)
-
-// function notifyRotation (oldFilename, newFilename) {
-//   wlogger.info('Rotating log files')
-// }
-
-// This controls what goes into the log FILES
-// const wlogger = winston.createLogger({
-//   level: 'verbose',
-//   format: winston.format.json(),
-//   transports: [
-//     //
-//     // - Write to all logs with level `info` and below to `combined.log`
-//     // - Write all logs error (and below) to `error.log`.
-//     //
-//     // new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-//     // new winston.transports.File({ filename: 'logs/combined.log' })
-//     transport
-//   ]
-// })
-
-// function outputToConsole () {
-//   wlogger.add(
-//     new winston.transports.Console({
-//       format: winston.format.simple(),
-//       level: 'info'
-//     })
-//   )
-// }
-
-// This controls the logs to CONSOLE
-// if (config.env !== 'test') {
-//   outputToConsole()
-// }
-
 const logger = new Wlogger()
+
+// Allow the logger to write to the console.
+logger.outputToConsole()
+
 const wlogger = logger.wlogger
 
 module.exports = { wlogger, Wlogger }

@@ -49,23 +49,23 @@ class JSONRPC {
   async router (str, from) {
     try {
       // console.log('router str: ', str)
-      console.log('router from: ', from)
+      console.log('JSON RPC router recieved data from: ', from)
 
       // Exit quietly if 'from' is not specified.
       if (!from || typeof from !== 'string') {
-        // console.warn(
-        //   'Warning: Can not send JSON RPC response. Can not determine which peer this message came from.'
-        // )
+        wlogger.info(
+          'Warning: Can not send JSON RPC response. Can not determine which peer this message came from.'
+        )
         return
       }
 
       // Attempt to parse the incoming data as a JSON RPC string.
       const parsedData = _this.jsonrpc.parse(str)
-      // console.log('\nrouter from: ', from)
-      // console.log('parsedData: ', parsedData)
+      // wlogger.debug(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
 
       // Exit quietly if the incoming string is an invalid JSON RPC string.
       if (parsedData.type === 'invalid') {
+        wlogger.info('Rejecting invalid JSON RPC command.')
         return
       }
 
@@ -74,8 +74,20 @@ class JSONRPC {
       if (alreadyProcessed) {
         return
       } else {
-        console.log('\nProcessing instruction from: ', from)
-        console.log('parsedData: ', parsedData)
+        // This node will regularly ping known circuit relays with an /about
+        // JSON RPC call. These will be handled by ipfs-coord, but will percolate
+        // up to ipfs-coord. Ignore these messages.
+        if (
+          parsedData.type.includes('success') &&
+          parsedData.payload.method === undefined
+        ) {
+          return
+        }
+
+        // Log the incoming JSON RPC command.
+        wlogger.info(
+          `JSON RPC received from ${from}, ID: ${parsedData.payload.id}, type: ${parsedData.type}, method: ${parsedData.payload.method}`
+        )
       }
 
       // Added the property "from" to the parsedData object;
