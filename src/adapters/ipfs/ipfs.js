@@ -2,6 +2,10 @@
   Clean Architecture Adapter for IPFS.
   This library deals with IPFS so that the apps business logic doesn't need
   to have any specific knowledge of the js-ipfs library.
+
+  TODO: Add the external IP address to the list of multiaddrs advertised by
+  this node. See this GitHub Issue for details:
+  https://github.com/Permissionless-Software-Foundation/ipfs-service-provider/issues/38
 */
 
 // Global npm libraries
