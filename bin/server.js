@@ -94,6 +94,13 @@ class Server {
       // Attach the other IPFS controllers
       await controllers.attachControllers(app)
 
+      // ipfs-coord has a memory leak. This app shuts down after 8 hours. It
+      // expects to be run by Docker or pm2, which can automatically restart
+      // the app.
+      setTimeout(function () {
+        process.exit(0)
+      }, 60000 * 60 * 8)
+
       return app
     } catch (err) {
       console.error('Could not start server. Error: ', err)
