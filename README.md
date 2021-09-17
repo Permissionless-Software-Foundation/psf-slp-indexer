@@ -15,6 +15,8 @@ This boilerplate extends that code to provide the basic features required to be 
 
 If you are interested in creating your own service provider on the IPFS network, fork this repository and start building.
 
+- [Video: Installing ipfs-service-provider](https://youtu.be/Z0NsboIVN44)
+
 ## Features
 
 This project covers basic necessities of most APIs.
