@@ -43,9 +43,10 @@ A development environment will allow you modify the code on-the-fly and contribu
 ```bash
 git clone https://github.com/Permissionless-Software-Foundation/ipfs-service-provider
 cd ipfs-service-provider
+./install-mongo-sh
 sudo npm install -g node-pre-gyp
 npm install
-npm start
+./ipfs-service-provider.sh
 ```
 
 ### Production Environment
