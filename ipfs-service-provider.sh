@@ -10,7 +10,7 @@ export IPFS_WS_PORT=5269
 # Production database connection string.
 #export DBURL=mongodb://localhost:27017/bch-service-dev
 
-export COORD_NAME=ipfs-serive-provider-generic
+export COORD_NAME=ipfs-service-provider-generic
 export MNEMONIC="churn aisle shield silver ladder swear hunt slim pen demand spoil veteran"
 
 export DEBUG_LEVEL=1
