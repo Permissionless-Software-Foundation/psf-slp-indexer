@@ -36,13 +36,31 @@ This project covers basic necessities of most APIs.
 
 ## Installation
 
+### Development Environment
+
+A development environment will allow you modify the code on-the-fly and contribute to the code base of this repository. [PM2](https://www.npmjs.com/package/pm2) is recommended for running this code base as an IPFS Circuit Relay.
+
 ```bash
 git clone https://github.com/Permissionless-Software-Foundation/ipfs-service-provider
 cd ipfs-service-provider
+./install-mongo-sh
 sudo npm install -g node-pre-gyp
 npm install
-npm start
+./ipfs-service-provider.sh
 ```
+
+### Production Environment
+
+The [docker](./production/docker) directory contains a Dockerfile for building a production deployment. However, there is currently [a bug](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider/issues/38) preventing the Docker container from being used as a Circuit Relay.
+
+```
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Operation Notes
+
+- There is a memory leak in the version of js-ipfs. The app is currently configured to shut down every 8 hours to flush memory. It relies on a process manager like pm2, Docker, or systemd to restart the app after it shuts down, in order to ensure continuous operation.
 
 ## Structure
 
