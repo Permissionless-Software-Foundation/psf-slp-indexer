@@ -15,8 +15,6 @@ This boilerplate extends that code to provide the basic features required to be 
 
 If you are interested in creating your own service provider on the IPFS network, fork this repository and start building.
 
-- [Video: Installing ipfs-service-provider](https://youtu.be/Z0NsboIVN44)
-
 ## Features
 
 This project covers basic necessities of most APIs.
@@ -41,6 +39,9 @@ This project covers basic necessities of most APIs.
 ### Development Environment
 
 A development environment will allow you modify the code on-the-fly and contribute to the code base of this repository. [PM2](https://www.npmjs.com/package/pm2) is recommended for running this code base as an IPFS Circuit Relay.
+
+- [Video: Installing ipfs-service-provider](https://youtu.be/Z0NsboIVN44)
+- [Step-by-step installation instructions](https://gist.github.com/christroutner/3304a71d4c12a3a3e1664a438f64d9d0)
 
 ```bash
 git clone https://github.com/Permissionless-Software-Foundation/ipfs-service-provider
