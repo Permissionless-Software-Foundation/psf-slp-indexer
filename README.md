@@ -40,6 +40,9 @@ This project covers basic necessities of most APIs.
 
 A development environment will allow you modify the code on-the-fly and contribute to the code base of this repository. [PM2](https://www.npmjs.com/package/pm2) is recommended for running this code base as an IPFS Circuit Relay.
 
+- [Video: Installing ipfs-service-provider](https://youtu.be/Z0NsboIVN44)
+- [Step-by-step installation instructions](https://gist.github.com/christroutner/3304a71d4c12a3a3e1664a438f64d9d0)
+
 ```bash
 git clone https://github.com/Permissionless-Software-Foundation/ipfs-service-provider
 cd ipfs-service-provider
