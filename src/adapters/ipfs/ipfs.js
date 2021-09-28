@@ -36,7 +36,7 @@ class IpfsAdapter {
           relay: {
             enabled: true, // enable circuit relay dialer and listener
             hop: {
-              enabled: true // enable circuit relay HOP (make this node a relay)
+              enabled: config.isCircuitRelay // enable circuit relay HOP (make this node a relay)
             }
           },
           pubsub: true, // enable pubsub
@@ -60,6 +60,10 @@ class IpfsAdapter {
 
       // Set the 'server' profile so the node does not scan private networks.
       await this.ipfs.config.profiles.apply('server')
+
+      // Debugging: Display IPFS config settings.
+      // const configSettings = await this.ipfs.config.getAll()
+      // console.log(`configSettings: ${JSON.stringify(configSettings, null, 2)}`)
 
       // Signal that this adapter is ready.
       this.isReady = true
