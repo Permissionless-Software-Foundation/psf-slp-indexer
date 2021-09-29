@@ -7,6 +7,7 @@
 // Global npm libraries
 const IpfsCoord = require('ipfs-coord')
 const BCHJS = require('@psf/bch-js')
+const publicIp = require('public-ip')
 
 // Local libraries
 const config = require('../../../config')
@@ -38,6 +39,24 @@ class IpfsCoordAdapter {
   }
 
   async start () {
+    const circuitRelayInfo = {}
+
+    // If configured as a Circuit Relay, get the public IP addresses for this node.
+    if (this.config.isCircuitRelay) {
+      try {
+        const ip4 = await publicIp.v4()
+        // const ip6 = await publicIp.v6()
+
+        circuitRelayInfo.ip4 = ip4
+        circuitRelayInfo.tcpPort = this.config.ipfsTcpPort
+
+        // Domain used by browser-based secure websocket connections.
+        circuitRelayInfo.crDomain = this.config.crDomain
+      } catch (err) {
+        /* exit quietly */
+      }
+    }
+
     this.ipfsCoord = new this.IpfsCoord({
       ipfs: this.ipfs,
       type: 'node.js',
@@ -45,6 +64,7 @@ class IpfsCoordAdapter {
       bchjs: this.bchjs,
       privateLog: console.log, // Default to console.log
       isCircuitRelay: this.config.isCircuitRelay,
+      circuitRelayInfo,
       apiInfo: this.config.apiInfo,
       announceJsonLd: this.config.announceJsonLd,
       debugLevel: this.config.debugLevel
