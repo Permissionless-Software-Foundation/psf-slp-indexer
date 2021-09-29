@@ -26,8 +26,8 @@ services:
       - mongo-ipfs-service
     ports:
       - '5001:5001' # <host port>:<container port>
-      - '4001:4001' # IPFS TCP
-      - '4003:4003' # IPFS WS
+      - '5268:5268' # IPFS TCP
+      - '5269:5269' # IPFS WS
     volumes:
       - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
     restart: always
