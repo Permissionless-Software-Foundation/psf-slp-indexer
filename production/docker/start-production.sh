@@ -11,10 +11,10 @@ export MNEMONIC="olive two muscle bottom coral ancient wait legend bronze useful
 export COORD_NAME=ipfs-service-provider-generic
 
 # Allow this node to function as a circuit relay. It must not be behind a firewall.
-export ENABLE_CIRCUIT_RELAY=true
+#export ENABLE_CIRCUIT_RELAY=true
 # For browsers to use your circuit realy, you must set up a domain, SSL certificate,
 # and you must forward that subdomain to the IPFS_WS_PORT.
-export CR_DOMAIN=subdomain.yourdomain.com
+#export CR_DOMAIN=subdomain.yourdomain.com
 
 # Debug level. 0 = minimal info. 2 = max info.
 export DEBUG_LEVEL=1
