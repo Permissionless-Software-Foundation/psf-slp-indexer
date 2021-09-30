@@ -77,6 +77,8 @@ class IpfsAdapter {
 
   async stop () {
     await this.ipfs.stop()
+
+    return true
   }
 }
 

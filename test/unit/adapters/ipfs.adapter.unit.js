@@ -47,4 +47,17 @@ describe('#IPFS-adapter', () => {
       }
     })
   })
+
+  describe('#stop', () => {
+    it('should stop the IPFS node', async () => {
+      // Mock dependencies
+      uut.ipfs = {
+        stop: () => {}
+      }
+
+      const result = await uut.stop()
+
+      assert.equal(result, true)
+    })
+  })
 })
