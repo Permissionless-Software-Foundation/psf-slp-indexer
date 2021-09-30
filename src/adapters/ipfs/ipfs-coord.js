@@ -29,8 +29,8 @@ class IpfsCoordAdapter {
     this.IpfsCoord = IpfsCoord
     this.ipfsCoord = {}
     this.bchjs = new BCHJS()
-    // this.rpc = new JSONRPC()
     this.config = config
+    this.publicIp = publicIp
 
     // Properties of this class instance.
     this.isReady = false
@@ -44,7 +44,7 @@ class IpfsCoordAdapter {
     // If configured as a Circuit Relay, get the public IP addresses for this node.
     if (this.config.isCircuitRelay) {
       try {
-        const ip4 = await publicIp.v4()
+        const ip4 = await this.publicIp.v4()
         // const ip6 = await publicIp.v6()
 
         circuitRelayInfo.ip4 = ip4
