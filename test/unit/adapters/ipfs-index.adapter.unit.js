@@ -45,5 +45,23 @@ describe('#IPFS-adapter-index', () => {
         assert.include(err.message, 'test error')
       }
     })
+
+    it('should handle lock-file errors', async () => {
+      try {
+        // Force an error
+        sandbox
+          .stub(uut.ipfsAdapter, 'start')
+          .rejects(new Error('Lock already being held'))
+
+        // Prevent process from exiting
+        sandbox.stub(uut.process, 'exit').returns()
+
+        await uut.start()
+
+        assert.fail('Unexpected code path.')
+      } catch (err) {
+        assert.include(err.message, 'Lock already being held')
+      }
+    })
   })
 })

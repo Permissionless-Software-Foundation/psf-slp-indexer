@@ -56,7 +56,7 @@ class JSONRPC {
         wlogger.info(
           'Warning: Can not send JSON RPC response. Can not determine which peer this message came from.'
         )
-        return
+        return false
       }
 
       // Attempt to parse the incoming data as a JSON RPC string.
@@ -66,22 +66,24 @@ class JSONRPC {
       // Exit quietly if the incoming string is an invalid JSON RPC string.
       if (parsedData.type === 'invalid') {
         wlogger.info('Rejecting invalid JSON RPC command.')
-        return
+        return false
       }
 
       // Check for duplicate entries with same 'id' value.
       const alreadyProcessed = _this._checkIfAlreadyProcessed(parsedData)
       if (alreadyProcessed) {
-        return
+        return false
       } else {
+        // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
+
         // This node will regularly ping known circuit relays with an /about
         // JSON RPC call. These will be handled by ipfs-coord, but will percolate
-        // up to ipfs-coord. Ignore these messages.
+        // up to this library. Ignore these messages.
         if (
           parsedData.type.includes('success') &&
           parsedData.payload.method === undefined
         ) {
-          return
+          return false
         }
 
         // Log the incoming JSON RPC command.
@@ -151,6 +153,8 @@ class JSONRPC {
   // If the ID is new, the function adds it to the cache and return false.
   _checkIfAlreadyProcessed (data) {
     try {
+      // console.log('data: ', data)
+
       const id = data.payload.id
 
       // Check if the hash is in the array of already processed message.
@@ -170,7 +174,7 @@ class JSONRPC {
       return alreadyProcessed
     } catch (err) {
       console.error('Error in _checkIfAlreadyProcessed: ', err)
-      return false
+      return true
     }
   }
 
