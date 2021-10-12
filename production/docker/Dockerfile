@@ -53,7 +53,7 @@ RUN git clone https://github.com/Permissionless-Software-Foundation/ipfs-service
 WORKDIR /home/safeuser/ipfs-service-provider
 
 # For development: switch to unstable branch
-#RUN git checkout ct-unstable
+RUN git checkout ct-unstable
 
 # Install dependencies
 #RUN mkdir .ipfsdata
