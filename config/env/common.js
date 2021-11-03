@@ -78,5 +78,13 @@ module.exports = {
   // BCH Mnemonic for generating encryption keys and payment address
   mnemonic: process.env.MNEMONIC ? process.env.MNEMONIC : '',
 
-  debugLevel: process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 2
+  debugLevel: process.env.DEBUG_LEVEL ? parseInt(process.env.DEBUG_LEVEL) : 2,
+
+  // RPC connection information, used by the SLP indexer to communicate with the
+  // full node.
+  rpcUri: process.env.RPC_URI
+    ? process.env.RPC_URI
+    : 'http://192.168.0.36:8334/',
+  rpcUser: process.env.RPC_USER ? process.env.RPC_USER : 'bitcoin',
+  rpcPass: process.env.RPC_PASS ? process.env.RPC_PASS : 'password'
 }
