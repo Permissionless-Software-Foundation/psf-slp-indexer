@@ -1,0 +1,33 @@
+# Start the service with the command 'docker-compose up -d'
+
+version: '2'
+
+services:
+  mongo-ipfs-service:
+    image: mongo
+    container_name: mongo-ipfs-service
+    ports:
+      - '5555:27017' # <host port>:<container port>
+    volumes:
+      - ../data/database:/data/db
+    command: mongod --logpath=/dev/null # -- quiet
+    restart: always
+
+  ipfs-service:
+    build: .
+    container_name: ipfs-service
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '10'
+    mem_limit: 500mb
+    links:
+      - mongo-ipfs-service
+    ports:
+      - '5001:5001' # <host port>:<container port>
+      - '5268:5268' # IPFS TCP
+      - '5269:5269' # IPFS WS
+    volumes:
+      - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+    restart: always
