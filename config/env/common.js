@@ -11,7 +11,7 @@ const version = pkgInfo.version
 
 const ipfsCoordName = process.env.COORD_NAME
   ? process.env.COORD_NAME
-  : 'ipfs-bch-wallet-service'
+  : 'psf-slp-indexer'
 
 module.exports = {
   // Configure TCP port.
@@ -60,7 +60,7 @@ module.exports = {
     '@type': 'WebAPI',
     name: ipfsCoordName,
     version,
-    protocol: 'generic-service',
+    protocol: 'psf-slp-indexer',
     description:
       'This is a generic IPFS Serivice Provider that uses JSON RPC over IPFS to communicate with it. This instance has not been customized. Source code: https://github.com/Permissionless-Software-Foundation/ipfs-service-provider',
     documentation: 'https://ipfs-service-provider.fullstack.cash/',
