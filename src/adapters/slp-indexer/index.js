@@ -13,6 +13,7 @@ const level = require('level')
 const readline = require('readline')
 
 // Local libraries
+const { wlogger } = require('../wlogger')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -37,7 +38,8 @@ const statusDb = level(
 class SlpIndexer {
   async start () {
     try {
-      console.log('starting indexer...\n')
+      console.log('starting SLP indexer...\n')
+      wlogger.info('starting SLP indexer...')
 
       // Detect 'q' key to stop indexing.
       console.log("Press the 'q' key to stop indexing.")
