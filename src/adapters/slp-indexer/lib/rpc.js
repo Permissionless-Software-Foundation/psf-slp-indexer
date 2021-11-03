@@ -47,8 +47,28 @@ class RPC {
       return response.data.result
     } catch (err) {
       // Write out error to error log.
-      // logger.error(`Error in rawtransactions/decodeRawTransaction: `, err)
       this.wlogger.error('Error in rpc.js/getBlockCount().', err)
+
+      throw err
+    }
+  }
+
+  // Given a block hash, return the block header. This includes the block height.
+  async getBlockHeader (hash, verbose = true) {
+    try {
+      if (!hash) throw new Error('Block hash must be provided')
+
+      const options = this.getAxiosOptions()
+      options.data.id = 'getblockheader'
+      options.data.method = 'getblockheader'
+      options.data.params = [hash, verbose]
+
+      const response = await this.axios.request(options)
+
+      return response.data.result
+    } catch (err) {
+      // Write out error to error log.
+      this.wlogger.error('Error in rpc.js/getBlockHeader().', err)
 
       throw err
     }
