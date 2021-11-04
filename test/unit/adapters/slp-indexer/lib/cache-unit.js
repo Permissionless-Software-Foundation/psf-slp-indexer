@@ -8,7 +8,7 @@ const sinon = require('sinon')
 const BCHJS = require('@psf/bch-js')
 const bchjs = new BCHJS()
 
-const Cache = require('../../lib/cache')
+const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 
 describe('#cache.js', () => {
   let uut, sandbox
@@ -26,7 +26,7 @@ describe('#cache.js', () => {
     it('should get tx data cache on second call', async () => {
       // Mock devDependencies
       sandbox
-        .stub(uut.bchjs.Transaction, 'get2')
+        .stub(uut.transaction, 'get')
         .onCall(0)
         .resolves({ blockheight: 543957 })
         .onCall(1)

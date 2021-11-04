@@ -2,6 +2,10 @@
   This library is concernced with navigating the DAG of a transaction.
 */
 
+// const txDb = level(`${__dirname.toString()}/../../../leveldb/current/txs`, {
+// valueEncoding: 'json'
+// })
+
 class DAG {
   constructor (localConfig = {}) {
     this.cache = localConfig.cache
