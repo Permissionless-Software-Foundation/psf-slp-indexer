@@ -299,7 +299,9 @@ class Send {
       // database BEFORE processing (i.e. deleting UTXOs from the database).
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        console.log(
+          `pre-processing thisVin: ${JSON.stringify(thisVin, null, 2)}`
+        )
 
         // If there are no tokens in this input, then skip it.
         if (!thisVin.tokenQty) continue
@@ -317,7 +319,7 @@ class Send {
           // See dev-notes.md about this errant TXID:
           // 16a40eca8bf6a1d4b913820718db2361686a9371e4b4ad82998c0566cf7a3052
           console.log(
-            `Errant input with txid ${thisVin.txid} detected with no matching address in DB. Converting to non-SLP input.`
+            `Errant input with txid ${thisVin.txid} detected with no matching address (${thisVin.address}) in DB. Converting to non-SLP input.`
           )
           thisVin.tokenQty = 0
           thisVin.tokenQtyStr = '0'
@@ -344,7 +346,7 @@ class Send {
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // If there are no tokens in this input, then skip it.
         if (!thisVin.tokenQty) continue
