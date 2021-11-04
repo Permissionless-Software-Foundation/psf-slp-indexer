@@ -154,20 +154,6 @@ class FilterBlock {
     }
   }
 
-  // A simpler version of the function above.
-  async filterAndSortSlpTxs2 (txids, blockHeight) {
-    try {
-      // Filter out all the non-SLP transactions.
-      const slpTxs = await this.filterSlpTxs(txids)
-      // console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
-
-      return slpTxs
-    } catch (err) {
-      console.error('Error in fitlerAndSortSlpTxs()')
-      throw err
-    }
-  }
-
   // This function loops through each of the unsortedAry txids. It checks to
   // see if that TXID is the child of the last element in the chainedAry. If
   // it is, the TXID is added to the end of the chainedAry, and removed from
@@ -220,9 +206,11 @@ class FilterBlock {
           try {
             // Is the TX an SLP TX? If not, it will throw an error.
             await this.transaction.decodeOpReturn(txid)
+
             slpTxs.push(txid)
           } catch (err) {
             /* exit quietly */
+            // console.log(`TXID ${txid} not an SLP TX.`)
           }
         } catch (err) {
           console.error(

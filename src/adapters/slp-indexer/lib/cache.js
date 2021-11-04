@@ -12,6 +12,7 @@ class Cache {
     this.transaction = new Transaction()
 
     this.cache = {}
+    this.cacheCnt = 0
   }
 
   // Save a new entry into the cache.
@@ -35,6 +36,11 @@ class Cache {
 
     // Save the data to the cache.
     this.put(key, txData)
+
+    this.cacheCnt++
+    if (this.cacheCnt % 100 === 0) {
+      console.log(`tx cache has ${this.cachecnt} cached txs`)
+    }
 
     return txData
   }

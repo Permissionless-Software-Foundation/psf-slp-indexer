@@ -4,6 +4,7 @@
 
 // Public npm libraries
 const BigNumber = require('bignumber.js')
+const slpParser = require('slp-parser')
 
 // Local libraries
 const RPC = require('./rpc')
@@ -14,15 +15,18 @@ const RPC = require('./rpc')
 
 class Transaction {
   constructor (config) {
+    // Encapsulate dependencies
     this.rpc = new RPC()
+    this.slpParser = slpParser
 
     // State
     this.txCache = {}
+    this.txCacheCnt = 0
   }
 
   /**
    * @api Transaction.get() get()
-   * @apiName get3
+   * @apiName get
    * @apiGroup Transaction
    * @apiDescription
    * Returns an object of transaction data, including addresses for input UTXOs.
@@ -53,7 +57,7 @@ class Transaction {
       }
 
       // Get TX data
-      const txDetails = await this.rpc.getRawTransaction.getTxData(txid)
+      const txDetails = await this.getTxData(txid)
       // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
       // Get the block height the transaction was mined in.
@@ -173,12 +177,12 @@ class Transaction {
       // Process TX inputs
       for (let i = 0; i < txDetails.vin.length; i++) {
         const thisVin = txDetails.vin[i]
-        console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
+        // console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
 
         const vinTokenData = await this.getTokenInfo(thisVin.txid)
-        console.log(
-          `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-        )
+        // console.log(
+        //   `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+        // )
 
         // Corner case: Ensure the token ID is the same.
         const vinTokenIdIsTheSame = vinTokenData.tokenId === txDetails.tokenId
@@ -295,14 +299,7 @@ class Transaction {
 
       return txDetails
     } catch (err) {
-      console.error('Error in get3()')
-
-      // This case handles rate limit errors.
-      if (err.response && err.response.data && err.response.data.error) {
-        throw new Error(err.response.data.error)
-      }
-
-      if (err.error) throw new Error(err.error)
+      console.error('Error in get()')
       throw err
     }
   }
@@ -379,7 +376,7 @@ class Transaction {
       const opReturn = txDetails.vout[0].scriptPubKey.hex
       // console.log(`opReturn hex: ${opReturn}`)
 
-      const parsedData = _this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
+      const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
       // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
 
       // Convert Buffer data to hex strings or utf8 strings.
@@ -416,10 +413,135 @@ class Transaction {
       // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
       this.txCache[txid] = tokenData
+      this.txCacheCnt++
+      if (this.txCacheCnt % 100 === 0) {
+        console.log(`decodeOpReturn cache has ${this.txCachecnt} cached txs`)
+      }
 
       return tokenData
     } catch (error) {
       throw error
+    }
+  }
+
+  /**
+   * @api RawTransactions.getTxData() getTxData()
+   * @apiName getTxData
+   * @apiGroup RawTransactions
+   * @apiDescription
+   * Returns an object of transaction data, including addresses for input UTXOs.
+   *
+   * This function is equivalent to running `getRawTransaction (txid, true)`,
+   * execept the `vin` array will be populated with an `address` property that
+   * contains the `bitcoincash:` address of the sender for each input.
+   *
+   * This function will only work with a single txid. It does not yet support an
+   * array of TXIDs.
+   *
+   * @apiExample Example usage:
+   * (async () => {
+   * try {
+   *  let txData = await bchjs.RawTransactions.getTxData("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
+   *  console.log(txData);
+   * } catch(error) {
+   * console.error(error)
+   * }
+   * })()
+   */
+  // Equivalent to running: async getRawTransaction (txid, verbose = true)
+  // Only handles a single TXID (not arrays).
+  // Appends the BCH address to the inputs of the transaction.
+  async getTxData (txid) {
+    try {
+      if (typeof txid !== 'string') {
+        throw new Error(
+          'Input to raw-transaction.js/getTxData() must be a string containg a TXID.'
+        )
+      }
+
+      // Get the TX details for the transaction under consideration.
+      const txDetails = await this.rpc.getRawTransaction(txid)
+      // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+
+      const inAddrs = await this._getInputAddrs(txDetails)
+      // console.log(`inAddrs: ${JSON.stringify(inAddrs, null, 2)}`)
+
+      // Add the input address to the transaction data.
+      for (let i = 0; i < inAddrs.length; i++) {
+        txDetails.vin[i].address = inAddrs[i].address
+        txDetails.vin[i].value = inAddrs[i].value
+      }
+
+      return txDetails
+    } catch (error) {
+      console.error('Error in transaction.js/getTxData()')
+      throw err
+
+      // if (error.error) throw new Error(error.error)
+      //
+      // // This case handles rate limit errors.
+      // if (error.response && error.response.data && error.response.data.error) {
+      //   throw new Error(error.response.data.error)
+      // } else if (error.response && error.response.data) {
+      //   throw error.response.data
+      // } else throw error
+    }
+  }
+
+  // Given verbose transaction details, this function retrieves the transaction
+  // data for the inputs (the parent transactions). It returns an array of
+  // objects. Each object corresponds to a transaction input, and contains
+  // the address that generated that input UTXO.
+  //
+  // Assumes a single TX. Does not yet work with an array of TXs.
+  // This function returns an array of objects, each object if formated as follows:
+  // {
+  //   vin: 0, // The position of the input for the given txid
+  //   address: bitcoincash:qzhrpmu7nruyfcemeanqh5leuqcnf6zkjq4qm9nqh0
+  // }
+  async _getInputAddrs (txDetails) {
+    try {
+      const retArray = [] // Return array
+
+      for (let i = 0; i < txDetails.vin.length; i++) {
+        // The first input represents the sender of the BCH or tokens.
+        const vin = txDetails.vin[i]
+        const inputTxid = vin.txid
+        const inputVout = vin.vout
+
+        // TODO: Coinbase TXs have no input transaction. Figure out how to
+        // handle this corner case.
+
+        // Get the TX details for the input, in order to retrieve the address of
+        // the sender.
+        const txDetailsParent = await this.rpc.getRawTransaction(inputTxid)
+        // console.log(
+        //   `txDetailsParent: ${JSON.stringify(txDetailsParent, null, 2)}`
+        // )
+
+        // The vout from the previous tx that represents the sender.
+        const voutSender = txDetailsParent.vout[inputVout]
+
+        retArray.push({
+          vin: i,
+          address: voutSender.scriptPubKey.addresses[0],
+          value: voutSender.value
+        })
+      }
+
+      return retArray
+    } catch (error) {
+      console.error('Error in transaction.js/_getInputAddrs()')
+      throw err
+
+      // if (error.error) throw new Error(error.error)
+      //
+      // // This case handles rate limit errors.
+      // if (error.response && error.response.data && error.response.data.error) {
+      //   throw new Error(error.response.data.error)
+      // } else if (error.response && error.response.data) {
+      //   throw error.response.data
+      // } else throw error
     }
   }
 }

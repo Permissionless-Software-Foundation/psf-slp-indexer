@@ -20,7 +20,7 @@
 */
 
 const BigNumber = require('bignumber.js')
-const BCHJS = require('@psf/bch-js')
+// const BCHJS = require('@psf/bch-js')
 
 const IndexerUtils = require('./utils')
 const SlpValidate = require('./slp-validate')
@@ -37,7 +37,7 @@ class Send {
 
     this.util = new IndexerUtils()
     this.slpValidate = new SlpValidate()
-    this.bchjs = new BCHJS()
+    // this.bchjs = new BCHJS()
   }
 
   async processTx (data) {

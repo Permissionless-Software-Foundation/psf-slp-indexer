@@ -2,7 +2,7 @@
   Main class library for the SLP indexing functionality.
 
   Testing notes:
-  - First Genesis tx occurs in block 543376
+  - First Genesis tx occurs in block 543376, txid: 545cba6f72a08cbcb08c7d4e8166267942e8cb9a611328805c62fa538e861ba4
   - First Send tx occurs in block 543409
   - First Mint tx occurs in block 543614 txid: ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34
 
@@ -56,6 +56,9 @@ class SlpIndexer {
       cache: this.cache,
       transaction: this.transaction
     })
+    this.genesis = new Genesis({ addrDb, tokenDb })
+    this.send = new Send({ addrDb, tokenDb, txDb })
+    this.mint = new Mint({ addrDb, tokenDb, txDb })
 
     // State
     this.stopIndexing = false
@@ -93,6 +96,7 @@ class SlpIndexer {
       try {
         status = await statusDb.get('status')
       } catch (err) {
+        console.log('Error trying to get status from leveldb')
         // New database, so there is no status. Create it.
         status = {
           startBlockHeight: 543376,
@@ -220,6 +224,8 @@ class SlpIndexer {
           await this.processTx({ tx, blockHeight })
         } catch (err) {
           console.log('----> HANDLING ERROR <----')
+          console.log(err)
+
           // Move the tx to the back of the queue.
           slpTxs.push(tx)
 
