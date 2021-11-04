@@ -296,8 +296,8 @@ class SlpIndexer {
         const parentTxData = await this.cache.get(thisVin.txid)
 
         // Get the block height of that transaction.
-        const parentBlockhash = parentTxData.blockhash
-        const parentBlockHeader = await this.rpc.getBlockHeader(parentBlockhash)
+        // const parentBlockhash = parentTxData.blockhash
+        // const parentBlockHeader = await this.rpc.getBlockHeader(parentBlockhash)
 
         // Find and track the oldest parent block height.
         // if (parentBlockHeader.height < targetBlockHeight) {

@@ -420,6 +420,7 @@ class Transaction {
 
       return tokenData
     } catch (error) {
+      console.error('Error in decodeOpReturn()')
       throw error
     }
   }
@@ -473,7 +474,7 @@ class Transaction {
       }
 
       return txDetails
-    } catch (error) {
+    } catch (err) {
       console.error('Error in transaction.js/getTxData()')
       throw err
 
@@ -530,7 +531,7 @@ class Transaction {
       }
 
       return retArray
-    } catch (error) {
+    } catch (err) {
       console.error('Error in transaction.js/_getInputAddrs()')
       throw err
 

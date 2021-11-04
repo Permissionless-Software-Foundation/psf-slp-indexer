@@ -137,7 +137,7 @@ describe('#rpc.js', () => {
 
   describe('#getBlockHash', () => {
     it('should get the hash of a block', async () => {
-      const height = 600000
+      // const height = 600000
       const hash =
         '0000000000000000008e8d83cba6d45a9314bc2ef4538d4e0577c6bed8593536'
 

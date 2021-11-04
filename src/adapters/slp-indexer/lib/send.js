@@ -52,7 +52,7 @@ class Send {
   async processTx (data) {
     try {
       // console.log(`send.processTx() data: ${JSON.stringify(data, null, 2)}`)
-      const { txData, slpData } = data
+      const { txData } = data
       const txid = txData.txid
 
       // console.log('slpData: ', slpData)

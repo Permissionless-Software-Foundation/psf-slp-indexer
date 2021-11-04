@@ -56,7 +56,8 @@ class DAG {
 
       // If the txid does not exist in the txidAry array, then add it.
       const txid = txData.txid
-      console.log('txid: ', txid)
+      // console.log('txid: ', txid)
+
       const isAlreadyAdded = txidAry.filter((x) => x === txid)
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
@@ -68,7 +69,7 @@ class DAG {
       // Loop through each input that represents tokens.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         const sameTokenId = thisVin.tokenId === txData.tokenId
 
@@ -81,7 +82,7 @@ class DAG {
 
         // Get the parent transaction.
         const parentTx = await this.cache.get(thisVin.txid)
-        console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
 
         // Not sure why or how parentTx can be undefined, but...
         if (!parentTx) return
