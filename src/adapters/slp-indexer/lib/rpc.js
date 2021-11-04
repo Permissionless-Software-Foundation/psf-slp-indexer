@@ -21,7 +21,7 @@ class RPC {
   getAxiosOptions () {
     return {
       method: 'post',
-      baseURL: this.config.rpcUri,
+      baseURL: `http://${this.config.rpcUri}/`,
       timeout: 15000,
       auth: {
         username: this.config.rpcUser,

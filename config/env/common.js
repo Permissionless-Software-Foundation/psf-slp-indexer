@@ -82,9 +82,7 @@ module.exports = {
 
   // RPC connection information, used by the SLP indexer to communicate with the
   // full node.
-  rpcUri: process.env.RPC_URI
-    ? process.env.RPC_URI
-    : 'http://192.168.0.36:8332/',
+  rpcUri: process.env.RPC_URI ? process.env.RPC_URI : '192.168.0.36:8332',
   rpcUser: process.env.RPC_USER ? process.env.RPC_USER : 'bitcoin',
   rpcPass: process.env.RPC_PASS ? process.env.RPC_PASS : 'password'
 }
