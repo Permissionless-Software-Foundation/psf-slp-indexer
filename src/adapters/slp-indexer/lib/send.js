@@ -74,6 +74,11 @@ class Send {
       const txidIsValid = await this.dag.validateTxid(txid)
       if (!txidIsValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
+
+        // Mark TXID as invalid and save in DB.
+        txData.isValidSlp = false
+        await this.txDb.put(txData.txid, txData)
+
         return
       }
 

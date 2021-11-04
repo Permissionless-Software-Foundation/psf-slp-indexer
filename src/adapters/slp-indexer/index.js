@@ -51,7 +51,7 @@ class SlpIndexer {
     this.rpc = new RPC()
     this.dbBackup = new DbBackup()
     this.cache = new Cache()
-    this.transaction = new Transaction()
+    this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
       cache: this.cache,
       transaction: this.transaction
