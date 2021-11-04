@@ -74,11 +74,6 @@ class Send {
       const txidIsValid = await this.dag.validateTxid(txid)
       if (!txidIsValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
-
-        // Mark TXID as invalid and save in DB.
-        txData.isValidSlp = false
-        await this.txDb.put(txData.txid, txData)
-
         return
       }
 
@@ -93,13 +88,6 @@ class Send {
       //   console.log(`No valid inputs found. Skipping ${txid}`)
       //   return
       // }
-
-      if (
-        data.txData.txid ===
-        'b1091bb9d5821b84dd65be21158d905bcf2d799bf096b81a5c8a74d1c6e2e9ef'
-      ) {
-        console.log(`data.txData: ${JSON.stringify(data.txData, null, 2)}`)
-      }
 
       // Subtract the input UTXOs and balances from input addresses.
       await this.subtractTokensFromInputAddr(data)
@@ -311,15 +299,24 @@ class Send {
       // database BEFORE processing (i.e. deleting UTXOs from the database).
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        console.log(
-          `pre-processing thisVin: ${JSON.stringify(thisVin, null, 2)}`
-        )
+        // console.log(
+        //   `pre-processing thisVin: ${JSON.stringify(thisVin, null, 2)}`
+        // )
 
         // If there are no tokens in this input, then skip it.
         if (!thisVin.tokenQty) continue
 
         // If the token IDs do not match, skip it.
         if (thisVin.tokenId !== txData.tokenId) continue
+
+        // Do a DAG validation of the input.
+        const inputIsValid = await this.dag.validateTxid(thisVin.txid)
+        if (!inputIsValid) {
+          thisVin.tokenId = null
+          thisVin.tokenQty = 0
+          thisVin.tokenQtyStr = '0'
+          continue
+        }
 
         // Get the DB entry for this address.
         const addrData = await this.addrDb.get(thisVin.address)
@@ -343,7 +340,7 @@ class Send {
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        // console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // If there are no tokens in this input, then skip it.
         if (!thisVin.tokenQty) continue

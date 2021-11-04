@@ -37,6 +37,15 @@ class Cache {
     // If the data existed in the cache, this function is done.
     if (txData) return txData
 
+    // Try to get txData from the database.
+    try {
+      txData = await this.txDb.get(key)
+
+      return txData
+    } catch (err) {
+      /* exit quietly */
+    }
+
     // Get TX Data from full node if it's not in the cache.
     txData = await this.transaction.get(key)
     // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
@@ -50,6 +59,11 @@ class Cache {
     }
 
     return txData
+  }
+
+  // Delete an entry from the cache
+  delete (key) {
+    delete this.cache[key]
   }
 }
 

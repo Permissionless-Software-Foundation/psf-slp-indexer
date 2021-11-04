@@ -15,13 +15,6 @@ const RPC = require('./rpc')
 
 class Transaction {
   constructor (localConfig = {}) {
-    this.txDb = localConfig.txDb
-    if (!this.txDb) {
-      throw new Error(
-        'Must include txDb when instantiationg Transaction library'
-      )
-    }
-
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.slpParser = slpParser
@@ -185,22 +178,6 @@ class Transaction {
       for (let i = 0; i < txDetails.vin.length; i++) {
         const thisVin = txDetails.vin[i]
         // console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
-
-        // Try to retrieve the TX from the database, to check if it's already
-        // been processed and market valid or invalid.
-        try {
-          const dbTx = await this.txDb.get(thisVin.txid)
-
-          // If TXID is marked as invalid, then update the Vin token data.
-          if (!dbTx.isValidSlp) {
-            thisVin.tokenQty = 0
-            thisVin.tokenQtyStr = '0'
-            thisVin.tokenId = null
-            continue
-          }
-        } catch (err) {
-          /* exit quietly */
-        }
 
         const vinTokenData = await this.getTokenInfo(thisVin.txid)
         // console.log(
