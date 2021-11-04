@@ -25,9 +25,16 @@ const BigNumber = require('bignumber.js')
 const IndexerUtils = require('./utils')
 const SlpValidate = require('./slp-validate')
 // const blacklist = require('./blacklist')
+const DAG = require('./dag')
 
 class Send {
   constructor (localConfig = {}) {
+    this.cache = localConfig.cache
+    if (!this.cache) {
+      throw new Error(
+        'Must pass cache instance when instantiating Send library'
+      )
+    }
     // TODO: Throw error if database handles are not passed in with localConfig
 
     // LevelDBs
@@ -35,9 +42,11 @@ class Send {
     this.tokenDb = localConfig.tokenDb
     this.txDb = localConfig.txDb
 
+    // Encapsulate dependencies
     this.util = new IndexerUtils()
     this.slpValidate = new SlpValidate()
     // this.bchjs = new BCHJS()
+    this.dag = new DAG(localConfig)
   }
 
   async processTx (data) {
@@ -61,7 +70,8 @@ class Send {
       start = start.getTime()
 
       // Validate the TX against the SLP DAG.
-      const txidIsValid = await this.slpValidate.validateTxid(txid)
+      // const txidIsValid = await this.slpValidate.validateTxid(txid)
+      const txidIsValid = await this.dag.validateTxid(txid)
       if (!txidIsValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
         return

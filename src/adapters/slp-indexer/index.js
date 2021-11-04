@@ -57,7 +57,7 @@ class SlpIndexer {
       transaction: this.transaction
     })
     this.genesis = new Genesis({ addrDb, tokenDb })
-    this.send = new Send({ addrDb, tokenDb, txDb })
+    this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb })
 
     // State
@@ -388,9 +388,6 @@ class SlpIndexer {
 
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
 
-      // Add the transaction to the database.
-      await txDb.put(txData.txid, txData)
-
       // Route the data for processing, based on the type of transaction.
       if (slpData.txType.includes('GENESIS')) {
         await this.genesis.processTx(data)
@@ -410,6 +407,10 @@ class SlpIndexer {
 
         console.log(`Send tx processed: ${txData.txid}`)
       }
+
+      // Mark TXID as valid and add the transaction to the database.
+      txData.isValidSlp = true
+      await txDb.put(txData.txid, txData)
     } catch (err) {
       console.error('Error in processData(): ', err)
       throw err
