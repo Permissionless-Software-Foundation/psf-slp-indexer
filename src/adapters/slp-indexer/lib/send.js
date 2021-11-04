@@ -94,6 +94,13 @@ class Send {
       //   return
       // }
 
+      if (
+        data.txData.txid ===
+        'b1091bb9d5821b84dd65be21158d905bcf2d799bf096b81a5c8a74d1c6e2e9ef'
+      ) {
+        console.log(`data.txData: ${JSON.stringify(data.txData, null, 2)}`)
+      }
+
       // Subtract the input UTXOs and balances from input addresses.
       await this.subtractTokensFromInputAddr(data)
 

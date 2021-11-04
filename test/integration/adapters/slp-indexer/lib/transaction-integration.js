@@ -7,24 +7,30 @@ const assert = require('chai').assert
 const BCHJS = require('@psf/bch-js')
 const bchjs = new BCHJS()
 
+const MockLevel = require('../../../../unit/mocks/leveldb-mock')
+
 const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
 
 describe('#transaction.js', () => {
   let uut
 
   beforeEach(() => {
-    uut = new Transaction({ bchjs })
+    const addrDb = new MockLevel()
+    const tokenDb = new MockLevel()
+    const txDb = new MockLevel()
+
+    uut = new Transaction({ bchjs, txDb })
   })
 
-  describe('#decodeOpReturn', () => {
-    it('should throw error for problematic TX', async () => {
-      const txid =
-        '16a40eca8bf6a1d4b913820718db2361686a9371e4b4ad82998c0566cf7a3052'
-
-      const result = await uut.decodeOpReturn(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
-    })
-  })
+  // describe('#decodeOpReturn', () => {
+  //   it('should throw error for problematic TX', async () => {
+  //     const txid =
+  //       '16a40eca8bf6a1d4b913820718db2361686a9371e4b4ad82998c0566cf7a3052'
+  //
+  //     const result = await uut.decodeOpReturn(txid)
+  //     console.log(`result: ${JSON.stringify(result, null, 2)}`)
+  //   })
+  // })
 
   // describe('#get', () => {
   //   // This is a problematic TX.

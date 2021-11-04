@@ -127,7 +127,7 @@ class DAG {
 
       // If the txid does not exist in the txidAry array, then add it.
       const txid = txData.txid
-      console.log('txid: ', txid)
+      // console.log('txid: ', txid)
       const isAlreadyAdded = txidAry.filter((x) => x === txid)
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
@@ -219,6 +219,7 @@ class DAG {
       const tokenId = txData.tokenId
 
       const isValid = await this.crawlDag2(txData, tokenId, txidAry)
+      // console.log(`txidAry: ${JSON.stringify(txidAry, null, 2)}`)
 
       // Return false if txid did not pass DAG validation.
       // if (!isValid) {
