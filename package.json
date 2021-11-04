@@ -13,7 +13,8 @@
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/ test/e2e/automated/"
+    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/ test/e2e/automated/",
+    "reindex": "node src/adapters/slp-indexer/re-index.js"
   },
   "author": "Chris Troutner <chris.troutner@gmail.com>",
   "license": "MIT",

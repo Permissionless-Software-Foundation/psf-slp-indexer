@@ -15,8 +15,8 @@ describe('#cache.js', () => {
   let uut, sandbox
 
   beforeEach(() => {
-    const addrDb = new MockLevel()
-    const tokenDb = new MockLevel()
+    // const addrDb = new MockLevel()
+    // const tokenDb = new MockLevel()
     const txDb = new MockLevel()
 
     // Restore the sandbox before each test.
