@@ -8,16 +8,22 @@ const BCHJS = require('@psf/bch-js')
 // const bchjs = new BCHJS()
 const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
 
-const Cache = require('../../lib/cache')
+const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 const cache = new Cache({ bchjs })
 
-const DAG = require('../../lib/dag')
+const MockLevel = require('../../../../unit/mocks/leveldb-mock')
+
+const DAG = require('../../../../../src/adapters/slp-indexer/lib/dag')
 
 describe('#dag.js', () => {
   let uut
 
   beforeEach(() => {
-    uut = new DAG({ cache })
+    const addrDb = new MockLevel()
+    const tokenDb = new MockLevel()
+    const txDb = new MockLevel()
+
+    uut = new DAG({ cache, txDb })
   })
 
   describe('#DAG', () => {

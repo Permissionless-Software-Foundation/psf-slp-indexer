@@ -7,7 +7,7 @@ const assert = require('chai').assert
 const BCHJS = require('@psf/bch-js')
 const bchjs = new BCHJS()
 
-const Cache = require('../../lib/cache')
+const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 
 describe('#cache.js', () => {
   let uut

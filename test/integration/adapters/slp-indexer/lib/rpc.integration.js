@@ -68,7 +68,7 @@ describe('#rpc.js', () => {
         'ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34'
 
       const result = await uut.getRawTransaction(txid)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       assert.equal(result.txid, txid)
     })
