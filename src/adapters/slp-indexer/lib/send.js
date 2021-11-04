@@ -310,22 +310,7 @@ class Send {
         if (thisVin.tokenId !== txData.tokenId) continue
 
         // Get the DB entry for this address.
-        let addrData = {}
-        try {
-          addrData = await this.addrDb.get(thisVin.address)
-        } catch (err) {
-          // Corner case: If address for this Vin is not in the database, then
-          // convert it to a non-token input.
-          // See dev-notes.md about this errant TXID:
-          // 16a40eca8bf6a1d4b913820718db2361686a9371e4b4ad82998c0566cf7a3052
-          console.log(
-            `Errant input with txid ${thisVin.txid} detected with no matching address (${thisVin.address}) in DB. Converting to non-SLP input.`
-          )
-          thisVin.tokenQty = 0
-          thisVin.tokenQtyStr = '0'
-          thisVin.tokenId = null
-          continue
-        }
+        const addrData = await this.addrDb.get(thisVin.address)
 
         // Get the UTXO entry that matches the current input.
         const utxoToDelete = addrData.utxos.filter((x) => {

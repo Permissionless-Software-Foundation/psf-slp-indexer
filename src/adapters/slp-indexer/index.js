@@ -411,6 +411,8 @@ class SlpIndexer {
       // Mark TXID as valid and add the transaction to the database.
       txData.isValidSlp = true
       await txDb.put(txData.txid, txData)
+
+      //
     } catch (err) {
       console.error('Error in processData(): ', err)
       throw err
