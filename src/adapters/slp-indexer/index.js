@@ -50,7 +50,7 @@ class SlpIndexer {
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.dbBackup = new DbBackup()
-    this.cache = new Cache()
+    this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
       cache: this.cache,

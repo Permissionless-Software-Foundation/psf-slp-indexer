@@ -8,8 +8,15 @@ const Transaction = require('./transaction')
 
 class Cache {
   constructor (localConfig = {}) {
+    this.txDb = localConfig.txDb
+    if (!this.txDb) {
+      throw new Error(
+        'Must include txDb when instantiationg Transaction library'
+      )
+    }
+
     // Encapsulate dependencies
-    this.transaction = new Transaction()
+    this.transaction = new Transaction(localConfig)
 
     this.cache = {}
     this.cacheCnt = 0
