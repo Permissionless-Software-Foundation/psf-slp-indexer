@@ -8,9 +8,13 @@
   - Increase the tokens in circulation value in the token index.
 */
 
-const IndexerUtils = require('./utils')
+// Public npm libraries
 const BigNumber = require('bignumber.js')
+
+// Local libraries
+const IndexerUtils = require('./utils')
 const SlpValidate = require('./slp-validate')
+const DAG = require('./dag')
 
 class Mint {
   constructor (localConfig = {}) {
@@ -23,6 +27,7 @@ class Mint {
 
     this.util = new IndexerUtils()
     this.slpValidate = new SlpValidate()
+    this.dag = new DAG(localConfig)
   }
 
   async processTx (data) {
