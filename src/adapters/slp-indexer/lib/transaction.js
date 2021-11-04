@@ -360,69 +360,64 @@ class Transaction {
    */
   // Reimplementation of decodeOpReturn() using slp-parser.
   async decodeOpReturn (txid) {
-    try {
-      // Validate the txid input.
-      if (!txid || txid === '' || typeof txid !== 'string') {
-        throw new Error('txid string must be included.')
-      }
-
-      // Return results if they've been cached.
-      const cachedVal = this.txCache[txid]
-      if (cachedVal) return cachedVal
-
-      const txDetails = await this.rpc.getRawTransaction(txid)
-
-      // SLP spec expects OP_RETURN to be the first output of the transaction.
-      const opReturn = txDetails.vout[0].scriptPubKey.hex
-      // console.log(`opReturn hex: ${opReturn}`)
-
-      const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
-      // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
-
-      // Convert Buffer data to hex strings or utf8 strings.
-      let tokenData = {}
-      if (parsedData.transactionType === 'SEND') {
-        tokenData = {
-          tokenType: parsedData.tokenType,
-          txType: parsedData.transactionType,
-          tokenId: parsedData.data.tokenId.toString('hex'),
-          amounts: parsedData.data.amounts
-        }
-      } else if (parsedData.transactionType === 'GENESIS') {
-        tokenData = {
-          tokenType: parsedData.tokenType,
-          txType: parsedData.transactionType,
-          ticker: parsedData.data.ticker.toString(),
-          name: parsedData.data.name.toString(),
-          tokenId: txid,
-          documentUri: parsedData.data.documentUri.toString(),
-          documentHash: parsedData.data.documentHash.toString(),
-          decimals: parsedData.data.decimals,
-          mintBatonVout: parsedData.data.mintBatonVout,
-          qty: parsedData.data.qty
-        }
-      } else if (parsedData.transactionType === 'MINT') {
-        tokenData = {
-          tokenType: parsedData.tokenType,
-          txType: parsedData.transactionType,
-          tokenId: parsedData.data.tokenId.toString('hex'),
-          mintBatonVout: parsedData.data.mintBatonVout,
-          qty: parsedData.data.qty
-        }
-      }
-      // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
-
-      this.txCache[txid] = tokenData
-      this.txCacheCnt++
-      if (this.txCacheCnt % 100 === 0) {
-        console.log(`decodeOpReturn cache has ${this.txCachecnt} cached txs`)
-      }
-
-      return tokenData
-    } catch (error) {
-      console.error('Error in decodeOpReturn()')
-      throw error
+    // Validate the txid input.
+    if (!txid || txid === '' || typeof txid !== 'string') {
+      throw new Error('txid string must be included.')
     }
+
+    // Return results if they've been cached.
+    const cachedVal = this.txCache[txid]
+    if (cachedVal) return cachedVal
+
+    const txDetails = await this.rpc.getRawTransaction(txid)
+
+    // SLP spec expects OP_RETURN to be the first output of the transaction.
+    const opReturn = txDetails.vout[0].scriptPubKey.hex
+    // console.log(`opReturn hex: ${opReturn}`)
+
+    const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
+    // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
+
+    // Convert Buffer data to hex strings or utf8 strings.
+    let tokenData = {}
+    if (parsedData.transactionType === 'SEND') {
+      tokenData = {
+        tokenType: parsedData.tokenType,
+        txType: parsedData.transactionType,
+        tokenId: parsedData.data.tokenId.toString('hex'),
+        amounts: parsedData.data.amounts
+      }
+    } else if (parsedData.transactionType === 'GENESIS') {
+      tokenData = {
+        tokenType: parsedData.tokenType,
+        txType: parsedData.transactionType,
+        ticker: parsedData.data.ticker.toString(),
+        name: parsedData.data.name.toString(),
+        tokenId: txid,
+        documentUri: parsedData.data.documentUri.toString(),
+        documentHash: parsedData.data.documentHash.toString(),
+        decimals: parsedData.data.decimals,
+        mintBatonVout: parsedData.data.mintBatonVout,
+        qty: parsedData.data.qty
+      }
+    } else if (parsedData.transactionType === 'MINT') {
+      tokenData = {
+        tokenType: parsedData.tokenType,
+        txType: parsedData.transactionType,
+        tokenId: parsedData.data.tokenId.toString('hex'),
+        mintBatonVout: parsedData.data.mintBatonVout,
+        qty: parsedData.data.qty
+      }
+    }
+    // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+
+    this.txCache[txid] = tokenData
+    this.txCacheCnt++
+    if (this.txCacheCnt % 100 === 0) {
+      console.log(`decodeOpReturn cache has ${this.txCachecnt} cached txs`)
+    }
+
+    return tokenData
   }
 
   /**
