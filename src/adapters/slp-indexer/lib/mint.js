@@ -18,6 +18,12 @@ const DAG = require('./dag')
 
 class Mint {
   constructor (localConfig = {}) {
+    this.cache = localConfig.cache
+    if (!this.cache) {
+      throw new Error(
+        'Must pass cache instance when instantiating Send library'
+      )
+    }
     // TODO: Throw error if database handles are not passed in with localConfig
 
     // LevelDBs

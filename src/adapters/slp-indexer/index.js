@@ -58,7 +58,7 @@ class SlpIndexer {
     })
     this.genesis = new Genesis({ addrDb, tokenDb })
     this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
-    this.mint = new Mint({ addrDb, tokenDb, txDb })
+    this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
 
     // State
     this.stopIndexing = false
