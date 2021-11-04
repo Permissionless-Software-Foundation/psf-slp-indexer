@@ -299,6 +299,7 @@ class Send {
       // database BEFORE processing (i.e. deleting UTXOs from the database).
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
+        console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // If there are no tokens in this input, then skip it.
         if (!thisVin.tokenQty) continue
