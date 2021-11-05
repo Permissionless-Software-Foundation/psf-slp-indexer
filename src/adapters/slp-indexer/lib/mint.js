@@ -52,6 +52,7 @@ class Mint {
       //   return
       // }
       const txidIsValid = await this.dag.validateTxid(txid)
+      console.log('txidIsValid: ', txidIsValid)
       if (!txidIsValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
         return
@@ -127,6 +128,7 @@ class Mint {
       let addr = {}
       let baton = {}
       let thisAddr
+      // let invalidInputFound = false
 
       // Find the input address that spent the baton.
       const vin = data.txData.vin
@@ -139,9 +141,9 @@ class Mint {
         // let addr = {}
         try {
           addr = await this.addrDb.get(thisAddr)
-          console.log(
-            `removeBatonInAddr() ${thisAddr}: ${JSON.stringify(addr, null, 2)}`
-          )
+          // console.log(
+          //   `removeBatonInAddr() ${thisAddr}: ${JSON.stringify(addr, null, 2)}`
+          // )
         } catch (err) {
           // Move on to the next address.
           continue
@@ -170,8 +172,8 @@ class Mint {
       }
 
       if (!batonFound) {
-        console.log(`data.txData: ${JSON.stringify(data.txData, null, 2)}`)
-        console.log(`addr: ${JSON.stringify(addr, null, 2)}`)
+        // console.log(`data.txData: ${JSON.stringify(data.txData, null, 2)}`)
+        // console.log(`addr: ${JSON.stringify(addr, null, 2)}`)
         throw new Error('Minting baton not found. UTXO is not in database.')
       }
 

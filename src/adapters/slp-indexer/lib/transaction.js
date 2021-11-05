@@ -414,7 +414,7 @@ class Transaction {
     this.txCache[txid] = tokenData
     this.txCacheCnt++
     if (this.txCacheCnt % 100 === 0) {
-      console.log(`decodeOpReturn cache has ${this.txCachecnt} cached txs`)
+      console.log(`decodeOpReturn cache has ${this.txCacheCnt} cached txs`)
     }
 
     return tokenData

@@ -55,7 +55,7 @@ class Cache {
 
     this.cacheCnt++
     if (this.cacheCnt % 100 === 0) {
-      console.log(`tx cache has ${this.cachecnt} cached txs`)
+      console.log(`tx cache has ${this.cacheCnt} cached txs`)
     }
 
     return txData

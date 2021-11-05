@@ -120,6 +120,8 @@ class SlpReIndexer {
       )
       console.log(`slpTxIndex: ${slpTxIndex}`)
 
+      // const lastBlockIndex = txMap.findIndex(x => x.height === 543418)
+
       // Loop through the block heights and index every block.
       // for (
       //   let blockHeight = status.syncedBlockHeight;
@@ -128,6 +130,7 @@ class SlpReIndexer {
       //   blockHeight++
       // ) {
       for (let i = slpTxIndex; i < txMap.length; i++) {
+      // for (let i = slpTxIndex; i < lastBlockIndex; i++) {
         const blockHeight = txMap[i].height
 
         // Update and save the sync status.
@@ -260,7 +263,7 @@ class SlpReIndexer {
 
           console.log(`Error count for ${tx}: ${errObj[0].cnt}`)
 
-          const retryCnt = 15
+          const retryCnt = 5
           if (errObj[0].cnt > retryCnt) {
             await this.handleProcessFailure(blockHeight, tx, err.message)
             throw new Error(
