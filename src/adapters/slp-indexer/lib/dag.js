@@ -141,13 +141,12 @@ class DAG {
         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       }
 
-      // let chainedParentsDetected = null
-
       // Loop through each input that represents tokens.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
         // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
+        // Evaluate if the token IDs match.
         const sameTokenId = thisVin.tokenId === txData.tokenId
 
         // If the input is not colored as a token, then skip it.
@@ -157,64 +156,63 @@ class DAG {
           continue
         }
 
-        // First attempt to retrieve parent TX from database.
+        // Phase 1: retrieve the parent TX.
+
         let parentTx = {}
         try {
           // Get the parent from the database
           parentTx = await this.txDb.get(thisVin.txid)
           // console.log(`parentTx from DB: ${JSON.stringify(parentTx, null, 2)}`)
-
-          // If the parent TX is a valid SLP tx that has already been evaluated.
-          if (parentTx.isValidSlp) {
-            // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-            // console.log(`parentTX TXID: ${parentTx.txid}`)
-
-            // Ensure this input is either a token or a minting baton.
-            const vinIsTokenOrBaton = !!thisVin.tokenQty || thisVin.isMintBaton
-            // console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
-
-            // Ensure this input originates from that valid parent.
-            // console.log(`parentTx.vout: ${JSON.stringify(parentTx.vout, null, 2)}`)
-            const parentOutMatch = parentTx.vout.filter(x => x.n === thisVin.vout && vinIsTokenOrBaton)
-            // console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
-
-            if (parentOutMatch.length) {
-              // Stop crawling DAG and use result from DB.
-              txidAry.unshift(parentTx.txid)
-
-              // Final parent found. Stop the recursive calls.
-              endFound = true
-              return endFound
-            }
-          }
         } catch (err) {
-          /* exit quietly */
-          // console.log(err)
+          // If DB lookup failed, retrieve the parent TX from the cache.
+          parentTx = await this.cache.get(thisVin.txid)
         }
 
-        // If DB lookup failed, retrieve the parent TX from the cache.
-        parentTx = await this.cache.get(thisVin.txid)
+        // Phase 2: Evaluate relationship between parent and child.
 
-        // Get the parent transaction.
-        // const parentTx = await this.cache.get(thisVin.txid)
-        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+        // Phase 2a: Evaluate rules that apply regardless of where parent came
+        // from (cache or full node).
+        if (parentTx.tokenType !== txData.tokenType) {
+          // Corner case: Mixing NFT and Type 1 tokens.
+          endFound = false
+          return endFound
+        }
+
+        // Phase 2b: Evaluate cached pre-evaluated parents.
+        // If the parent TX is a valid SLP tx that has already been evaluated.
+        if (parentTx.isValidSlp) {
+          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+          // console.log(`parentTX TXID: ${parentTx.txid}`)
+
+          // Ensure this input is either a token or a minting baton.
+          const vinIsTokenOrBaton = !!thisVin.tokenQty || thisVin.isMintBaton
+          // console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
+
+          // Ensure this input originates from that parent.
+          // console.log(`parentTx.vout: ${JSON.stringify(parentTx.vout, null, 2)}`)
+          const parentOutMatch = parentTx.vout.filter(x => x.n === thisVin.vout && vinIsTokenOrBaton)
+          // console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
+
+          if (parentOutMatch.length) {
+            // Stop crawling DAG and use result from DB.
+            txidAry.unshift(parentTx.txid)
+
+            // Final parent found. Stop the recursive calls.
+            endFound = true
+            return endFound
+          }
+        }
+
+        // Phase 2c: Evaluate un-cached, un-evaluated parent
 
         // Not sure why or how parentTx can be undefined, but...
         if (!parentTx) return
-
-        // console.log(`parent TXID: ${parentTx.txid}`)
 
         if (parentTx.tokenId !== tokenId) {
           // Corner case. Outputs from one token used for input of a different token.
           throw new Error(
             `TokenID does not match. Given token ID ${tokenId} does not match token ID ${parentTx.tokenId} in parent TXID ${parentTx.txid}`
           )
-
-          //
-        } else if (parentTx.tokenType !== txData.tokenType) {
-          // Corner case: Mixing NFT and Type 1 tokens.
-          endFound = false
-          return endFound
 
           //
         } else if (parentTx.txid === tokenId) {
@@ -224,6 +222,8 @@ class DAG {
           // Final parent found. Stop the recursive calls.
           endFound = true
           return endFound
+
+          //
         } else {
           // chainedParentsDetected = true
 
