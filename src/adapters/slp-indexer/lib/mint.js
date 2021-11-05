@@ -55,6 +55,11 @@ class Mint {
       console.log('txidIsValid: ', txidIsValid)
       if (!txidIsValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
+
+        // Mark TX as invalid and save in database.
+        data.txData.isValidSlp = false
+        await this.txDb.put(data.txData.txid, data.txData)
+
         return
       }
 

@@ -160,17 +160,17 @@ class DAG {
 
           // If the parent TX is a valid SLP tx that has already been evaluated.
           if (parentTx.isValidSlp) {
-            // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-            // console.log(`parentTX TXID: ${parentTx.txid}`)
+            console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+            console.log(`parentTX TXID: ${parentTx.txid}`)
 
             // Ensure this input is either a token or a minting baton.
             const vinIsTokenOrBaton = !!thisVin.tokenQty || thisVin.isMintBaton
-            // console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
+            console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
 
             // Ensure this input originates from that valid parent.
             // console.log(`parentTx.vout: ${JSON.stringify(parentTx.vout, null, 2)}`)
             const parentOutMatch = parentTx.vout.filter(x => x.n === thisVin.vout && vinIsTokenOrBaton)
-            // console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
+            console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
 
             if (parentOutMatch.length) {
               // Stop crawling DAG and use result from DB.
@@ -241,7 +241,7 @@ class DAG {
       const tokenId = txData.tokenId
 
       const isValid = await this.crawlDag2(txData, tokenId, txidAry)
-      // console.log(`txidAry: ${JSON.stringify(txidAry, null, 2)}`)
+      console.log(`txidAry: ${JSON.stringify(txidAry, null, 2)}`)
 
       return isValid
     } catch (err) {

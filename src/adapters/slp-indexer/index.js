@@ -408,9 +408,12 @@ class SlpIndexer {
         console.log(`Send tx processed: ${txData.txid}`)
       }
 
-      // Mark TXID as valid and add the transaction to the database.
-      txData.isValidSlp = true
-      await txDb.put(txData.txid, txData)
+      // If a prior library did not explictely mark this TX as invalide,
+      if (txData.isValidSlp !== false) {
+        // Mark TXID as valid and add the transaction to the database.
+        txData.isValidSlp = true
+        await txDb.put(txData.txid, txData)
+      }
 
       //
     } catch (err) {

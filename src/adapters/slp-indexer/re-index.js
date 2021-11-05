@@ -120,7 +120,7 @@ class SlpReIndexer {
       )
       console.log(`slpTxIndex: ${slpTxIndex}`)
 
-      // const lastBlockIndex = txMap.findIndex(x => x.height === 543418)
+      // const lastBlockIndex = txMap.findIndex(x => x.height === 570650)
 
       // Loop through the block heights and index every block.
       // for (
@@ -422,9 +422,14 @@ class SlpReIndexer {
         console.log(`Send tx processed: ${txData.txid}`)
       }
 
-      // Mark TXID as valid and add the transaction to the database.
-      txData.isValidSlp = true
-      await txDb.put(txData.txid, txData)
+      // If a prior library did not explictely mark this TX as invalide,
+      if (txData.isValidSlp !== false) {
+        // Mark TXID as valid and add the transaction to the database.
+        txData.isValidSlp = true
+        await txDb.put(txData.txid, txData)
+      }
+
+      //
     } catch (err) {
       console.error('Error in processData(): ', err)
       throw err
