@@ -4,7 +4,7 @@
 */
 
 const BCHJS = require('@psf/bch-js')
-const bchjs = new BCHJS({ restURL: 'http://localhost:3000/v5/' })
+const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
 
 const level = require('level')
 
@@ -72,7 +72,9 @@ async function getTxs () {
 
         for (let i = 0; i < txs.length; i++) {
           const elem = txs[i]
-          console.log(`elem.txid: ${elem.txid}, elem.blockHeight: ${elem.blockHeight}`)
+          console.log(
+            `elem.txid: ${elem.txid}, elem.blockHeight: ${elem.blockHeight}`
+          )
 
           if (elem.blockHeight !== currentBlock) {
             // Save the current block data to the output array.
