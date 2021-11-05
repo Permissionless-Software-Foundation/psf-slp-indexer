@@ -138,6 +138,7 @@ class DAG {
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
         txidAry.unshift(txData.txid)
+        // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       }
 
       // let chainedParentsDetected = null
@@ -208,6 +209,14 @@ class DAG {
           throw new Error(
             `TokenID does not match. Given token ID ${tokenId} does not match token ID ${parentTx.tokenId} in parent TXID ${parentTx.txid}`
           )
+
+          //
+        } else if (parentTx.tokenType !== txData.tokenType) {
+          // Corner case: Mixing NFT and Type 1 tokens.
+          endFound = false
+          return endFound
+
+          //
         } else if (parentTx.txid === tokenId) {
           // GENESIS TX Found. End of DAG.
           txidAry.unshift(parentTx.txid)

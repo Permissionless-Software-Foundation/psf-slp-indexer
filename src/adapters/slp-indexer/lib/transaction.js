@@ -86,6 +86,7 @@ class Transaction {
       // Add token information to the tx details object.
       txDetails.tokenTxType = txTokenData.txType
       txDetails.tokenId = txTokenData.tokenId
+      txDetails.tokenType = txTokenData.tokenType
       txDetails.tokenTicker = genesisData.ticker
       txDetails.tokenName = genesisData.name
       txDetails.tokenDecimals = genesisData.decimals
