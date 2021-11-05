@@ -109,6 +109,14 @@ describe('#dag.js', () => {
         const result = await uut.validateTxid(txid)
         console.log('result: ', result)
       })
+
+      it('should pass a valid, but large DAG', async () => {
+        const txid =
+          '9d7905b5cb8901b0a90e6c704530dd20f1c22af4f5ba119fb707fc7026cf59b2'
+
+        const result = await uut.validateTxid(txid)
+        console.log('result: ', result)
+      })
     })
 
     describe('#crawlDag2', () => {

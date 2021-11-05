@@ -10,6 +10,8 @@ class DAG {
     }
     this.txDb = localConfig.txDb
     if (!this.txDb) throw new Error('TX DB required')
+
+    this.cnt = 0
   }
 
   // Given a token TXID, this function returns an array of TXIDs representing
@@ -121,10 +123,13 @@ class DAG {
   // from the database is used.
   // If the TX data is not found in the database, operation will continue like
   // crawlDag().
-  async crawlDag2 (txData, tokenId, txidAry) {
+  async crawlDag2 (txData, tokenId, txidAry, endFound = null) {
     try {
+      this.cnt++
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
-      // console.log(`crawling TXID ${txData.txid}`)
+      // console.log(`crawling TXID ${txData.txid}, cnt ${this.cnt}`)
+
+      if (endFound === true || endFound === false) return endFound
 
       // If the txid does not exist in the txidAry array, then add it.
       const txid = txData.txid
@@ -135,7 +140,7 @@ class DAG {
         txidAry.unshift(txData.txid)
       }
 
-      let chainedParentsDetected = false
+      // let chainedParentsDetected = null
 
       // Loop through each input that represents tokens.
       for (let i = 0; i < txData.vin.length; i++) {
@@ -160,24 +165,25 @@ class DAG {
 
           // If the parent TX is a valid SLP tx that has already been evaluated.
           if (parentTx.isValidSlp) {
-            console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-            console.log(`parentTX TXID: ${parentTx.txid}`)
+            // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+            // console.log(`parentTX TXID: ${parentTx.txid}`)
 
             // Ensure this input is either a token or a minting baton.
             const vinIsTokenOrBaton = !!thisVin.tokenQty || thisVin.isMintBaton
-            console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
+            // console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
 
             // Ensure this input originates from that valid parent.
             // console.log(`parentTx.vout: ${JSON.stringify(parentTx.vout, null, 2)}`)
             const parentOutMatch = parentTx.vout.filter(x => x.n === thisVin.vout && vinIsTokenOrBaton)
-            console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
+            // console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
 
             if (parentOutMatch.length) {
               // Stop crawling DAG and use result from DB.
               txidAry.unshift(parentTx.txid)
 
               // Final parent found. Stop the recursive calls.
-              return true
+              endFound = true
+              return endFound
             }
           }
         } catch (err) {
@@ -207,17 +213,21 @@ class DAG {
           txidAry.unshift(parentTx.txid)
 
           // Final parent found. Stop the recursive calls.
-          return true
+          endFound = true
+          return endFound
         } else {
           // chainedParentsDetected = true
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
-          chainedParentsDetected = await this.crawlDag2(parentTx, tokenId, txidAry)
+          endFound = await this.crawlDag2(parentTx, tokenId, txidAry, endFound)
         }
       }
 
-      return chainedParentsDetected
+      // return endFound
+      if (endFound === true) return true
+
+      return false
     } catch (err) {
       console.error('Error in crawlDag()')
       throw err
@@ -241,7 +251,7 @@ class DAG {
       const tokenId = txData.tokenId
 
       const isValid = await this.crawlDag2(txData, tokenId, txidAry)
-      console.log(`txidAry: ${JSON.stringify(txidAry, null, 2)}`)
+      // console.log(`txidAry: ${JSON.stringify(txidAry, null, 2)}`)
 
       return isValid
     } catch (err) {
