@@ -154,7 +154,7 @@ class SlpIndexer {
         )
 
         // Create a zip-file backup every 'epoch' of blocks
-        if (blockHeight % 50 === 0) {
+        if (blockHeight % 100 === 0) {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
