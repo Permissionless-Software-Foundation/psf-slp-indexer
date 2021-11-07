@@ -190,7 +190,9 @@ class DAG {
 
           // Ensure this input originates from that parent.
           // console.log(`parentTx.vout: ${JSON.stringify(parentTx.vout, null, 2)}`)
-          const parentOutMatch = parentTx.vout.filter(x => x.n === thisVin.vout && vinIsTokenOrBaton)
+          const parentOutMatch = parentTx.vout.filter(
+            (x) => x.n === thisVin.vout && vinIsTokenOrBaton
+          )
           // console.log(`parentOutMatch: ${JSON.stringify(parentOutMatch, null, 2)}`)
 
           if (parentOutMatch.length) {
@@ -201,6 +203,9 @@ class DAG {
             endFound = true
             return endFound
           }
+        } else if (parentTx.isValidSlp == false) {
+          endFound = false
+          return endFound
         }
 
         // Phase 2c: Evaluate un-cached, un-evaluated parent
