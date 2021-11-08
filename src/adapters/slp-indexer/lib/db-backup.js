@@ -91,7 +91,7 @@ class DbBackup {
       this.shell.exec(`unzip slp-indexer-${height}.zip`)
 
       // Restore the backup
-      this.shell.exec('./restore.sh')
+      this.shell.exec('./restore-auto.sh')
     } catch (err) {
       console.error('Error in unzipDb: ', err)
     }
