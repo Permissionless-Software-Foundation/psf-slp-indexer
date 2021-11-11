@@ -117,7 +117,8 @@ class SlpIndexer {
       // Loop through the block heights and index every block.
       for (
         let blockHeight = status.syncedBlockHeight;
-        blockHeight < biggestBlockHeight;
+        // blockHeight < biggestBlockHeight;
+        blockHeight < 688836;
         // blockHeight < status.syncedBlockHeight + 5;
         blockHeight++
       ) {
