@@ -49,7 +49,7 @@ class SlpIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup()
+    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({

@@ -11,7 +11,15 @@ const shell = require('shelljs')
 const dbDir = `${__dirname.toString()}/../../../../leveldb`
 
 class DbBackup {
-  constructor () {
+  constructor(localConfig = {}) {
+    const { addrDb, tokenDb, txDb, statusDb } = localConfig
+    this.addrDb = addrDb
+    this.tokenDb = tokenDb
+    this.txDb = txDb
+    this.statusDb = statusDb
+    // TODO: throw error if dbs are not passed in.
+
+    // Encapsulate dependencies
     this.shell = shell
 
     // Create the backup directory if it doesn't already exist.
@@ -19,7 +27,7 @@ class DbBackup {
   }
 
   // Backup the LevelDB.
-  backupDb () {
+  backupDb() {
     try {
       // console.log(`dbDir: ${dbDir}`)
 
@@ -42,7 +50,7 @@ class DbBackup {
     }
   }
 
-  restoreDb () {
+  restoreDb() {
     try {
       // console.log(`dbDir: ${dbDir}`)
 
@@ -62,11 +70,23 @@ class DbBackup {
   }
 
   // Create a zipped copy of the database.
-  zipDb (height) {
+  zipDb(height) {
     try {
+      // Close the databases
+      await this.addrDb.close()
+      await this.tokenDb.close()
+      await this.txDb.close()
+      await this.statusDb.close()
+
       this.shell.exec(
         `zip -r ${dbDir}/zips/slp-indexer-${height}.zip ${dbDir}/current`
       )
+
+      // Reopen the databases.
+      await this.addrDb.open()
+      await this.tokenDb.open()
+      await this.txDb.open()
+      await this.statusDb.open()
     } catch (err) {
       console.error('Error in zipDb')
       throw err
@@ -75,7 +95,7 @@ class DbBackup {
 
   // Unzip a previous backup to roll the database back.
   // Height must match a zip file.
-  unzipDb (height) {
+  unzipDb(height) {
     try {
       // Wipe the old database
       this.shell.cd(`${dbDir}/../`)
