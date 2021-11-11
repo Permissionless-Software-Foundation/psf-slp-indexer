@@ -11,7 +11,7 @@ const shell = require('shelljs')
 const dbDir = `${__dirname.toString()}/../../../../leveldb`
 
 class DbBackup {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     const { addrDb, tokenDb, txDb, statusDb } = localConfig
     this.addrDb = addrDb
     this.tokenDb = tokenDb
@@ -27,7 +27,7 @@ class DbBackup {
   }
 
   // Backup the LevelDB.
-  backupDb() {
+  async backupDb () {
     try {
       // Close the databases
       await this.addrDb.close()
@@ -62,7 +62,7 @@ class DbBackup {
     }
   }
 
-  restoreDb() {
+  async restoreDb () {
     try {
       // Close the databases
       await this.addrDb.close()
@@ -88,7 +88,7 @@ class DbBackup {
   }
 
   // Create a zipped copy of the database.
-  zipDb(height) {
+  async zipDb (height) {
     try {
       // Close the databases
       await this.addrDb.close()
@@ -113,7 +113,7 @@ class DbBackup {
 
   // Unzip a previous backup to roll the database back.
   // Height must match a zip file.
-  unzipDb(height) {
+  async unzipDb (height) {
     try {
       // Close the databases
       await this.addrDb.close()
