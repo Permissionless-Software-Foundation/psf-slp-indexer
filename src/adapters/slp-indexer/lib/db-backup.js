@@ -29,6 +29,12 @@ class DbBackup {
   // Backup the LevelDB.
   backupDb() {
     try {
+      // Close the databases
+      await this.addrDb.close()
+      await this.tokenDb.close()
+      await this.txDb.close()
+      await this.statusDb.close()
+
       // console.log(`dbDir: ${dbDir}`)
 
       // Delete the old backup
@@ -43,6 +49,12 @@ class DbBackup {
       this.shell.cp('-r', `${dbDir}/current/tokens`, `${dbDir}/backup/`)
       this.shell.cp('-r', `${dbDir}/current/txs`, `${dbDir}/backup/`)
 
+      // Reopen the databases.
+      await this.addrDb.open()
+      await this.tokenDb.open()
+      await this.txDb.open()
+      await this.statusDb.open()
+
       return true
     } catch (err) {
       console.error('Error in backupDb()')
@@ -52,6 +64,12 @@ class DbBackup {
 
   restoreDb() {
     try {
+      // Close the databases
+      await this.addrDb.close()
+      await this.tokenDb.close()
+      await this.txDb.close()
+      await this.statusDb.close()
+
       // console.log(`dbDir: ${dbDir}`)
 
       // this.shell.mv(`${dbDir}/backup/addrs`, `${dbDir}/current/`)
@@ -97,6 +115,12 @@ class DbBackup {
   // Height must match a zip file.
   unzipDb(height) {
     try {
+      // Close the databases
+      await this.addrDb.close()
+      await this.tokenDb.close()
+      await this.txDb.close()
+      await this.statusDb.close()
+
       // Wipe the old database
       this.shell.cd(`${dbDir}/../`)
       this.shell.exec('./wipe-db.sh')
