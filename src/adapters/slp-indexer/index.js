@@ -249,7 +249,7 @@ class SlpIndexer {
 
           console.log(`Error count for ${tx}: ${errObj[0].cnt}`)
 
-          const retryCnt = 35
+          const retryCnt = 100
           if (errObj[0].cnt > retryCnt) {
             await this.handleProcessFailure(blockHeight, tx, err.message)
             throw new Error(
