@@ -61,6 +61,7 @@ class FilterBlock {
         let txData = {}
         try {
           txData = await this.cache.get(txid)
+          // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
         } catch (err) {
           // Corner case to catch forged SLP Txs.
           if (
@@ -106,7 +107,8 @@ class FilterBlock {
         // console.log(`(before) independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
         // console.log(`(before) slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
 
-        // TODO: Complete the forward part of the DAG.
+        // Check if there are any txs in this block for the 'forward' part of
+        // the DAG.
         await this.forwardDag(chainedTxids, slpTxs)
         // console.log(`after forwardDag, chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`)
         // console.log(`after forwardDag, slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
@@ -135,6 +137,9 @@ class FilterBlock {
         // )
         // console.log(`(after) slpTxs: ${JSON.stringify(slpTxs, null, 2)}\n`)
       } while (slpTxs.length)
+
+      // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
+      // console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
 
       // Add any 'independent' TXIDS to the beginning of the 'sorted' TXIDs,
       // so long as they don't already exist in the sorted array.
@@ -249,7 +254,7 @@ class FilterBlock {
     }
   }
 
-  // checkForParent(tx, blockheight) expects a transaction and blockhight value
+  // checkForParent(tx, blockheight, chainedTxids) expects a transaction and blockhight value
   // as input. chainedTxids should be an empty array, which will be filled in
   // with the list of parent TXIDs, if the txid has parents.
   //
@@ -279,8 +284,12 @@ class FilterBlock {
         const thisVin = txData.vin[i]
         // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
-        // If the input is not colored as a token, then skip it.
-        if (!thisVin.tokenQty) continue
+        // If the input is not colored as a token, or does not represent a
+        // minting baton, then skip it.
+        if (!thisVin.tokenQty && !thisVin.isMintBaton) {
+          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+          continue
+        }
 
         // Get the parent transaction.
         let parentTx = {}
@@ -318,7 +327,7 @@ class FilterBlock {
 
       return chainedParentsDetected
     } catch (err) {
-      console.error('Error in checkForParent()')
+      console.error('Error in checkForParent(). txdata: ', txData)
       throw err
     }
   }

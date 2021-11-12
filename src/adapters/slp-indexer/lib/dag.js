@@ -203,7 +203,7 @@ class DAG {
             endFound = true
             return endFound
           }
-        } else if (parentTx.isValidSlp == false) {
+        } else if (parentTx.isValidSlp === false) {
           endFound = false
           return endFound
         }
