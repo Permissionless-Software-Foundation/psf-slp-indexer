@@ -2,7 +2,7 @@
   Integration tests for the Cache library
 */
 
-// const assert = require('chai').assert
+const assert = require('chai').assert
 
 const BCHJS = require('@psf/bch-js')
 const bchjs = new BCHJS()
@@ -41,6 +41,46 @@ describe('#transaction.js', () => {
   })
 
   describe('#get', () => {
+    it('should get details about a SLP SEND tx with SEND input', async () => {
+      const txid =
+        '266844d53e46bbd7dd37134688dffea6e54d944edff27a0add63dd0908839bc1'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that there are stanardized properties.
+      assert.property(result, 'txid')
+      assert.property(result, 'vin')
+      assert.property(result, 'vout')
+      assert.property(result.vout[0], 'value')
+      assert.property(result.vout[1].scriptPubKey, 'addresses')
+
+      // Assert outputs have expected properties
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[1].tokenQtyStr, '1')
+      assert.equal(result.vout[2].tokenQty, 998833)
+      assert.equal(result.vout[2].tokenQtyStr, '998833')
+      assert.equal(result.vout[3].tokenQty, null)
+      assert.equal(result.vout[3].tokenQtyStr, null)
+
+      // Assert that inputs have expected properties
+      assert.equal(result.vin[0].tokenQtyStr, '998834')
+      assert.equal(result.vin[0].tokenQty, 998834)
+      assert.equal(
+        result.vin[0].tokenId,
+        '497291b8a1dfe69c8daea50677a3d31a5ef0e9484d8bebb610dac64bbc202fb7'
+      )
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+
+      // Assert blockheight is added
+      assert.equal(result.blockheight, 603424)
+      assert.equal(result.isSlpTx, true)
+    })
+
     // This is a problematic TX.
     // TX b1091bb9d5821b84dd65be21158d905bcf2d799bf096b81a5c8a74d1c6e2e9ef
     // Has an input TX: 16a40eca8bf6a1d4b913820718db2361686a9371e4b4ad82998c0566cf7a3052
