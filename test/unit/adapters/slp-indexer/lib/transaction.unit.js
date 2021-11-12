@@ -286,6 +286,64 @@ describe('#Transaction', () => {
     })
   })
 
+  describe('#getTxData', () => {
+    it('should return tx data with input addresses', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.rpc, 'getRawTransaction')
+        .resolves(mockData.nonSlpTxDetails)
+      sandbox.stub(uut, '_getInputAddrs').resolves([
+        {
+          vin: 0,
+          address: 'bitcoincash:qr2jtznnkhy0jnynn4l7jmmce6teqcyrhc8herhlgt'
+        }
+      ])
+
+      const txid =
+        '05f7d4a4e25f53d63a360434eb54f221abf159112b7fffc91da1072a079cded3'
+
+      const result = await uut.getTxData(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.property(result.vin[0], 'address')
+    })
+
+    it('should throw an error for a non-txid input', async () => {
+      try {
+        await uut.getTxData(1234)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+
+        assert.include(
+          err.message,
+          'Input to raw-transaction.js/getTxData() must be a string containg a TXID.'
+        )
+      }
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        // Force a network error.
+        sandbox
+          .stub(uut.rpc, 'getRawTransaction')
+          .rejects(new Error('test error'))
+
+        const txid =
+          '05f7d4a4e25f53d63a360434eb54f221abf159112b7fffc91da1072a079cded3'
+
+        await uut.getTxData(txid)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+
+        assert.equal(err.message, 'test error')
+      }
+    })
+  })
+
   // describe('#get', () => {
   //   it('should throw an error if txid is not specified', async () => {
   //     try {
