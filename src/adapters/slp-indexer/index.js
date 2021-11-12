@@ -117,8 +117,8 @@ class SlpIndexer {
       // Loop through the block heights and index every block.
       for (
         let blockHeight = status.syncedBlockHeight;
-        // blockHeight < biggestBlockHeight;
-        blockHeight < 688836;
+        blockHeight < biggestBlockHeight;
+        // blockHeight < 688836;
         // blockHeight < status.syncedBlockHeight + 5;
         blockHeight++
       ) {
@@ -155,7 +155,7 @@ class SlpIndexer {
         )
 
         // Create a zip-file backup every 'epoch' of blocks
-        if (blockHeight % 50 === 0) {
+        if (blockHeight % 200 === 0) {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
