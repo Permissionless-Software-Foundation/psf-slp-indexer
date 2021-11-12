@@ -528,15 +528,6 @@ class Transaction {
     } catch (err) {
       console.error('Error in transaction.js/_getInputAddrs()')
       throw err
-
-      // if (error.error) throw new Error(error.error)
-      //
-      // // This case handles rate limit errors.
-      // if (error.response && error.response.data && error.response.data.error) {
-      //   throw new Error(error.response.data.error)
-      // } else if (error.response && error.response.data) {
-      //   throw error.response.data
-      // } else throw error
     }
   }
 }

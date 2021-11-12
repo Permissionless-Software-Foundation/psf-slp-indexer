@@ -252,6 +252,40 @@ describe('#Transaction', () => {
     })
   })
 
+  describe('#_getInputAddrs', () => {
+    it('should return an array of input addresses', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.rpc, 'getRawTransaction')
+        .resolves(mockData.mockParentTx1)
+
+      const result = await uut._getInputAddrs(mockData.mockTxIn)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.isArray(result)
+      assert.equal(result.length, 1)
+      assert.property(result[0], 'vin')
+      assert.property(result[0], 'address')
+    })
+
+    it('should catch and throw and error', async () => {
+      try {
+        // Force an error
+        sandbox
+          .stub(uut.rpc, 'getRawTransaction')
+          .rejects(new Error('test error'))
+
+        await uut._getInputAddrs(mockData.mockTxIn)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+
+        assert.equal(err.message, 'test error')
+      }
+    })
+  })
+
   // describe('#get', () => {
   //   it('should throw an error if txid is not specified', async () => {
   //     try {
