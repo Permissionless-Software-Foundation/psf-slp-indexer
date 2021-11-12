@@ -32,7 +32,7 @@ class Controllers {
     // Attach the REST controllers to the Koa app.
     // this.attachRESTControllers(app)
 
-    this.attachRPCControllers()
+    // this.attachRPCControllers()
   }
 
   // Top-level function for this library.

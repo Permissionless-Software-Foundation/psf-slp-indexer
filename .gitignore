@@ -65,5 +65,6 @@ system-user-*.json
 orbitdb
 ipfsdata
 .ipfsdata
+leveldb/
 
 !README.md
