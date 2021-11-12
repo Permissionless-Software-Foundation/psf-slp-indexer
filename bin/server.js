@@ -25,11 +25,11 @@ const AdminLib = require('../src/adapters/admin')
 const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
 const { wlogger } = require('../src/adapters/wlogger')
 const SlpIndexer = require('../src/adapters/slp-indexer')
-const slpIndexer = new SlpIndexer()
 
 class Server {
   constructor () {
     this.adminLib = new AdminLib()
+    this.slpIndexer = new SlpIndexer()
   }
 
   async startServer () {
@@ -104,7 +104,7 @@ class Server {
       // }, 60000 * 60 * 2) // 2 hours
 
       // Start the SLP Indexer
-      slpIndexer.start()
+      this.slpIndexer.start()
 
       return app
     } catch (err) {

@@ -7,6 +7,7 @@
 // Public npm libraries
 const assert = require('chai').assert
 const axios = require('axios').default
+const sinon = require('sinon')
 
 // Local support libraries
 const config = require('../../../config')
@@ -21,8 +22,15 @@ const context = {}
 const LOCALHOST = `http://localhost:${config.port}`
 
 describe('Auth', () => {
+  let sandbox
+
   before(async () => {
+    sandbox = sinon.createSandbox()
+
     const app = new Server()
+
+    // Prevent indexer from starting.
+    sandbox.stub(app.slpIndexer, 'start').resolves({})
 
     // This should be the first instruction. It starts the REST API server.
     await app.startServer()
@@ -47,6 +55,8 @@ describe('Auth', () => {
     context.user = testUser.user
     context.token = testUser.token
   })
+
+  afterEach(() => sandbox.restore())
 
   describe('POST /auth', () => {
     it('should throw 401 if credentials are incorrect', async () => {
