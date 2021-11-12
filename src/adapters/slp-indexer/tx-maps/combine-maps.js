@@ -3,8 +3,8 @@
   them.
 */
 
-const map1 = require('./slp-tx-570631-v2.json')
-const map2 = require('./slp-tx-601455-v1.json')
+const map1 = require('./slp-tx-map-601455.json')
+const map2 = require('./tx-map.json')
 
 const fs = require('fs')
 
