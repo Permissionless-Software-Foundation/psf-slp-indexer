@@ -5,7 +5,7 @@
 */
 
 // Load the TX map of SLP transactions in the blockchain
-const txMap = require('./tx-maps/slp-tx-601455-v1.json')
+const txMap = require('./tx-maps/slp-tx-map-691599.json')
 
 // Public npm libraries.
 const level = require('level')
@@ -168,7 +168,7 @@ class SlpReIndexer {
         )
 
         // Create a zip-file backup every 'epoch' of blocks
-        if (blockHeight % 50 === 0) {
+        if (blockHeight % 200 === 0) {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
@@ -324,7 +324,7 @@ class SlpReIndexer {
       console.log(`targetBlockHeight: ${targetBlockHeight}`)
 
       // Round the hight to the nearest 50
-      const rollbackHeight = Math.floor(targetBlockHeight / 50) * 50
+      const rollbackHeight = Math.floor(targetBlockHeight / 200) * 200
       console.log(
         `Rolling database back to this block height: ${rollbackHeight}`
       )
