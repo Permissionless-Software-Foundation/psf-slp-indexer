@@ -9,10 +9,6 @@ const slpParser = require('slp-parser')
 // Local libraries
 const RPC = require('./rpc')
 
-// const RawTransaction = require('./raw-transactions')
-// const SlpUtils = require('./slp/utils')
-// const Blockchain = require('./blockchain')
-
 class Transaction {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
@@ -360,6 +356,7 @@ class Transaction {
    *
    */
   // Reimplementation of decodeOpReturn() using slp-parser.
+  // Originally copied from bch-js slp-utils.js lib.
   async decodeOpReturn (txid) {
     // Validate the txid input.
     if (!txid || txid === '' || typeof txid !== 'string') {
@@ -371,6 +368,7 @@ class Transaction {
     if (cachedVal) return cachedVal
 
     const txDetails = await this.rpc.getRawTransaction(txid)
+    // console.log('txDetails: ', txDetails)
 
     // SLP spec expects OP_RETURN to be the first output of the transaction.
     const opReturn = txDetails.vout[0].scriptPubKey.hex
@@ -473,15 +471,6 @@ class Transaction {
     } catch (err) {
       console.error('Error in transaction.js/getTxData()')
       throw err
-
-      // if (error.error) throw new Error(error.error)
-      //
-      // // This case handles rate limit errors.
-      // if (error.response && error.response.data && error.response.data.error) {
-      //   throw new Error(error.response.data.error)
-      // } else if (error.response && error.response.data) {
-      //   throw error.response.data
-      // } else throw error
     }
   }
 
@@ -530,15 +519,6 @@ class Transaction {
     } catch (err) {
       console.error('Error in transaction.js/_getInputAddrs()')
       throw err
-
-      // if (error.error) throw new Error(error.error)
-      //
-      // // This case handles rate limit errors.
-      // if (error.response && error.response.data && error.response.data.error) {
-      //   throw new Error(error.response.data.error)
-      // } else if (error.response && error.response.data) {
-      //   throw error.response.data
-      // } else throw error
     }
   }
 }

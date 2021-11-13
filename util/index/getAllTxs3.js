@@ -3,8 +3,7 @@
   block height.
 */
 
-// const BCHJS = require('@psf/bch-js')
-// const bchjs = new BCHJS({ restURL: 'http://localhost:3000/v5/' })
+const fs = require('fs')
 
 const level = require('level')
 
@@ -127,7 +126,9 @@ async function getTxs () {
         // Push the final element
         outAry.push(currentObj)
 
-        console.log(`${JSON.stringify(outAry, null, 2)}`)
+        const outJsonStr = JSON.stringify(outAry, null, 2)
+        console.log(`${outJsonStr}`)
+        fs.writeFileSync('./tx-map.json', outJsonStr)
       } catch (err) {
         console.error(err)
       }

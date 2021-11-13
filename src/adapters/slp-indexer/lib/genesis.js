@@ -71,7 +71,14 @@ class Genesis {
     try {
       const { slpData, txData, blockHeight } = data
 
-      const recvrAddr = txData.vout[1].scriptPubKey.addresses[0]
+      let recvrAddr
+      try {
+        recvrAddr = txData.vout[1].scriptPubKey.addresses[0]
+      } catch (err) {
+        // Corner case in tx 8a2aa5bb691a0ba15cce0d2a5b4aade6f43d39e10dc0a10d89dd6e7938a10c63
+        // Where second output was a second OP_RETURN
+        return true
+      }
 
       // Update/add reciever address.
       let addr

@@ -17,7 +17,7 @@
     "reindex": "node src/adapters/slp-indexer/re-index.js"
   },
   "author": "Chris Troutner <chris.troutner@gmail.com>",
-  "license": "MIT",
+  "license": "GPL-2.0",
   "apidoc": {
     "title": "psf-slp-indexer",
     "url": "localhost:5000"
