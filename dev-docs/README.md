@@ -1,4 +1,11 @@
-# Indexer Files
+# Developer Documentation
+
+This indexer started as a fork of [ipfs-service-provider](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider). That repository provides a Koa REST API and JSON RPC over IPFS. The indexing logic was added in the `src/adapters/slp-indexer`.
+
+The code in this repository follows the [Clean Architecture](https://troutsblog.com/blog/clean-architecture) design pattern. The app is built on the principles of [TDD](https://tanzu.vmware.com/content/blog/why-tdd), using [these test design patterns](https://youtu.be/lE3RYnchHps).
+
+
+## Indexer Libraries
 
 This document lays out the file structure of the SLP indexer. It gives a brief overview of what each file does, and how they fit together. This coveres the files in the `src/adapters/slp-indexer/lib/` folder.
 
