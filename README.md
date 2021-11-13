@@ -10,8 +10,8 @@ Current status: **Alpha**
 
 This project is using conventional development milestones:
 - Alpha = Under active development. Bugs are expected, things are expected to break.
-- Beta = Some bugs still exist, but code is mature for other professional developers to play with.
-- Production = Code has been heavily tested and code commits have slowed in frequency. App ready for normal operators.
+- Beta = Some bugs still exist, but code is mature enough for other professional developers to play with and contribute to.
+- Production = Code has been heavily tested and code commits have slowed in frequency. App is ready for normal operators.
 
 Regular status updates will be reported at the [bi-weekly PSF Technical Steering Committee meetings](https://github.com/Permissionless-Software-Foundation/TSC/issues). Updates will also be reported in [this Telegram channel](https://t.me/psf_slp).
 
@@ -21,9 +21,10 @@ Regular status updates will be reported at the [bi-weekly PSF Technical Steering
 
 - Written in [standard JavaScript](https://www.npmjs.com/package/standard), using the [Clean Architecture](https://troutsblog.com/blog/clean-architecture) design pattern.
 - 100% unit test coverage. This allows for operational reliability and easy code collaboration.
-- [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) Licensed to encourage wide adoption and unrestricted use throughout the BCH ecosystem.
+- [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) Licensed to encourage wide adoption and free use throughout the BCH ecosystem.
 - [LevelDB](https://github.com/google/leveldb) used for fast, efficient indexing and querying.
 - Drastically reduced memory usage, compared to SLPDB.
+- Fast indexing using transaction maps.
 - Docker container for easy deployment and horizontal scaling.
 
 ## Requirements
