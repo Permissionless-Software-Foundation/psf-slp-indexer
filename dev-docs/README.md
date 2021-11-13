@@ -1,6 +1,6 @@
 # Developer Documentation
 
-This indexer started as a fork of [ipfs-service-provider](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider). That repository provides a Koa REST API and JSON RPC over IPFS. The indexing logic was added in the `src/adapters/slp-indexer`.
+This indexer started as a fork of [ipfs-service-provider](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider). That repository provides two interfaces for communication: 1) a Koa REST API and 2) [JSON RPC over IPFS](https://troutsblog.com/blog/ipfs-service-providers). The SLP indexing logic was added in the `src/adapters/slp-indexer` directory.
 
 The code in this repository follows the [Clean Architecture](https://troutsblog.com/blog/clean-architecture) design pattern. The app is built on the principles of [TDD](https://tanzu.vmware.com/content/blog/why-tdd), using [these test design patterns](https://youtu.be/lE3RYnchHps).
 
