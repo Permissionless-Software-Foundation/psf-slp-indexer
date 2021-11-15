@@ -67,143 +67,179 @@ describe('#dag.js', () => {
   })
 
   describe('#crawlDag2()', () => {
-    it('should catch and throw errors', async () => {
+    it('should throw an error if txid is not included', async () => {
       try {
         await uut.crawlDag2()
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'txid required to crawl DAG')
+      }
+    })
+
+    it('should throw an error if tokenId is not included', async () => {
+      try {
+        const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+
+        await uut.crawlDag2(txid)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'tokenId required to crawl DAG')
+      }
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.cache, 'get').rejects(new Error('test error'))
+
+        const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+        const tokenId =
+            '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+
+        await uut.crawlDag2(txid, tokenId)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test error')
       }
     })
 
     // Happy path - simple two-tx DAG.
     it('should return true for valid SEND', async () => {
-      // Mock dependencies
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
-
-      const txidAry = []
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
 
-      const result = await uut.crawlDag2(txData, tokenId, txidAry)
+      const result = await uut.crawlDag2(txid, tokenId)
       // console.log('result: ', result)
-      // console.log('txidAry: ', txidAry)
 
-      assert.equal(result, true)
-      assert.equal(txidAry.length, 2)
+      assert.equal(result.isValid, true)
+      assert.equal(result.dag.length, 2)
     })
 
     it('should return false if tx has no inputs', async () => {
-      const txidAry = []
+      // Force token quantity to be zero.
+      mockData.slpSendTxData01.vin[0].tokenQty = 0
+
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpSendTxData01)
+        .onCall(1).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
 
-      // Force token quantity to be zero.
-      txData.vin[0].tokenQty = 0
-
-      const result = await uut.crawlDag2(txData, tokenId, txidAry)
+      const result = await uut.crawlDag2(txid, tokenId)
       // console.log('result: ', result)
-      // console.log('txidAry: ', txidAry)
 
-      assert.equal(result, false)
-      assert.equal(txidAry.length, 1)
+      assert.equal(result.isValid, false)
+      assert.equal(result.dag.length, 1)
     })
 
     it('should return true for a mint baton', async () => {
-      // Mock dependencies
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
-
-      const txidAry = []
-      const tokenId =
-        '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
-
       // Force token quantity to be zero
-      txData.vin[0].tokenQty = 0
+      mockData.slpSendTxData01.vin[0].tokenQty = 0
 
       // Force input to have mint baton
-      txData.vin[0].isMintBaton = true
+      mockData.slpSendTxData01.vin[0].isMintBaton = true
 
-      const result = await uut.crawlDag2(txData, tokenId, txidAry)
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpSendTxData01)
+        .onCall(1).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+      const tokenId =
+        '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+
+      const result = await uut.crawlDag2(txid, tokenId)
       // console.log('result: ', result)
-      // console.log('txidAry: ', txidAry)
 
-      assert.equal(result, true)
-      assert.equal(txidAry.length, 2)
+      assert.equal(result.isValid, true)
+      assert.equal(result.dag.length, 2)
     })
 
     it('should return false if parent has different token type', async () => {
       // Force parent TX to have a different token type.
       mockData.slpGenesisTxData01.tokenType = 45
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
 
-      const txidAry = []
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpSendTxData01)
+        .onCall(1).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
 
-      const result = await uut.crawlDag2(txData, tokenId, txidAry)
+      const result = await uut.crawlDag2(txid, tokenId)
       // console.log('result: ', result)
-      // console.log('txidAry: ', txidAry)
 
-      assert.equal(result, false)
-      assert.equal(txidAry.length, 1)
+      assert.equal(result.isValid, false)
+      assert.equal(result.dag.length, 1)
     })
 
     // Simulates parent tx being marked isValid=true from the DB.
     it('should return true for cached valid parent', async () => {
       // Force parent tx to be valid.
       mockData.slpGenesisTxData01.isValidSlp = true
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
 
-      const txidAry = []
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpSendTxData01)
+        .onCall(1).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
 
-      const result = await uut.crawlDag2(txData, tokenId, txidAry)
+      const result = await uut.crawlDag2(txid, tokenId)
       // console.log('result: ', result)
-      // console.log('txidAry: ', txidAry)
 
-      assert.equal(result, true)
-      assert.equal(txidAry.length, 2)
+      assert.equal(result.isValid, true)
+      assert.equal(result.dag.length, 2)
     })
 
     // Simulates parent tx being marked isValid=false from the DB.
     it('should return false for cached invalid parent', async () => {
       // Force parent tx to be valid.
       mockData.slpGenesisTxData01.isValidSlp = false
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
 
-      const txidAry = []
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpSendTxData01)
+        .onCall(1).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
 
-      const result = await uut.crawlDag2(txData, tokenId, txidAry)
+      const result = await uut.crawlDag2(txid, tokenId)
       // console.log('result: ', result)
-      // console.log('txidAry: ', txidAry)
 
-      assert.equal(result, false)
-      assert.equal(txidAry.length, 1)
+      assert.equal(result.isValid, false)
+      assert.equal(result.dag.length, 1)
     })
 
     it('should throw an error if parent has different tokenId', async () => {
       // Force parent to have different token ID
       mockData.slpGenesisTxData01.tokenId =
         'aaaaae35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
 
-      const txidAry = []
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpSendTxData01)
+        .onCall(1).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-      const txData = mockData.slpSendTxData01
 
       try {
-        await uut.crawlDag2(txData, tokenId, txidAry)
+        await uut.crawlDag2(txid, tokenId)
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -213,12 +249,45 @@ describe('#dag.js', () => {
   })
 
   describe('#validateTxid', () => {
-    it('should return true for valid SEND tx', async () => {
+    it('if crawlDag() returns true, this should return true', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get').resolves(mockData.slpSendTxData01)
+      sandbox.stub(uut, 'crawlDag2').resolves(true)
+
       const txid =
         '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
 
       const result = await uut.validateTxid(txid)
-      console.log('result: ', result)
+      // console.log('result: ', result)
+
+      assert.equal(result, true)
     })
+
+    // it('if crawlDag() returns false, this should return true', async () => {
+    //   // Mock dependencies
+    //   sandbox.stub(uut.cache, 'get').resolves(mockData.slpSendTxData01)
+    //   sandbox.stub(uut, 'crawlDag2').resolves(false)
+    //
+    //   const txid =
+    //     '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+    //
+    //   const result = await uut.validateTxid(txid)
+    //   // console.log('result: ', result)
+    //
+    //   assert.equal(result, false)
+    // })
   })
+
+  // describe('#getDag', () => {
+  //   it('should get DAG for 2-tx chain', async () => {
+  //     // Mock dependencies
+  //     sandbox.stub(uut.cache, 'get').resolves(mockData.slpSendTxData01)
+  //
+  //     const txid =
+  //       '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+  //
+  //     const result = await uut.getDag(txid)
+  //     console.log('result: ', result)
+  //   })
+  // })
 })

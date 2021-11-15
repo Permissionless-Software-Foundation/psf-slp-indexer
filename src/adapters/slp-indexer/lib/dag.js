@@ -121,15 +121,34 @@ class DAG {
   // from the database is used.
   // If the TX data is not found in the database, operation will continue like
   // crawlDag().
-  async crawlDag2 (txData, tokenId, txidAry, endFound = null) {
+  async crawlDag2 (txid, tokenId, txidAry = [], endFound = null) {
     try {
+      if (!txid) {
+        throw new Error('txid required to crawl DAG')
+      }
+      if (!tokenId) {
+        throw new Error('tokenId required to crawl DAG')
+      }
+
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       // console.log(`crawling TXID ${txData.txid}, cnt ${this.cnt}`)
 
-      if (endFound === true || endFound === false) return endFound
+      // Set default value for the output object.
+      const outObj = {
+        isValid: false,
+        dag: []
+      }
+
+      const txData = await this.cache.get(txid)
+
+      // Exit immediately if endFound achieves true or false status.
+      if (endFound === true || endFound === false) {
+        outObj.isValid = endFound
+        outObj.dag = txidAry
+        return outObj
+      }
 
       // If the txid does not exist in the txidAry array, then add it.
-      const txid = txData.txid
       const isAlreadyAdded = txidAry.filter((x) => x === txid)
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
@@ -172,7 +191,8 @@ class DAG {
         if (parentTx.tokenType !== txData.tokenType) {
           // Corner case: Mixing NFT and Type 1 tokens.
           endFound = false
-          return endFound
+          outObj.dag = txidAry
+          return outObj
         }
 
         // Phase 2b: Evaluate cached pre-evaluated parents.
@@ -198,17 +218,20 @@ class DAG {
 
             // Final parent found. Stop the recursive calls.
             endFound = true
-            return endFound
+            outObj.isValid = true
+            outObj.dag = txidAry
+            return outObj
           }
         } else if (parentTx.isValidSlp === false) {
           endFound = false
-          return endFound
+          outObj.dag = txidAry
+          return outObj
         }
 
         // Phase 2c: Evaluate un-cached, un-evaluated parent
 
         // Not sure why or how parentTx can be undefined, but...
-        if (!parentTx) return
+        // if (!parentTx) return
 
         if (parentTx.tokenId !== tokenId) {
           // Corner case. Outputs from one token used for input of a different token.
@@ -223,7 +246,9 @@ class DAG {
 
           // Final parent found. Stop the recursive calls.
           endFound = true
-          return endFound
+          outObj.isValid = true
+          outObj.dag = txidAry
+          return outObj
 
           //
         } else {
@@ -231,14 +256,19 @@ class DAG {
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
-          endFound = await this.crawlDag2(parentTx, tokenId, txidAry, endFound)
+          const inObj = await this.crawlDag2(parentTx.txid, tokenId, txidAry, endFound)
+          endFound = inObj.isValid
         }
       }
 
-      // return endFound
-      if (endFound === true) return true
+      outObj.dag = txidAry
 
-      return false
+      if (endFound === true) {
+        outObj.isValid = true
+        return outObj
+      }
+
+      return outObj
     } catch (err) {
       console.error('Error in crawlDag()')
       throw err
@@ -261,7 +291,7 @@ class DAG {
 
       const tokenId = txData.tokenId
 
-      const isValid = await this.crawlDag2(txData, tokenId, txidAry)
+      const { isValid } = await this.crawlDag2(txData, tokenId, txidAry)
       // console.log(`txidAry: ${JSON.stringify(txidAry, null, 2)}`)
 
       return isValid
