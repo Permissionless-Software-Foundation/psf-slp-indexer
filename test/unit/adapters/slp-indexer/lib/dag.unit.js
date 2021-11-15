@@ -21,7 +21,9 @@ describe('#dag.js', () => {
 
   // Mock txDb and force mock to return error.
   const txDb = new MockLevel()
-  txDb.get = () => { throw new Error('not in db') }
+  txDb.get = () => {
+    throw new Error('not in db')
+  }
 
   const cache = new Cache({ bchjs, txDb })
 
@@ -45,7 +47,10 @@ describe('#dag.js', () => {
         assert.fail('Unexpected code path')
         console.log(uut)
       } catch (err) {
-        assert.equal(err.message, 'instance of cache required when instantiating DAG')
+        assert.equal(
+          err.message,
+          'instance of cache required when instantiating DAG'
+        )
       }
     })
 
@@ -188,7 +193,8 @@ describe('#dag.js', () => {
 
     it('should throw an error if parent has different tokenId', async () => {
       // Force parent to have different token ID
-      mockData.slpGenesisTxData01.tokenId = 'aaaaae35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+      mockData.slpGenesisTxData01.tokenId =
+        'aaaaae35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
       sandbox.stub(uut.cache, 'get').resolves(mockData.slpGenesisTxData01)
 
       const txidAry = []
@@ -203,6 +209,16 @@ describe('#dag.js', () => {
       } catch (err) {
         assert.include(err.message, 'TokenID does not match')
       }
+    })
+  })
+
+  describe('#validateTxid', () => {
+    it('should return true for valid SEND tx', async () => {
+      const txid =
+        '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+
+      const result = await uut.validateTxid(txid)
+      console.log('result: ', result)
     })
   })
 })
