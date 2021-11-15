@@ -10,8 +10,6 @@ class DAG {
     }
     this.txDb = localConfig.txDb
     if (!this.txDb) throw new Error('TX DB required')
-
-    this.cnt = 0
   }
 
   // Given a token TXID, this function returns an array of TXIDs representing
@@ -125,7 +123,6 @@ class DAG {
   // crawlDag().
   async crawlDag2 (txData, tokenId, txidAry, endFound = null) {
     try {
-      this.cnt++
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       // console.log(`crawling TXID ${txData.txid}, cnt ${this.cnt}`)
 
@@ -133,7 +130,6 @@ class DAG {
 
       // If the txid does not exist in the txidAry array, then add it.
       const txid = txData.txid
-      // console.log('txid: ', txid)
       const isAlreadyAdded = txidAry.filter((x) => x === txid)
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
@@ -166,6 +162,7 @@ class DAG {
         } catch (err) {
           // If DB lookup failed, retrieve the parent TX from the cache.
           parentTx = await this.cache.get(thisVin.txid)
+          // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
         }
 
         // Phase 2: Evaluate relationship between parent and child.
