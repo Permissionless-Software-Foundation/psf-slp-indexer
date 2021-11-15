@@ -13,7 +13,7 @@ const BigNumber = require('bignumber.js')
 
 // Local libraries
 const IndexerUtils = require('./utils')
-const SlpValidate = require('./slp-validate')
+// const SlpValidate = require('./slp-validate')
 const DAG = require('./dag')
 
 class Mint {
@@ -32,7 +32,7 @@ class Mint {
     this.txDb = localConfig.txDb
 
     this.util = new IndexerUtils()
-    this.slpValidate = new SlpValidate()
+    // this.slpValidate = new SlpValidate()
     this.dag = new DAG(localConfig)
   }
 
@@ -55,7 +55,7 @@ class Mint {
 
       const { isValid } = await this.dag.crawlDag2(txid, tokenId)
       // const txidIsValid = await this.dag.validateTxid(txid)
-      console.log('txidIsValid: ', isValid)
+      console.log('isValid: ', isValid)
       if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
