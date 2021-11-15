@@ -46,14 +46,17 @@ class Mint {
 
       // Validate the TX against the SLP DAG.
       const txid = data.txData.txid
+      const tokenId = data.txData.tokenId
       // const txidIsValid = await this.slpValidate.validateTxid(txid)
       // if (!txidIsValid) {
       //   console.log(`TXID ${txid} failed DAG validation. Skipping.`)
       //   return
       // }
-      const txidIsValid = await this.dag.validateTxid(txid)
-      console.log('txidIsValid: ', txidIsValid)
-      if (!txidIsValid) {
+
+      const { isValid } = await this.dag.crawlDag2(txid, tokenId)
+      // const txidIsValid = await this.dag.validateTxid(txid)
+      console.log('txidIsValid: ', isValid)
+      if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
         // Mark TX as invalid and save in database.
