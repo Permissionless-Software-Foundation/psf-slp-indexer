@@ -4,6 +4,10 @@
   transactions in the blockchain.
 */
 
+// Global constants
+const EPOCH = 1000 // blocks between backups
+const RETRY_CNT = 100 // Number of retries before exiting the indexer
+
 // Load the TX map of SLP transactions in the blockchain
 const txMap = require('./tx-maps/tx-map.json')
 
@@ -170,7 +174,7 @@ class SlpReIndexer {
         )
 
         // Create a zip-file backup every 'epoch' of blocks
-        if (blockHeight % 200 === 0) {
+        if (blockHeight % EPOCH === 0) {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
@@ -190,9 +194,9 @@ class SlpReIndexer {
         if (!slpTxs.length) continue
 
         // Backup the database
-        if (blockHeight % 5 === 0) {
-          this.dbBackup.backupDb()
-        }
+        // if (blockHeight % 5 === 0) {
+        //   this.dbBackup.backupDb()
+        // }
 
         // const testAddr =
         //   'bitcoincash:qpq5uuctyf6qhh5nlsdxx8guhf7lxhegnsr0lwx4ev'
@@ -210,8 +214,8 @@ class SlpReIndexer {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
 
-      console.log('Restoring backup of database.')
-      this.dbBackup.restoreDb()
+      // console.log('Restoring backup of database.')
+      // this.dbBackup.restoreDb()
 
       // For debugging purposes, exit if there is an error.
       process.exit(0)
@@ -265,7 +269,7 @@ class SlpReIndexer {
 
           console.log(`Error count for ${tx}: ${errObj[0].cnt}`)
 
-          const retryCnt = 15
+          const retryCnt = RETRY_CNT
           if (errObj[0].cnt > retryCnt) {
             await this.handleProcessFailure(blockHeight, tx, err.message)
             throw new Error(
@@ -326,7 +330,7 @@ class SlpReIndexer {
       console.log(`targetBlockHeight: ${targetBlockHeight}`)
 
       // Round the hight to the nearest 50
-      const rollbackHeight = Math.floor(targetBlockHeight / 200) * 200
+      const rollbackHeight = Math.floor(targetBlockHeight / EPOCH) * EPOCH
       console.log(
         `Rolling database back to this block height: ${rollbackHeight}`
       )
