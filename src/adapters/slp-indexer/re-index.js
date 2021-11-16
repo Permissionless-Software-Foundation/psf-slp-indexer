@@ -5,7 +5,7 @@
 */
 
 // Load the TX map of SLP transactions in the blockchain
-const txMap = require('./tx-maps/slp-tx-map-691599.json')
+const txMap = require('./tx-maps/tx-map.json')
 
 // Public npm libraries.
 const level = require('level')
