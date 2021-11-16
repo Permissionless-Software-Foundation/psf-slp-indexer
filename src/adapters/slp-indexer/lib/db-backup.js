@@ -101,6 +101,7 @@ class DbBackup {
       )
 
       // Reopen the databases.
+      console.log('Reopening database')
       await this.addrDb.open()
       await this.tokenDb.open()
       await this.txDb.open()
