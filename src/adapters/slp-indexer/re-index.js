@@ -24,10 +24,12 @@ const Mint = require('./lib/mint')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
-  valueEncoding: 'json'
+  valueEncoding: 'json',
+  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
 })
 const txDb = level(`${__dirname.toString()}/../../../leveldb/current/txs`, {
-  valueEncoding: 'json'
+  valueEncoding: 'json',
+  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
 })
 const tokenDb = level(
   `${__dirname.toString()}/../../../leveldb/current/tokens`,
@@ -48,7 +50,7 @@ class SlpReIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup()
+    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
