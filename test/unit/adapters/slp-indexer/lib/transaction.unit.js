@@ -8,7 +8,6 @@ const sinon = require('sinon')
 const cloneDeep = require('lodash.clonedeep')
 
 const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-
 const mockDataLib = require('../../../mocks/transaction-mock.js')
 
 describe('#Transaction', () => {
@@ -730,6 +729,44 @@ describe('#Transaction', () => {
       assert.equal(result.isSlpTx, true)
     })
 
+    it('should throw an error for unknown tx type', async () => {
+      try {
+      // Mock dependencies
+        sandbox
+          .stub(uut, 'getTxData')
+          .resolves(mockData.genesisTestInputTx02)
+        sandbox
+          .stub(uut.rpc, 'getBlockHeader')
+          .resolves({ height: 571212 })
+
+        // Force token type to be an unknown type
+        mockData.genesisTestOpReturn03.txType = 'UNKNOWN'
+        sandbox
+          .stub(uut, 'getTokenInfo')
+          .onCall(0)
+          .resolves(mockData.genesisTestOpReturn03)
+          .onCall(1)
+          .resolves(mockData.genesisTestOpReturn03)
+          .onCall(2)
+          .resolves(false)
+          .onCall(3)
+          .resolves(false)
+          .onCall(4)
+          .resolves(false)
+
+        const txid =
+          '4de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf'
+
+        await uut.get(txid)
+        // const result = await uut.get(txid)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'Unknown SLP TX type for TX')
+      }
+    })
+
     // It should process a GENESIS tx
     it('should process a GENESIS tx', async () => {
       // Mock dependencies
@@ -785,6 +822,43 @@ describe('#Transaction', () => {
       // Assert added TX data exists.
       assert.equal(result.blockheight, 571212)
       assert.equal(result.isSlpTx, true)
+    })
+
+    // Forces this mint tx to have a mint baton as input
+    it('should process TX with MINT baton input', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut, 'getTxData')
+        .resolves(mockData.mintTestInputTx02)
+      sandbox
+        .stub(uut.rpc, 'getBlockHeader')
+        .resolves({ height: 543614 })
+
+      // Force input TX to be a mint baton.
+      sandbox
+        .stub(uut, 'getTokenInfo')
+        .onCall(0)
+        .resolves(mockData.mintTestOpReturnData04)
+        .onCall(1)
+        .resolves(mockData.mintTestOpReturnData04)
+        .onCall(2)
+        .resolves(mockData.mintTestOpReturnData04)
+        .onCall(3)
+        .resolves(mockData.mintTestOpReturnData04)
+        .onCall(4)
+        .resolves(mockData.mintTestOpReturnData04)
+        .onCall(5)
+        .resolves(mockData.mintTestOpReturnData04)
+
+      const txid =
+          'ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].isMintBaton, true)
     })
   })
 })
