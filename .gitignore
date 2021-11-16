@@ -66,5 +66,6 @@ orbitdb
 ipfsdata
 .ipfsdata
 leveldb/
+tx-map.json
 
 !README.md
