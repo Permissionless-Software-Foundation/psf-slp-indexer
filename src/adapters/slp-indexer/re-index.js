@@ -178,7 +178,7 @@ class SlpReIndexer {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
-          this.dbBackup.zipDb(blockHeight)
+          await this.dbBackup.zipDb(blockHeight)
         }
 
         // Filter and sort block transactions, to make indexing more efficient
@@ -195,7 +195,7 @@ class SlpReIndexer {
 
         // Backup the database
         // if (blockHeight % 5 === 0) {
-        //   this.dbBackup.backupDb()
+        //   await this.dbBackup.backupDb()
         // }
 
         // const testAddr =
@@ -215,7 +215,7 @@ class SlpReIndexer {
       // Don't throw an error. This is a top-level function.
 
       // console.log('Restoring backup of database.')
-      // this.dbBackup.restoreDb()
+      // await this.dbBackup.restoreDb()
 
       // For debugging purposes, exit if there is an error.
       process.exit(0)
@@ -342,7 +342,7 @@ class SlpReIndexer {
       // console.log(`Rolling database back to this block height: ${rollbackHeight}`)
 
       // Roll back the database to before the parent transaction.
-      // this.dbBackup.unzipDb(rollbackHeight)
+      // await this.dbBackup.unzipDb(rollbackHeight)
 
       // Kill the process, which will allow the app to shut down, and pm2 or Docker can
       // restart it at a block height prior to the problematic parent transaction.
