@@ -23,7 +23,7 @@ const BigNumber = require('bignumber.js')
 // const BCHJS = require('@psf/bch-js')
 
 const IndexerUtils = require('./utils')
-const SlpValidate = require('./slp-validate')
+// const SlpValidate = require('./slp-validate')
 // const blacklist = require('./blacklist')
 const DAG = require('./dag')
 
@@ -44,7 +44,7 @@ class Send {
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
-    this.slpValidate = new SlpValidate()
+    // this.slpValidate = new SlpValidate()
     // this.bchjs = new BCHJS()
     this.dag = new DAG(localConfig)
   }
@@ -54,6 +54,7 @@ class Send {
       // console.log(`send.processTx() data: ${JSON.stringify(data, null, 2)}`)
       const { txData } = data
       const txid = txData.txid
+      const tokenId = data.txData.tokenId
 
       // console.log('slpData: ', slpData)
       // console.log('slpData.amounts: ', slpData.amounts)
@@ -71,8 +72,9 @@ class Send {
 
       // Validate the TX against the SLP DAG.
       // const txidIsValid = await this.slpValidate.validateTxid(txid)
-      const txidIsValid = await this.dag.validateTxid(txid)
-      if (!txidIsValid) {
+      // const txidIsValid = await this.dag.validateTxid(txid)
+      const { isValid } = await this.dag.crawlDag(txid, tokenId)
+      if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
         // Mark TX as invalid and save in database.
@@ -315,8 +317,9 @@ class Send {
         if (thisVin.tokenId !== txData.tokenId) continue
 
         // Do a DAG validation of the input.
-        const inputIsValid = await this.dag.validateTxid(thisVin.txid)
-        if (!inputIsValid) {
+        // const inputIsValid = await this.dag.validateTxid(thisVin.txid)
+        const { isValid } = await this.dag.crawlDag(thisVin.txid, txData.tokenId)
+        if (!isValid) {
           thisVin.tokenId = null
           thisVin.tokenQty = 0
           thisVin.tokenQtyStr = '0'

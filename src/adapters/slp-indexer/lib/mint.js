@@ -13,7 +13,7 @@ const BigNumber = require('bignumber.js')
 
 // Local libraries
 const IndexerUtils = require('./utils')
-const SlpValidate = require('./slp-validate')
+// const SlpValidate = require('./slp-validate')
 const DAG = require('./dag')
 
 class Mint {
@@ -32,7 +32,7 @@ class Mint {
     this.txDb = localConfig.txDb
 
     this.util = new IndexerUtils()
-    this.slpValidate = new SlpValidate()
+    // this.slpValidate = new SlpValidate()
     this.dag = new DAG(localConfig)
   }
 
@@ -46,14 +46,17 @@ class Mint {
 
       // Validate the TX against the SLP DAG.
       const txid = data.txData.txid
+      const tokenId = data.txData.tokenId
       // const txidIsValid = await this.slpValidate.validateTxid(txid)
       // if (!txidIsValid) {
       //   console.log(`TXID ${txid} failed DAG validation. Skipping.`)
       //   return
       // }
-      const txidIsValid = await this.dag.validateTxid(txid)
-      console.log('txidIsValid: ', txidIsValid)
-      if (!txidIsValid) {
+
+      const { isValid } = await this.dag.crawlDag(txid, tokenId)
+      // const txidIsValid = await this.dag.validateTxid(txid)
+      console.log('isValid: ', isValid)
+      if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
         // Mark TX as invalid and save in database.
