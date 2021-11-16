@@ -1,5 +1,7 @@
 /*
   This library is concernced with navigating the DAG of a transaction.
+
+  All other methods have been replaced with crawlDag()
 */
 
 class DAG {
