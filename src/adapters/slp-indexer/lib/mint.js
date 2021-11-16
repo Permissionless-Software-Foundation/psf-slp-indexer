@@ -53,7 +53,7 @@ class Mint {
       //   return
       // }
 
-      const { isValid } = await this.dag.crawlDag2(txid, tokenId)
+      const { isValid } = await this.dag.crawlDag(txid, tokenId)
       // const txidIsValid = await this.dag.validateTxid(txid)
       console.log('isValid: ', isValid)
       if (!isValid) {

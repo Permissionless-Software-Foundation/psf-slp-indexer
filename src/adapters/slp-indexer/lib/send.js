@@ -73,7 +73,7 @@ class Send {
       // Validate the TX against the SLP DAG.
       // const txidIsValid = await this.slpValidate.validateTxid(txid)
       // const txidIsValid = await this.dag.validateTxid(txid)
-      const { isValid } = await this.dag.crawlDag2(txid, tokenId)
+      const { isValid } = await this.dag.crawlDag(txid, tokenId)
       if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
@@ -318,7 +318,7 @@ class Send {
 
         // Do a DAG validation of the input.
         // const inputIsValid = await this.dag.validateTxid(thisVin.txid)
-        const { isValid } = await this.dag.crawlDag2(thisVin.txid, txData.tokenId)
+        const { isValid } = await this.dag.crawlDag(thisVin.txid, txData.tokenId)
         if (!isValid) {
           thisVin.tokenId = null
           thisVin.tokenQty = 0

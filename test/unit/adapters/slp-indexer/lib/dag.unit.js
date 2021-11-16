@@ -69,7 +69,7 @@ describe('#dag.js', () => {
   describe('#crawlDag2()', () => {
     it('should throw an error if txid is not included', async () => {
       try {
-        await uut.crawlDag2()
+        await uut.crawlDag()
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -81,7 +81,7 @@ describe('#dag.js', () => {
       try {
         const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
 
-        await uut.crawlDag2(txid)
+        await uut.crawlDag(txid)
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -98,7 +98,7 @@ describe('#dag.js', () => {
         const tokenId =
             '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-        await uut.crawlDag2(txid, tokenId)
+        await uut.crawlDag(txid, tokenId)
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -112,7 +112,7 @@ describe('#dag.js', () => {
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-      const result = await uut.crawlDag2(txid, tokenId)
+      const result = await uut.crawlDag(txid, tokenId)
       // console.log('result: ', result)
 
       assert.equal(result.isValid, true)
@@ -132,7 +132,7 @@ describe('#dag.js', () => {
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-      const result = await uut.crawlDag2(txid, tokenId)
+      const result = await uut.crawlDag(txid, tokenId)
       // console.log('result: ', result)
 
       assert.equal(result.isValid, false)
@@ -155,7 +155,7 @@ describe('#dag.js', () => {
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-      const result = await uut.crawlDag2(txid, tokenId)
+      const result = await uut.crawlDag(txid, tokenId)
       // console.log('result: ', result)
 
       assert.equal(result.isValid, true)
@@ -175,7 +175,7 @@ describe('#dag.js', () => {
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-      const result = await uut.crawlDag2(txid, tokenId)
+      const result = await uut.crawlDag(txid, tokenId)
       // console.log('result: ', result)
 
       assert.equal(result.isValid, false)
@@ -196,7 +196,7 @@ describe('#dag.js', () => {
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-      const result = await uut.crawlDag2(txid, tokenId)
+      const result = await uut.crawlDag(txid, tokenId)
       // console.log('result: ', result)
 
       assert.equal(result.isValid, true)
@@ -217,7 +217,7 @@ describe('#dag.js', () => {
       const tokenId =
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
-      const result = await uut.crawlDag2(txid, tokenId)
+      const result = await uut.crawlDag(txid, tokenId)
       // console.log('result: ', result)
 
       assert.equal(result.isValid, false)
@@ -239,7 +239,7 @@ describe('#dag.js', () => {
         '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
 
       try {
-        await uut.crawlDag2(txid, tokenId)
+        await uut.crawlDag(txid, tokenId)
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -247,47 +247,4 @@ describe('#dag.js', () => {
       }
     })
   })
-
-  describe('#validateTxid', () => {
-    it('if crawlDag() returns true, this should return true', async () => {
-      // Mock dependencies
-      sandbox.stub(uut.cache, 'get').resolves(mockData.slpSendTxData01)
-      sandbox.stub(uut, 'crawlDag2').resolves(true)
-
-      const txid =
-        '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
-
-      const result = await uut.validateTxid(txid)
-      // console.log('result: ', result)
-
-      assert.equal(result, true)
-    })
-
-    // it('if crawlDag() returns false, this should return true', async () => {
-    //   // Mock dependencies
-    //   sandbox.stub(uut.cache, 'get').resolves(mockData.slpSendTxData01)
-    //   sandbox.stub(uut, 'crawlDag2').resolves(false)
-    //
-    //   const txid =
-    //     '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
-    //
-    //   const result = await uut.validateTxid(txid)
-    //   // console.log('result: ', result)
-    //
-    //   assert.equal(result, false)
-    // })
-  })
-
-  // describe('#getDag', () => {
-  //   it('should get DAG for 2-tx chain', async () => {
-  //     // Mock dependencies
-  //     sandbox.stub(uut.cache, 'get').resolves(mockData.slpSendTxData01)
-  //
-  //     const txid =
-  //       '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
-  //
-  //     const result = await uut.getDag(txid)
-  //     console.log('result: ', result)
-  //   })
-  // })
 })
