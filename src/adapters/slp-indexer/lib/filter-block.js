@@ -32,7 +32,179 @@ class FilterBlock {
     // Encapsulate dependencies
     this.pQueue = new PQueue({ concurrency: 20 })
 
-    // this.txCache = {} // Used to cache transaction data.
+    // this.txCache = {} // Used to locally cache transaction data.
+  }
+
+  // Filter out raw block transactions and return an array of txs that are
+  // (unvalidated) SLP transactions.
+  // An array of TXIDs are expected as input. An array of TXIDs are output.
+  async filterSlpTxs (txids) {
+    try {
+      const slpTxs = []
+
+      // Add Tx to slpTxs array if it passes the OP_RETURN check.
+      // This function is used below with the queue.
+      const processTx = async (txid) => {
+        // Is the TX an SLP TX?
+        const isSlp = await this.transaction.getTokenInfo(txid)
+
+        if (isSlp) { slpTxs.push(txid) }
+      }
+
+      const promiseArray = []
+
+      // Filter out all the non-SLP transactions.
+      for (let i = 0; i < txids.length; i++) {
+        const txid = txids[i]
+
+        promiseArray.push(this.pQueue.add(() => processTx(txid)))
+        // promiseArray.push(this.pQueue.add(() => this.transaction.getTokenInfo(txid)))
+      }
+
+      // Wait for all promises in the array to resolve.
+      await Promise.all(promiseArray)
+
+      // Wait for all the transactions in the block to be processed.
+      // This should be redundent.
+      await this.pQueue.onEmpty()
+
+      return slpTxs
+    } catch (err) {
+      console.error('Error in filterSlpTxs()')
+      throw err
+    }
+  }
+
+  // checkForParent(tx, blockheight, chainedTxids) expects a transaction and blockhight value
+  // as input. chainedTxids should be an empty array, which will be filled in
+  // with the list of parent TXIDs, if the txid has parents.
+  //
+  // This function will return false if the TX does not have a parent UTXO in
+  // the same block. If it does have a parent UTXO, it will return true.
+  //
+  // This function will recursively call itself, to traverse the DAG and find
+  // all the parent UTXOs for that transaction. It will then
+  // return an array of TXs, sorted with the oldest parent first, and the given
+  // input tx as the last element.
+  async checkForParent2 (txid, blockheight, chainedTxids = []) {
+    try {
+      // console.log('txid: ', txid)
+
+      // Get the transaction data for the durrent txid, from the cache.
+      const txData = await this.cache.get(txid)
+      // console.log('txData: ', txData)
+
+      // If the txid does not exist in the chainedTxids array, then add it.
+      const isAlreadyAdded = chainedTxids.filter((x) => x === txid)
+      if (!isAlreadyAdded.length) {
+        // Add it to the beginning of the array.
+        chainedTxids.unshift(txData.txid)
+      }
+
+      // Default value.
+      let chainedParentsDetected = false
+
+      // Loop through each input that represents tokens.
+      for (let i = 0; i < txData.vin.length; i++) {
+        const thisVin = txData.vin[i]
+        // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+
+        // If the input is not colored as a token, or does not represent a
+        // minting baton, then skip it.
+        if (!thisVin.tokenQty && !thisVin.isMintBaton) {
+          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+          continue
+        }
+
+        // Get the parent transaction.
+        const parentTx = await this.cache.get(thisVin.txid)
+        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+
+        // If block height of parent tx is same as the current tx, recurively
+        // crawl the DAG, starting with the parent.
+        if (blockheight === parentTx.blockheight) {
+          chainedParentsDetected = true
+
+          // Recursively call this function to follow the DAG to the first parent
+          // in this block.
+          await this.checkForParent(parentTx, blockheight, chainedTxids)
+        }
+      }
+
+      return chainedParentsDetected
+    } catch (err) {
+      console.error('Error in checkForParent(). txid: ', txid)
+      throw err
+    }
+  }
+
+  async checkForParent (txData, blockheight, chainedTxids = []) {
+    try {
+      // If the txid does not exist in the chainedTxids array, then add it.
+      const txid = txData.txid
+      const isAlreadyAdded = chainedTxids.filter((x) => x === txid)
+      if (!isAlreadyAdded.length) {
+        // Add it to the beginning of the array.
+        chainedTxids.unshift(txData.txid)
+      }
+
+      let chainedParentsDetected = false
+
+      // const txData = await this.bchjs.Transaction.get(txid)
+
+      // Loop through each input that represents tokens.
+      for (let i = 0; i < txData.vin.length; i++) {
+        const thisVin = txData.vin[i]
+        // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+
+        // If the input is not colored as a token, or does not represent a
+        // minting baton, then skip it.
+        if (!thisVin.tokenQty && !thisVin.isMintBaton) {
+          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+          continue
+        }
+
+        // Get the parent transaction.
+        let parentTx = {}
+        if (this.txCache[thisVin.txid]) {
+          // Get the parent TX from the local cache if it exists.
+          parentTx = this.txCache.txid
+        } else {
+          // Otherwise, get parent TX from the global app cache.
+          parentTx = await this.cache.get(thisVin.txid)
+          this.txCache[thisVin.txid] = parentTx
+        }
+        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+
+        // Not sure why or how parentTx can be undefined, but
+        // if (!parentTx) return
+
+        // console.log(`parent TXID: ${parentTx.txid}`)
+
+        // Get the block height of that transaction.
+        // const parentBlockhash = parentTx.blockhash
+        // const parentBlockHeader = await this.rpc.getBlockHeader(
+        //   parentBlockhash
+        // )
+        // console.log(`parentBlockHeader: ${JSON.stringify(parentBlockHeader, null, 2)}`)
+
+        // If block height of parent tx is same as the current tx, recurively
+        // the parent.
+        // if (blockheight === parentBlockHeader.height) {
+        if (blockheight === parentTx.blockheight) {
+          chainedParentsDetected = true
+
+          // Recursively call this function to follow the DAG to the first parent
+          // in this block.
+          await this.checkForParent(parentTx, blockheight, chainedTxids)
+        }
+      }
+
+      return chainedParentsDetected
+    } catch (err) {
+      console.error('Error in checkForParent(). txdata: ', txData)
+      throw err
+    }
   }
 
   // Primary function for this library. Takes an array of txs as input. Returns
@@ -195,139 +367,6 @@ class FilterBlock {
       }
     } catch (err) {
       console.error('Error in forwardDag')
-      throw err
-    }
-  }
-
-  // Filter out raw block transactions and return an array of txs that are
-  // (unvalidated) SLP transactions.
-  // An array of TXIDs are expected as input. An array of TXIDs are output.
-  async filterSlpTxs (txids) {
-    try {
-      const slpTxs = []
-
-      const processTx = async (txid) => {
-        try {
-          try {
-            // Is the TX an SLP TX? If not, it will throw an error.
-            await this.transaction.decodeOpReturn(txid)
-
-            slpTxs.push(txid)
-          } catch (err) {
-            /* exit quietly */
-            // console.log(`TXID ${txid} not an SLP TX.`)
-          }
-        } catch (err) {
-          console.error(
-            'Error in filterSlpTxs(processTx(txid)). Exiting quietly.'
-          )
-        }
-      }
-
-      const promiseArray = []
-
-      // Filter out all the non-SLP transactions.
-      for (let i = 0; i < txids.length; i++) {
-        const txid = txids[i]
-
-        // try {
-        //   // Is the TX an SLP TX? If not, it will throw an error.
-        //   await this.bchjs.SLP.Utils.decodeOpReturn(txid)
-        // } catch (err) {
-        //   continue
-        // }
-        //
-        // slpTxs.push(txid)
-
-        promiseArray.push(this.pQueue.add(() => processTx(txid)))
-      }
-
-      await Promise.all(promiseArray)
-
-      // Wait for all the transactions in the block to be processed.
-      await this.pQueue.onEmpty()
-
-      return slpTxs
-    } catch (err) {
-      console.error('Error in filterSlpTxs()')
-      throw err
-    }
-  }
-
-  // checkForParent(tx, blockheight, chainedTxids) expects a transaction and blockhight value
-  // as input. chainedTxids should be an empty array, which will be filled in
-  // with the list of parent TXIDs, if the txid has parents.
-  //
-  // This function will return false if the TX does not have a parent UTXO in
-  // the same block. If it does have a parent UTXO, it will return true.
-  //
-  // This function will recursively call itself, to traverse the DAG and find
-  // all the parent UTXOs for that transaction. It will then
-  // return an array of TXs, sorted with the oldest parent first, and the given
-  // input tx as the last element.
-  async checkForParent (txData, blockheight, chainedTxids) {
-    try {
-      // If the txid does not exist in the chainedTxids array, then add it.
-      const txid = txData.txid
-      const isAlreadyAdded = chainedTxids.filter((x) => x === txid)
-      if (!isAlreadyAdded.length) {
-        // Add it to the beginning of the array.
-        chainedTxids.unshift(txData.txid)
-      }
-
-      let chainedParentsDetected = false
-
-      // const txData = await this.bchjs.Transaction.get(txid)
-
-      // Loop through each input that represents tokens.
-      for (let i = 0; i < txData.vin.length; i++) {
-        const thisVin = txData.vin[i]
-        // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-
-        // If the input is not colored as a token, or does not represent a
-        // minting baton, then skip it.
-        if (!thisVin.tokenQty && !thisVin.isMintBaton) {
-          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-          continue
-        }
-
-        // Get the parent transaction.
-        let parentTx = {}
-        if (this.txCache[thisVin.txid]) {
-          parentTx = this.txCache.txid
-        } else {
-          parentTx = await this.cache.get(thisVin.txid)
-          this.txCache[thisVin.txid] = parentTx
-        }
-        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
-
-        // Not sure why or how parentTx can be undefined, but
-        if (!parentTx) return
-
-        // console.log(`parent TXID: ${parentTx.txid}`)
-
-        // Get the block height of that transaction.
-        // const parentBlockhash = parentTx.blockhash
-        // const parentBlockHeader = await this.rpc.getBlockHeader(
-        //   parentBlockhash
-        // )
-        // console.log(`parentBlockHeader: ${JSON.stringify(parentBlockHeader, null, 2)}`)
-
-        // If block height of parent tx is same as the current tx, recurively
-        // the parent.
-        // if (blockheight === parentBlockHeader.height) {
-        if (blockheight === parentTx.blockheight) {
-          chainedParentsDetected = true
-
-          // Recursively call this function to follow the DAG to the first parent
-          // in this block.
-          await this.checkForParent(parentTx, blockheight, chainedTxids)
-        }
-      }
-
-      return chainedParentsDetected
-    } catch (err) {
-      console.error('Error in checkForParent(). txdata: ', txData)
       throw err
     }
   }
