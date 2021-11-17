@@ -75,12 +75,15 @@ class FilterBlock {
     }
   }
 
-  // checkForParent(tx, blockheight, chainedTxids) expects a transaction and blockhight value
-  // as input. chainedTxids should be an empty array, which will be filled in
-  // with the list of parent TXIDs, if the txid has parents.
+  // checkForParent(txid, blockheight) expects a transaction and
+  // blockhight value as input.
   //
-  // This function will return false if the TX does not have a parent UTXO in
-  // the same block. If it does have a parent UTXO, it will return true.
+  // This function will return an object with two properties:
+  // - hasParent: Boolean, true or false
+  // - dag: []
+  //
+  // The `dag` property will contain a list of TXIDs of parent TXs in the same
+  // block as the given txid. It will be empty if there are not parents.
   //
   // This function will recursively call itself, to traverse the DAG and find
   // all the parent UTXOs for that transaction. It will then
@@ -90,7 +93,13 @@ class FilterBlock {
     try {
       // console.log('txid: ', txid)
 
-      // Get the transaction data for the durrent txid, from the cache.
+      // Default output object
+      const outObj = {
+        hasParent: false,
+        dag: []
+      }
+
+      // Get the transaction data for the current txid, from the cache.
       const txData = await this.cache.get(txid)
       // console.log('txData: ', txData)
 
@@ -118,7 +127,8 @@ class FilterBlock {
 
         // Get the parent transaction.
         const parentTx = await this.cache.get(thisVin.txid)
-        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+        // console.log(`parentTx.txid: ${JSON.stringify(parentTx.txid, null, 2)}`)
+        // console.log(`parentTx.blockheight: ${JSON.stringify(parentTx.blockheight, null, 2)}`)
 
         // If block height of parent tx is same as the current tx, recurively
         // crawl the DAG, starting with the parent.
@@ -127,13 +137,86 @@ class FilterBlock {
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
-          await this.checkForParent(parentTx, blockheight, chainedTxids)
+          await this.checkForParent2(parentTx.txid, blockheight, chainedTxids)
         }
       }
 
-      return chainedParentsDetected
+      // return chainedParentsDetected
+      outObj.hasParent = chainedParentsDetected
+      outObj.dag = chainedTxids
+
+      return outObj
     } catch (err) {
-      console.error('Error in checkForParent(). txid: ', txid)
+      console.error('Error in checkForParent2(). txid: ', txid)
+      throw err
+    }
+  }
+
+  // This function is similar in nature to checkForParent(). Whereas
+  // checkForParent() sorts an array by a 'backward' DAG of txs in the same block,
+  // forwardDag() looks for chained TXs in the 'forward' part of the DAG, again,
+  // in the same block.
+  // This function loops through each of the unsortedAry txids. It checks to
+  // see if that TXID is the child of the last element in the chainedAry. If
+  // it is, the TXID is added to the end of the chainedAry, and removed from
+  // the unsortedAry.
+  // Returns an object with these properties:
+  // - success: true if forward DAG TX found, otherwise false
+  // - chainedArray: array of sorted TXIDs
+  // - unsortedArray: array of TXIDs that are not part of the DAG
+  async forwardDag (chainedAry, unsortedAry) {
+    try {
+      let dagFound = false
+
+      // Loop through each entry in the unsorted array.
+      for (let i = 0; i < unsortedAry.length; i++) {
+        // The current txid being evaluated.
+        const thisTxid = unsortedAry[i]
+
+        // The last link in the DAG of chained TXs.
+        const lastLink = chainedAry[chainedAry.length - 1]
+
+        const txData = await this.cache.get(thisTxid)
+        // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+
+        // Loop through each Vin.
+        for (let j = 0; j < txData.vin.length; j++) {
+          const thisVin = txData.vin[j]
+          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+
+          // Skip if this input is not colored as a token, or not a minting baton.
+          if (!thisVin.tokenQty && !thisVin.isMintBaton) continue
+
+          // If the current txid in the unsortedAry points to the last element
+          // in the chainedAry array as it's parent.
+          if (thisVin.txid === lastLink) {
+            dagFound = true
+
+            // Remove the txid from the unsortedAry.
+            unsortedAry = unsortedAry.filter((x) => x !== thisTxid)
+            // console.log(`Removed ${thisTxid} from unsortedAry: ${JSON.stringify(unsortedAry, null, 2)}`)
+
+            // Add the txid to the end of the chainedAry.
+            chainedAry.push(thisTxid)
+
+            // Reset the counter for the unsorted array. This will restart the
+            // search within the block.
+            i = 0
+
+            break
+          }
+        }
+      }
+
+      // Signal that function completed successfully.
+      // return true
+      return {
+        success: dagFound,
+        chainedArray: chainedAry,
+        unsortedArray: unsortedAry
+      }
+    } catch (err) {
+      console.error('Error in forwardDag')
       throw err
     }
   }
@@ -142,6 +225,7 @@ class FilterBlock {
     try {
       // If the txid does not exist in the chainedTxids array, then add it.
       const txid = txData.txid
+      console.log(`txid: ${txid}`)
       const isAlreadyAdded = chainedTxids.filter((x) => x === txid)
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
@@ -165,16 +249,18 @@ class FilterBlock {
         }
 
         // Get the parent transaction.
-        let parentTx = {}
-        if (this.txCache[thisVin.txid]) {
-          // Get the parent TX from the local cache if it exists.
-          parentTx = this.txCache.txid
-        } else {
-          // Otherwise, get parent TX from the global app cache.
-          parentTx = await this.cache.get(thisVin.txid)
-          this.txCache[thisVin.txid] = parentTx
-        }
-        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+        // let parentTx = {}
+        // if (this.txCache[thisVin.txid]) {
+        //   // Get the parent TX from the local cache if it exists.
+        //   parentTx = this.txCache.txid
+        // } else {
+        //   // Otherwise, get parent TX from the global app cache.
+        //   parentTx = await this.cache.get(thisVin.txid)
+        //   this.txCache[thisVin.txid] = parentTx
+        // }
+        const parentTx = await this.cache.get(thisVin.txid)
+        console.log(`parent txid: ${thisVin.txid}`)
+        console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
 
         // Not sure why or how parentTx can be undefined, but
         // if (!parentTx) return
@@ -193,6 +279,10 @@ class FilterBlock {
         // if (blockheight === parentBlockHeader.height) {
         if (blockheight === parentTx.blockheight) {
           chainedParentsDetected = true
+
+          // Used for debugging
+          // console.log(`Block ${parentTx.blockheight} has same block height as child.`)
+          // process.exit(0)
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
@@ -327,46 +417,6 @@ class FilterBlock {
     } catch (err) {
       console.error('Error in fitlerAndSortSlpTxs()')
       console.log(err)
-      throw err
-    }
-  }
-
-  // This function loops through each of the unsortedAry txids. It checks to
-  // see if that TXID is the child of the last element in the chainedAry. If
-  // it is, the TXID is added to the end of the chainedAry, and removed from
-  // the unsortedAry.
-  // Edits the arrays in-place. Returns true, otherwise throws an error.
-  async forwardDag (chainedAry, unsortedAry) {
-    try {
-      for (let i = 0; i < unsortedAry.length; i++) {
-        const thisTxid = unsortedAry[i]
-
-        const lastLink = chainedAry[chainedAry.length - 1]
-
-        const txData = await this.cache.get(thisTxid)
-
-        // Loop through each Vin.
-        for (let j = 0; j < txData.vin.length; j++) {
-          const thisVin = txData.vin[j]
-
-          // Skip if this input is not colored as a token.
-          if (!thisVin.tokenQty) continue
-
-          // If the current txid in the unsortedAry points to the last element
-          // in the chainedAry array as it's parent.
-          if (thisVin.txid === lastLink) {
-            // Remove the txid from the unsortedAry.
-            unsortedAry = unsortedAry.filter((x) => x !== thisTxid)
-
-            // Add the txid to the end of the chainedAry.
-            chainedAry.push(thisTxid)
-
-            break
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Error in forwardDag')
       throw err
     }
   }
