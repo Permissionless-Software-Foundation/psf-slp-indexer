@@ -66,6 +66,76 @@ describe('#filter-block.js', () => {
     })
   })
 
+  describe('#_retryWrapper', () => {
+    it('should throw an error if function handler is not provided', async () => {
+      try {
+        await uut.retryWrapper()
+        assert.fail('unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'function handler is required')
+      }
+    })
+
+    it('should throw an error if input object  is not provided', async () => {
+      try {
+        const funcHandler = () => {}
+        await uut.retryWrapper(funcHandler)
+        assert.fail('unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'input object is required')
+      }
+    })
+
+    it('should execute the given function.', async () => {
+      const inputTest = 'test'
+      // func mock to execute into the retry wrapper
+      const funcHandle = sinon.spy()
+
+      await uut.retryWrapper(funcHandle, inputTest)
+
+      assert.equal(inputTest, funcHandle.getCall(0).args[0])
+      assert.equal(funcHandle.callCount, 1)
+    })
+
+    it('should call handleValidationError() when p-retry error is thrown', async () => {
+      try {
+        const inputTest = 'test'
+        const funcHandle = () => {
+          throw new Error('test error')
+        }
+        uut.attempts = 1
+
+        await uut.retryWrapper(funcHandle, inputTest)
+
+        assert.fail('unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test error')
+      }
+    })
+
+    it('should retry the specific number of times before giving up', async () => {
+      const inputTest = 'test'
+      const funcHandle = () => {
+        throw new Error('test error')
+      }
+      // func handler
+      const spy = sinon.spy(funcHandle)
+
+      // p-retry attempts
+      const attempts = 1
+
+      try {
+        uut.attempts = attempts
+
+        await uut.retryWrapper(spy, inputTest)
+
+        assert.fail('unexpected code path')
+      } catch (error) {
+        assert.equal(spy.callCount, attempts + 1)
+      }
+    })
+  })
+
   describe('#filterSlpTxs', () => {
     it('should filter SLP txs from block', async () => {
       // From block 652,276
@@ -114,6 +184,9 @@ describe('#filter-block.js', () => {
         sandbox
           .stub(uut.transaction, 'getTokenInfo')
           .rejects(new Error('test error'))
+
+        // Force retry to be 0.
+        uut.attempts = 0
 
         await uut.filterSlpTxs(txs)
 
@@ -203,6 +276,19 @@ describe('#filter-block.js', () => {
       assert.equal(result.chainedArray.length, 5)
       assert.equal(result.unsortedArray.length, 2)
     })
+
+    it('should catch and throw errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.cache, 'get').rejects(new Error('test error'))
+
+        await uut.forwardDag(['fake-txid'], ['fake-txid'])
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test error')
+      }
+    })
   })
 
   describe('#filterAndSortSlpTxs2', () => {
@@ -240,6 +326,33 @@ describe('#filter-block.js', () => {
       assert.equal(result.length, 3)
       assert.include(result[0], '82a9') // Independent tx
       assert.include(result[2], 'e5ff') // newest chained tx
+    })
+
+    it('should return an empty array if given an empty array', async () => {
+      const blockHeight = 543413
+      const txs = []
+
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.isArray(result)
+      assert.equal(result.length, 0)
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut, 'filterSlpTxs').rejects(new Error('test error'))
+
+        const blockHeight = 543413
+        const txs = []
+
+        await uut.filterAndSortSlpTxs2(txs, blockHeight)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test error')
+      }
     })
   })
 })

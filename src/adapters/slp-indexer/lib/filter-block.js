@@ -278,82 +278,6 @@ class FilterBlock {
     }
   }
 
-  // async checkForParent (txData, blockheight, chainedTxids = []) {
-  //   try {
-  //     // If the txid does not exist in the chainedTxids array, then add it.
-  //     const txid = txData.txid
-  //     console.log(`txid: ${txid}`)
-  //     const isAlreadyAdded = chainedTxids.filter((x) => x === txid)
-  //     if (!isAlreadyAdded.length) {
-  //       // Add it to the beginning of the array.
-  //       chainedTxids.unshift(txData.txid)
-  //     }
-  //
-  //     let chainedParentsDetected = false
-  //
-  //     // const txData = await this.bchjs.Transaction.get(txid)
-  //
-  //     // Loop through each input that represents tokens.
-  //     for (let i = 0; i < txData.vin.length; i++) {
-  //       const thisVin = txData.vin[i]
-  //       // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-  //
-  //       // If the input is not colored as a token, or does not represent a
-  //       // minting baton, then skip it.
-  //       if (!thisVin.tokenQty && !thisVin.isMintBaton) {
-  //         // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-  //         continue
-  //       }
-  //
-  //       // Get the parent transaction.
-  //       // let parentTx = {}
-  //       // if (this.txCache[thisVin.txid]) {
-  //       //   // Get the parent TX from the local cache if it exists.
-  //       //   parentTx = this.txCache.txid
-  //       // } else {
-  //       //   // Otherwise, get parent TX from the global app cache.
-  //       //   parentTx = await this.cache.get(thisVin.txid)
-  //       //   this.txCache[thisVin.txid] = parentTx
-  //       // }
-  //       const parentTx = await this.cache.get(thisVin.txid)
-  //       // console.log(`parent txid: ${thisVin.txid}`)
-  //       // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
-  //
-  //       // Not sure why or how parentTx can be undefined, but
-  //       // if (!parentTx) return
-  //
-  //       // console.log(`parent TXID: ${parentTx.txid}`)
-  //
-  //       // Get the block height of that transaction.
-  //       // const parentBlockhash = parentTx.blockhash
-  //       // const parentBlockHeader = await this.rpc.getBlockHeader(
-  //       //   parentBlockhash
-  //       // )
-  //       // console.log(`parentBlockHeader: ${JSON.stringify(parentBlockHeader, null, 2)}`)
-  //
-  //       // If block height of parent tx is same as the current tx, recurively
-  //       // the parent.
-  //       // if (blockheight === parentBlockHeader.height) {
-  //       if (blockheight === parentTx.blockheight) {
-  //         chainedParentsDetected = true
-  //
-  //         // Used for debugging
-  //         // console.log(`Block ${parentTx.blockheight} has same block height as child.`)
-  //         // process.exit(0)
-  //
-  //         // Recursively call this function to follow the DAG to the first parent
-  //         // in this block.
-  //         await this.checkForParent(parentTx, blockheight, chainedTxids)
-  //       }
-  //     }
-  //
-  //     return chainedParentsDetected
-  //   } catch (err) {
-  //     console.error('Error in checkForParent(). txdata: ', txData)
-  //     throw err
-  //   }
-  // }
-
   // Primary function for this library. It takes an array of txs from a block as
   // input. It filters all the candidate SLP transactions, then sorts those
   // SLP transactions by their DAG within the block.
@@ -380,43 +304,43 @@ class FilterBlock {
 
       let sortedTxids = []
       const independentTxids = []
-      let i = 0
+      // let i = 0
 
       // Loop while there are entries in the slpTxs array. This loop will remove
       // entries from the array until it's empty.
       do {
         // const txid = slpTxs[0]
         const txid = slpTxs.shift()
-        console.log(`start loop slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-        console.log(`i: ${i}, txid: ${txid}`)
-        i++
+        // console.log(`start loop slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+        // console.log(`i: ${i}, txid: ${txid}`)
+        // i++
 
         // Check if TX is part of a backwards DAG
         const { hasParent, dag: backDag } = await this.checkForParent2(
           txid,
           blockHeight
         )
-        console.log(`hasParent: ${hasParent}`)
-        console.log(`backDag: ${JSON.stringify(backDag, null, 2)}`)
-        console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+        // console.log(`hasParent: ${hasParent}`)
+        // console.log(`backDag: ${JSON.stringify(backDag, null, 2)}`)
+        // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
 
         let sortedArray = backDag
         let hasChild = false
 
         // Check if TX is part of a forward DAG
         if (slpTxs.length) {
-          // const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
-          const { success, chainedArray, unsortedArray } =
-            await this.forwardDag(backDag, slpTxs)
+          const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
+          // const { success, chainedArray, unsortedArray } =
+          //   await this.forwardDag(backDag, slpTxs)
 
           sortedArray = chainedArray
           hasChild = success
 
-          console.log(`hasChild: ${hasChild}`)
-          console.log(`chainedArray: ${JSON.stringify(chainedArray, null, 2)}`)
-          console.log(
-            `unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`
-          )
+          // console.log(`hasChild: ${hasChild}`)
+          // console.log(`chainedArray: ${JSON.stringify(chainedArray, null, 2)}`)
+          // console.log(
+          //   `unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`
+          // )
         }
 
         // If TX does not have a backward or forward DAG in the block, then it
@@ -448,9 +372,9 @@ class FilterBlock {
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }
 
-        console.log(
-          `slpTxs after removing elems: ${JSON.stringify(slpTxs, null, 2)}`
-        )
+        // console.log(
+        //   `slpTxs after removing elems: ${JSON.stringify(slpTxs, null, 2)}`
+        // )
       } while (slpTxs.length)
 
       // The slpTxs array is empty. Each entry has landed in one of the two
@@ -461,146 +385,10 @@ class FilterBlock {
       return independentTxids.concat(sortedTxids)
     } catch (err) {
       console.error('Error in fitlerAndSortSlpTxs2()')
-      console.log(err)
+      // console.log(err)
       throw err
     }
   }
-
-  // Primary function for this library. Takes an array of txs from a block as
-  // input. Returns an array of only SLP txs, sorted by their UTXO DAG within
-  // the block.
-  // async filterAndSortSlpTxs (txids, blockHeight) {
-  //   try {
-  //     console.log(`txids before filtering: ${txids.length}`)
-  //
-  //     // Filter out all the non-SLP transactions.
-  //     let slpTxs = await this.filterSlpTxs(txids)
-  //     console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
-  //     console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
-  //
-  //     // No SLP txids in the array? Exit.
-  //     if (!slpTxs.length) return []
-  //
-  //     const sortedTxids = []
-  //     const independentTxids = []
-  //     let i = 0
-  //
-  //     // Loop while there are entries in the slpTxs array. This loop will remove
-  //     // entries from the array until it's empty.
-  //     do {
-  //       const txid = slpTxs[0]
-  //       console.log(`i: ${i}, txid: ${txid}`)
-  //       i++
-  //
-  //       // Check if tx has a parent in the same block.
-  //       const chainedTxids = []
-  //       let txData = {}
-  //
-  //       // Get TX data.
-  //       try {
-  //         txData = await this.cache.get(txid)
-  //         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
-  //       } catch (err) {
-  //         // Corner case to catch forged SLP Txs.
-  //         if (
-  //           err.message.includes('No such mempool or blockchain transaction')
-  //         ) {
-  //           console.log(`Transaction.get() error: ${err.message}`)
-  //           console.log("Skipping transaction. It's probably a forged SLP tx.")
-  //
-  //           // Remove the problematic TX.
-  //           slpTxs.shift()
-  //
-  //           continue
-  //         }
-  //
-  //         // Throw error of other types of errors.
-  //         throw err
-  //       }
-  //
-  //       const { hasParent, dag: backDag } = await this.checkForParent2(
-  //         txid,
-  //         blockHeight
-  //       )
-  //
-  //       // If no parent, then add this TX to the output array, and process the
-  //       // next tx.
-  //       if (!hasParent) {
-  //         independentTxids.push(txid)
-  //
-  //         // Remove the txid from slpTxs
-  //         slpTxs = slpTxs.filter((x) => x !== txid)
-  //
-  //         continue
-  //       }
-  //
-  //       // console.log(`\ntxid: ${txid}`)
-  //       // console.log(
-  //       //   `(before) sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`
-  //       // )
-  //       // console.log(
-  //       //   `(before) chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`
-  //       // )
-  //       // console.log(`(before) independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
-  //       // console.log(`(before) slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-  //
-  //       // Check if there are any txs in this block for the 'forward' part of
-  //       // the DAG.
-  //       console.log(`backDag: ${JSON.stringify(backDag, null, 2)}`)
-  //       console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-  //       const { success, chainedArray, unsortedArray } = await this.forwardDag(backDag, slpTxs)
-  //       // console.log(`after forwardDag, chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`)
-  //       // console.log(`after forwardDag, slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-  //       console.log(`chainedArray: ${JSON.stringify(chainedArray, null, 2)}`)
-  //       console.log(`unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`)
-  //
-  //       chainedTxids.concat(chainedArray)
-  //
-  //       // Separate txids in chainedTxids from slpTxs
-  //       for (let j = 0; j < chainedTxids.length; j++) {
-  //         const thisTxid = chainedTxids[j]
-  //
-  //         // Skip if the curent TXID is already in the sortedTxids array.
-  //         const isAlreadySorted = sortedTxids.filter((x) => x === thisTxid)
-  //         if (isAlreadySorted.length) continue
-  //
-  //         // Remove current TXID from slpTxs
-  //         slpTxs = slpTxs.filter((x) => x !== thisTxid)
-  //
-  //         // Add txid to the beginning of the sortedTxids array.
-  //         // sortedTxids.unshift(thisTxid)
-  //         sortedTxids.push(thisTxid)
-  //       }
-  //
-  //       // console.log(
-  //       //   `(after) sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`
-  //       // )
-  //       // console.log(
-  //       //   `(after) chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`
-  //       // )
-  //       // console.log(`(after) slpTxs: ${JSON.stringify(slpTxs, null, 2)}\n`)
-  //     } while (slpTxs.length && i < 100)
-  //
-  //     console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
-  //     console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
-  //
-  //     // Add any 'independent' TXIDS to the beginning of the 'sorted' TXIDs,
-  //     // so long as they don't already exist in the sorted array.
-  //     for (let i = 0; i < independentTxids.length; i++) {
-  //       const thisTxid = independentTxids[i]
-  //
-  //       if (!sortedTxids.includes(thisTxid)) {
-  //         sortedTxids.unshift(thisTxid)
-  //       }
-  //     }
-  //
-  //     return sortedTxids
-  //   } catch (err) {
-  //     console.error('Error in fitlerAndSortSlpTxs()')
-  //     console.log(err)
-  //     throw err
-  //   }
-  // }
 }
 
 module.exports = FilterBlock
