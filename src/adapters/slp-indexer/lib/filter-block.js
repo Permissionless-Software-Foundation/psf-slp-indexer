@@ -11,6 +11,7 @@
 
 // const BCHJS = require('@psf/bch-js')
 const PQueue = require('p-queue').default
+const pRetry = require('p-retry')
 
 // const config = require('../../../config')
 
@@ -31,8 +32,49 @@ class FilterBlock {
 
     // Encapsulate dependencies
     this.pQueue = new PQueue({ concurrency: 20 })
+    this.pRetry = pRetry
+
+    // Number of retry attempts
+    this.attempts = 5
 
     // this.txCache = {} // Used to locally cache transaction data.
+  }
+
+  // Wrap the p-retry library.
+  // This function returns a promise that will resolve to the output of the
+  // function 'funcHandle'.
+  async retryWrapper (funcHandle, inputObj) {
+    try {
+      // console.log('retryWrapper inputObj: ', inputObj)
+
+      if (!funcHandle) {
+        throw new Error('function handler is required')
+      }
+      if (!inputObj) {
+        throw new Error('input object is required')
+      }
+      // console.log('Entering retryWrapper()')
+
+      // Add artificial delay to prevent 429 errors.
+      // await this.sleep(this.retryPeriod)
+
+      return this.pRetry(
+        async () => {
+          return await funcHandle(inputObj)
+        },
+        {
+          onFailedAttempt: (error) => {
+            console.log(
+              `Attempt ${error.attemptNumber} failed. There are ${error.retriesLeft} tries left. `
+            )
+          },
+          retries: this.attempts // Retry 5 times
+        }
+      )
+    } catch (err) {
+      console.error('Error in retryWrapper()')
+      throw err
+    }
   }
 
   // Filter out raw block transactions and return an array of txs that are
@@ -48,7 +90,9 @@ class FilterBlock {
         // Is the TX an SLP TX?
         const isSlp = await this.transaction.getTokenInfo(txid)
 
-        if (isSlp) { slpTxs.push(txid) }
+        if (isSlp) {
+          slpTxs.push(txid)
+        }
       }
 
       const promiseArray = []
@@ -57,7 +101,14 @@ class FilterBlock {
       for (let i = 0; i < txids.length; i++) {
         const txid = txids[i]
 
-        promiseArray.push(this.pQueue.add(() => processTx(txid)))
+        // Create a promise that will automatically retry.
+        const p1 = this.retryWrapper(processTx, txid)
+
+        // Add the promise to the queue
+        const thisPromise = this.pQueue.add(() => p1)
+
+        // Add the queued promise to the array.
+        promiseArray.push(thisPromise)
         // promiseArray.push(this.pQueue.add(() => this.transaction.getTokenInfo(txid)))
       }
 
@@ -355,14 +406,17 @@ class FilterBlock {
         // Check if TX is part of a forward DAG
         if (slpTxs.length) {
           // const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
-          const { success, chainedArray, unsortedArray } = await this.forwardDag(backDag, slpTxs)
+          const { success, chainedArray, unsortedArray } =
+            await this.forwardDag(backDag, slpTxs)
 
           sortedArray = chainedArray
           hasChild = success
 
           console.log(`hasChild: ${hasChild}`)
           console.log(`chainedArray: ${JSON.stringify(chainedArray, null, 2)}`)
-          console.log(`unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`)
+          console.log(
+            `unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`
+          )
         }
 
         // If TX does not have a backward or forward DAG in the block, then it
@@ -386,15 +440,17 @@ class FilterBlock {
         // Ensure that any txids in independentTxids or independentTxids are
         // removed from the slpTxs array, before continuing the loop.
         for (let j = 0; j < sortedTxids.length; j++) {
-          slpTxs = slpTxs.filter(x => x !== sortedTxids[j])
+          slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }
         for (let j = 0; j < independentTxids.length; j++) {
-          slpTxs = slpTxs.filter(x => x !== sortedTxids[j])
+          slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }
 
-        console.log(`slpTxs after removing elems: ${JSON.stringify(slpTxs, null, 2)}`)
+        console.log(
+          `slpTxs after removing elems: ${JSON.stringify(slpTxs, null, 2)}`
+        )
       } while (slpTxs.length)
 
       // The slpTxs array is empty. Each entry has landed in one of the two
