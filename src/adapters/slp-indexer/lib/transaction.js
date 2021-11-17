@@ -308,6 +308,12 @@ class Transaction {
       const tokenData = await this.decodeOpReturn(txid)
       return tokenData
     } catch (err) {
+      // Throw an error if root cause was a connection issue with the full node.
+      if (err.message.includes('status code 50')) {
+        throw err
+      }
+
+      // Otherwise return false
       return false
     }
   }

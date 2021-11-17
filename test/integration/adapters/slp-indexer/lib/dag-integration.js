@@ -64,6 +64,20 @@ describe('#dag.js', () => {
         assert.isArray(result.dag)
         assert.equal(result.dag.length, 4)
       })
+
+      it('should get DAG for 3-tx DAG', async () => {
+        const txid =
+          '4e52e0ec21d26feb8bdcafdbe48d0f15662f1ba2b3bea8200bcf0a90d7c209ee'
+        const tokenId =
+          'd9aa162704578945543f5856400546310392a3e68a7922fbc3490e2f21cc7501'
+
+        const result = await uut.crawlDag(txid, tokenId)
+        // console.log('result: ', result)
+
+        assert.equal(result.isValid, true)
+        assert.isArray(result.dag)
+        assert.equal(result.dag.length, 3)
+      })
     })
   })
 })
