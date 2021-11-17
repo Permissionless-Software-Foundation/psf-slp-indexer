@@ -42,7 +42,10 @@ describe('#filter-block.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must include instance of tx cache when instantiating filter-block.js')
+        assert.equal(
+          err.message,
+          'Must include instance of tx cache when instantiating filter-block.js'
+        )
       }
     })
 
@@ -55,7 +58,10 @@ describe('#filter-block.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must include instance of transaction lib when instantiating filter-block.js')
+        assert.equal(
+          err.message,
+          'Must include instance of transaction lib when instantiating filter-block.js'
+        )
       }
     })
   })
@@ -72,12 +78,18 @@ describe('#filter-block.js', () => {
       ]
 
       // The first 4 blocks are not SLP. The 5th is.
-      sandbox.stub(uut.transaction, 'getTokenInfo')
-        .onCall(0).resolves(false)
-        .onCall(1).resolves(false)
-        .onCall(2).resolves(false)
-        .onCall(3).resolves(false)
-        .onCall(4).resolves(true)
+      sandbox
+        .stub(uut.transaction, 'getTokenInfo')
+        .onCall(0)
+        .resolves(false)
+        .onCall(1)
+        .resolves(false)
+        .onCall(2)
+        .resolves(false)
+        .onCall(3)
+        .resolves(false)
+        .onCall(4)
+        .resolves(true)
 
       const slpTxs = await uut.filterSlpTxs(txs)
       // console.log(slpTxs)
@@ -99,7 +111,9 @@ describe('#filter-block.js', () => {
         ]
 
         // Force an error
-        sandbox.stub(uut.transaction, 'getTokenInfo').rejects(new Error('test error'))
+        sandbox
+          .stub(uut.transaction, 'getTokenInfo')
+          .rejects(new Error('test error'))
 
         await uut.filterSlpTxs(txs)
 
@@ -113,13 +127,19 @@ describe('#filter-block.js', () => {
   describe('#checkForParent2', () => {
     it('should return 2-tx DAG', async () => {
       // Mock dependencies
-      sandbox.stub(uut.cache, 'get')
-        .onCall(0).resolves(mockData.twoTxDag01)
-        .onCall(1).resolves(mockData.twoTxDag02)
-        .onCall(2).resolves(mockData.twoTxDag02)
-        .onCall(3).resolves(mockData.twoTxDag03)
+      sandbox
+        .stub(uut.cache, 'get')
+        .onCall(0)
+        .resolves(mockData.twoTxDag01)
+        .onCall(1)
+        .resolves(mockData.twoTxDag02)
+        .onCall(2)
+        .resolves(mockData.twoTxDag02)
+        .onCall(3)
+        .resolves(mockData.twoTxDag03)
 
-      const txid = 'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
+      const txid =
+        'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
 
       const result = await uut.checkForParent2(txid, 543413)
       // console.log('result: ', result)
@@ -133,7 +153,8 @@ describe('#filter-block.js', () => {
         // Force error
         sandbox.stub(uut.cache, 'get').rejects(new Error('test error'))
 
-        const txid = 'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
+        const txid =
+          'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
 
         await uut.checkForParent2(txid, 543413)
 
@@ -150,11 +171,18 @@ describe('#filter-block.js', () => {
       sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
 
       // Mock dependencies
-      sandbox.stub(uut.cache, 'get')
-        .onCall(0).resolves(mockData.forwardDagTx01)
-        .onCall(1).resolves(mockData.forwardDagTx02)
-        .onCall(2).resolves(mockData.forwardDagTx03)
-        .onCall(3).resolves(mockData.forwardDagTx02)
+      sandbox
+        .stub(uut.cache, 'get')
+        .onCall(0)
+        .resolves(mockData.forwardDagTx01)
+        .onCall(1)
+        .resolves(mockData.forwardDagTx02)
+        .onCall(2)
+        .resolves(mockData.forwardDagTx03)
+        .onCall(3)
+        .resolves(mockData.forwardDagTx02)
+        .onCall(4)
+        .resolves(mockData.forwardDagTx03)
 
       const chainedArray = [
         '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2',
@@ -174,6 +202,44 @@ describe('#filter-block.js', () => {
       assert.equal(result.success, true)
       assert.equal(result.chainedArray.length, 5)
       assert.equal(result.unsortedArray.length, 2)
+    })
+  })
+
+  describe('#filterAndSortSlpTxs2', () => {
+    it('should filter and sort a combination of independent and chained txs', async () => {
+      // force cache to get data from the full node.
+      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+
+      const blockHeight = 543413
+      const txs = [
+        '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2',
+        '82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac',
+        'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
+      ]
+
+      // Mock dependencies
+      sandbox.stub(uut, 'filterSlpTxs').resolves(txs)
+      sandbox
+        .stub(uut, 'checkForParent2')
+        .onCall(0)
+        .resolves({ hasParent: false, dag: [txs[0]] })
+        .onCall(1)
+        .resolves({ hasParent: false, dag: [txs[1]] })
+      sandbox
+        .stub(uut, 'forwardDag')
+        .onCall(0)
+        .resolves({
+          success: true,
+          chainedArray: [txs[0], txs[2]],
+          unsortedArray: [txs[1]]
+        })
+
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.length, 3)
+      assert.include(result[0], '82a9') // Independent tx
+      assert.include(result[2], 'e5ff') // newest chained tx
     })
   })
 })

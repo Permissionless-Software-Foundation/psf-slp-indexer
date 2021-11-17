@@ -183,7 +183,7 @@ class SlpReIndexer {
 
         // Filter and sort block transactions, to make indexing more efficient
         // and easier to debug.
-        const slpTxs = await this.filterBlock.filterAndSortSlpTxs(
+        const slpTxs = await this.filterBlock.filterAndSortSlpTxs2(
           txs,
           blockHeight
         )
