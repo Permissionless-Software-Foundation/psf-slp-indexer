@@ -6,7 +6,7 @@
 
 // Global constants
 const EPOCH = 1000 // blocks between backups
-const RETRY_CNT = 35 // Number of retries before exiting the indexer
+const RETRY_CNT = 5 // Number of retries before exiting the indexer
 
 // Load the TX map of SLP transactions in the blockchain
 const txMap = require('./tx-maps/tx-map.json')
