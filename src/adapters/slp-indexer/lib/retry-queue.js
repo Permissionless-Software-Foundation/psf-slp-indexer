@@ -18,19 +18,12 @@ let _this
 
 class RetryQueue {
   constructor (localConfig = {}) {
-    // if (!localConfig.bchjs) {
-    //   throw new Error(
-    //     'Must pass instance of bch-js when instantiating RetryQueue Class.'
-    //   )
-    // }
-    // this.bchjs = localConfig.bchjs
-
     // Encapsulate dependencies
-    this.validationQueue = new PQueue({ concurrency: 1 })
+    this.queue = new PQueue({ concurrency: 1 })
     this.pRetry = pRetry
 
     this.attempts = 5
-    this.retryPeriod = 5000
+    this.retryPeriod = 10
 
     _this = this
   }
@@ -38,7 +31,7 @@ class RetryQueue {
   // Add an async function to the queue, and execute it with the input object.
   async addToQueue (funcHandle, inputObj) {
     try {
-      console.log('addToQueue inputObj: ', inputObj)
+      // console.log('addToQueue inputObj: ', inputObj)
 
       if (!funcHandle) {
         throw new Error('function handler is required')
@@ -47,12 +40,12 @@ class RetryQueue {
         throw new Error('input object is required')
       }
 
-      const returnVal = await _this.validationQueue.add(() =>
+      const returnVal = await _this.queue.add(() =>
         _this.retryWrapper(funcHandle, inputObj)
       )
       return returnVal
     } catch (err) {
-      console.error('Error in addToQueue()')
+      console.error('Error in addToQueue(): ', err)
       throw err
     }
   }
@@ -70,7 +63,7 @@ class RetryQueue {
       if (!inputObj) {
         throw new Error('input object is required')
       }
-      console.log('Entering retryWrapper()')
+      // console.log('Entering retryWrapper()')
 
       // Add artificial delay to prevent 429 errors.
       // await this.sleep(this.retryPeriod)
@@ -107,7 +100,7 @@ class RetryQueue {
   }
 
   sleep (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }
 
