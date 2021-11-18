@@ -175,9 +175,9 @@ class SlpIndexer {
         if (!slpTxs.length) continue
 
         // Backup the database
-        if (blockHeight % 5 === 0) {
-          await this.dbBackup.backupDb()
-        }
+        // if (blockHeight % 5 === 0) {
+        //   await this.dbBackup.backupDb()
+        // }
 
         // const testAddr =
         //   'bitcoincash:qpq5uuctyf6qhh5nlsdxx8guhf7lxhegnsr0lwx4ev'
@@ -195,8 +195,8 @@ class SlpIndexer {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
 
-      console.log('Restoring backup of database.')
-      await this.dbBackup.restoreDb()
+      // console.log('Restoring backup of database.')
+      // await this.dbBackup.restoreDb()
 
       // For debugging purposes, exit if there is an error.
       process.exit(0)
@@ -315,12 +315,6 @@ class SlpIndexer {
       console.log(
         `Rolling database back to this block height: ${rollbackHeight}`
       )
-
-      // throw new Error(errMsg)
-
-      // Round the hight to the nearest 100
-      // const rollbackHeight = Math.floor(targetBlockHeight / 100) * 100
-      // console.log(`Rolling database back to this block height: ${rollbackHeight}`)
 
       // Roll back the database to before the parent transaction.
       await this.dbBackup.unzipDb(rollbackHeight)
