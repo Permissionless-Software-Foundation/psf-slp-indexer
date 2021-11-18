@@ -211,7 +211,7 @@ class SlpReIndexer {
         await this.processSlpTxs(slpTxs, blockHeight)
       }
     } catch (err) {
-      console.log('Error in indexer: ', err)
+      console.log('Error in re-index.js: ', err)
       // Don't throw an error. This is a top-level function.
 
       // console.log('Restoring backup of database.')

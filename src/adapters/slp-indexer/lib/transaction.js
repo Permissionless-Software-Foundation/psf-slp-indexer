@@ -66,7 +66,7 @@ class Transaction {
 
       // Get Token Data
       const txTokenData = await this.getTokenInfo(txid)
-      // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+      console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
 
       // If not a token, return the tx data. Processing is complete.
       if (!txTokenData) return txDetails
@@ -76,6 +76,7 @@ class Transaction {
       txDetails.isSlpTx = true
 
       // Get Genesis data
+      console.log(`txTokenData.tokenId: ${txTokenData.tokenId}`)
       const genesisData = await this.getTokenInfo(txTokenData.tokenId)
       // console.log(`genesisData: ${JSON.stringify(genesisData, null, 2)}`)
 
@@ -176,6 +177,7 @@ class Transaction {
         const thisVin = txDetails.vin[i]
         // console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
 
+        console.log(`thisVin.txid: ${thisVin.txid}`)
         const vinTokenData = await this.getTokenInfo(thisVin.txid)
         // console.log(
         //   `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
@@ -296,7 +298,7 @@ class Transaction {
 
       return txDetails
     } catch (err) {
-      console.error('Error in get()')
+      console.error('Error in transaction.js/get(). txid: ', txid)
       throw err
     }
   }
@@ -306,6 +308,10 @@ class Transaction {
   async getTokenInfo (txid) {
     try {
       const tokenData = await this.decodeOpReturn(txid)
+
+      // Corner case: token ID comes back as all zeros
+      if (tokenData.tokenId.includes('00000000')) { return false }
+
       return tokenData
     } catch (err) {
       // Throw an error if root cause was a connection issue with the full node.
@@ -364,65 +370,70 @@ class Transaction {
   // Reimplementation of decodeOpReturn() using slp-parser.
   // Originally copied from bch-js slp-utils.js lib.
   async decodeOpReturn (txid) {
+    try {
     // Validate the txid input.
-    if (!txid || txid === '' || typeof txid !== 'string') {
-      throw new Error('txid string must be included.')
-    }
-
-    // Return results if they've been cached.
-    const cachedVal = this.txCache[txid]
-    if (cachedVal) return cachedVal
-
-    const txDetails = await this.rpc.getRawTransaction(txid)
-    // console.log('txDetails: ', txDetails)
-
-    // SLP spec expects OP_RETURN to be the first output of the transaction.
-    const opReturn = txDetails.vout[0].scriptPubKey.hex
-    // console.log(`opReturn hex: ${opReturn}`)
-
-    const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
-    // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
-
-    // Convert Buffer data to hex strings or utf8 strings.
-    let tokenData = {}
-    if (parsedData.transactionType === 'SEND') {
-      tokenData = {
-        tokenType: parsedData.tokenType,
-        txType: parsedData.transactionType,
-        tokenId: parsedData.data.tokenId.toString('hex'),
-        amounts: parsedData.data.amounts
+      if (!txid || txid === '' || typeof txid !== 'string') {
+        throw new Error('txid string must be included.')
       }
-    } else if (parsedData.transactionType === 'GENESIS') {
-      tokenData = {
-        tokenType: parsedData.tokenType,
-        txType: parsedData.transactionType,
-        ticker: parsedData.data.ticker.toString(),
-        name: parsedData.data.name.toString(),
-        tokenId: txid,
-        documentUri: parsedData.data.documentUri.toString(),
-        documentHash: parsedData.data.documentHash.toString(),
-        decimals: parsedData.data.decimals,
-        mintBatonVout: parsedData.data.mintBatonVout,
-        qty: parsedData.data.qty
-      }
-    } else if (parsedData.transactionType === 'MINT') {
-      tokenData = {
-        tokenType: parsedData.tokenType,
-        txType: parsedData.transactionType,
-        tokenId: parsedData.data.tokenId.toString('hex'),
-        mintBatonVout: parsedData.data.mintBatonVout,
-        qty: parsedData.data.qty
-      }
-    }
-    // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
-    this.txCache[txid] = tokenData
-    this.txCacheCnt++
-    if (this.txCacheCnt % 100 === 0) {
-      console.log(`decodeOpReturn cache has ${this.txCacheCnt} cached txs`)
-    }
+      // Return results if they've been cached.
+      const cachedVal = this.txCache[txid]
+      if (cachedVal) return cachedVal
 
-    return tokenData
+      const txDetails = await this.rpc.getRawTransaction(txid)
+      // console.log('txDetails: ', txDetails)
+
+      // SLP spec expects OP_RETURN to be the first output of the transaction.
+      const opReturn = txDetails.vout[0].scriptPubKey.hex
+      // console.log(`opReturn hex: ${opReturn}`)
+
+      const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
+      // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
+
+      // Convert Buffer data to hex strings or utf8 strings.
+      let tokenData = {}
+      if (parsedData.transactionType === 'SEND') {
+        tokenData = {
+          tokenType: parsedData.tokenType,
+          txType: parsedData.transactionType,
+          tokenId: parsedData.data.tokenId.toString('hex'),
+          amounts: parsedData.data.amounts
+        }
+      } else if (parsedData.transactionType === 'GENESIS') {
+        tokenData = {
+          tokenType: parsedData.tokenType,
+          txType: parsedData.transactionType,
+          ticker: parsedData.data.ticker.toString(),
+          name: parsedData.data.name.toString(),
+          tokenId: txid,
+          documentUri: parsedData.data.documentUri.toString(),
+          documentHash: parsedData.data.documentHash.toString(),
+          decimals: parsedData.data.decimals,
+          mintBatonVout: parsedData.data.mintBatonVout,
+          qty: parsedData.data.qty
+        }
+      } else if (parsedData.transactionType === 'MINT') {
+        tokenData = {
+          tokenType: parsedData.tokenType,
+          txType: parsedData.transactionType,
+          tokenId: parsedData.data.tokenId.toString('hex'),
+          mintBatonVout: parsedData.data.mintBatonVout,
+          qty: parsedData.data.qty
+        }
+      }
+      // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+
+      this.txCache[txid] = tokenData
+      this.txCacheCnt++
+      if (this.txCacheCnt % 100 === 0) {
+        console.log(`decodeOpReturn cache has ${this.txCacheCnt} cached txs`)
+      }
+
+      return tokenData
+    } catch (err) {
+      console.error(`Error in transaction.js/decodeOpReturn(). txid: ${txid}`)
+      throw err
+    }
   }
 
   /**
