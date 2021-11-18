@@ -204,4 +204,30 @@ describe('#genesis.js', () => {
       }
     })
   })
+
+  describe('#processTx', () => {
+    it('should execute lower functions', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'addTokenToDB').resolves()
+      sandbox.stub(uut, 'addReceiverAddress').resolves()
+      sandbox.stub(uut, 'addBatonAddress').resolves()
+
+      const result = await uut.processTx(mockData.genesisData)
+      assert.equal(result, true)
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut, 'addTokenToDB').rejects(new Error('test error'))
+
+        await uut.processTx(mockData.genesisData)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'test error')
+      }
+    })
+  })
 })

@@ -27,7 +27,10 @@ class Genesis {
   // Primary function. Processes GENESIS transaction.
   async processTx (data) {
     try {
-      console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      console.log(
+        `Processing Genesis txid ${data.txData.txid} with ticker '${data.slpData.ticker}' and name '${data.slpData.name}'`
+      )
       // const { slpData, blockHeight, txData } = data
 
       await this.addTokenToDB(data)
@@ -35,6 +38,9 @@ class Genesis {
       await this.addReceiverAddress(data)
 
       await this.addBatonAddress(data)
+
+      // Signal that call completed successfully.
+      return true
     } catch (err) {
       console.error('Error in genesis.processTx()')
       throw err

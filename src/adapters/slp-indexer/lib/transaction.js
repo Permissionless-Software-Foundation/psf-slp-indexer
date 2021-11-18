@@ -316,7 +316,6 @@ class Transaction {
     try {
       // Get token data, and auto-retry if the full node throws an error
       const tokenData = await this.decodeOpReturn(txid)
-      // const tokenData = await this.queue.addToQueue(this.decodeOpReturn, txid)
 
       // Corner case: token ID comes back as all zeros
       // Assumption: a normal TXID won't contain this many zeros.
@@ -397,6 +396,7 @@ class Transaction {
     if (cachedVal) return cachedVal
 
     // const txDetails = await _this.rpc.getRawTransaction(txid)
+    // Auto-retry if call to full node fails.
     const txDetails = await this.queue.addToQueue(this.rpc.getRawTransaction, txid)
     // console.log('txDetails: ', txDetails)
 
