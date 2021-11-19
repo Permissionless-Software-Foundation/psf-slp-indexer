@@ -8,6 +8,9 @@
 
 */
 
+const EPOCH = 1000 // blocks between backups
+const RETRY_CNT = 35 // Number of retries before exiting the indexer
+
 // Public npm libraries.
 const level = require('level')
 const readline = require('readline')
@@ -155,7 +158,7 @@ class SlpIndexer {
         )
 
         // Create a zip-file backup every 'epoch' of blocks
-        if (blockHeight % 200 === 0) {
+        if (blockHeight % EPOCH === 0) {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
@@ -250,7 +253,7 @@ class SlpIndexer {
 
           console.log(`Error count for ${tx}: ${errObj[0].cnt}`)
 
-          const retryCnt = 100
+          const retryCnt = RETRY_CNT
           if (errObj[0].cnt > retryCnt) {
             await this.handleProcessFailure(blockHeight, tx, err.message)
             throw new Error(
@@ -311,7 +314,7 @@ class SlpIndexer {
       console.log(`targetBlockHeight: ${targetBlockHeight}`)
 
       // Round the hight to the nearest 50
-      const rollbackHeight = Math.floor(targetBlockHeight / 200) * 200
+      const rollbackHeight = Math.floor(targetBlockHeight / EPOCH) * EPOCH
       console.log(
         `Rolling database back to this block height: ${rollbackHeight}`
       )
