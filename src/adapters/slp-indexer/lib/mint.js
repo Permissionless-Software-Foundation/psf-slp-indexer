@@ -82,6 +82,9 @@ class Mint {
 
       // If there is a minting baton output, add the address to the DB.
       await this.addBatonOutAddr(data)
+
+      // Return true to signal a successful completion of this function.
+      return true
     } catch (err) {
       console.error('Error in mint.processTx()')
       throw err
@@ -243,6 +246,8 @@ class Mint {
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
 
+      // Signal that the method completed successfully by returning the addr
+      // object.
       return addr
     } catch (err) {
       console.error('Error in mint.js/addBatonOutAddr()')
@@ -278,6 +283,10 @@ class Mint {
 
       // Save updates to the database.
       await this.tokenDb.put(slpData.tokenId, tokenStats)
+
+      // Signal that the function completed successfully by returning the
+      // tokenStats object.
+      return tokenStats
     } catch (err) {
       console.error('Error in mint.js/updateTokenStats()')
       throw err
