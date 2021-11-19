@@ -68,5 +68,6 @@ ipfsdata
 leveldb/
 logs/
 tx-map.json
+slp-tx-map.zip
 
 !README.md

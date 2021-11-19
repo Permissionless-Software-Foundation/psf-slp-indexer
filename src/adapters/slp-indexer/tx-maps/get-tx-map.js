@@ -4,35 +4,45 @@
 
 const https = require('https')
 const fs = require('fs')
+const shell = require('shelljs')
 
 const url =
-  'https://bafybeifg5ke5szowrwubucf2ljdthlgukupl3mvldtnjkacvig3wv4tity.ipfs.dweb.link/slp-tx-map-691599.json'
+  'https://bafybeieensqa52bczfdqbupxx4gjez7n4wmll7hhb5cfn67xwt5aykzyy4.ipfs.dweb.link/slp-tx-map.zip'
 
 async function getTxMap () {
   try {
     const download = function (url, dest, cb) {
-      const file = fs.createWriteStream(dest)
-      https
-        .get(url, function (response) {
-          response.pipe(file)
-          file.on('finish', function () {
-            file.close(cb) // close() is async, call cb after close completes.
+      return new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(dest)
+        https
+          .get(url, function (response) {
+            response.pipe(file)
+            file.on('finish', function () {
+              file.close(cb) // close() is async, call cb after close completes.
+              return resolve(true)
+            })
           })
-        })
-        .on('error', function (err) {
-          // Handle errors
-          fs.unlink(dest) // Delete the file async. (But we don't check the result)
-          if (cb) cb(err.message)
-        })
+          .on('error', function (err) {
+            // Handle errors
+            fs.unlink(dest) // Delete the file async. (But we don't check the result)
+            // if (cb) cb(err.message)
+            return reject(err)
+          })
+      })
     }
 
     console.log(
       'Downloading tx-map. It\'s a big file (over 100MB), it can take a while...'
     )
-    const dest = 'tx-map.json'
-    download(url, dest, function () {
+
+    // const dest = 'tx-map.json'
+    const dest = 'slp-tx-map.zip'
+    await download(url, dest, function () {
       console.log('done')
     })
+
+    // Unzip the tx map.
+    shell.exec(`unzip ${dest}`)
   } catch (err) {
     console.error('Error in getTxMap(): ', err)
   }

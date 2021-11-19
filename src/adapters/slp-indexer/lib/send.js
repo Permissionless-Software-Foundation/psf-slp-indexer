@@ -375,8 +375,6 @@ class Send {
         // console.log('addrData after utxo delete: ', addrData)
 
         // Subtract the token balance
-        console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
-        console.log(`utxoToDelete[0]: ${JSON.stringify(utxoToDelete[0], null, 2)}`)
         this.subtractBalanceFromSend(addrData, utxoToDelete[0])
         // console.log('addrData after subtractBalanceFromSend: ', addrData)
 

@@ -3,8 +3,8 @@
   them.
 */
 
-const map1 = require('./slp-tx-map-601455.json')
-const map2 = require('./tx-map.json')
+const map1 = require('./tx-map.json')
+const map2 = require('./tx-map-new.json')
 
 const fs = require('fs')
 
@@ -17,6 +17,7 @@ async function combineMaps () {
     // Get block heights from each map.
     const map1Heights = map1.map(x => x.height)
     const map2Heights = map2.map(x => x.height)
+    // console.log(`map1Heights: ${JSON.stringify(map1Heights, null, 2)}`)
 
     // Combine both arrays.
     let allHeights = map1Heights.concat(map2Heights)
@@ -60,6 +61,7 @@ async function combineMaps () {
 
       // Combine transactions from both maps.
       let allTxs = map1Txs[0].txs.concat(map2Txs[0].txs)
+      // console.log(`allTxs: ${JSON.stringify(allTxs, null, 2)}`)
 
       // Remove duplicates
       allTxs = [...new Set(allTxs)]
@@ -72,10 +74,10 @@ async function combineMaps () {
       combinedMap.push(thisObj)
     }
 
-    console.log(`combinedMap: ${JSON.stringify(combinedMap, null, 2)}`)
+    // console.log(`combinedMap: ${JSON.stringify(combinedMap, null, 2)}`)
     console.log(`map1Heights: ${map1Heights.length}, map2Heights: ${map2Heights.length}, combinedMap: ${combinedMap.length}`)
 
-    fs.writeFileSync('./combined-map.json', JSON.stringify(combinedMap, null, 2))
+    fs.writeFileSync('./out-combined-map.json', JSON.stringify(combinedMap, null, 2))
   } catch (err) {
     console.error(err)
   }
