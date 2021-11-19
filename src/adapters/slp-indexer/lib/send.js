@@ -193,7 +193,7 @@ class Send {
         voutIndex,
         slpAmountStr
       )
-      console.log(`newUtxo: ${JSON.stringify(newUtxo, null, 2)}`)
+      // console.log(`newUtxo: ${JSON.stringify(newUtxo, null, 2)}`)
 
       // Add the UTXO to the addr object.
       addr.utxos.push(newUtxo)
