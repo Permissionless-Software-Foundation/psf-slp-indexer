@@ -103,9 +103,9 @@ async function getTxs () {
 
         for (let i = 0; i < txData.length; i++) {
           const elem = txData[i]
-          console.log(
-            `elem.txid: ${elem.txid}, elem.blockHeight: ${elem.blockheight}`
-          )
+          // console.log(
+          //   `elem.txid: ${elem.txid}, elem.blockHeight: ${elem.blockheight}`
+          // )
 
           if (elem.blockheight !== currentBlock) {
             // Save the current block data to the output array.
@@ -127,8 +127,8 @@ async function getTxs () {
         outAry.push(currentObj)
 
         const outJsonStr = JSON.stringify(outAry, null, 2)
-        console.log(`${outJsonStr}`)
-        fs.writeFileSync('./tx-map.json', outJsonStr)
+        // console.log(`${outJsonStr}`)
+        fs.writeFileSync('./tx-map-new.json', outJsonStr)
       } catch (err) {
         console.error(err)
       }
