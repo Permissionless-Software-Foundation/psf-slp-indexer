@@ -65,23 +65,10 @@ class Send {
       const txid = txData.txid
       const tokenId = data.txData.tokenId
 
-      // console.log('slpData: ', slpData)
-      // console.log('slpData.amounts: ', slpData.amounts)
-
-      // Skip any token transactions that are on the blacklist.
-      // if (blacklist.includes(slpData.tokenId)) {
-      //   console.log(
-      //     `Skipping TXID ${txid} as it uses token ${slpData.tokenId}, which is on the blacklist.`
-      //   )
-      //   return
-      // }
-
       let start = new Date()
       start = start.getTime()
 
       // Validate the TX against the SLP DAG.
-      // const txidIsValid = await this.slpValidate.validateTxid(txid)
-      // const txidIsValid = await this.dag.validateTxid(txid)
       const { isValid } = await this.dag.crawlDag(txid, tokenId)
       if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
@@ -93,23 +80,16 @@ class Send {
         return
       }
 
-      let end = new Date()
-      end = end.getTime()
-      const diff = end - start
-      console.log(`DAG validation took ${diff} mS for TXID ${txid}`)
-
-      // // Ensure this is at least one input that has the same token ID.
-      // const validInputs = txData.vin.filter(x => x.tokenId === txData.tokenId)
-      // if (!validInputs.length) {
-      //   console.log(`No valid inputs found. Skipping ${txid}`)
-      //   return
-      // }
-
       // Subtract the input UTXOs and balances from input addresses.
       await this.subtractTokensFromInputAddr(data)
 
       // Add the output UTXOs to output addresses
       await this.addTokensFromOutput(data)
+
+      let end = new Date()
+      end = end.getTime()
+      const diff = end - start
+      console.log(`Processing of SEND TX took ${diff} mS for TXID ${txid}`)
 
       return true
     } catch (err) {
