@@ -1,25 +1,19 @@
 /*
   A utility library for doing common tasks with respect to indexing.
+  This library is primarily used by the genesis.js, mint.js, and send.js files.
 */
-
-// const BigNumber = require('bignumber.js')
 
 class IndexerUtils {
   // Generate a new schema/template for an address object. This structure will
   // be populated with data.
   getNewAddrObj () {
-    try {
-      const addr = {
-        utxos: [],
-        txs: [],
-        balances: []
-      }
-
-      return addr
-    } catch (err) {
-      console.error('Error in getNewAddrObj()')
-      throw err
+    const addr = {
+      utxos: [],
+      txs: [],
+      balances: []
     }
+
+    return addr
   }
 
   // Will add a new entry to an array, but only if the entry does not already
@@ -42,6 +36,7 @@ class IndexerUtils {
       array.push(txObj)
     } catch (err) {
       console.error('Error in indexer/util.js/addTxWithoutDuplicate')
+      throw err
     }
   }
 

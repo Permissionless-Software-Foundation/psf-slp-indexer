@@ -8,13 +8,29 @@ class Genesis {
   constructor (localConfig = {}) {
     // LevelDBs
     this.addrDb = localConfig.addrDb
+    if (!this.addrDb) {
+      throw new Error(
+        'Instance of address DB required when instantiating genesis.js'
+      )
+    }
     this.tokenDb = localConfig.tokenDb
+    if (!this.tokenDb) {
+      throw new Error(
+        'Instance of token DB required when instantiating genesis.js'
+      )
+    }
 
+    // Encapsulate dependencies
     this.util = new IndexerUtils()
   }
 
+  // Primary function. Processes GENESIS transaction.
   async processTx (data) {
     try {
+      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      console.log(
+        `Processing Genesis txid ${data.txData.txid} with ticker '${data.slpData.ticker}' and name '${data.slpData.name}'`
+      )
       // const { slpData, blockHeight, txData } = data
 
       await this.addTokenToDB(data)
@@ -22,6 +38,9 @@ class Genesis {
       await this.addReceiverAddress(data)
 
       await this.addBatonAddress(data)
+
+      // Signal that call completed successfully.
+      return true
     } catch (err) {
       console.error('Error in genesis.processTx()')
       throw err
@@ -205,6 +224,7 @@ class Genesis {
       // Token exists in the address object, update the balance.
       for (let i = 0; i < addrObj.balances.length; i++) {
         const thisBalance = addrObj.balances[i]
+        console.log(`thisBalance: ${JSON.stringify(thisBalance, null, 2)}`)
 
         if (thisBalance.tokenId !== tokenId) continue
 
@@ -213,9 +233,6 @@ class Genesis {
 
         return true
       }
-
-      // This code path shouldn't execute.
-      return false
     } catch (err) {
       console.error('Error in indexer/utils.js/updateBalance()')
       throw err

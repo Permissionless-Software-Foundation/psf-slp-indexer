@@ -345,7 +345,7 @@ describe('#Transaction', () => {
 
   describe('#getTokenInfo', () => {
     it('should return data from decodeOpReturn()', async () => {
-      sandbox.stub(uut, 'decodeOpReturn').resolves({ txid: 'sometxid' })
+      sandbox.stub(uut, 'decodeOpReturn').resolves({ txid: 'sometxid', tokenId: 'sometokenid' })
 
       const result = await uut.getTokenInfo('input-txid')
 

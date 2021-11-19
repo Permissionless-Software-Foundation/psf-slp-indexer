@@ -9,12 +9,17 @@ const axios = require('axios')
 const { wlogger } = require('../../wlogger')
 const config = require('../../../../config')
 
+// Global pointer to instance of this class
+let _this
+
 class RPC {
   constructor () {
     // Encapsulate dependencies
     this.axios = axios
     this.wlogger = wlogger
     this.config = config
+
+    _this = this
   }
 
   // Axios options used when calling axios.post() to talk with a full node.
@@ -125,18 +130,18 @@ class RPC {
     try {
       if (!txid) throw new Error('txid must be provided')
 
-      const options = this.getAxiosOptions()
+      const options = _this.getAxiosOptions()
 
       options.data.id = 'getrawtransaction'
       options.data.method = 'getrawtransaction'
       options.data.params = [txid, verbose]
 
-      const response = await this.axios.request(options)
+      const response = await _this.axios.request(options)
 
       return response.data.result
     } catch (err) {
       // Write out error to error log.
-      this.wlogger.error('Error in rpc.js/getRawTransaction() ', err)
+      _this.wlogger.error('Error in rpc.js/getRawTransaction() ', err)
 
       throw err
     }

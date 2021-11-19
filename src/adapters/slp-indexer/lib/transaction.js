@@ -8,16 +8,23 @@ const slpParser = require('slp-parser')
 
 // Local libraries
 const RPC = require('./rpc')
+const RetryQueue = require('./retry-queue')
+
+// Global pointer to instance of this class
+let _this
 
 class Transaction {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.slpParser = slpParser
+    this.queue = new RetryQueue()
 
     // State
     this.txCache = {}
     this.txCacheCnt = 0
+
+    _this = this
   }
 
   /**
@@ -76,6 +83,7 @@ class Transaction {
       txDetails.isSlpTx = true
 
       // Get Genesis data
+      // console.log(`txTokenData.tokenId: ${txTokenData.tokenId}`)
       const genesisData = await this.getTokenInfo(txTokenData.tokenId)
       // console.log(`genesisData: ${JSON.stringify(genesisData, null, 2)}`)
 
@@ -176,6 +184,7 @@ class Transaction {
         const thisVin = txDetails.vin[i]
         // console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
 
+        // console.log(`thisVin.txid: ${thisVin.txid}`)
         const vinTokenData = await this.getTokenInfo(thisVin.txid)
         // console.log(
         //   `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
@@ -296,7 +305,7 @@ class Transaction {
 
       return txDetails
     } catch (err) {
-      console.error('Error in get()')
+      console.error('Error in transaction.js/get(). txid: ', txid)
       throw err
     }
   }
@@ -305,13 +314,26 @@ class Transaction {
   // Returns the token data if the txid is an SLP tx.
   async getTokenInfo (txid) {
     try {
+      // Get token data, and auto-retry if the full node throws an error
       const tokenData = await this.decodeOpReturn(txid)
+
+      // Corner case: token ID comes back as all zeros
+      // Assumption: a normal TXID won't contain this many zeros.
+      if (tokenData.tokenId.includes('00000000')) { return false }
+
       return tokenData
     } catch (err) {
-      // Throw an error if root cause was a connection issue with the full node.
-      if (err.message.includes('status code 50')) {
-        throw err
-      }
+      // Dev Note: It's impossible to tell the difference between a full node
+      // having a network issue vs the corner-case of passing a 'fake' TXID
+      // that does not exist. In both instances, the full node will respond
+      // with a 500 error code. Auto-retry should fix network errors, so it
+      // must be assumed that a 500 error code at this point in the code path
+      // is due to the corner case, and returning false (as opposed to throwing
+      // an error) is the proper response.
+      // Code below intentially commented out.
+      // if (err.message.includes('status code 50')) {
+      //   throw err
+      // }
 
       // Otherwise return false
       return false
@@ -370,17 +392,19 @@ class Transaction {
     }
 
     // Return results if they've been cached.
-    const cachedVal = this.txCache[txid]
+    const cachedVal = _this.txCache[txid]
     if (cachedVal) return cachedVal
 
-    const txDetails = await this.rpc.getRawTransaction(txid)
+    // const txDetails = await _this.rpc.getRawTransaction(txid)
+    // Auto-retry if call to full node fails.
+    const txDetails = await this.queue.addToQueue(this.rpc.getRawTransaction, txid)
     // console.log('txDetails: ', txDetails)
 
     // SLP spec expects OP_RETURN to be the first output of the transaction.
     const opReturn = txDetails.vout[0].scriptPubKey.hex
     // console.log(`opReturn hex: ${opReturn}`)
 
-    const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
+    const parsedData = _this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
     // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
 
     // Convert Buffer data to hex strings or utf8 strings.
@@ -416,13 +440,16 @@ class Transaction {
     }
     // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
-    this.txCache[txid] = tokenData
-    this.txCacheCnt++
-    if (this.txCacheCnt % 100 === 0) {
-      console.log(`decodeOpReturn cache has ${this.txCacheCnt} cached txs`)
+    _this.txCache[txid] = tokenData
+    _this.txCacheCnt++
+    if (_this.txCacheCnt % 100 === 0) {
+      console.log(`decodeOpReturn cache has ${_this.txCacheCnt} cached txs`)
     }
 
     return tokenData
+
+    // Dev Note: There is no try/catch statement here because this function
+    // throws errors as part of its normal operation.
   }
 
   /**

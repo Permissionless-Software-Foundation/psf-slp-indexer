@@ -6,7 +6,7 @@
 
 // Global constants
 const EPOCH = 1000 // blocks between backups
-const RETRY_CNT = 35 // Number of retries before exiting the indexer
+const RETRY_CNT = 5 // Number of retries before exiting the indexer
 
 // Load the TX map of SLP transactions in the blockchain
 const txMap = require('./tx-maps/tx-map.json')
@@ -211,7 +211,7 @@ class SlpReIndexer {
         await this.processSlpTxs(slpTxs, blockHeight)
       }
     } catch (err) {
-      console.log('Error in indexer: ', err)
+      console.log('Error in re-index.js: ', err)
       // Don't throw an error. This is a top-level function.
 
       // console.log('Restoring backup of database.')
@@ -335,18 +335,18 @@ class SlpReIndexer {
         `Rolling database back to this block height: ${rollbackHeight}`
       )
 
-      throw new Error(errMsg)
+      // throw new Error(errMsg)
 
       // Round the hight to the nearest 100
       // const rollbackHeight = Math.floor(targetBlockHeight / 100) * 100
       // console.log(`Rolling database back to this block height: ${rollbackHeight}`)
 
       // Roll back the database to before the parent transaction.
-      // await this.dbBackup.unzipDb(rollbackHeight)
+      await this.dbBackup.unzipDb(rollbackHeight)
 
       // Kill the process, which will allow the app to shut down, and pm2 or Docker can
       // restart it at a block height prior to the problematic parent transaction.
-      // process.exit(0)
+      process.exit(0)
     } catch (err) {
       console.error('Error in handleProcessFailure: ', err)
       // Do not throw an error, as this is an error handlilng function.

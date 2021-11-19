@@ -13,26 +13,38 @@ const BigNumber = require('bignumber.js')
 
 // Local libraries
 const IndexerUtils = require('./utils')
-// const SlpValidate = require('./slp-validate')
 const DAG = require('./dag')
 
 class Mint {
   constructor (localConfig = {}) {
+    // Dependency injection
     this.cache = localConfig.cache
     if (!this.cache) {
       throw new Error(
-        'Must pass cache instance when instantiating Send library'
+        'Must pass cache instance when instantiating mint.js'
       )
     }
-    // TODO: Throw error if database handles are not passed in with localConfig
-
-    // LevelDBs
     this.addrDb = localConfig.addrDb
+    if (!this.addrDb) {
+      throw new Error(
+        'Must pass address DB instance when instantiating mint.js'
+      )
+    }
     this.tokenDb = localConfig.tokenDb
+    if (!this.tokenDb) {
+      throw new Error(
+        'Must pass token DB instance when instantiating mint.js'
+      )
+    }
     this.txDb = localConfig.txDb
+    if (!this.txDb) {
+      throw new Error(
+        'Must pass transaction DB instance when instantiating mint.js'
+      )
+    }
 
+    // Encapsulate dependencies
     this.util = new IndexerUtils()
-    // this.slpValidate = new SlpValidate()
     this.dag = new DAG(localConfig)
   }
 
@@ -47,17 +59,10 @@ class Mint {
       // Validate the TX against the SLP DAG.
       const txid = data.txData.txid
       const tokenId = data.txData.tokenId
-      // const txidIsValid = await this.slpValidate.validateTxid(txid)
-      // if (!txidIsValid) {
-      //   console.log(`TXID ${txid} failed DAG validation. Skipping.`)
-      //   return
-      // }
-
       const { isValid } = await this.dag.crawlDag(txid, tokenId)
-      // const txidIsValid = await this.dag.validateTxid(txid)
-      console.log('isValid: ', isValid)
+      // console.log('isValid: ', isValid)
       if (!isValid) {
-        console.log(`TXID ${txid} failed DAG validation. Skipping.`)
+        console.log(`MINT TXID ${txid} failed DAG validation. Skipping.`)
 
         // Mark TX as invalid and save in database.
         data.txData.isValidSlp = false
@@ -66,7 +71,7 @@ class Mint {
         return
       }
 
-      // Update the minting baton to the the output address.
+      // Remove the minting baton from the input address.
       await this.removeBatonInAddr(data)
 
       // Add the output UTXOs to output addresses
@@ -75,7 +80,11 @@ class Mint {
       // Update the circulating supply in the token index.
       await this.updateTokenStats(data)
 
+      // If there is a minting baton output, add the address to the DB.
       await this.addBatonOutAddr(data)
+
+      // Return true to signal a successful completion of this function.
+      return true
     } catch (err) {
       console.error('Error in mint.processTx()')
       throw err
@@ -120,9 +129,6 @@ class Mint {
 
         return true
       }
-
-      // This code path shouldn't execute.
-      return false
     } catch (err) {
       console.error('Error in updateBalanceFromMint()')
       throw err
@@ -240,6 +246,8 @@ class Mint {
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
 
+      // Signal that the method completed successfully by returning the addr
+      // object.
       return addr
     } catch (err) {
       console.error('Error in mint.js/addBatonOutAddr()')
@@ -275,6 +283,10 @@ class Mint {
 
       // Save updates to the database.
       await this.tokenDb.put(slpData.tokenId, tokenStats)
+
+      // Signal that the function completed successfully by returning the
+      // tokenStats object.
+      return tokenStats
     } catch (err) {
       console.error('Error in mint.js/updateTokenStats()')
       throw err
@@ -321,8 +333,10 @@ class Mint {
       }
       this.util.addTxWithoutDuplicate(txObj, addr.txs)
 
+      // console.log(`addr: ${JSON.stringify(addr, null, 2)}`)
+
       // Update balances
-      this.updateBalanceFromMint(addr, slpData, txData)
+      this.updateBalanceFromMint(addr, slpData)
 
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
