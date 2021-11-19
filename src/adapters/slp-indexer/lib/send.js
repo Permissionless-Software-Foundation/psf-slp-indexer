@@ -20,35 +20,44 @@
 */
 
 const BigNumber = require('bignumber.js')
-// const BCHJS = require('@psf/bch-js')
 
 const IndexerUtils = require('./utils')
-// const SlpValidate = require('./slp-validate')
-// const blacklist = require('./blacklist')
 const DAG = require('./dag')
 
 class Send {
   constructor (localConfig = {}) {
+    // Dependency injection
     this.cache = localConfig.cache
     if (!this.cache) {
       throw new Error(
-        'Must pass cache instance when instantiating Send library'
+        'Must pass cache instance when instantiating send.js'
       )
     }
-    // TODO: Throw error if database handles are not passed in with localConfig
-
-    // LevelDBs
     this.addrDb = localConfig.addrDb
+    if (!this.addrDb) {
+      throw new Error(
+        'Must pass address DB instance when instantiating send.js'
+      )
+    }
     this.tokenDb = localConfig.tokenDb
+    if (!this.tokenDb) {
+      throw new Error(
+        'Must pass token DB instance when instantiating send.js'
+      )
+    }
     this.txDb = localConfig.txDb
+    if (!this.txDb) {
+      throw new Error(
+        'Must pass transaction DB instance when instantiating send.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
-    // this.slpValidate = new SlpValidate()
-    // this.bchjs = new BCHJS()
     this.dag = new DAG(localConfig)
   }
 
+  // This is the top-level function. It calls all other subfunctions.
   async processTx (data) {
     try {
       // console.log(`send.processTx() data: ${JSON.stringify(data, null, 2)}`)
@@ -101,6 +110,8 @@ class Send {
 
       // Add the output UTXOs to output addresses
       await this.addTokensFromOutput(data)
+
+      return true
     } catch (err) {
       console.error('Error in send.processTx()')
       throw err
@@ -125,11 +136,7 @@ class Send {
       return true
     } catch (err) {
       console.error('Error in addTokensFromOutput()')
-      // throw err
-
-      // For debugging
-      console.error(err)
-      process.exit(1)
+      throw err
     }
   }
 
@@ -235,14 +242,6 @@ class Send {
       }
 
       return utxo
-
-      // addr.utxos.push(utxo)
-      // console.log(
-      //   `send utxo (txid ${txData.txid}): ${JSON.stringify(utxo, null, 2)}`
-      // )
-      // // this.util.addWithoutDuplicate(utxo, addr.utxos)
-      //
-      // return addr
     } catch (err) {
       console.error('Error in updateAddrObjFromOutput()')
       throw err
@@ -250,6 +249,8 @@ class Send {
   }
 
   // Update the balance for the given address with the given token data.
+  // Modifies the balance of the addrObj, in-place.
+  // Returns true to signal that the function completed successfully.
   updateBalanceFromSend (addrObj, slpData, amountIndex) {
     try {
       // console.log('addrObj: ', addrObj)
@@ -286,9 +287,6 @@ class Send {
 
         return true
       }
-
-      // This code path shouldn't execute.
-      return false
     } catch (err) {
       console.error('Error in updateBalanceFromSend()')
       throw err
@@ -303,7 +301,7 @@ class Send {
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // Loop through each input, and ensure all input UTXOs are present in the
-      // database BEFORE processing (i.e. deleting UTXOs from the database).
+      // database BEFORE processing (i.e. before deleting UTXOs from the database).
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
         // console.log(
@@ -328,6 +326,9 @@ class Send {
 
         // Get the DB entry for this address.
         const addrData = await this.addrDb.get(thisVin.address)
+        // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+        // console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
+        // process.exit(0)
 
         // Get the UTXO entry that matches the current input.
         const utxoToDelete = addrData.utxos.filter((x) => {
@@ -344,7 +345,7 @@ class Send {
         }
       }
 
-      // Loop through and process each input, but deleting the input UTXO
+      // Loop through and process each input and delete the input UTXO
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
@@ -370,12 +371,7 @@ class Send {
 
         // This is most often where the indexer will 'break'. This is primarily
         // due to several chained UTXOs in the block, which are rapidly spending
-        // tokens. The p-retry library is essential for allowing the indexer
-        // to chew through all the chained transactions.
-        // TODO: An optimation for the use-case is to query the DAG with
-        // slp-validate, and validate each TXID. Of course, I would need to
-        // update this code to anticipate that a TXID might have already been
-        // processed.
+        // tokens.
         if (!utxoToDelete.length) {
           console.log(`\nthisVin: ${JSON.stringify(thisVin, null, 2)}`)
           console.log(
@@ -399,6 +395,8 @@ class Send {
         // console.log('addrData after utxo delete: ', addrData)
 
         // Subtract the token balance
+        console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
+        console.log(`utxoToDelete[0]: ${JSON.stringify(utxoToDelete[0], null, 2)}`)
         this.subtractBalanceFromSend(addrData, utxoToDelete[0])
         // console.log('addrData after subtractBalanceFromSend: ', addrData)
 
@@ -413,6 +411,7 @@ class Send {
         await this.addrDb.put(thisVin.address, addrData)
       }
 
+      // Return true to indicate that the TX was processed.
       return true
       // const inputTx = await this.txDb.get()
     } catch (err) {
