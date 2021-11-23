@@ -190,23 +190,23 @@ describe('#filter-block.js', () => {
       console.log(`result: ${JSON.stringify(result, null, 2)}`)
     })
 
-    // it('should sort prolematic block', async () => {
-    //   // force cache to get data from the full node.
-    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
-    //
-    //   const blockHeight = 714282
-    //   const blockHash = await rpc.getBlockHash(blockHeight)
-    //   const block = await rpc.getBlock(blockHash)
-    //
-    //   const txs = block.tx
-    //   // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
-    //
-    //   const result = await uut.filterAndSortSlpTxs2(
-    //     txs,
-    //     blockHeight
-    //   )
-    //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
-    // })
+    it('should sort prolematic block', async () => {
+      // force cache to get data from the full node.
+      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+
+      const blockHeight = 714476
+      const blockHash = await rpc.getBlockHash(blockHeight)
+      const block = await rpc.getBlock(blockHash)
+
+      const txs = block.tx
+      // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
+
+      const result = await uut.filterAndSortSlpTxs2(
+        txs,
+        blockHeight
+      )
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    })
   })
 
   describe('#checkForParent', () => {

@@ -382,11 +382,17 @@ class FilterBlock {
       // return { sortedTxids, independentTxids }
 
       // For debugging:
-      // console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
-      // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
+      console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
+      console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
 
-      // Return the combined arrays with the independent txids first.
-      return independentTxids.concat(sortedTxids)
+      // Combine arrays with the independent txids first.
+      let combined = independentTxids.concat(sortedTxids)
+
+      // Ensure there are no duplicate TXIDs.
+      // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
+      combined = [...new Set(combined)]
+
+      return combined
     } catch (err) {
       console.error('Error in fitlerAndSortSlpTxs2()')
       // console.log(err)

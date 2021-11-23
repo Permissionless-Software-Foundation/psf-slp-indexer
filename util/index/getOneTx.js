@@ -2,21 +2,21 @@
   Utility tool to retrieve a single TX from the TX database.
 */
 
-const addr = 'bitcoincash:qrjspsctn5plxa77a0ddmj2ftcarjvnjmca0gqspay'
+const TXID = '0e27a51375d165b656459c1a4bc79e835541b70fad0183bb70a2bcfa037a4f27'
 
 const level = require('level')
 
-const addrDb = level(`${__dirname.toString()}/../../leveldb/current/addrs`, {
+const txDb = level(`${__dirname.toString()}/../../leveldb/current/txs`, {
   valueEncoding: 'json'
 })
 
-async function getAddr () {
+async function getTx () {
   try {
-    const addrData = await addrDb.get(addr)
+    const txData = await txDb.get(TXID)
 
-    console.log(`${JSON.stringify(addrData, null, 2)}`)
+    console.log(`${JSON.stringify(txData, null, 2)}`)
   } catch (err) {
     console.error(err)
   }
 }
-getAddr()
+getTx()
