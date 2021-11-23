@@ -6,8 +6,8 @@ const assert = require('chai').assert
 const sinon = require('sinon')
 
 const BCHJS = require('@psf/bch-js')
-// const bchjs = new BCHJS()
-const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
+const bchjs = new BCHJS()
+// const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
 
 const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
@@ -189,6 +189,24 @@ describe('#filter-block.js', () => {
       )
       console.log(`result: ${JSON.stringify(result, null, 2)}`)
     })
+
+    // it('should sort prolematic block', async () => {
+    //   // force cache to get data from the full node.
+    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //   const blockHeight = 714282
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //
+    //   const txs = block.tx
+    //   // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
+    //
+    //   const result = await uut.filterAndSortSlpTxs2(
+    //     txs,
+    //     blockHeight
+    //   )
+    //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    // })
   })
 
   describe('#checkForParent', () => {

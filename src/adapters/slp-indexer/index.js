@@ -8,8 +8,8 @@
 
 */
 
-const EPOCH = 200 // blocks between backups
-const RETRY_CNT = 35 // Number of retries before exiting the indexer
+const EPOCH = 20 // blocks between backups
+const RETRY_CNT = 5 // Number of retries before exiting the indexer
 
 // Public npm libraries.
 const level = require('level')
@@ -121,8 +121,8 @@ class SlpIndexer {
       for (
         let blockHeight = status.syncedBlockHeight;
         blockHeight < biggestBlockHeight;
-        // blockHeight < 688836;
-        // blockHeight < status.syncedBlockHeight + 5;
+        // blockHeight < 714475;
+        // blockHeight < status.syncedBlockHeight;
         blockHeight++
       ) {
         // Update and save the sync status.
@@ -194,6 +194,14 @@ class SlpIndexer {
         // Progressively processes TXs in the array.
         await this.processSlpTxs(slpTxs, blockHeight)
       }
+
+      console.log(
+        `\n\nBulk Indexing has completed. Last block synced: ${status.syncedBlockHeight}\n`
+      )
+
+      // Update and save the sync status.
+      status.syncedBlockHeight++
+      await statusDb.put('status', status)
     } catch (err) {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
@@ -320,7 +328,7 @@ class SlpIndexer {
       )
 
       // Roll back the database to before the parent transaction.
-      await this.dbBackup.unzipDb(rollbackHeight)
+      // await this.dbBackup.unzipDb(rollbackHeight)
 
       // Kill the process, which will allow the app to shut down, and pm2 or Docker can
       // restart it at a block height prior to the problematic parent transaction.

@@ -381,6 +381,10 @@ class FilterBlock {
       // arrays below.
       // return { sortedTxids, independentTxids }
 
+      // For debugging:
+      // console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
+      // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
+
       // Return the combined arrays with the independent txids first.
       return independentTxids.concat(sortedTxids)
     } catch (err) {
