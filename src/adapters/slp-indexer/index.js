@@ -8,8 +8,8 @@
 
 */
 
-const EPOCH = 20 // blocks between backups
-const RETRY_CNT = 5 // Number of retries before exiting the indexer
+const EPOCH = 50 // blocks between backups
+const RETRY_CNT = 25 // Number of retries before exiting the indexer
 
 // Public npm libraries.
 const level = require('level')
@@ -119,7 +119,7 @@ class SlpIndexer {
 
       // Loop through the block heights and index every block.
       for (
-        let blockHeight = status.syncedBlockHeight + 1;
+        let blockHeight = status.syncedBlockHeight;
         blockHeight < biggestBlockHeight;
         // blockHeight < 714475;
         // blockHeight < status.syncedBlockHeight;
