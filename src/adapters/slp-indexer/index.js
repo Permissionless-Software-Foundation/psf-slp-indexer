@@ -116,11 +116,12 @@ class SlpIndexer {
       // Get the current block height
       const biggestBlockHeight = await this.rpc.getBlockCount()
       console.log('Current chain block height: ', biggestBlockHeight)
+      console.log('Starting bulk indexing.')
 
       // Loop through the block heights and index every block.
       for (
         let blockHeight = status.syncedBlockHeight;
-        blockHeight < biggestBlockHeight;
+        blockHeight < biggestBlockHeight - 10;
         // blockHeight < 714475;
         // blockHeight < status.syncedBlockHeight;
         blockHeight++
@@ -195,13 +196,14 @@ class SlpIndexer {
         await this.processSlpTxs(slpTxs, blockHeight)
       }
 
-      console.log(
-        `\n\nBulk Indexing has completed. Last block synced: ${status.syncedBlockHeight}\n`
-      )
-
       // Update and save the sync status.
       status.syncedBlockHeight++
       await statusDb.put('status', status)
+
+      console.log(
+        `\n\nBulk Indexing has completed. Last block synced: ${status.syncedBlockHeight}\n`
+      )
+      console.log('Starting indexing of weak blocks.')
     } catch (err) {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.

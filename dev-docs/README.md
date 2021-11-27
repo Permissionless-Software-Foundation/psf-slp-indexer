@@ -25,3 +25,28 @@ This document lays out the file structure of the SLP indexer. It gives a brief o
 - [gensis.js](../src/adapters/slp-indexer/lib/genesis.js) - This library contains the logic used to index SLP GENESIS transactions.
 - [mint.js](../src/adapters/slp-indexer/lib/mint.js) - This library contains the logic used to index SLP MINT transactions.
 - [send.js](../src/adapters/slp-indexer/lib/send.js) - This library contains the logic used to index SLP SEND transactions.
+
+## Indexer Databases
+The indexer maintains several LevelDB databases.
+
+- status - This is a small database that tracks the current state of the indexer.
+- tokens - This database tracks the state of each token class. It tracks stats about each token, like the number in circulation and the number of burned tokens.
+- addrs - This tracks addresses hold tokens and their current balance.
+- txs - This is a persistant cache of transaction data. This reduces computational load by quickly retrieving hydrated token data, rather than recomputing it each time the transaction is needed.
+- ptxs - (Processed transactions) A list of transactions that have already been processed by the indexer. This is periodically purged. It's used sync the mempool and blocks, when a new block is found.
+
+## Indexing Phases
+There are three distinct 'phases' or indexing that this app will run through:
+
+### Bulk Indexing (Phase 1):
+This is starting point. The indexer queries the full node to determine the current block height. The indexer then begins indexing the SLP transactions in each block and updating the database, until it reaches 10 blocks from the tip of the chain. These are considered 'strong' blocks, due to 10-block check point used by BCH. There should never be a re-org of more than 10 blocks.
+
+During this phase, the epoch value is set at 50. The database will back itself up every 50 blocks, and will roll back to this backup if it encounters an error in indexing.
+
+### Weak blocks (Phase 2):
+Once the indexer gets within 10 blocks of the tip, it enters this second phase. These are considered 'weak' blocks, as they could potentially be reorganized.
+
+During this phase, the epoch value is set at 10. The database will back itself up every 10 blocks, and will roll back to these backups if a re-org is detected.
+
+### Mempool Indexing (Phase 3):
+Once the indexer reaches the tip of the blockchain, it begins indexing the mempool. The mempool is loaded into a queue, and any new transactions detected by the full node are passed into the queue by listening to the ZMQ port of the full node. When a new block is found, all the already-processed transactions are ignored.
