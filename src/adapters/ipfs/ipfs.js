@@ -51,6 +51,11 @@ class IpfsAdapter {
               `/ip4/0.0.0.0/tcp/${this.config.ipfsTcpPort}`,
               `/ip4/0.0.0.0/tcp/${this.config.ipfsWsPort}/ws`
             ]
+          },
+          Datastore: {
+            StorageMax: '2GB',
+            StorageGCWatermark: 50,
+            GCPeriod: '15m'
           }
         }
       }
@@ -62,8 +67,8 @@ class IpfsAdapter {
       await this.ipfs.config.profiles.apply('server')
 
       // Debugging: Display IPFS config settings.
-      // const configSettings = await this.ipfs.config.getAll()
-      // console.log(`configSettings: ${JSON.stringify(configSettings, null, 2)}`)
+      const configSettings = await this.ipfs.config.getAll()
+      console.log(`configSettings: ${JSON.stringify(configSettings, null, 2)}`)
 
       // Signal that this adapter is ready.
       this.isReady = true
