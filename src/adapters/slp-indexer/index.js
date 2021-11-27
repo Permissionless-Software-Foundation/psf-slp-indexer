@@ -52,7 +52,7 @@ const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
 let _this
 
 class SlpIndexer {
-  constructor (localConfig = {}) {
+  constructor(localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
@@ -70,7 +70,7 @@ class SlpIndexer {
     _this = this
   }
 
-  async start () {
+  async start() {
     try {
       console.log('starting SLP indexer...\n')
       wlogger.info('starting SLP indexer...')
@@ -126,46 +126,8 @@ class SlpIndexer {
           process.exit(0)
         }
 
-        // Get the block hash for the current block height.
-        const blockHash = await this.rpc.getBlockHash(blockHeight)
-        // console.log("blockHash: ", blockHash);
-
-        // Now get the actual data stored in that block.
-        const block = await this.rpc.getBlock(blockHash)
-        // console.log('block: ', block)
-
-        // Transactions in the block.
-        const txs = block.tx
-
-        const now = new Date()
-        console.log(
-          `Indexing block ${blockHeight} with ${
-            txs.length
-          } transactions. ${now.toLocaleString()}`
-        )
-
-        // Create a zip-file backup every 'epoch' of blocks
-        if (blockHeight % EPOCH === 0) {
-          console.log(
-            `Creating zip archive of database at block ${blockHeight}`
-          )
-          await this.dbBackup.zipDb(blockHeight, EPOCH)
-        }
-
-        // Filter and sort block transactions, to make indexing more efficient
-        // and easier to debug.
-        const slpTxs = await this.filterBlock.filterAndSortSlpTxs2(
-          txs,
-          blockHeight
-        )
-        console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-        console.log(`slpTxs.length: ${slpTxs.length}`)
-
-        // Move on to the next block if there are no SLP transactions.
-        if (!slpTxs.length) continue
-
-        // Progressively processes TXs in the array.
-        await this.processSlpTxs(slpTxs, blockHeight)
+        // Process all SLP txs in the block.
+        await this.processBlock(blockHeight)
       }
 
       // Update and save the sync status.
@@ -185,6 +147,17 @@ class SlpIndexer {
       console.log('Starting indexing of mempool')
 
       process.exit(0)
+
+      // Enter permanent loop.
+      do {
+        // On a new transaction, process it.
+
+        // On a new block, process it.
+
+        // Check for block re-org. Roll back database if one is encountered.
+
+        // Every 10 blocks, make a backup.
+      } while(1)
     } catch (err) {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
@@ -197,11 +170,60 @@ class SlpIndexer {
     }
   }
 
+  // Processes an entire block.
+  async processBlock(blockHeight) {
+    try {
+      // Get the block hash for the current block height.
+      const blockHash = await this.rpc.getBlockHash(blockHeight)
+      // console.log("blockHash: ", blockHash);
+
+      // Now get the actual data stored in that block.
+      const block = await this.rpc.getBlock(blockHash)
+      // console.log('block: ', block)
+
+      // Transactions in the block.
+      const txs = block.tx
+
+      const now = new Date()
+      console.log(
+        `Indexing block ${blockHeight} with ${
+          txs.length
+        } transactions. ${now.toLocaleString()}`
+      )
+
+      // Create a zip-file backup every 'epoch' of blocks
+      if (blockHeight % EPOCH === 0) {
+        console.log(
+          `Creating zip archive of database at block ${blockHeight}`
+        )
+        await this.dbBackup.zipDb(blockHeight, EPOCH)
+      }
+
+      // Filter and sort block transactions, to make indexing more efficient
+      // and easier to debug.
+      const slpTxs = await this.filterBlock.filterAndSortSlpTxs2(
+        txs,
+        blockHeight
+      )
+      console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      console.log(`slpTxs.length: ${slpTxs.length}`)
+
+      // If the block has no txs after filtering for SLP txs, then return.
+      if (!slpTxs.length) return
+
+      // Progressively processes TXs in the array.
+      await this.processSlpTxs(slpTxs, blockHeight)
+    } catch(err) {
+      console.error('Error in processBlock()')
+      throw err
+    }
+  }
+
   // This processes each SLP tx in-order in the array. If an error is found,
   // the current TX is moved to the back of the queue. Processing continues
   // until the array is empty, or the same TX has failed to process RETRY_CNT
   // times in a row.
-  async processSlpTxs (slpTxs, blockHeight) {
+  async processSlpTxs(slpTxs, blockHeight) {
     try {
       const errors = [] // Track errors
 
@@ -267,7 +289,7 @@ class SlpIndexer {
   // get stuck.
   // It determines the block height of the problematic parent transaction, then
   // rolls the database to a block height before that transaction.
-  async handleProcessFailure (blockHeight, tx, errMsg) {
+  async handleProcessFailure(blockHeight, tx, errMsg) {
     try {
       console.log(`Block height: ${blockHeight}`)
       console.log(`errMsg: ${errMsg}`)
@@ -325,7 +347,7 @@ class SlpIndexer {
   }
 
   // Process a single SLP transaction.
-  async processTx (inData) {
+  async processTx(inData) {
     try {
       const { tx, blockHeight } = inData
 
@@ -338,6 +360,7 @@ class SlpIndexer {
         await pTxDb.get(tx)
 
         // If TXID exists in the DB, then it's been processed. Exit.
+        console.log(`${tx} already processed. Skipping.`)
         return
       } catch {
         /* exit quietly */
@@ -380,7 +403,7 @@ class SlpIndexer {
 
   // This function routes the data for further processing, based on the type of
   // SLP transaction it is.
-  async processData (data) {
+  async processData(data) {
     try {
       const { slpData, txData } = data
       // console.log('slpData: ', slpData)
