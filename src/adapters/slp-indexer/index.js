@@ -45,11 +45,14 @@ const statusDb = level(
     valueEncoding: 'json'
   }
 )
+const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
+  valueEncoding: 'json'
+})
 
 let _this
 
 class SlpIndexer {
-  constructor (localConfig = {}) {
+  constructor(localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
@@ -67,7 +70,7 @@ class SlpIndexer {
     _this = this
   }
 
-  async start () {
+  async start() {
     try {
       console.log('starting SLP indexer...\n')
       wlogger.info('starting SLP indexer...')
@@ -89,7 +92,6 @@ class SlpIndexer {
 
         await statusDb.put('status', status)
       }
-      // console.log('status: ', status)
       console.log(
         `Indexer is currently synced to height ${status.syncedBlockHeight}`
       )
@@ -147,7 +149,7 @@ class SlpIndexer {
           console.log(
             `Creating zip archive of database at block ${blockHeight}`
           )
-          await this.dbBackup.zipDb(blockHeight)
+          await this.dbBackup.zipDb(blockHeight, EPOCH)
         }
 
         // Filter and sort block transactions, to make indexing more efficient
@@ -200,17 +202,16 @@ class SlpIndexer {
     }
   }
 
-  // This is a replacement for the concurrent processing. This processes each
-  // slp tx in-order in the array. If an error is found, the current TX is
-  // moved to the back of the queue. Processing continues until the array is
-  // is empty, or the same TX has failed to process 5 times in a row.
-  async processSlpTxs (slpTxs, blockHeight) {
+  // This processes each SLP tx in-order in the array. If an error is found,
+  // the current TX is moved to the back of the queue. Processing continues
+  // until the array is empty, or the same TX has failed to process RETRY_CNT
+  // times in a row.
+  async processSlpTxs(slpTxs, blockHeight) {
     try {
       const errors = [] // Track errors
 
-      // Loop through each tx in the slpTxs array.
-      // const numTxs = slpTxs.length
-      // for (let i = 0; i < numTxs; i++) {
+      // Loop through each tx in the slpTxs array, until all the TXs have been
+      // removed from the array.
       do {
         // Get the first element in the slpTxs array.
         const tx = slpTxs.shift()
@@ -220,6 +221,9 @@ class SlpIndexer {
         try {
           // Attempt to process TX
           await this.processTx({ tx, blockHeight })
+
+          // Save the TX to the processed database.
+          await pTxDb.put(tx, true)
         } catch (err) {
           console.log('----> HANDLING ERROR <----')
           console.log(err)
@@ -268,7 +272,7 @@ class SlpIndexer {
   // get stuck.
   // It determines the block height of the problematic parent transaction, then
   // rolls the database to a block height before that transaction.
-  async handleProcessFailure (blockHeight, tx, errMsg) {
+  async handleProcessFailure(blockHeight, tx, errMsg) {
     try {
       console.log(`Block height: ${blockHeight}`)
       console.log(`errMsg: ${errMsg}`)
@@ -325,13 +329,24 @@ class SlpIndexer {
     }
   }
 
-  // Process the transactions within a block. Uses p-queue to process TXs in
-  // parallel.
-  async processTx (inData) {
+  // Process a single SLP transaction.
+  async processTx(inData) {
     try {
       const { tx, blockHeight } = inData
 
       let dataToProcess = false
+
+      // Check the pTxs database to see if this transaction has already been
+      // processed. If so, skip it.
+      try {
+        // Will throw an error if tx is not found, which is the same as false.
+        await pTxDb.get(tx)
+
+        // If TXID exists in the DB, then it's been processed. Exit.
+        return
+      } catch {
+        /* exit quietly */
+      }
 
       try {
         // Is the TX an SLP TX? If not, it will throw an error.
@@ -370,7 +385,7 @@ class SlpIndexer {
 
   // This function routes the data for further processing, based on the type of
   // SLP transaction it is.
-  async processData (data) {
+  async processData(data) {
     try {
       const { slpData, txData } = data
       // console.log('slpData: ', slpData)
