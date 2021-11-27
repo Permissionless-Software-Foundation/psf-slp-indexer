@@ -2,7 +2,7 @@
   A class library for processing Genesis SLP transactions
 */
 
-const IndexerUtils = require('./utils')
+const IndexerUtils = require('../lib/utils')
 
 class Genesis {
   constructor (localConfig = {}) {

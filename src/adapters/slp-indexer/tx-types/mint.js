@@ -12,8 +12,8 @@
 const BigNumber = require('bignumber.js')
 
 // Local libraries
-const IndexerUtils = require('./utils')
-const DAG = require('./dag')
+const IndexerUtils = require('../lib/utils')
+const DAG = require('../lib/dag')
 
 class Mint {
   constructor (localConfig = {}) {

@@ -9,7 +9,7 @@ const cloneDeep = require('lodash.clonedeep')
 const BigNumber = require('bignumber.js')
 
 // Local libraries
-const Genesis = require('../../../../../src/adapters/slp-indexer/lib/genesis')
+const Genesis = require('../../../../../src/adapters/slp-indexer/tx-types/genesis')
 const MockLevel = require('../../../../unit/mocks/leveldb-mock')
 const mockDataLib = require('../../../../unit/mocks/genesis-mock')
 

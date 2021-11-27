@@ -22,9 +22,9 @@ const DbBackup = require('./lib/db-backup')
 const Cache = require('./lib/cache')
 const Transaction = require('./lib/transaction')
 const FilterBlock = require('./lib/filter-block')
-const Genesis = require('./lib/genesis')
-const Send = require('./lib/send')
-const Mint = require('./lib/mint')
+const Genesis = require('./tx-types/genesis')
+const Send = require('./tx-types/send')
+const Mint = require('./tx-types/mint')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
