@@ -102,7 +102,7 @@ class DbBackup {
       )
 
       const deleteBackup = parseInt(process.env.DELETE_BACKUP)
-      if (deleteBackup) {
+      if (deleteBackup && epoch) {
         // Delete the old backup.
         const oldHeight = height + epoch
         this.shell.rm(`${dbDir}/zips/slp-indexer-${oldHeight}.zip`)

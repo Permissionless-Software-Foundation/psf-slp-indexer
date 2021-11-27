@@ -97,7 +97,7 @@ class SlpIndexer {
       )
 
       // Get the current block height
-      const biggestBlockHeight = await this.rpc.getBlockCount()
+      let biggestBlockHeight = await this.rpc.getBlockCount()
       console.log('Current chain block height: ', biggestBlockHeight)
       console.log('Starting bulk indexing.')
 
@@ -105,7 +105,7 @@ class SlpIndexer {
       // Phase 1: Bulk indexing
       for (
         let blockHeight = status.syncedBlockHeight;
-        blockHeight < biggestBlockHeight - 10;
+        blockHeight < biggestBlockHeight;
         // blockHeight < 714475;
         // blockHeight < status.syncedBlockHeight;
         blockHeight++
@@ -164,20 +164,6 @@ class SlpIndexer {
         // Move on to the next block if there are no SLP transactions.
         if (!slpTxs.length) continue
 
-        // Backup the database
-        // if (blockHeight % 5 === 0) {
-        //   await this.dbBackup.backupDb()
-        // }
-
-        // const testAddr =
-        //   'bitcoincash:qpq5uuctyf6qhh5nlsdxx8guhf7lxhegnsr0lwx4ev'
-        // try {
-        //   const testData = await addrDb.get(testAddr)
-        //   console.log(`${testAddr}: ${JSON.stringify(testData, null, 2)}`)
-        // } catch (err) {
-        //   /* exit quietly */
-        // }
-
         // Progressively processes TXs in the array.
         await this.processSlpTxs(slpTxs, blockHeight)
       }
@@ -189,7 +175,16 @@ class SlpIndexer {
       console.log(
         `\n\nBulk Indexing has completed. Last block synced: ${status.syncedBlockHeight}\n`
       )
-      console.log('Starting indexing of weak blocks.')
+
+      // Temp code for debugging. Take a backup at this point.
+      await this.dbBackup.zipDb(status.syncedBlockHeight)
+
+      // Get the current block height
+      biggestBlockHeight = await this.rpc.getBlockCount()
+      console.log('Current chain block height: ', biggestBlockHeight)
+      console.log('Starting indexing of mempool')
+
+      process.exit(0)
     } catch (err) {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
