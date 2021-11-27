@@ -51,6 +51,11 @@ class IpfsAdapter {
               `/ip4/0.0.0.0/tcp/${this.config.ipfsTcpPort}`,
               `/ip4/0.0.0.0/tcp/${this.config.ipfsWsPort}/ws`
             ]
+          },
+          Datastore: {
+            StorageMax: '2GB',
+            StorageGCWatermark: 50,
+            GCPeriod: '15m'
           }
         }
       }
