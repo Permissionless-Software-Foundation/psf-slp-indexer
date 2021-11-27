@@ -67,8 +67,8 @@ class IpfsAdapter {
       await this.ipfs.config.profiles.apply('server')
 
       // Debugging: Display IPFS config settings.
-      const configSettings = await this.ipfs.config.getAll()
-      console.log(`configSettings: ${JSON.stringify(configSettings, null, 2)}`)
+      // const configSettings = await this.ipfs.config.getAll()
+      // console.log(`configSettings: ${JSON.stringify(configSettings, null, 2)}`)
 
       // Signal that this adapter is ready.
       this.isReady = true
