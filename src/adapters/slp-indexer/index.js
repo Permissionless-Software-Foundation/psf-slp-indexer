@@ -13,7 +13,6 @@ const RETRY_CNT = 25 // Number of retries before exiting the indexer
 
 // Public npm libraries.
 const level = require('level')
-const readline = require('readline')
 
 // Local libraries
 const { wlogger } = require('../wlogger')
@@ -25,6 +24,7 @@ const FilterBlock = require('./lib/filter-block')
 const Genesis = require('./tx-types/genesis')
 const Send = require('./tx-types/send')
 const Mint = require('./tx-types/mint')
+const StartStop = require('./lib/start-stop')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -62,9 +62,7 @@ class SlpIndexer {
     this.genesis = new Genesis({ addrDb, tokenDb })
     this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
-
-    // State
-    this.stopIndexing = false
+    this.startStop = new StartStop()
 
     _this = this
   }
@@ -74,25 +72,8 @@ class SlpIndexer {
       console.log('starting SLP indexer...\n')
       wlogger.info('starting SLP indexer...')
 
-      // Detect 'q' key to stop indexing.
-      console.log("Press the 'q' key to stop indexing.")
-      readline.emitKeypressEvents(process.stdin)
-      if (process.stdin.isTTY) {
-        process.stdin.setRawMode(true)
-      }
-      process.stdin.on('keypress', (str, key) => {
-        if (key.name === 'q') {
-          console.log(
-            'q key detected. Will stop indexing after processing current block.'
-          )
-          _this.stopIndexing = true
-        }
-
-        // Exit immediately if Ctrl+C is pressed.
-        if (key.ctrl && key.name === 'c') {
-          process.exit(0)
-        }
-      })
+      // Capture keyboard input to determine when to shut down.
+      this.startStop.initStartStop()
 
       // Get the current sync status.
       let status
@@ -119,6 +100,7 @@ class SlpIndexer {
       console.log('Starting bulk indexing.')
 
       // Loop through the block heights and index every block.
+      // Phase 1: Bulk indexing
       for (
         let blockHeight = status.syncedBlockHeight;
         blockHeight < biggestBlockHeight - 10;
@@ -131,7 +113,9 @@ class SlpIndexer {
         await statusDb.put('status', status)
         // console.log(`Indexing block ${blockHeight}`)
 
-        if (this.stopIndexing) {
+        // Shut down elegantly if the 'q' key was detected.
+        const shouldStop = this.startStop.stopStatus()
+        if (shouldStop) {
           console.log(
             `'q' key detected. Stopping indexing. Last block processed was ${
               blockHeight - 1
