@@ -52,7 +52,7 @@ const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
 let _this
 
 class SlpIndexer {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
@@ -70,7 +70,7 @@ class SlpIndexer {
     _this = this
   }
 
-  async start() {
+  async start () {
     try {
       console.log('starting SLP indexer...\n')
       wlogger.info('starting SLP indexer...')
@@ -206,7 +206,7 @@ class SlpIndexer {
   // the current TX is moved to the back of the queue. Processing continues
   // until the array is empty, or the same TX has failed to process RETRY_CNT
   // times in a row.
-  async processSlpTxs(slpTxs, blockHeight) {
+  async processSlpTxs (slpTxs, blockHeight) {
     try {
       const errors = [] // Track errors
 
@@ -272,7 +272,7 @@ class SlpIndexer {
   // get stuck.
   // It determines the block height of the problematic parent transaction, then
   // rolls the database to a block height before that transaction.
-  async handleProcessFailure(blockHeight, tx, errMsg) {
+  async handleProcessFailure (blockHeight, tx, errMsg) {
     try {
       console.log(`Block height: ${blockHeight}`)
       console.log(`errMsg: ${errMsg}`)
@@ -330,7 +330,7 @@ class SlpIndexer {
   }
 
   // Process a single SLP transaction.
-  async processTx(inData) {
+  async processTx (inData) {
     try {
       const { tx, blockHeight } = inData
 
@@ -385,7 +385,7 @@ class SlpIndexer {
 
   // This function routes the data for further processing, based on the type of
   // SLP transaction it is.
-  async processData(data) {
+  async processData (data) {
     try {
       const { slpData, txData } = data
       // console.log('slpData: ', slpData)
