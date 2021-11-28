@@ -11,6 +11,9 @@ let _this
 
 class StartStop {
   constructor () {
+    // Encapsulate dependencies
+    this.process = process
+
     this.stopIndexing = false
 
     _this = this
@@ -28,11 +31,11 @@ class StartStop {
 
     readline.emitKeypressEvents(process.stdin)
 
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(true)
+    if (this.process.stdin.isTTY) {
+      this.process.stdin.setRawMode(true)
     }
 
-    process.stdin.on('keypress', (str, key) => {
+    this.process.stdin.on('keypress', (str, key) => {
       if (key.name === 'q') {
         console.log(
           'q key detected. Will stop indexing after processing current block.'
@@ -42,7 +45,7 @@ class StartStop {
 
       // Exit immediately if Ctrl+C is pressed.
       if (key.ctrl && key.name === 'c') {
-        process.exit(0)
+        this.process.exit(0)
       }
     })
 

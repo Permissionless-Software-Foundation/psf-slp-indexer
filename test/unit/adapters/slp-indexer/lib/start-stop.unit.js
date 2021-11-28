@@ -37,8 +37,9 @@ describe('#start-stop', () => {
   describe('#initStartStop', () => {
     it('should initialize stdin hooks', () => {
       // mock process so that test completes.
-      sandbox.stub(process.stdin, 'setRawMode').returns()
-      sandbox.stub(process.stdin, 'on').returns()
+      // sandbox.stub(process.stdin, 'setRawMode').returns()
+      // sandbox.stub(process.stdin, 'on').returns()
+      uut.process = mockProcess
 
       const result = uut.initStartStop()
 
@@ -46,3 +47,11 @@ describe('#start-stop', () => {
     })
   })
 })
+
+const mockProcess = {
+  stdin: {
+    setRawMode: () => {},
+    on: () => {}
+  },
+  exit: () => {}
+}
