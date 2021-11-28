@@ -2,9 +2,8 @@
   Utility tool to retrieve a single TX from the TX database.
 */
 
-// const addr = 'bitcoincash:ppuxz3nyzt8hhxtxqlw4h4k2ahxq3vct0cdz9fhhw0'
-// const addr = 'bitcoincash:pqdsh4fyupkj9n9zk44gejqhzzte6eg38ge9g4cckq'
-const addr = 'bitcoincash:pq39w5jt7zcn2ugrak0r80vz6qhv0d9fvsprn5u7qy'
+// const addr = 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx'
+const addr = 'bitcoincash:qrcdvlvl0edx8fffv89n5nevhx9pcngvqv86wvksj3'
 
 const level = require('level')
 

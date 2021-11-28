@@ -92,5 +92,12 @@ describe('#transaction.js', () => {
     //   const result = await uut.get(txid)
     //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
     // })
+
+    it('should properly hydrate a genesis UTXO being spent', async () => {
+      const txid = '401aae1bef9246c42916808c9595d2834791384dcf2e298d2fc294e27b6f5273'
+
+      const result = await uut.get(txid)
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    })
   })
 })

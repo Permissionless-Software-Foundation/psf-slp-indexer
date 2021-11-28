@@ -55,6 +55,12 @@ class ManagePTXDB {
           await this.pTxDb.del(thisKey)
           this.cleanCnt++
         }
+
+        // Temp code. Delete this after 12/12/21
+        if (value === true) {
+          await this.pTxDb.del(thisKey)
+          this.cleanCnt++
+        }
       }
 
       console.log(`Cleaned ${this.cleanCnt} entries from the pTxDb.`)

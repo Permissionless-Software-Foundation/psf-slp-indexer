@@ -70,6 +70,7 @@ class Send {
 
       // Validate the TX against the SLP DAG.
       const { isValid } = await this.dag.crawlDag(txid, tokenId)
+      console.log(`first call of crawlDag. isValid: ${isValid}`)
       if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
@@ -295,8 +296,11 @@ class Send {
         if (thisVin.tokenId !== txData.tokenId) continue
 
         // Do a DAG validation of the input.
+        // console.log(`crawling txid ${thisVin.txid} for token ${txData.tokenId}`)
         // const inputIsValid = await this.dag.validateTxid(thisVin.txid)
         const { isValid } = await this.dag.crawlDag(thisVin.txid, txData.tokenId)
+        // console.log(`send.js subtractTokensFromInputAddr() crawlDag result: ${isValid}`)
+        // console.log(`dag: ${JSON.stringify(dag, null, 2)}`)
         if (!isValid) {
           thisVin.tokenId = null
           thisVin.tokenQty = 0
@@ -339,7 +343,7 @@ class Send {
 
         // Get the DB entry for this address.
         const addrData = await this.addrDb.get(thisVin.address)
-        // console.log('addrData: ', addrData)
+        // console.log('before deletion, addrData: ', addrData)
 
         // Get the UTXO entry that matches the current input.
         const utxoToDelete = addrData.utxos.filter((x) => {
