@@ -177,8 +177,8 @@ class SlpIndexer {
       // Enter permanent loop.
       do {
         blockHeight = await this.rpc.getBlockCount()
-        console.log('Current chain block height: ', blockHeight)
-        console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
+        // console.log('Current chain block height: ', blockHeight)
+        // console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
 
         // On a new transaction, process it.
         const tx = this.zmq.getTx()
@@ -217,7 +217,7 @@ class SlpIndexer {
         // Every 10 blocks, make a backup.
 
         // Wait a few seconds between loops.
-        await this.utils.sleep(250)
+        await this.utils.sleep(50)
       } while (1)
     } catch (err) {
       console.log('Error in indexer: ', err)
