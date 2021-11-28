@@ -1,6 +1,9 @@
 /*
   This stand-alone app is used to compare two transaction maps, and combine
   them.
+
+  Run this command by increasing the memory allocation for node.js:
+  node --max_old_space_size=28000 combine-maps.js
 */
 
 const map1 = require('./tx-map.json')

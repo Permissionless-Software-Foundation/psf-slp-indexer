@@ -70,7 +70,6 @@ class Send {
 
       // Validate the TX against the SLP DAG.
       const { isValid } = await this.dag.crawlDag(txid, tokenId)
-      console.log(`first call of crawlDag. isValid: ${isValid}`)
       if (!isValid) {
         console.log(`TXID ${txid} failed DAG validation. Skipping.`)
 
