@@ -25,6 +25,8 @@ const Genesis = require('./tx-types/genesis')
 const Send = require('./tx-types/send')
 const Mint = require('./tx-types/mint')
 const StartStop = require('./lib/start-stop')
+const ZMQ = require('./lib/zmq')
+const Utils = require('./lib/utils')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -52,7 +54,7 @@ const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
 let _this
 
 class SlpIndexer {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
@@ -66,11 +68,13 @@ class SlpIndexer {
     this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
     this.startStop = new StartStop()
+    this.zmq = new ZMQ()
+    this.utils = new Utils()
 
     _this = this
   }
 
-  async start() {
+  async start () {
     try {
       console.log('starting SLP indexer...\n')
       wlogger.info('starting SLP indexer...')
@@ -133,31 +137,53 @@ class SlpIndexer {
       // Update and save the sync status.
       status.syncedBlockHeight++
       await statusDb.put('status', status)
+      const blockHeight = status.syncedBlockHeight
 
       console.log(
         `\n\nBulk Indexing has completed. Last block synced: ${status.syncedBlockHeight}\n`
       )
 
       // Temp code for debugging. Take a backup at this point.
-      await this.dbBackup.zipDb(status.syncedBlockHeight)
+      // await this.dbBackup.zipDb(status.syncedBlockHeight)
 
       // Get the current block height
       biggestBlockHeight = await this.rpc.getBlockCount()
       console.log('Current chain block height: ', biggestBlockHeight)
       console.log('Starting indexing of mempool')
 
-      process.exit(0)
+      // process.exit(0)
+
+      // Start connection to ZMQ/websocket interface on full node.
+      await this.zmq.connect()
 
       // Enter permanent loop.
       do {
         // On a new transaction, process it.
+        const tx = this.zmq.getTx()
+        if (tx) {
+          const inData = {
+            tx,
+            blockHeight
+          }
+          await this.processTx(inData)
+        }
 
         // On a new block, process it.
+        const block = this.zmq.getBlock()
+        if (block) {
+          console.log('block: ', block)
+          process.exit(0)
+
+          // await this.processBlock()
+        }
 
         // Check for block re-org. Roll back database if one is encountered.
 
         // Every 10 blocks, make a backup.
-      } while(1)
+
+        // Wait a few seconds between loops.
+        await this.utils.sleep(500)
+      } while (1)
     } catch (err) {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
@@ -171,7 +197,7 @@ class SlpIndexer {
   }
 
   // Processes an entire block.
-  async processBlock(blockHeight) {
+  async processBlock (blockHeight) {
     try {
       // Get the block hash for the current block height.
       const blockHash = await this.rpc.getBlockHash(blockHeight)
@@ -193,9 +219,7 @@ class SlpIndexer {
 
       // Create a zip-file backup every 'epoch' of blocks
       if (blockHeight % EPOCH === 0) {
-        console.log(
-          `Creating zip archive of database at block ${blockHeight}`
-        )
+        console.log(`Creating zip archive of database at block ${blockHeight}`)
         await this.dbBackup.zipDb(blockHeight, EPOCH)
       }
 
@@ -213,7 +237,7 @@ class SlpIndexer {
 
       // Progressively processes TXs in the array.
       await this.processSlpTxs(slpTxs, blockHeight)
-    } catch(err) {
+    } catch (err) {
       console.error('Error in processBlock()')
       throw err
     }
@@ -223,7 +247,7 @@ class SlpIndexer {
   // the current TX is moved to the back of the queue. Processing continues
   // until the array is empty, or the same TX has failed to process RETRY_CNT
   // times in a row.
-  async processSlpTxs(slpTxs, blockHeight) {
+  async processSlpTxs (slpTxs, blockHeight) {
     try {
       const errors = [] // Track errors
 
@@ -289,7 +313,7 @@ class SlpIndexer {
   // get stuck.
   // It determines the block height of the problematic parent transaction, then
   // rolls the database to a block height before that transaction.
-  async handleProcessFailure(blockHeight, tx, errMsg) {
+  async handleProcessFailure (blockHeight, tx, errMsg) {
     try {
       console.log(`Block height: ${blockHeight}`)
       console.log(`errMsg: ${errMsg}`)
@@ -347,7 +371,7 @@ class SlpIndexer {
   }
 
   // Process a single SLP transaction.
-  async processTx(inData) {
+  async processTx (inData) {
     try {
       const { tx, blockHeight } = inData
 
@@ -403,7 +427,7 @@ class SlpIndexer {
 
   // This function routes the data for further processing, based on the type of
   // SLP transaction it is.
-  async processData(data) {
+  async processData (data) {
     try {
       const { slpData, txData } = data
       // console.log('slpData: ', slpData)

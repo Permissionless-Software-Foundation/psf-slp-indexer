@@ -27,6 +27,7 @@
     "@chris.troutner/ipfs": "2.0.2",
     "@chris.troutner/slp-validate": "^1.2.2",
     "@psf/bch-js": "4.20.26",
+    "@psf/bitcoincash-zmq-decoder": "^0.1.5",
     "axios": "0.21.1",
     "bcryptjs": "2.4.3",
     "bignumber.js": "^9.0.1",
@@ -58,7 +59,8 @@
     "shelljs": "^0.8.4",
     "slp-parser": "^0.0.4",
     "winston": "3.3.3",
-    "winston-daily-rotate-file": "4.5.0"
+    "winston-daily-rotate-file": "4.5.0",
+    "zeromq": "^5.2.8"
   },
   "devDependencies": {
     "apidoc": "0.26.0",

@@ -55,6 +55,10 @@ class IndexerUtils {
       throw err
     }
   }
+
+  sleep (ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+  }
 }
 
 module.exports = IndexerUtils
