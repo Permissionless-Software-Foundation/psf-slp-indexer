@@ -13,7 +13,6 @@ const txMap = require('./tx-maps/tx-map.json')
 
 // Public npm libraries.
 const level = require('level')
-const readline = require('readline')
 
 // Local libraries
 const { wlogger } = require('../wlogger')
@@ -22,9 +21,11 @@ const DbBackup = require('./lib/db-backup')
 const Cache = require('./lib/cache')
 const Transaction = require('./lib/transaction')
 const FilterBlock = require('./lib/filter-block')
-const Genesis = require('./lib/genesis')
-const Send = require('./lib/send')
-const Mint = require('./lib/mint')
+const Genesis = require('./tx-types/genesis')
+const Send = require('./tx-types/send')
+const Mint = require('./tx-types/mint')
+const StartStop = require('./lib/start-stop')
+const Utils = require('./lib/utils')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -64,6 +65,8 @@ class SlpReIndexer {
     this.genesis = new Genesis({ addrDb, tokenDb })
     this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
+    this.startStop = new StartStop()
+    this.utils = new Utils()
 
     // State
     this.stopIndexing = false
@@ -76,25 +79,8 @@ class SlpReIndexer {
       console.log('starting SLP re-indexer...\n')
       wlogger.info('starting SLP re-indexer...')
 
-      // Detect 'q' key to stop indexing.
-      console.log("Press the 'q' key to stop indexing.")
-      readline.emitKeypressEvents(process.stdin)
-      if (process.stdin.isTTY) {
-        process.stdin.setRawMode(true)
-      }
-      process.stdin.on('keypress', (str, key) => {
-        if (key.name === 'q') {
-          console.log(
-            'q key detected. Will stop indexing after processing current block.'
-          )
-          _this.stopIndexing = true
-        }
-
-        // Exit immediately if Ctrl+C is pressed.
-        if (key.ctrl && key.name === 'c') {
-          process.exit(0)
-        }
-      })
+      // Capture keyboard input to determine when to shut down.
+      this.startStop.initStartStop()
 
       const firstBlock = txMap[0].height
       const lastBlock = txMap[txMap.length - 1].height
@@ -144,7 +130,9 @@ class SlpReIndexer {
         await statusDb.put('status', status)
         // console.log(`Indexing block ${blockHeight}`)
 
-        if (this.stopIndexing) {
+        // Shut down elegantly if the 'q' key was detected.
+        const shouldStop = this.startStop.stopStatus()
+        if (shouldStop) {
           console.log(
             `'q' key detected. Stopping indexing. Last block processed was ${
               blockHeight - 1
@@ -215,7 +203,7 @@ class SlpReIndexer {
       // Don't throw an error. This is a top-level function.
 
       // console.log('Restoring backup of database.')
-      // await this.dbBackup.restoreDb()
+      await this.dbBackup.restoreDb()
 
       // For debugging purposes, exit if there is an error.
       process.exit(0)
