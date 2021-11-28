@@ -6,7 +6,7 @@ const assert = require('chai').assert
 
 const BCHJS = require('@psf/bch-js')
 // const bchjs = new BCHJS()
-const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
+const bchjs = new BCHJS({ restURL: 'http://192.168.2.129:3000/v5/' })
 
 const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 // const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
@@ -77,6 +77,22 @@ describe('#dag.js', () => {
         assert.equal(result.isValid, true)
         assert.isArray(result.dag)
         assert.equal(result.dag.length, 3)
+      })
+
+      // This comes from real-world data while troubleshooting the app.
+      // CT 11/28/21
+      it('should validate a genesis TX', async () => {
+        const txid =
+          '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170'
+        const tokenId =
+          '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170'
+
+        const result = await uut.crawlDag(txid, tokenId)
+        // console.log('result: ', result)
+
+        assert.equal(result.isValid, true)
+        assert.isArray(result.dag)
+        assert.equal(result.dag.length, 1)
       })
     })
   })

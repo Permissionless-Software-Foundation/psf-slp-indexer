@@ -156,8 +156,158 @@ const utxo01 = {
   address: 'bitcoincash:qqf89zzwd0fqc3npkks997r5l7dpfjf9kgx2rqu500'
 }
 
+const addrData02 = {
+  utxos: [
+    {
+      txid: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+      vout: 1,
+      type: 'token',
+      qty: '100',
+      tokenId:
+        '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+      address: 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx'
+    }
+  ],
+  txs: [
+    {
+      txid: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+      height: 716085
+    }
+  ],
+  balances: [
+    {
+      tokenId:
+        '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+      qty: '100'
+    }
+  ]
+}
+
+const utxo02 = {
+  txid: '401aae1bef9246c42916808c9595d2834791384dcf2e298d2fc294e27b6f5273',
+  vout: 2,
+  type: 'token',
+  qty: '99',
+  tokenId: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+  address: 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx'
+}
+
+const sendData02 = {
+  slpData: {
+    tokenType: 1,
+    txType: 'SEND',
+    tokenId: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+    amounts: [new BigNumber('1')]
+  },
+  blockHeight: 716089,
+  txData: {
+    txid: '401aae1bef9246c42916808c9595d2834791384dcf2e298d2fc294e27b6f5273',
+    hash: '401aae1bef9246c42916808c9595d2834791384dcf2e298d2fc294e27b6f5273',
+    version: 2,
+    size: 481,
+    locktime: 0,
+    vin: [
+      {
+        txid: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+        vout: 3,
+        scriptSig: {
+          asm: '3045022100c4eeff10549ad63e8cea17df1516c6b124234c200b0c43dc382b429faafa848e02201881b92c0530ea2645ed21104d7beb2d56deecfba8ebb36b7a147c26a61fdf8f[ALL|FORKID] 033dd792cf506a8f2d2bbbf70ddce529f11c5ff2e4fe5a1fc139c82af7f5285a0b',
+          hex: '483045022100c4eeff10549ad63e8cea17df1516c6b124234c200b0c43dc382b429faafa848e02201881b92c0530ea2645ed21104d7beb2d56deecfba8ebb36b7a147c26a61fdf8f4121033dd792cf506a8f2d2bbbf70ddce529f11c5ff2e4fe5a1fc139c82af7f5285a0b'
+        },
+        sequence: 4294967295,
+        address: 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx',
+        value: 0.00016329,
+        tokenQtyStr: '0',
+        tokenQty: 0,
+        tokenId: null
+      },
+      {
+        txid: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+        vout: 1,
+        scriptSig: {
+          asm: '3045022100964354f4316ce4d580dd8dafe5c459c76389327560b8c7f167c594365e4f6b6302202a3a371d00c5cf712c17425a5e7e383fd952c0b92955598b9d90c5b96ce2fbdc[ALL|FORKID] 033dd792cf506a8f2d2bbbf70ddce529f11c5ff2e4fe5a1fc139c82af7f5285a0b',
+          hex: '483045022100964354f4316ce4d580dd8dafe5c459c76389327560b8c7f167c594365e4f6b6302202a3a371d00c5cf712c17425a5e7e383fd952c0b92955598b9d90c5b96ce2fbdc4121033dd792cf506a8f2d2bbbf70ddce529f11c5ff2e4fe5a1fc139c82af7f5285a0b'
+        },
+        sequence: 4294967295,
+        address: 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx',
+        value: 0.00000546,
+        tokenQtyStr: '0',
+        tokenQty: 0,
+        tokenId: null
+      }
+    ],
+    vout: [
+      {
+        value: 0,
+        n: 0,
+        scriptPubKey: {
+          asm: 'OP_RETURN 5262419 1 1145980243 59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170 0000000000000001 0000000000000063',
+          hex: '6a04534c500001010453454e442059cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170080000000000000001080000000000000063',
+          type: 'nulldata'
+        },
+        tokenQty: null,
+        tokenQtyStr: null
+      },
+      {
+        value: 0.00000546,
+        n: 1,
+        scriptPubKey: {
+          asm: 'OP_DUP OP_HASH160 f0d67d9f7e5a63a52961cb3a4f2cb98a1c4d0c03 OP_EQUALVERIFY OP_CHECKSIG',
+          hex: '76a914f0d67d9f7e5a63a52961cb3a4f2cb98a1c4d0c0388ac',
+          reqSigs: 1,
+          type: 'pubkeyhash',
+          addresses: ['bitcoincash:qrcdvlvl0edx8fffv89n5nevhx9pcngvqv86wvksj3']
+        },
+        tokenQtyStr: '1',
+        tokenQty: 1
+      },
+      {
+        value: 0.00000546,
+        n: 2,
+        scriptPubKey: {
+          asm: 'OP_DUP OP_HASH160 2850c60ee915fa20d663db91269e34eab3d1aaf9 OP_EQUALVERIFY OP_CHECKSIG',
+          hex: '76a9142850c60ee915fa20d663db91269e34eab3d1aaf988ac',
+          reqSigs: 1,
+          type: 'pubkeyhash',
+          addresses: ['bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx']
+        },
+        tokenQtyStr: '99',
+        tokenQty: 99
+      },
+      {
+        value: 0.00014987,
+        n: 3,
+        scriptPubKey: {
+          asm: 'OP_DUP OP_HASH160 2850c60ee915fa20d663db91269e34eab3d1aaf9 OP_EQUALVERIFY OP_CHECKSIG',
+          hex: '76a9142850c60ee915fa20d663db91269e34eab3d1aaf988ac',
+          reqSigs: 1,
+          type: 'pubkeyhash',
+          addresses: ['bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx']
+        },
+        tokenQty: null,
+        tokenQtyStr: null
+      }
+    ],
+    hex: '020000000270f13dcb618aad340038b07f053a517459c200374262b8e955b94869b83acd59030000006b483045022100c4eeff10549ad63e8cea17df1516c6b124234c200b0c43dc382b429faafa848e02201881b92c0530ea2645ed21104d7beb2d56deecfba8ebb36b7a147c26a61fdf8f4121033dd792cf506a8f2d2bbbf70ddce529f11c5ff2e4fe5a1fc139c82af7f5285a0bffffffff70f13dcb618aad340038b07f053a517459c200374262b8e955b94869b83acd59010000006b483045022100964354f4316ce4d580dd8dafe5c459c76389327560b8c7f167c594365e4f6b6302202a3a371d00c5cf712c17425a5e7e383fd952c0b92955598b9d90c5b96ce2fbdc4121033dd792cf506a8f2d2bbbf70ddce529f11c5ff2e4fe5a1fc139c82af7f5285a0bffffffff040000000000000000406a04534c500001010453454e442059cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df17008000000000000000108000000000000006322020000000000001976a914f0d67d9f7e5a63a52961cb3a4f2cb98a1c4d0c0388ac22020000000000001976a9142850c60ee915fa20d663db91269e34eab3d1aaf988ac8b3a0000000000001976a9142850c60ee915fa20d663db91269e34eab3d1aaf988ac00000000',
+    blockheight: 716088,
+    isSlpTx: true,
+    tokenTxType: 'SEND',
+    tokenId: '59cd3ab86948b955e9b862423700c25974513a057fb0380034ad8a61cb3df170',
+    tokenType: 1,
+    tokenTicker: 'SLPTEST',
+    tokenName: 'SLP Test Token',
+    tokenDecimals: 0,
+    tokenUri: 'https://FullStack.cash',
+    tokenDocHash: '',
+    isValidSlp: true
+  }
+}
+
 module.exports = {
   sendData01,
   addrData01,
-  utxo01
+  utxo01,
+  addrData02,
+  utxo02,
+  sendData02
 }

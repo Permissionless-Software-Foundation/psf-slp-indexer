@@ -32,7 +32,7 @@ class DAG {
       }
 
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
-      // console.log(`crawling TXID ${txData.txid}, cnt ${this.cnt}`)
+      // console.log(`crawling TXID ${txid}, endFound: ${endFound}`)
 
       // Set default value for the output object.
       const outObj = {
@@ -56,6 +56,17 @@ class DAG {
         // Add it to the beginning of the array.
         txidAry.unshift(txData.txid)
         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+      }
+
+      // If this is the genesis TX, then exit immediately.
+      // This happens when evaluating the first send TX after a genesis TX.
+      if (txid === tokenId) {
+        // TODO: Should decodeOpReturn() be run on this txid, to ensure it
+        // is valid via SLP OP_RETURN rules?
+
+        outObj.isValid = true
+        outObj.dag = txidAry
+        return outObj
       }
 
       // Loop through each input that represents tokens.
@@ -158,7 +169,12 @@ class DAG {
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
-          const inObj = await this.crawlDag(parentTx.txid, tokenId, txidAry, endFound)
+          const inObj = await this.crawlDag(
+            parentTx.txid,
+            tokenId,
+            txidAry,
+            endFound
+          )
           endFound = inObj.isValid
         }
       }

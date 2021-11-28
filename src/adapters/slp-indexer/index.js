@@ -418,7 +418,7 @@ class SlpIndexer {
         // If TXID exists in the DB, then it's been processed. Exit.
         console.log(`${tx} already processed. Skipping.`)
         return
-      } catch {
+      } catch (err) {
         /* exit quietly */
       }
 

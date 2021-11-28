@@ -50,8 +50,12 @@ class Cache {
     txData = await this.transaction.get(key)
     // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
 
-    // Save the data to the cache.
+    // Save the data to the *local* cache.
     this.put(key, txData)
+
+    // Dev note: Do not store the TX data in the TX Level DB at this point. A
+    // determination about its SLP validity has not yet been made. That data
+    // is assumed to be in any entry coming out of the LevelDB.
 
     this.cacheCnt++
     if (this.cacheCnt % 100 === 0) {

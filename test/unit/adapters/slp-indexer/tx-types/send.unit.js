@@ -182,6 +182,21 @@ describe('#send.js', () => {
         assert.include(err.message, 'Could not find UTXO in address')
       }
     })
+
+    // This test comes from real-world data and a bug where it was noticed that
+    // send after genesis was not properly deleting the original UTXO.
+    it('should subtract tokens using real-world data', async () => {
+      // Force DAG validation to succeed
+      sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
+
+      // Force database to return previous address data
+      sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData02)
+
+      const result = await uut.subtractTokensFromInputAddr(mockData.sendData02)
+      // console.log('result: ', result)
+
+      assert.equal(result, true)
+    })
   })
 
   describe('#addUtxoToOutputAddr', () => {
