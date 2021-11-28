@@ -46,6 +46,9 @@ During this phase, the epoch value is set at 50. The database will back itself u
 ### Mempool Indexing (Phase 2):
 Once the indexer reaches the tip of the blockchain, it begins listening to the ZMQ port on the full node. New transactions entering the mempool are passed to the indexer via the ZMQ port. Zero-confirmation SLP transaction are evaluated based on the DAG of transaction. When a new block is found, all the already-processed transactions are ignored. Any transactions missed by ZMQ (it happens) will be processed when the new block is found.
 
+## Tools
+The [`/util/index`](../util/index) folder contains several utility functions for working with the LevelDB databases. There are scripts for looking up addresses, transactions, token stats, etc.
+
 ## ToDo
 
 - Detect and handle block reorgs.
