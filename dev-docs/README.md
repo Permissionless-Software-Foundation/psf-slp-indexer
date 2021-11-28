@@ -1,6 +1,6 @@
 # Developer Documentation
 
-This indexer started as a fork of [ipfs-service-provider](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider). That repository provides two interfaces for communication: 1) a Koa REST API and 2) [JSON RPC over IPFS](https://troutsblog.com/blog/ipfs-service-providers). The SLP indexing logic was added in the `src/adapters/slp-indexer` directory.
+This indexer started as a fork of [ipfs-service-provider](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider). That repository provides two interfaces for communication: 1) a [Koa](https://koajs.com/) REST API and 2) [JSON RPC over IPFS](https://troutsblog.com/blog/ipfs-service-providers). The SLP indexing logic was added in the `src/adapters/slp-indexer` directory.
 
 The code in this repository follows the [Clean Architecture](https://troutsblog.com/blog/clean-architecture) design pattern. The app is built on the principles of [TDD](https://tanzu.vmware.com/content/blog/why-tdd), using [these test design patterns](https://youtu.be/lE3RYnchHps).
 
@@ -39,14 +39,13 @@ The indexer maintains several LevelDB databases.
 There are three distinct 'phases' or indexing that this app will run through:
 
 ### Bulk Indexing (Phase 1):
-This is starting point. The indexer queries the full node to determine the current block height. The indexer then begins indexing the SLP transactions in each block and updating the database, until it reaches 10 blocks from the tip of the chain. These are considered 'strong' blocks, due to 10-block check point used by BCH. There should never be a re-org of more than 10 blocks.
+This is starting point. The indexer queries the full node to determine the current block height. The indexer then begins indexing the SLP transactions in each block and updating the database, until it reaches to tip of the blockchain.
 
 During this phase, the epoch value is set at 50. The database will back itself up every 50 blocks, and will roll back to this backup if it encounters an error in indexing.
 
-### Weak blocks (Phase 2):
-Once the indexer gets within 10 blocks of the tip, it enters this second phase. These are considered 'weak' blocks, as they could potentially be reorganized.
+### Mempool Indexing (Phase 2):
+Once the indexer reaches the tip of the blockchain, it begins listening to the ZMQ port on the full node. New transactions entering the mempool are passed to the indexer via the ZMQ port. Zero-confirmation SLP transaction are evaluated based on the DAG of transaction. When a new block is found, all the already-processed transactions are ignored. Any transactions missed by ZMQ (it happens) will be processed when the new block is found.
 
-During this phase, the epoch value is set at 10. The database will back itself up every 10 blocks, and will roll back to these backups if a re-org is detected.
+## ToDo
 
-### Mempool Indexing (Phase 3):
-Once the indexer reaches the tip of the blockchain, it begins indexing the mempool. The mempool is loaded into a queue, and any new transactions detected by the full node are passed into the queue by listening to the ZMQ port of the full node. When a new block is found, all the already-processed transactions are ignored.
+- Detect and handle block reorgs.
