@@ -11,7 +11,7 @@ const zmq = require('zeromq')
 // Local libraries
 const config = require('../../../../config')
 
-// let _this
+let _this
 
 class ZMQ {
   constructor () {
@@ -24,7 +24,7 @@ class ZMQ {
     this.txQueue = []
     this.blockQueue = []
 
-    // _this = this
+    _this = this
   }
 
   // Connect to the ZMQ port of the full node.
@@ -58,15 +58,16 @@ class ZMQ {
       if (decoded === 'rawtx') {
         // Process new transactions.
 
-        const txd = this.bchZmqDecoder.decodeTransaction(message)
+        const txd = _this.bchZmqDecoder.decodeTransaction(message)
         // console.log(`txd: ${JSON.stringify(txd, null, 2)}`)
-        this.txQueue.push(txd.txid)
+        // console.log(`txd.format.txid: ${txd.format.txid}`)
+        _this.txQueue.push(txd.format.txid)
       } else if (decoded === 'rawblock') {
         // Process new blocks
 
-        const blk = this.bchZmqDecoder.decodeBlock(message)
-        // console.log(`blk: ${JSON.stringify(blk, null, 2)}`)
-        this.blockQueue.push(blk)
+        const blk = _this.bchZmqDecoder.decodeBlock(message)
+        console.log(`blk: ${JSON.stringify(blk, null, 2)}`)
+        _this.blockQueue.push(blk)
       }
 
       return true
@@ -78,18 +79,21 @@ class ZMQ {
 
   // Get the next TX in the queue
   getTx () {
+    console.log(`this.txQueue.length: ${this.txQueue.length}`)
     let nextTx = this.txQueue.shift()
+    // console.log(`nextTx: ${JSON.stringify(nextTx, null, 2)}`)
 
-    if (!nextTx) nextTx = false
+    if (nextTx === undefined) nextTx = false
 
     return nextTx
   }
 
   // Get the next block in the queue
   getBlock () {
-    let nextBlock = this.blockQueue.shift()
+    console.log(`this.blockQueue.length: ${this.blockQueue.length}`)
+    let nextBlock = _this.blockQueue.shift()
 
-    if (!nextBlock) nextBlock = false
+    if (nextBlock === undefined) nextBlock = false
 
     return nextBlock
   }

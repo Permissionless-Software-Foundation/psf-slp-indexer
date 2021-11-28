@@ -51,7 +51,7 @@ const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
   valueEncoding: 'json'
 })
 
-let _this
+// let _this
 
 class SlpIndexer {
   constructor (localConfig = {}) {
@@ -71,7 +71,10 @@ class SlpIndexer {
     this.zmq = new ZMQ()
     this.utils = new Utils()
 
-    _this = this
+    // state
+    this.indexState = 'phase0'
+
+    // _this = this
   }
 
   async start () {
@@ -130,14 +133,22 @@ class SlpIndexer {
           process.exit(0)
         }
 
+        this.indexState = 'phase1'
+
         // Process all SLP txs in the block.
         await this.processBlock(blockHeight)
       }
 
-      // Update and save the sync status.
-      status.syncedBlockHeight++
-      await statusDb.put('status', status)
-      const blockHeight = status.syncedBlockHeight
+      // Debugging: state the current state of the indexer.
+      console.log(`Leaving ${this.indexState}`)
+
+      let blockHeight = status.syncedBlockHeight
+      if (this.indexState === 'phase1') {
+        // Update and save the sync status.
+        status.syncedBlockHeight++
+        await statusDb.put('status', status)
+        blockHeight = status.syncedBlockHeight
+      }
 
       console.log(
         `\n\nBulk Indexing has completed. Last block synced: ${status.syncedBlockHeight}\n`
@@ -155,16 +166,23 @@ class SlpIndexer {
 
       // Start connection to ZMQ/websocket interface on full node.
       await this.zmq.connect()
+      console.log('Connected to ZMQ port of full node.')
 
       // Enter permanent loop.
       do {
+        blockHeight = await this.rpc.getBlockCount()
+        console.log('Current chain block height: ', blockHeight)
+        console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
+
         // On a new transaction, process it.
         const tx = this.zmq.getTx()
+        // console.log('tx: ', tx)
         if (tx) {
           const inData = {
             tx,
             blockHeight
           }
+          // console.log(`inData: ${JSON.stringify(inData, null, 2)}`)
           await this.processTx(inData)
         }
 
@@ -172,9 +190,16 @@ class SlpIndexer {
         const block = this.zmq.getBlock()
         if (block) {
           console.log('block: ', block)
-          process.exit(0)
 
-          // await this.processBlock()
+          const blockHeader = await this.rpc.getBlockHeader(block.hash)
+          blockHeight = blockHeader.height
+          console.log(`processing block ${blockHeight}`)
+
+          // process.exit(0)
+
+          await this.processBlock(blockHeight)
+          status.syncedBlockHeight = blockHeight
+          await statusDb.put('status', status)
         }
 
         // Check for block re-org. Roll back database if one is encountered.
@@ -262,9 +287,6 @@ class SlpIndexer {
         try {
           // Attempt to process TX
           await this.processTx({ tx, blockHeight })
-
-          // Save the TX to the processed database.
-          await pTxDb.put(tx, true)
         } catch (err) {
           console.log('----> HANDLING ERROR <----')
           console.log(err)
@@ -398,7 +420,7 @@ class SlpIndexer {
         // console.log('height: ', blockHeight)
 
         // Get the transaction information.
-        const txData = await _this.cache.get(tx)
+        const txData = await this.cache.get(tx)
         // console.log('txData: ', txData)
 
         // Combine available data for further processing.
@@ -417,6 +439,9 @@ class SlpIndexer {
         console.log('Inspecting tx: ', tx)
         await this.processData(dataToProcess)
       }
+
+      // Save the TX to the processed database.
+      await pTxDb.put(tx, blockHeight)
 
       // console.log(`Completed ${tx}`)
     } catch (err) {
