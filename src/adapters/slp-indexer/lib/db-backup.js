@@ -88,7 +88,7 @@ class DbBackup {
   }
 
   // Create a zipped copy of the database.
-  async zipDb (height) {
+  async zipDb (height, epoch) {
     try {
       // Close the databases
       await this.addrDb.close()
@@ -96,9 +96,17 @@ class DbBackup {
       await this.txDb.close()
       await this.statusDb.close()
 
+      // Create a zip backup of the current database.
       this.shell.exec(
         `zip -r ${dbDir}/zips/slp-indexer-${height}.zip ${dbDir}/current`
       )
+
+      const deleteBackup = parseInt(process.env.DELETE_BACKUP)
+      if (deleteBackup && epoch) {
+        // Delete the old backup.
+        const oldHeight = height + epoch
+        this.shell.rm(`${dbDir}/zips/slp-indexer-${oldHeight}.zip`)
+      }
 
       // Reopen the databases.
       console.log('Reopening database')

@@ -6,8 +6,8 @@ const assert = require('chai').assert
 const sinon = require('sinon')
 
 const BCHJS = require('@psf/bch-js')
-// const bchjs = new BCHJS()
-const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
+const bchjs = new BCHJS()
+// const bchjs = new BCHJS({ restURL: 'http://192.168.0.36:3000/v5/' })
 
 const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
@@ -182,6 +182,24 @@ describe('#filter-block.js', () => {
         '95d460512143b636bbc5780d8b27b04fca3bfd2f22003ab48da594e2bab9cfc1',
         'b36b0c7485ad569b98cc9b9614dc68a5208495f22ec3b00effcf963b135a5215'
       ]
+
+      const result = await uut.filterAndSortSlpTxs2(
+        txs,
+        blockHeight
+      )
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    })
+
+    it('should sort prolematic block', async () => {
+      // force cache to get data from the full node.
+      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+
+      const blockHeight = 714476
+      const blockHash = await rpc.getBlockHash(blockHeight)
+      const block = await rpc.getBlock(blockHash)
+
+      const txs = block.tx
+      // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
 
       const result = await uut.filterAndSortSlpTxs2(
         txs,

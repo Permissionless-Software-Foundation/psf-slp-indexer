@@ -17,3 +17,7 @@ This first TXID is problematic. It forms a valid DAG with a GENESIS tx, but it's
 - TXID: 9e85f156f83304f38cc44f759b319b3d3f0b45d79b81eadd712df6336e1f5cfa (invalid) 567566
 - TXID: afea5ee626e415bfd2b3b957ee3a076e6e0f79e11cbe58a66100731dd5b7bba4 (invalid) 567559
 - TXID: 495322b37d6b2eae81f045eda612b95870a0c2b6069c58f70cf8ef4e6a9fd43a (valid) 567558
+
+## Problematic Blocks
+
+- 714476 - caused filter-block.js/filterAndSortSlpTxs2() to have a duplicate TXID. This caused the TX to be processed twice, causing a halt to indexing because the deleted UTXO could not be found.

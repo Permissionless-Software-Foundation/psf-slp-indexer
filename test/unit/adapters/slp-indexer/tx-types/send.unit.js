@@ -9,7 +9,7 @@ const cloneDeep = require('lodash.clonedeep')
 const BigNumber = require('bignumber.js')
 
 // Local libraries
-const Send = require('../../../../../src/adapters/slp-indexer/lib/send')
+const Send = require('../../../../../src/adapters/slp-indexer/tx-types/send')
 const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 const MockLevel = require('../../../../unit/mocks/leveldb-mock')
 const mockDataLib = require('../../../../unit/mocks/send-mock')

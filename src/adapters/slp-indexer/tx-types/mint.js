@@ -12,8 +12,8 @@
 const BigNumber = require('bignumber.js')
 
 // Local libraries
-const IndexerUtils = require('./utils')
-const DAG = require('./dag')
+const IndexerUtils = require('../lib/utils')
+const DAG = require('../lib/dag')
 
 class Mint {
   constructor (localConfig = {}) {
@@ -188,6 +188,7 @@ class Mint {
       if (!batonFound) {
         // console.log(`data.txData: ${JSON.stringify(data.txData, null, 2)}`)
         // console.log(`addr: ${JSON.stringify(addr, null, 2)}`)
+        console.log(`vin: ${JSON.stringify(vin, null, 2)}`)
         throw new Error('Minting baton not found. UTXO is not in database.')
       }
 

@@ -21,8 +21,8 @@
 
 const BigNumber = require('bignumber.js')
 
-const IndexerUtils = require('./utils')
-const DAG = require('./dag')
+const IndexerUtils = require('../lib/utils')
+const DAG = require('../lib/dag')
 
 class Send {
   constructor (localConfig = {}) {

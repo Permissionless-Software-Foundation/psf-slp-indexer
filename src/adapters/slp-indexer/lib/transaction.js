@@ -64,9 +64,19 @@ class Transaction {
       // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
       // Get the block height the transaction was mined in.
-      const blockHeader = await this.rpc.getBlockHeader(txDetails.blockhash)
-      txDetails.blockheight = blockHeader.height
-      // console.log(`blockHeader: ${JSON.stringify(blockHeader, null, 2)}`)
+      if (!txDetails.blockhash) {
+        // Transaction has not been mined yet.
+
+        // Assumption: the TX will make it into the next block.
+        const blockHeight = await this.rpc.getBlockCount()
+        txDetails.blockheight = blockHeight + 1
+      } else {
+        // Transaction is in a mined block.
+
+        const blockHeader = await this.rpc.getBlockHeader(txDetails.blockhash)
+        txDetails.blockheight = blockHeader.height
+        // console.log(`blockHeader: ${JSON.stringify(blockHeader, null, 2)}`)
+      }
 
       // Set default as not an SLP tx
       txDetails.isSlpTx = false
@@ -319,7 +329,9 @@ class Transaction {
 
       // Corner case: token ID comes back as all zeros
       // Assumption: a normal TXID won't contain this many zeros.
-      if (tokenData.tokenId.includes('00000000')) { return false }
+      if (tokenData.tokenId.includes('00000000')) {
+        return false
+      }
 
       return tokenData
     } catch (err) {
@@ -397,7 +409,10 @@ class Transaction {
 
     // const txDetails = await _this.rpc.getRawTransaction(txid)
     // Auto-retry if call to full node fails.
-    const txDetails = await this.queue.addToQueue(this.rpc.getRawTransaction, txid)
+    const txDetails = await this.queue.addToQueue(
+      this.rpc.getRawTransaction,
+      txid
+    )
     // console.log('txDetails: ', txDetails)
 
     // SLP spec expects OP_RETURN to be the first output of the transaction.

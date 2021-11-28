@@ -9,7 +9,7 @@ const cloneDeep = require('lodash.clonedeep')
 const BigNumber = require('bignumber.js')
 
 // Local libraries
-const Mint = require('../../../../../src/adapters/slp-indexer/lib/mint')
+const Mint = require('../../../../../src/adapters/slp-indexer/tx-types/mint')
 const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 const MockLevel = require('../../../../unit/mocks/leveldb-mock')
 const mockDataLib = require('../../../../unit/mocks/mint-mock')
