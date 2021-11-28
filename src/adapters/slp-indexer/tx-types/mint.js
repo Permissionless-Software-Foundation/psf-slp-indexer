@@ -188,6 +188,7 @@ class Mint {
       if (!batonFound) {
         // console.log(`data.txData: ${JSON.stringify(data.txData, null, 2)}`)
         // console.log(`addr: ${JSON.stringify(addr, null, 2)}`)
+        console.log(`vin: ${JSON.stringify(vin, null, 2)}`)
         throw new Error('Minting baton not found. UTXO is not in database.')
       }
 
