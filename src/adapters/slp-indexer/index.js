@@ -391,7 +391,7 @@ class SlpIndexer {
       )
 
       // Roll back the database to before the parent transaction.
-      // await this.dbBackup.unzipDb(rollbackHeight)
+      await this.dbBackup.unzipDb(rollbackHeight)
 
       // Kill the process, which will allow the app to shut down, and pm2 or Docker can
       // restart it at a block height prior to the problematic parent transaction.
