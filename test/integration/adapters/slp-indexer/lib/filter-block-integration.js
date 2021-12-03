@@ -34,61 +34,74 @@ describe('#filter-block.js', () => {
 
   afterEach(() => sandbox.restore())
 
-  // describe('#filterAndSortSlpTxs', () => {
-  //   // it('should sort problematic block', async () => {
-  //   //   // force cache to get data from the full node.
-  //   //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
-  //   //
-  //   //   const blockHeight = 688837
-  //   //   const blockHash = await rpc.getBlockHash(blockHeight)
-  //   //   const block = await rpc.getBlock(blockHash)
-  //   //   const txs = block.tx
-  //   //
-  //   //   const slpTxs = await uut.filterAndSortSlpTxs(
-  //   //     txs,
-  //   //     blockHeight
-  //   //   )
-  //   //   console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-  //   // })
-  //
-  //   it('should filter a small block', async () => {
-  //     // force cache to get data from the full node.
-  //     sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
-  //
-  //     const blockHeight = 652276
-  //     const blockHash = await rpc.getBlockHash(blockHeight)
-  //     const block = await rpc.getBlock(blockHash)
-  //     // console.log(`block: ${JSON.stringify(block, null, 2)}`)
-  //
-  //     const txs = block.tx
-  //
-  //     const slpTxs = await uut.filterAndSortSlpTxs(
-  //       txs,
-  //       blockHeight
-  //     )
-  //     // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-  //
-  //     assert.equal(slpTxs.length, 1)
-  //   })
-  //
-  //   it('should filter a block with a DAG', async () => {
-  //     // force cache to get data from the full node.
-  //     sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
-  //
-  //     const blockHeight = 543413
-  //     const blockHash = await rpc.getBlockHash(blockHeight)
-  //     const block = await rpc.getBlock(blockHash)
-  //
-  //     const txs = block.tx
-  //     // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
-  //
-  //     const slpTxs = await uut.filterAndSortSlpTxs(
-  //       txs,
-  //       blockHeight
-  //     )
-  //     console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-  //   })
-  // })
+  describe('#filterAndSortSlpTxs', () => {
+    // it('should sort problematic block', async () => {
+    //   // force cache to get data from the full node.
+    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //   const blockHeight = 688837
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //   const txs = block.tx
+    //
+    //   const slpTxs = await uut.filterAndSortSlpTxs(
+    //     txs,
+    //     blockHeight
+    //   )
+    //   console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+    // })
+    //
+    //   it('should filter a small block', async () => {
+    //     // force cache to get data from the full node.
+    //     sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //     const blockHeight = 652276
+    //     const blockHash = await rpc.getBlockHash(blockHeight)
+    //     const block = await rpc.getBlock(blockHash)
+    //     // console.log(`block: ${JSON.stringify(block, null, 2)}`)
+    //
+    //     const txs = block.tx
+    //
+    //     const slpTxs = await uut.filterAndSortSlpTxs(
+    //       txs,
+    //       blockHeight
+    //     )
+    //     // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+    //
+    //     assert.equal(slpTxs.length, 1)
+    //   })
+    //
+    //   it('should filter a block with a DAG', async () => {
+    //     // force cache to get data from the full node.
+    //     sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //     const blockHeight = 543413
+    //     const blockHash = await rpc.getBlockHash(blockHeight)
+    //     const block = await rpc.getBlock(blockHash)
+    //
+    //     const txs = block.tx
+    //     // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
+    //
+    //     const slpTxs = await uut.filterAndSortSlpTxs(
+    //       txs,
+    //       blockHeight
+    //     )
+    //     console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+    //   })
+
+    // it('should sort problematic block', async () => {
+    //   // force cache to get data from the full node.
+    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //   const blockHeight = 688837
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //   const txs = block.tx
+    //
+    //   const slpTxs = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+    //   console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+    // })
+  })
 
   describe('#filterAndSortSlpTxs2', () => {
     it('should filter a block with a DAG', async () => {
@@ -102,10 +115,7 @@ describe('#filter-block.js', () => {
       const txs = block.tx
       // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
 
-      const result = await uut.filterAndSortSlpTxs2(
-        txs,
-        blockHeight
-      )
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       // assert.equal(result.sortedTxids.length, 7)
@@ -132,10 +142,7 @@ describe('#filter-block.js', () => {
         '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
       ]
 
-      const result = await uut.filterAndSortSlpTxs2(
-        txs,
-        blockHeight
-      )
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(result.length, 8)
@@ -165,10 +172,7 @@ describe('#filter-block.js', () => {
         'ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34'
       ]
 
-      const result = await uut.filterAndSortSlpTxs2(
-        txs,
-        blockHeight
-      )
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       console.log(`result: ${JSON.stringify(result, null, 2)}`)
     })
 
@@ -183,28 +187,38 @@ describe('#filter-block.js', () => {
         'b36b0c7485ad569b98cc9b9614dc68a5208495f22ec3b00effcf963b135a5215'
       ]
 
-      const result = await uut.filterAndSortSlpTxs2(
-        txs,
-        blockHeight
-      )
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       console.log(`result: ${JSON.stringify(result, null, 2)}`)
     })
 
-    it('should sort prolematic block', async () => {
+    // it('should sort prolematic block', async () => {
+    //   // force cache to get data from the full node.
+    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //   const blockHeight = 714476
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //
+    //   const txs = block.tx
+    //   // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
+    //
+    //   const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+    //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    // })
+
+    // This block caused the app to freeze up.
+    it('should sort prolematic block 642869', async () => {
       // force cache to get data from the full node.
       sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
 
-      const blockHeight = 714476
+      const blockHeight = 642869
       const blockHash = await rpc.getBlockHash(blockHeight)
       const block = await rpc.getBlock(blockHash)
 
       const txs = block.tx
       // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
 
-      const result = await uut.filterAndSortSlpTxs2(
-        txs,
-        blockHeight
-      )
+      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       console.log(`result: ${JSON.stringify(result, null, 2)}`)
     })
   })
@@ -214,7 +228,8 @@ describe('#filter-block.js', () => {
       // force cache to get data from the full node.
       sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
 
-      const txid = '234893177b18a95dbfc1eb855d69f1c9cc256a317a6c51be8fd1b9a38ae072ce'
+      const txid =
+        '234893177b18a95dbfc1eb855d69f1c9cc256a317a6c51be8fd1b9a38ae072ce'
 
       const result = await uut.checkForParent2(txid, 543413)
       // console.log('result: ', result)

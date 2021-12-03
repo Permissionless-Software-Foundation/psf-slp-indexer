@@ -128,6 +128,10 @@ class FilterBlock {
     }
   }
 
+  sleep (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
   // checkForParent(txid, blockheight) expects a transaction and
   // blockhight value as input.
   //
@@ -147,6 +151,8 @@ class FilterBlock {
       // console.log('txid: ', txid)
       // console.log(`chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`)
 
+      // await this.sleep(500)
+
       // Default output object
       const outObj = {
         hasParent: false,
@@ -162,6 +168,10 @@ class FilterBlock {
       if (!isAlreadyAdded.length) {
         // Add it to the beginning of the array.
         chainedTxids.unshift(txData.txid)
+      } else {
+        // TXID exists in the chainedTxids array, it's already been analyzed, so
+        // skip it.
+        return
       }
 
       // Default value.
