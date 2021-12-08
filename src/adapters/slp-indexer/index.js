@@ -28,6 +28,7 @@ const StartStop = require('./lib/start-stop')
 const ZMQ = require('./lib/zmq')
 const Utils = require('./lib/utils')
 const ManagePTXDB = require('./lib/ptxdb')
+const Query = require('./lib/query')
 
 // Instantiate LevelDB databases
 console.log('Opening LevelDB databases...')
@@ -73,6 +74,7 @@ class SlpIndexer {
     this.zmq = new ZMQ()
     this.utils = new Utils()
     this.managePtxdb = new ManagePTXDB({ pTxDb })
+    this.query = new Query({ addrDb, tokenDb, txDb, statusDb, pTxDb })
 
     // state
     this.indexState = 'phase0'

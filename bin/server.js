@@ -24,12 +24,12 @@ const config = require('../config') // this first.
 const AdminLib = require('../src/adapters/admin')
 const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
 const { wlogger } = require('../src/adapters/wlogger')
-const SlpIndexer = require('../src/adapters/slp-indexer')
+// const SlpIndexer = require('../src/adapters/slp-indexer')
 
 class Server {
   constructor () {
     this.adminLib = new AdminLib()
-    this.slpIndexer = new SlpIndexer()
+    // this.slpIndexer = new SlpIndexer()
   }
 
   async startServer () {
@@ -104,7 +104,8 @@ class Server {
       // }, 60000 * 60 * 2) // 2 hours
 
       // Start the SLP Indexer
-      this.slpIndexer.start()
+      // this.slpIndexer.start()
+      controllers.adapters.slpIndexer.start()
 
       return app
     } catch (err) {
