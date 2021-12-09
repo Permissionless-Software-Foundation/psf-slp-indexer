@@ -347,6 +347,8 @@ class Transaction {
       //   throw err
       // }
 
+      console.log('err: ', err)
+
       // Otherwise return false
       return false
     }

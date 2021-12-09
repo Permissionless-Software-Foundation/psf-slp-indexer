@@ -3,7 +3,7 @@
 */
 
 // const addr = 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx'
-const addr = 'bitcoincash:qrcdvlvl0edx8fffv89n5nevhx9pcngvqv86wvksj3'
+const addr = 'bitcoincash:qr4zmzh74n66pnsc8zvlpuzjwcgnk6g8eqwtdqwlf9'
 
 const level = require('level')
 

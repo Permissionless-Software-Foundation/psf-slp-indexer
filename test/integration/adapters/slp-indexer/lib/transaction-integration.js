@@ -97,7 +97,18 @@ describe('#transaction.js', () => {
       const txid = '401aae1bef9246c42916808c9595d2834791384dcf2e298d2fc294e27b6f5273'
 
       const result = await uut.get(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.property(result, 'txid')
+    })
+  })
+
+  describe('#getTokenInfo', () => {
+    it('should return data on burn transaction', async () => {
+      const txid = '70d69e0f3d58e52526ef8136b20993b5b4d3f7c936771fd2f490ccfc5c019372'
+
+      const result = await uut.getTokenInfo(txid)
+      console.log('result: ', result)
     })
   })
 })

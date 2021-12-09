@@ -92,6 +92,9 @@ class FilterBlock {
 
         if (isSlp) {
           slpTxs.push(txid)
+        } else {
+          // Check if any input UTXOs are in the database. If so, delete them,
+          // since they are officially burned.
         }
       }
 

@@ -141,14 +141,20 @@ class SlpIndexer {
           process.exit(0)
         }
 
-        this.indexState = 'phase1'
-
         // Process all SLP txs in the block.
         await this.processBlock(blockHeight)
+
+        // Change phase after processing first block. This prevents unneeded
+        // zipping of the database after a restart.
+        this.indexState = 'phase1'
+
+        // Wait a few seconds between loops.
+        // await this.utils.sleep(1000)
       }
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
+      this.indexState = 'phase2'
 
       let blockHeight = status.syncedBlockHeight
       // if (this.indexState === 'phase1') {
@@ -255,7 +261,8 @@ class SlpIndexer {
       )
 
       // Create a zip-file backup every 'epoch' of blocks
-      if (blockHeight % EPOCH === 0) {
+      if (blockHeight % EPOCH === 0 && this.indexState !== 'phase0') {
+        console.log(`this.indexState: ${this.indexState}`)
         console.log(`Creating zip archive of database at block ${blockHeight}`)
         await this.dbBackup.zipDb(blockHeight, EPOCH)
       }
@@ -300,6 +307,14 @@ class SlpIndexer {
           // Attempt to process TX
           await this.processTx({ tx, blockHeight })
         } catch (err) {
+          // Temp. Seeing if we can skip errors when in phase 2.
+          if (this.indexState === 'phase2') {
+            console.log(
+              'Skipping error because indexer is in phase 2, indexing the tip of the chain.'
+            )
+            return
+          }
+
           console.log('----> HANDLING ERROR <----')
           console.log(err)
 

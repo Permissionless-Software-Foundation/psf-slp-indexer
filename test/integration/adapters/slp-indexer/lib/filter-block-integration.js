@@ -207,20 +207,20 @@ describe('#filter-block.js', () => {
     // })
 
     // This block caused the app to freeze up.
-    it('should sort prolematic block 642869', async () => {
-      // force cache to get data from the full node.
-      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
-
-      const blockHeight = 642869
-      const blockHash = await rpc.getBlockHash(blockHeight)
-      const block = await rpc.getBlock(blockHash)
-
-      const txs = block.tx
-      // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
-
-      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
-    })
+    // it('should sort problematic block 642869', async () => {
+    //   // force cache to get data from the full node.
+    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //   const blockHeight = 642869
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //
+    //   const txs = block.tx
+    //   // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
+    //
+    //   const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+    //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    // })
   })
 
   describe('#checkForParent', () => {
@@ -288,6 +288,18 @@ describe('#filter-block.js', () => {
       assert.equal(result.success, true)
       assert.equal(result.chainedArray.length, 7)
       assert.equal(result.unsortedArray, 0)
+    })
+  })
+
+  describe('#filterSlpTxs', () => {
+    it('should not filter out burn TX', async () => {
+      const blockHeight = 717638
+      const blockHash = await rpc.getBlockHash(blockHeight)
+      const block = await rpc.getBlock(blockHash)
+      const txs = block.tx
+
+      const result = await uut.filterSlpTxs(txs)
+      console.log('result: ', result)
     })
   })
 })
