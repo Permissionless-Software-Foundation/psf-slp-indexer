@@ -111,7 +111,11 @@ class FilterBlock {
         } else {
           // Check if any input UTXOs are in the database. If so, delete them,
           // since they are officially burned.
-          // await this.deleteBurnedUtxos(txid)
+          const result = await this.deleteBurnedUtxos(txid)
+
+          if (!result) {
+            console.log(`deleteBurnedUtxos() errored on on txid ${txid}. Coinbase?`)
+          }
         }
       }
 
@@ -120,6 +124,7 @@ class FilterBlock {
       // Filter out all the non-SLP transactions.
       for (let i = 0; i < txids.length; i++) {
         const txid = txids[i]
+        console.log('txid: ', txid)
 
         // Create a promise that will automatically retry.
         const p1 = this.retryWrapper(processTx, txid)
@@ -212,8 +217,13 @@ class FilterBlock {
       // Signal that this function completed successfully.
       return true
     } catch (err) {
-      console.error('Error in deleteBurnedUtxos()')
-      throw err
+      // console.log(`deleteBurnedUtxos error txid: ${txidIn}`)
+      // console.error('Error in deleteBurnedUtxos()')
+      // throw err
+
+      // Ignore any errors.
+      // Return false to signal an error.
+      return false
     }
   }
 
