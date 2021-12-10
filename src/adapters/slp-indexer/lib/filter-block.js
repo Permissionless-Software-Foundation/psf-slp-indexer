@@ -124,7 +124,7 @@ class FilterBlock {
       // Filter out all the non-SLP transactions.
       for (let i = 0; i < txids.length; i++) {
         const txid = txids[i]
-        console.log('txid: ', txid)
+        // console.log('txid: ', txid)
 
         // Create a promise that will automatically retry.
         const p1 = this.retryWrapper(processTx, txid)

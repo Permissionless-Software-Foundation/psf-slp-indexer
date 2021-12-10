@@ -30,10 +30,11 @@ describe('Auth', () => {
     const app = new Server()
 
     // Prevent indexer from starting.
-    sandbox.stub(app.slpIndexer, 'start').resolves({})
+    sandbox.stub(app.controllers.adapters.slpIndexer, 'start').resolves({})
 
     // This should be the first instruction. It starts the REST API server.
     await app.startServer()
+    console.log('App has started.')
 
     // Stop the IPFS node for the rest of the e2e tests.
     // await app.controllers.adapters.ipfs.stop()
