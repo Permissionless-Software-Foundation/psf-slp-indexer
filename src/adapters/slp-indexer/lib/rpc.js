@@ -140,9 +140,10 @@ class RPC {
 
       return response.data.result
     } catch (err) {
-      console.log('error txid: ', txid)
+      // console.log('error txid: ', txid)
 
-      // if (err.message.includes('txid must be provided')) return {}
+      // Don't log the error for this specific response.
+      if (err.message.includes('txid must be provided')) throw err
 
       // Write out error to error log.
       _this.wlogger.error('Error in rpc.js/getRawTransaction() ', err)

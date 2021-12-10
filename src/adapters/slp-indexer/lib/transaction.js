@@ -567,6 +567,11 @@ class Transaction {
 
       return retArray
     } catch (err) {
+      // Handle corner-case of a Coinbase TX.
+      if (err.message.includes('txid must be provided')) {
+        return []
+      }
+
       console.error('Error in transaction.js/_getInputAddrs()')
       throw err
     }
