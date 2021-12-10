@@ -3,6 +3,9 @@
   This library is primarily used by the genesis.js, mint.js, and send.js files.
 */
 
+// Global npm libraries
+const BigNumber = require('bignumber.js')
+
 class IndexerUtils {
   // Generate a new schema/template for an address object. This structure will
   // be populated with data.
@@ -52,6 +55,83 @@ class IndexerUtils {
       return newArray
     } catch (err) {
       console.error('Error in removeObjFromArray()')
+      throw err
+    }
+  }
+
+  // Scan the balances array for a token that matches the utxoObj. Subtract
+  // the balance of the utxoObj from that balance in the array.
+  // Assumes the utxoObj has the following properties:
+  // - txid
+  // - vout
+  // - tokenId
+  // - qty (string)
+  subtractUtxoBalance (utxoObj, balancesArray, tokenId) {
+    try {
+      let deleteEntry = false
+
+      for (let i = 0; i < balancesArray.length; i++) {
+        const thisBalance = balancesArray[i]
+
+        if (thisBalance.tokenId === utxoObj.tokenId) {
+          // Convert the balances of each to a BigNumber
+          const balanceQty = new BigNumber(thisBalance.qty)
+          const utxoQty = new BigNumber(utxoObj.qty)
+
+          // Subtract the difference
+          const newBalance = balanceQty.minus(utxoQty)
+
+          // If balance is zero, then remove the element from the array.
+          if (newBalance.isLessThanOrEqualTo(0)) {
+            deleteEntry = {
+              index: i
+            }
+
+            break
+          }
+
+          // Convert the BigNumber to a string.
+          thisBalance.qty = newBalance.toString()
+
+          break
+        }
+      }
+
+      // Delete the entry if quanity is zero
+      if (deleteEntry !== false) {
+        balancesArray = balancesArray.filter(x => x.tokenId !== tokenId)
+      }
+
+      return balancesArray
+    } catch (err) {
+      console.error('Error in subtractUtxoBalance()')
+      throw err
+    }
+  }
+
+  // Subtract a burned UTXO balance from the token data tracking that quantity.
+  subtractBurnedTokens (utxoObj, tokenData) {
+    try {
+      const utxoQty = new BigNumber(utxoObj.qty)
+      const tokensInCirculationBN = new BigNumber(tokenData.tokensInCirculationBN)
+
+      let totalBurned
+      if (tokenData.totalBurned) {
+        totalBurned = new BigNumber(tokenData.totalBurned)
+      } else {
+        totalBurned = new BigNumber(0)
+      }
+
+      const newCirculatingTotal = tokensInCirculationBN.minus(utxoQty)
+      const newBurned = totalBurned.plus(utxoQty)
+
+      tokenData.tokensInCirculationBN = newCirculatingTotal
+      tokenData.tokensInCirculationStr = newCirculatingTotal.toString()
+      tokenData.totalBurned = newBurned.toString()
+
+      return tokenData
+    } catch (err) {
+      console.error('Error in subtractBurnedTokens()')
       throw err
     }
   }

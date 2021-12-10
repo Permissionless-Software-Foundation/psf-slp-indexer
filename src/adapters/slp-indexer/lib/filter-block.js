@@ -9,14 +9,17 @@
     were spent.
 */
 
-// const BCHJS = require('@psf/bch-js')
+// Public npm libraries
 const PQueue = require('p-queue').default
 const pRetry = require('p-retry')
 
+// Local Libraries
 // const config = require('../../../config')
+const Utils = require('./utils')
 
 class FilterBlock {
   constructor (localConfig = {}) {
+    // Dependency Injection.
     this.cache = localConfig.cache
     if (!this.cache) {
       throw new Error(
@@ -29,10 +32,23 @@ class FilterBlock {
         'Must include instance of transaction lib when instantiating filter-block.js'
       )
     }
+    this.addrDb = localConfig.addrDb
+    if (!this.addrDb) {
+      throw new Error(
+        'Must pass address DB instance when instantiating filter-block.js'
+      )
+    }
+    this.tokenDb = localConfig.tokenDb
+    if (!this.tokenDb) {
+      throw new Error(
+        'Must pass token DB instance when instantiating filter-block.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.pQueue = new PQueue({ concurrency: 20 })
     this.pRetry = pRetry
+    this.utils = new Utils()
 
     // Number of retry attempts
     this.attempts = 5
@@ -95,6 +111,7 @@ class FilterBlock {
         } else {
           // Check if any input UTXOs are in the database. If so, delete them,
           // since they are officially burned.
+          // await this.deleteBurnedUtxos(txid)
         }
       }
 
@@ -127,6 +144,75 @@ class FilterBlock {
       return slpTxs
     } catch (err) {
       console.error('Error in filterSlpTxs()')
+      throw err
+    }
+  }
+
+  // Check the input UTXOs for a TX that fails the OP_RETURN test. If any input
+  // UTXOs exist in the database, they should be deleted as they are burned.
+  async deleteBurnedUtxos (txidIn) {
+    try {
+      const txDetails = await this.cache.get(txidIn)
+      // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+
+      const vins = txDetails.vin
+      // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
+
+      // Loop through each input to the TX
+      for (let i = 0; i < vins.length; i++) {
+        const thisVin = vins[i]
+
+        const txid = thisVin.txid
+        const vout = thisVin.vout
+        const addr = thisVin.address
+        let addrData = {}
+
+        // Try to get the address from the database.
+        try {
+          addrData = await this.addrDb.get(addr)
+        } catch (err) {
+          // Address (and thus input UTXO) is not in the database, so skip this
+          // input.
+          continue
+        }
+
+        // Loop through each UTXO associated with this address.
+        const utxos = addrData.utxos
+        for (let i = 0; i < utxos.length; i++) {
+          const thisUtxo = utxos[i]
+
+          // If the address contains the burned UTXO.
+          if (thisUtxo.txid === txid && thisUtxo.vout === vout) {
+            // Remove the UTXO from the address.
+            addrData.utxos = this.utils.removeUtxoFromArray(thisUtxo, addrData.utxos)
+
+            // Remove the balance from the address
+            addrData.balances = this.utils.subtractUtxoBalance(thisUtxo, addrData.balances, thisUtxo.tokenId)
+
+            // Add the TXID to the transaction history
+            addrData.txs.push({
+              txid: txidIn,
+              height: txDetails.blockheight
+            })
+
+            // Save the updated address data in the database.
+            // console.log(`Updated addrData: ${JSON.stringify(addrData, null, 2)}`)
+            await this.addrDb.put(addr, addrData)
+
+            // Add the amount of burned tokens to the token stats.
+            const tokenData = await this.tokenDb.get(thisUtxo.tokenId)
+            // console.log(`updated tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+            const newTokenData = this.utils.subtractBurnedTokens(thisUtxo, tokenData)
+            // console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
+            await this.tokenDb.put(thisUtxo.tokenId, newTokenData)
+          }
+        }
+      }
+
+      // Signal that this function completed successfully.
+      return true
+    } catch (err) {
+      console.error('Error in deleteBurnedUtxos()')
       throw err
     }
   }

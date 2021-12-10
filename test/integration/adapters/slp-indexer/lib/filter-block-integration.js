@@ -25,11 +25,13 @@ describe('#filter-block.js', () => {
     sandbox = sinon.createSandbox()
 
     const txDb = new MockLevel()
+    const addrDb = new MockLevel()
+    const tokenDb = new MockLevel()
 
     const cache = new Cache({ bchjs, txDb })
     const transaction = new Transaction()
 
-    uut = new FilterBlock({ cache, transaction })
+    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb })
   })
 
   afterEach(() => sandbox.restore())
@@ -292,13 +294,25 @@ describe('#filter-block.js', () => {
   })
 
   describe('#filterSlpTxs', () => {
-    it('should not filter out burn TX', async () => {
-      const blockHeight = 717638
-      const blockHash = await rpc.getBlockHash(blockHeight)
-      const block = await rpc.getBlock(blockHash)
-      const txs = block.tx
+    // it('should not filter out burn TX', async () => {
+    //   const blockHeight = 717638
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //   const txs = block.tx
+    //
+    //   const result = await uut.filterSlpTxs(txs)
+    //   console.log('result: ', result)
+    // })
+  })
 
-      const result = await uut.filterSlpTxs(txs)
+  describe('#deleteBurnedUtxos', () => {
+    it('should purge burned UTXOs from DB.', async () => {
+      // force cache to get data from the full node.
+      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+
+      const txid = '70d69e0f3d58e52526ef8136b20993b5b4d3f7c936771fd2f490ccfc5c019372'
+
+      const result = await uut.deleteBurnedUtxos(txid)
       console.log('result: ', result)
     })
   })

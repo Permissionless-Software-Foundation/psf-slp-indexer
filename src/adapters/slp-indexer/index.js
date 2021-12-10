@@ -65,7 +65,9 @@ class SlpIndexer {
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
       cache: this.cache,
-      transaction: this.transaction
+      transaction: this.transaction,
+      addrDb,
+      tokenDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb })
     this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
