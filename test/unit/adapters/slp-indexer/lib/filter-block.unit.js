@@ -26,11 +26,13 @@ describe('#filter-block.js', () => {
     txDb.get = () => {
       throw new Error('not in db')
     }
+    const addrDb = new MockLevel()
+    const tokenDb = new MockLevel()
 
     const cache = new Cache({ txDb })
     const transaction = new Transaction()
 
-    uut = new FilterBlock({ cache, transaction })
+    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb })
   })
 
   afterEach(() => sandbox.restore())
@@ -61,6 +63,23 @@ describe('#filter-block.js', () => {
         assert.equal(
           err.message,
           'Must include instance of transaction lib when instantiating filter-block.js'
+        )
+      }
+    })
+
+    it('should throw error if transaction address DB is not passed in', () => {
+      try {
+        const txDb = new MockLevel()
+        const cache = new Cache({ txDb })
+        const transaction = new Transaction()
+
+        uut = new FilterBlock({ cache, transaction })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(
+          err.message,
+          'Must pass address DB instance when instantiating filter-block.js'
         )
       }
     })
@@ -353,6 +372,29 @@ describe('#filter-block.js', () => {
       } catch (err) {
         assert.include(err.message, 'test error')
       }
+    })
+  })
+
+  describe('#deleteBurnedUtxos', () => {
+    it('should update address and token data from burn TXID', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get').resolves(mockData.burnTx01)
+      sandbox
+        .stub(uut.addrDb, 'get')
+        .onCall(0)
+        .rejects(new Error('not found'))
+        .onCall(1)
+        .resolves(mockData.addrData01)
+      sandbox.stub(uut.tokenDb, 'get').resolves(mockData.tokenData01)
+      sandbox.stub(uut.addrDb, 'put').resolves()
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const txid =
+        '70d69e0f3d58e52526ef8136b20993b5b4d3f7c936771fd2f490ccfc5c019372'
+
+      const result = await uut.deleteBurnedUtxos(txid)
+
+      assert.equal(result, true)
     })
   })
 })

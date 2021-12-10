@@ -541,11 +541,115 @@ const forwardDagTx03 = {
   tokenDocHash: ''
 }
 
+const burnTx01 = {
+  txid: '70d69e0f3d58e52526ef8136b20993b5b4d3f7c936771fd2f490ccfc5c019372',
+  hash: '70d69e0f3d58e52526ef8136b20993b5b4d3f7c936771fd2f490ccfc5c019372',
+  version: 2,
+  size: 338,
+  locktime: 0,
+  vin: [
+    {
+      txid: '1361b8db2d000d842d75a7ba87a39b7af585de4c699a5bd334a8f8e378346767',
+      vout: 0,
+      scriptSig: {
+        asm: '304402201b29a12d8a98d670f75ea2e0d0cfb1c9d9d6a9541cc96bdb0a1bed653825560d022055c66cebe5f50e3d7776c43f5779651ef3999b3e06e50c0ab2aa317193a02cf1[ALL|FORKID] 0204a8a6fae1ad31159cd2efe7022443d1b6f913cf1830ca190a0501321b41aa7c',
+        hex: '47304402201b29a12d8a98d670f75ea2e0d0cfb1c9d9d6a9541cc96bdb0a1bed653825560d022055c66cebe5f50e3d7776c43f5779651ef3999b3e06e50c0ab2aa317193a02cf141210204a8a6fae1ad31159cd2efe7022443d1b6f913cf1830ca190a0501321b41aa7c'
+      },
+      sequence: 4294967295,
+      address: 'bitcoincash:qp3t5cuncq2czduh27ps3jmz08m37ey3s5le8qca2f',
+      value: 0.00039025
+    },
+    {
+      txid: 'be7ebc3143e6f020cfc7a6b225ff0c291b8b22f51b391695bf409676cd501c5e',
+      vout: 1,
+      scriptSig: {
+        asm: '3044022000b905700ac1ca7eed48ebcba5d575e7f67ff6e1fcc1a4f757e7948fa8d6c72502207255a3d3371891b5971800f71270eae0e52253de83710a8b1e344fd96d64cbaa[ALL|FORKID] 0204a8a6fae1ad31159cd2efe7022443d1b6f913cf1830ca190a0501321b41aa7c',
+        hex: '473044022000b905700ac1ca7eed48ebcba5d575e7f67ff6e1fcc1a4f757e7948fa8d6c72502207255a3d3371891b5971800f71270eae0e52253de83710a8b1e344fd96d64cbaa41210204a8a6fae1ad31159cd2efe7022443d1b6f913cf1830ca190a0501321b41aa7c'
+      },
+      sequence: 4294967295,
+      address: 'bitcoincash:qp3t5cuncq2czduh27ps3jmz08m37ey3s5le8qca2f',
+      value: 0.00000546
+    }
+  ],
+  vout: [
+    {
+      value: 0.00039196,
+      n: 0,
+      scriptPubKey: {
+        asm: 'OP_DUP OP_HASH160 62ba6393c015813797578308cb6279f71f649185 OP_EQUALVERIFY OP_CHECKSIG',
+        hex: '76a91462ba6393c015813797578308cb6279f71f64918588ac',
+        reqSigs: 1,
+        type: 'pubkeyhash',
+        addresses: [
+          'bitcoincash:qp3t5cuncq2czduh27ps3jmz08m37ey3s5le8qca2f'
+        ]
+      }
+    }
+  ],
+  hex: '020000000267673478e3f8a834d35b9a694cde85f57a9ba387baa7752d840d002ddbb86113000000006a47304402201b29a12d8a98d670f75ea2e0d0cfb1c9d9d6a9541cc96bdb0a1bed653825560d022055c66cebe5f50e3d7776c43f5779651ef3999b3e06e50c0ab2aa317193a02cf141210204a8a6fae1ad31159cd2efe7022443d1b6f913cf1830ca190a0501321b41aa7cffffffff5e1c50cd769640bf9516391bf5228b1b290cff25b2a6c7cf20f0e64331bc7ebe010000006a473044022000b905700ac1ca7eed48ebcba5d575e7f67ff6e1fcc1a4f757e7948fa8d6c72502207255a3d3371891b5971800f71270eae0e52253de83710a8b1e344fd96d64cbaa41210204a8a6fae1ad31159cd2efe7022443d1b6f913cf1830ca190a0501321b41aa7cffffffff011c990000000000001976a91462ba6393c015813797578308cb6279f71f64918588ac00000000',
+  blockhash: '0000000000000000023533068bba840b28d8e7ec54df6b05aff016d9791757fd',
+  confirmations: 67,
+  time: 1639066973,
+  blocktime: 1639066973,
+  blockheight: 717638,
+  isSlpTx: false
+}
+
+const addrData01 = {
+  utxos: [
+    {
+      txid: 'be7ebc3143e6f020cfc7a6b225ff0c291b8b22f51b391695bf409676cd501c5e',
+      vout: 1,
+      type: 'token',
+      qty: '9900',
+      tokenId: 'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
+      address: 'bitcoincash:qp3t5cuncq2czduh27ps3jmz08m37ey3s5le8qca2f'
+    }
+  ],
+  txs: [
+    {
+      txid: 'f3ad7418888fb5344394d511e373b53f99a41bd6ae35176533d7b5b5a6b21452',
+      height: 717542
+    },
+    {
+      txid: '06fff9287c909617720ab002f12a05cd2d6f314f2e1e888df8e44bffd848b905',
+      height: 717546
+    },
+    {
+      txid: 'be7ebc3143e6f020cfc7a6b225ff0c291b8b22f51b391695bf409676cd501c5e',
+      height: 717555
+    }
+  ],
+  balances: [
+    {
+      tokenId: 'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
+      qty: '9900'
+    }
+  ]
+}
+
+const tokenData01 = {
+  type: 1,
+  ticker: 'TROUT',
+  name: "Trout's test token",
+  tokenId: 'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
+  documentUri: 'troutsblog.com',
+  documentHash: '',
+  decimals: 2,
+  mintBatonIsActive: true,
+  tokensInCirculationBN: '100100000000',
+  tokensInCirculationStr: '100100000000',
+  blockCreated: 622414
+}
+
 module.exports = {
   twoTxDag01,
   twoTxDag02,
   twoTxDag03,
   forwardDagTx01,
   forwardDagTx02,
-  forwardDagTx03
+  forwardDagTx03,
+  burnTx01,
+  addrData01,
+  tokenData01
 }

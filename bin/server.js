@@ -24,12 +24,14 @@ const config = require('../config') // this first.
 const AdminLib = require('../src/adapters/admin')
 const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
 const { wlogger } = require('../src/adapters/wlogger')
-const SlpIndexer = require('../src/adapters/slp-indexer')
+const Controllers = require('../src/controllers')
+// const SlpIndexer = require('../src/adapters/slp-indexer')
 
 class Server {
   constructor () {
+    // Encapsulate dependencies
     this.adminLib = new AdminLib()
-    this.slpIndexer = new SlpIndexer()
+    this.controllers = new Controllers()
   }
 
   async startServer () {
@@ -71,11 +73,9 @@ class Server {
       app.use(passport.session())
 
       // Attach REST API and JSON RPC controllers to the app.
-      const Controllers = require('../src/controllers')
-      const controllers = new Controllers()
-      await controllers.attachRESTControllers(app)
+      await this.controllers.attachRESTControllers(app)
 
-      app.controllers = controllers
+      app.controllers = this.controllers
 
       // Enable CORS for testing
       // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
@@ -94,7 +94,7 @@ class Server {
       if (success) console.log('System admin user created.')
 
       // Attach the other IPFS controllers
-      await controllers.attachControllers(app)
+      await app.controllers.attachControllers(app)
 
       // ipfs-coord has a memory leak. This app shuts down after 4 hours. It
       // expects to be run by Docker or pm2, which can automatically restart
@@ -104,7 +104,7 @@ class Server {
       // }, 60000 * 60 * 2) // 2 hours
 
       // Start the SLP Indexer
-      this.slpIndexer.start()
+      app.controllers.adapters.slpIndexer.start()
 
       return app
     } catch (err) {
