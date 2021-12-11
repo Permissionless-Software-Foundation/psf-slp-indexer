@@ -545,12 +545,17 @@ class Transaction {
         const inputTxid = vin.txid
         const inputVout = vin.vout
 
-        // TODO: Coinbase TXs have no input transaction. Figure out how to
-        // handle this corner case.
+        // Skip if there is no input TXID (Coinbase)
+        if (!inputTxid) continue
 
         // Get the TX details for the input, in order to retrieve the address of
         // the sender.
-        const txDetailsParent = await this.rpc.getRawTransaction(inputTxid)
+        // const txDetailsParent = await this.rpc.getRawTransaction(inputTxid)
+        const txDetailsParent = await this.queue.addToQueue(
+          this.rpc.getRawTransaction,
+          inputTxid
+        )
+
         // console.log(
         //   `txDetailsParent: ${JSON.stringify(txDetailsParent, null, 2)}`
         // )
