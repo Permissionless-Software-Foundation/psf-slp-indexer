@@ -82,16 +82,33 @@ class Send {
 
       // Subtract the input UTXOs and balances from input addresses.
       const spentBN = await this.subtractTokensFromInputAddr(data)
-      console.log(`TXID ${txid} spent ${spentBN.toString()} tokens.`)
+      // console.log(`TXID ${txid} spent ${spentBN.toString()} tokens.`)
 
       // Add the output UTXOs to output addresses
       const sentBN = await this.addTokensFromOutput(data)
-      console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
+      // console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // If the difference is positive, then it's a 'controlled burn' transaction.
       const diffBN = spentBN.minus(sentBN)
       if (diffBN.isGreaterThan(0)) {
         console.log(`TXID ${txid} burned ${diffBN.toString()} tokens.`)
+
+        // Update the token data.
+        const tokenData = await this.tokenDb.get(tokenId)
+        console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+
+        const tokensInCirc = new BigNumber(tokenData.tokensInCirculationBN)
+        const totalBurned = new BigNumber(tokenData.totalBurned)
+
+        const diffCirc = tokensInCirc.minus(diffBN)
+        const newBurned = totalBurned.plus(diffBN)
+
+        tokenData.tokensInCirculationBN = diffCirc
+        tokenData.tokensInCirculationStr = diffCirc.toString()
+        tokenData.totalBurned = newBurned.toString()
+
+        console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
+        await this.tokenDb.put(tokenId, tokenData)
       }
 
       let end = new Date()
@@ -193,7 +210,7 @@ class Send {
 
       // Update balances
       const qtyBN = this.updateBalanceFromSend(addr, slpData, voutIndex - 1)
-      console.log(`qtyBN: ${qtyBN.toString()}`)
+      // console.log(`qtyBN: ${qtyBN.toString()}`)
 
       // console.log(`Saving this UTXO data to database for addr ${recvrAddr}: ${JSON.stringify(addr.utxos, null, 2)}`)
 

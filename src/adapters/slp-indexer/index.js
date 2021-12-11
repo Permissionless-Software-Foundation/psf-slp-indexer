@@ -130,8 +130,6 @@ class SlpIndexer {
 
       let blockHeight = status.syncedBlockHeight
       do {
-        blockHeight++
-
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight
         await statusDb.put('status', status)
@@ -158,8 +156,11 @@ class SlpIndexer {
         // Wait a few seconds between loops.
         // await this.utils.sleep(1000)
 
+        blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
+      // } while (blockHeight <= 717831)
+      // process.exit(0)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
