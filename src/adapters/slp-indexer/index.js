@@ -120,13 +120,18 @@ class SlpIndexer {
 
       // Loop through the block heights and index every block.
       // Phase 1: Bulk indexing
-      for (
-        let blockHeight = status.syncedBlockHeight;
-        blockHeight < biggestBlockHeight + 1;
-        // blockHeight < 717796;
-        // blockHeight < status.syncedBlockHeight;
+      // for (
+      //   let blockHeight = status.syncedBlockHeight;
+      //   blockHeight < biggestBlockHeight + 1;
+      //   // blockHeight < 717796;
+      //   // blockHeight < status.syncedBlockHeight;
+      //   blockHeight++
+      // ) {
+
+      let blockHeight = status.syncedBlockHeight
+      do {
         blockHeight++
-      ) {
+
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight
         await statusDb.put('status', status)
@@ -152,13 +157,15 @@ class SlpIndexer {
 
         // Wait a few seconds between loops.
         // await this.utils.sleep(1000)
-      }
+
+        biggestBlockHeight = await this.rpc.getBlockCount()
+      } while (blockHeight <= biggestBlockHeight)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
       this.indexState = 'phase2'
 
-      let blockHeight = status.syncedBlockHeight
+      blockHeight = status.syncedBlockHeight
       // if (this.indexState === 'phase1') {
       //   // Update and save the sync status.
       //   status.syncedBlockHeight++
