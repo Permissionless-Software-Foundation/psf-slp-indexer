@@ -62,6 +62,12 @@ class Cache {
       console.log(`tx cache has ${this.cacheCnt} cached txs`)
     }
 
+    // Flush the cache once it gets too big, to same on memory.
+    if (this.cacheCnt > 1000000) {
+      this.cache = {}
+      this.cacheCnt = 0
+    }
+
     return txData
   }
 
