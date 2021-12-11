@@ -123,7 +123,7 @@ class SlpIndexer {
       for (
         let blockHeight = status.syncedBlockHeight;
         blockHeight < biggestBlockHeight + 1;
-        // blockHeight < 714475;
+        // blockHeight < 717796;
         // blockHeight < status.syncedBlockHeight;
         blockHeight++
       ) {
