@@ -82,9 +82,11 @@ class Send {
 
       // Subtract the input UTXOs and balances from input addresses.
       const spentBN = await this.subtractTokensFromInputAddr(data)
+      console.log(`TXID ${txid} spent ${spentBN.toString()} tokens.`)
 
       // Add the output UTXOs to output addresses
       const sentBN = await this.addTokensFromOutput(data)
+      console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // If the difference is positive, then it's a 'controlled burn' transaction.
       const diffBN = spentBN.minus(sentBN)
@@ -191,6 +193,7 @@ class Send {
 
       // Update balances
       const qtyBN = this.updateBalanceFromSend(addr, slpData, voutIndex - 1)
+      console.log(`qtyBN: ${qtyBN.toString()}`)
 
       // console.log(`Saving this UTXO data to database for addr ${recvrAddr}: ${JSON.stringify(addr.utxos, null, 2)}`)
 
@@ -252,7 +255,7 @@ class Send {
       if (!tokenExists.length) {
         // Balance for this token does not exist in the address. Add it.
         addrObj.balances.push({ tokenId, qty: qty.toString() })
-        return true
+        return qty
       }
       // console.log(`token balance for ${tokenId} already exists`)
 

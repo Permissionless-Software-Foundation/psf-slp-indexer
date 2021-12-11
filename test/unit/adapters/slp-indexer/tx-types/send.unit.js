@@ -92,10 +92,11 @@ describe('#send.js', () => {
 
   describe('#subtractBalanceFromSend', () => {
     it('should subtract a balance from an address object', () => {
-      const result = uut.subtractBalanceFromSend(mockData.addrData01, mockData.utxo01)
+      let result = uut.subtractBalanceFromSend(mockData.addrData01, mockData.utxo01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '234123')
     })
 
     it('should catch and throw errors', async () => {
@@ -118,20 +119,22 @@ describe('#send.js', () => {
       // Force database to return previous address data
       sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData01)
 
-      const result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '234123')
     })
 
     it('should skip inputs without a matching token ID', async () => {
       // Force input token ID to be different
       mockData.sendData01.txData.vin[1].tokenId = 'fake-token-id'
 
-      const result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '0')
     })
 
     it('should mark token qty as 0 if input fails DAG validation', async () => {
@@ -192,10 +195,11 @@ describe('#send.js', () => {
       // Force database to return previous address data
       sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData02)
 
-      const result = await uut.subtractTokensFromInputAddr(mockData.sendData02)
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData02)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '0')
     })
   })
 
@@ -234,12 +238,13 @@ describe('#send.js', () => {
       const startVal = parseInt(mockData.addrData01.balances[0].qty.toString())
 
       // console.log(`starting mockData.addrData01: ${JSON.stringify(mockData.addrData01, null, 2)}`)
-      const result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      result = result.toString()
       // console.log('result: ', result)
 
       const endVal = parseInt(mockData.addrData01.balances[0].qty.toString())
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
 
       // Assert that the balance of the address is greater after the function
       // completes.
@@ -250,9 +255,11 @@ describe('#send.js', () => {
       // Force existing balance to be for a different token
       mockData.addrData01.balances[0].tokenId = 'other-token'
 
-      const result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      result = result.toString()
+      // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
 
       // console.log(`addrData: ${JSON.stringify(mockData.addrData01, null, 2)}`)
       assert.equal(mockData.addrData01.balances[0].qty, '234123')
@@ -266,9 +273,11 @@ describe('#send.js', () => {
         qty: new BigNumber('10000')
       })
 
-      const result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      result = result.toString()
+      // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
 
       // console.log(`addrData: ${JSON.stringify(mockData.addrData01, null, 2)}`)
       assert.equal(mockData.addrData01.balances[0].qty, '10000')
@@ -292,12 +301,11 @@ describe('#send.js', () => {
       // Force creation of new address object
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not found'))
 
-      const result = await uut.updateOutputAddr(mockData.sendData01, 1)
+      let result = await uut.updateOutputAddr(mockData.sendData01, 1)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.isArray(result.utxos)
-      assert.isArray(result.txs)
-      assert.isArray(result.balances)
+      assert.equal(result, '4354768657')
     })
 
     it('should handle corner-case where scriptPubKey does not exist', async () => {
@@ -327,10 +335,11 @@ describe('#send.js', () => {
       // Force creation of new address object
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not found'))
 
-      const result = await uut.addTokensFromOutput(mockData.sendData01)
+      let result = await uut.addTokensFromOutput(mockData.sendData01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
     })
 
     it('should catch and throw errors', async () => {
@@ -349,11 +358,11 @@ describe('#send.js', () => {
     it('should process SEND data', async () => {
       // Mock dependencies
       sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
-      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves()
-      sandbox.stub(uut, 'addTokensFromOutput').resolves()
+      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves(new BigNumber(10))
+      sandbox.stub(uut, 'addTokensFromOutput').resolves(new BigNumber(10))
 
       const result = await uut.processTx(mockData.sendData01)
-      // console.log('result: ', result)
+      console.log('result: ', result)
 
       assert.equal(result, true)
     })
