@@ -270,9 +270,10 @@ describe('#Transaction', () => {
     it('should catch and throw and error', async () => {
       try {
         // Force an error
-        sandbox
-          .stub(uut.rpc, 'getRawTransaction')
-          .rejects(new Error('test error'))
+        // sandbox
+        //   .stub(uut.rpc, 'getRawTransaction')
+        //   .rejects(new Error('test error'))
+        sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
 
         await uut._getInputAddrs(mockData.mockTxIn)
 
