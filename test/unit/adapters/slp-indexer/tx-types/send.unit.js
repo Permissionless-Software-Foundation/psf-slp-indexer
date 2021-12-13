@@ -388,4 +388,40 @@ describe('#send.js', () => {
       }
     })
   })
+
+  describe('#processControlledBurn', () => {
+    it('should detect a burn and update token stats', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(0)
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const spentBN = new BigNumber(1000)
+      const sentBN = new BigNumber(900)
+      const txid = 'fake-txid'
+      const tokenId = 'fake-token-id'
+
+      const result = await uut.processControlledBurn(spentBN, sentBN, txid, tokenId)
+      // console.log('result: ', result.toString())
+
+      assert.equal(result.toString(), '100')
+      assert.equal(tokenData.totalBurned.toString(), '100')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        await uut.processControlledBurn()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+  })
 })

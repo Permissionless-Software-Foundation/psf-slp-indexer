@@ -88,8 +88,30 @@ class Send {
       const sentBN = await this.addTokensFromOutput(data)
       // console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
-      // If the difference is positive, then it's a 'controlled burn' transaction.
+      // Detect and process a 'controlled burn' transaction.
+      await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
+
+      let end = new Date()
+      end = end.getTime()
+      const diff = end - start
+      console.log(`Processing of SEND TX took ${diff} mS for TXID ${txid}`)
+
+      return true
+    } catch (err) {
+      console.error('Error in send.processTx()')
+      throw err
+    }
+  }
+
+  // This function expects two BigNumbers as an input, represent the amount
+  // spent (inputs) and sent (outputs). This info is used to detect a
+  // 'controlled burn' for a token. If a burn is detected, it updates the
+  // token stats.
+  async processControlledBurn (spentBN, sentBN, txid, tokenId) {
+    try {
       const diffBN = spentBN.minus(sentBN)
+
+      // If the difference is positive, then it's a 'controlled burn' transaction.
       if (diffBN.isGreaterThan(0)) {
         console.log(`TXID ${txid} burned ${diffBN.toString()} tokens.`)
 
@@ -111,14 +133,9 @@ class Send {
         await this.tokenDb.put(tokenId, tokenData)
       }
 
-      let end = new Date()
-      end = end.getTime()
-      const diff = end - start
-      console.log(`Processing of SEND TX took ${diff} mS for TXID ${txid}`)
-
-      return true
+      return diffBN
     } catch (err) {
-      console.error('Error in send.processTx()')
+      console.error('Error in processControlledBurn()')
       throw err
     }
   }
