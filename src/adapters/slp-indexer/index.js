@@ -8,7 +8,7 @@
 
 */
 
-const EPOCH = 50 // blocks between backups
+const EPOCH = 100 // blocks between backups
 const RETRY_CNT = 25 // Number of retries before exiting the indexer
 
 // Public npm libraries.
@@ -60,7 +60,7 @@ class SlpIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
+    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
@@ -159,7 +159,7 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight <= 717831)
+      // } while (blockHeight < 551645)
       // process.exit(0)
 
       // Debugging: state the current state of the indexer.
