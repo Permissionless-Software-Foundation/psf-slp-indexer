@@ -290,7 +290,7 @@ describe('#Transaction', () => {
     it('should return tx data with input addresses', async () => {
       // Mock dependencies
       sandbox
-        .stub(uut.rpc, 'getRawTransaction')
+        .stub(uut, 'getTxWithRetry')
         .resolves(mockData.nonSlpTxDetails)
       sandbox.stub(uut, '_getInputAddrs').resolves([
         {
@@ -310,7 +310,7 @@ describe('#Transaction', () => {
 
     it('should throw an error for a non-txid input', async () => {
       try {
-        await uut.getTxData(1234)
+        await uut.getTxData()
 
         assert.fail('Unexpected result')
       } catch (err) {
@@ -318,7 +318,7 @@ describe('#Transaction', () => {
 
         assert.include(
           err.message,
-          'Input to raw-transaction.js/getTxData() must be a string containg a TXID.'
+          'must be a string containg a TXID'
         )
       }
     })
@@ -327,7 +327,7 @@ describe('#Transaction', () => {
       try {
         // Force a network error.
         sandbox
-          .stub(uut.rpc, 'getRawTransaction')
+          .stub(uut, 'getTxWithRetry')
           .rejects(new Error('test error'))
 
         const txid =
