@@ -45,6 +45,11 @@ class FilterBlock {
       )
     }
     this.utxoDb = localConfig.utxoDb
+    if (!this.utxoDb) {
+      throw new Error(
+        'Must pass utxo DB instance when instantiating filter-block.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.pQueue = new PQueue({ concurrency: 20 })
@@ -156,44 +161,17 @@ class FilterBlock {
 
   // Lookup the address associated with a utxo
   async getAddressFromTxid (txidIn, vout) {
+    let utxo = {}
+
+    // Try to get the utxo from the database.
     try {
-      // const txDetails = await this.transaction.getTxWithRetry(txidIn)
-
-      // const vins = txDetails.vin
-      // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
-
-      // const vouts = txDetails.vout
-
-      // Loop through each input to the TX
-      // for (let i = 0; i < vins.length; i++) {
-      // const thisVout = vouts[vout]
-
-      // const txid = thisVin.txid
-      // const vout = thisVin.vout
-      let utxo = {}
-
-      // Try to get the utxo from the database.
-      try {
-        // addrData = await this.addrDb.get(addr)
-        utxo = await this.utxoDb.get(`${txidIn}:${vout}`)
-      } catch (err) {
-        // Address (and thus input UTXO) is not in the database, so skip this
-        // input.
-        // continue
-        return false
-      }
-
-      return utxo.address
-      // }
+      utxo = await this.utxoDb.get(`${txidIn}:${vout}`)
     } catch (err) {
-      // console.log(`deleteBurnedUtxos error txid: ${txidIn}`)
-      // console.error('Error in deleteBurnedUtxos()')
-      // throw err
-
-      // Ignore any errors.
-      // Return false to signal an error.
+      // Address (and thus input UTXO) is not in the database.
       return false
     }
+
+    return utxo.address
   }
 
   // Check the input UTXOs for a TX that fails the OP_RETURN test. If any input

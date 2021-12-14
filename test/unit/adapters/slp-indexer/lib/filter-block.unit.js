@@ -28,11 +28,12 @@ describe('#filter-block.js', () => {
     }
     const addrDb = new MockLevel()
     const tokenDb = new MockLevel()
+    const utxoDb = new MockLevel()
 
     const cache = new Cache({ txDb })
     const transaction = new Transaction()
 
-    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb })
+    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb })
   })
 
   afterEach(() => sandbox.restore())
@@ -67,7 +68,7 @@ describe('#filter-block.js', () => {
       }
     })
 
-    it('should throw error if transaction address DB is not passed in', () => {
+    it('should throw error if address DB is not passed in', () => {
       try {
         const txDb = new MockLevel()
         const cache = new Cache({ txDb })
@@ -80,6 +81,43 @@ describe('#filter-block.js', () => {
         assert.equal(
           err.message,
           'Must pass address DB instance when instantiating filter-block.js'
+        )
+      }
+    })
+
+    it('should throw error if token DB is not passed in', () => {
+      try {
+        const txDb = new MockLevel()
+        const addrDb = new MockLevel()
+        const cache = new Cache({ txDb })
+        const transaction = new Transaction()
+
+        uut = new FilterBlock({ cache, transaction, addrDb })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(
+          err.message,
+          'Must pass token DB instance when instantiating filter-block.js'
+        )
+      }
+    })
+
+    it('should throw error if utxo DB is not passed in', () => {
+      try {
+        const txDb = new MockLevel()
+        const addrDb = new MockLevel()
+        const tokenDb = new MockLevel()
+        const cache = new Cache({ txDb })
+        const transaction = new Transaction()
+
+        uut = new FilterBlock({ cache, transaction, addrDb, tokenDb })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(
+          err.message,
+          'Must pass utxo DB instance when instantiating filter-block.js'
         )
       }
     })
@@ -375,18 +413,41 @@ describe('#filter-block.js', () => {
     })
   })
 
+  describe('#getAddressFromTxid', () => {
+    it('should return data from the utxo database', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.utxoDb, 'get').resolves({ address: 'addr' })
+
+      const result = await uut.getAddressFromTxid('fake-txid', 0)
+
+      assert.equal(result, 'addr')
+    })
+
+    it('should return false if UTXO is not in database', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.utxoDb, 'get').rejects(new Error('not found'))
+
+      const result = await uut.getAddressFromTxid('fake-txid', 0)
+
+      assert.equal(result, false)
+    })
+  })
+
   describe('#deleteBurnedUtxos', () => {
     it('should update address and token data from burn TXID', async () => {
       // Mock dependencies
-      sandbox.stub(uut.cache, 'get').resolves(mockData.burnTx01)
+      sandbox.stub(uut.transaction, 'getTxWithRetry').resolves(mockData.burnTx01)
+      sandbox.stub(uut, 'getAddressFromTxid').resolves('bitcoincash:qp3t5cuncq2czduh27ps3jmz08m37ey3s5le8qca2f')
       sandbox
         .stub(uut.addrDb, 'get')
         .onCall(0)
         .rejects(new Error('not found'))
         .onCall(1)
         .resolves(mockData.addrData01)
+      sandbox.stub(uut.cache, 'get').resolves(mockData.burnTx01)
       sandbox.stub(uut.tokenDb, 'get').resolves(mockData.tokenData01)
       sandbox.stub(uut.addrDb, 'put').resolves()
+      sandbox.stub(uut.utxoDb, 'del').resolves()
       sandbox.stub(uut.tokenDb, 'put').resolves()
 
       const txid =
@@ -395,6 +456,30 @@ describe('#filter-block.js', () => {
       const result = await uut.deleteBurnedUtxos(txid)
 
       assert.equal(result, true)
+    })
+
+    it('should return true after processing non-token tx', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.transaction, 'getTxWithRetry').resolves(mockData.burnTx01)
+      // Force utxo DB to not have the UTXOs in question. This simulates a non-
+      // slp transaction.
+      sandbox.stub(uut, 'getAddressFromTxid').resolves(false)
+
+      const txid =
+        '70d69e0f3d58e52526ef8136b20993b5b4d3f7c936771fd2f490ccfc5c019372'
+
+      const result = await uut.deleteBurnedUtxos(txid)
+
+      assert.equal(result, true)
+    })
+
+    it('should return false on a processing error', async () => {
+      // Force error
+      sandbox.stub(uut.transaction, 'getTxWithRetry').rejects(new Error('test error'))
+
+      const result = await uut.deleteBurnedUtxos()
+
+      assert.equal(result, false)
     })
   })
 })
