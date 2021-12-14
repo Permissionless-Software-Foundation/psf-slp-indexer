@@ -8,7 +8,7 @@
 
 */
 
-const EPOCH = 100 // blocks between backups
+const EPOCH = 200 // blocks between backups
 const RETRY_CNT = 25 // Number of retries before exiting the indexer
 
 // Public npm libraries.
@@ -54,24 +54,34 @@ const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
   valueEncoding: 'json'
 })
 
+// The UTXO database is used as a sort of reverse-lookup. The key is the TXID
+// plus vout, in this format: 'txid:vout'.
+// and the value is the vout and address. This can be used to lookup what
+// address possesses the UTXO. This makes handling of 'controlled burn' txs
+// much faster.
+const utxoDb = level(`${__dirname.toString()}/../../../leveldb/current/utxos`, {
+  valueEncoding: 'json'
+})
+
 // let _this
 
 class SlpIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb })
+    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
       cache: this.cache,
       transaction: this.transaction,
       addrDb,
-      tokenDb
+      tokenDb,
+      utxoDb
     })
-    this.genesis = new Genesis({ addrDb, tokenDb })
-    this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
-    this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
+    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
+    this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
+    this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.startStop = new StartStop()
     this.zmq = new ZMQ()
     this.utils = new Utils()

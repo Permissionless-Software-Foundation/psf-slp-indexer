@@ -1,5 +1,10 @@
 /*
   High-level functions for working with Transactions
+
+  TODO:
+  - Change name of txCache to tokenCache
+  - Create an actual token cache that stores raw tx data from full node.
+
 */
 
 // Public npm libraries
@@ -21,6 +26,8 @@ class Transaction {
     this.queue = new RetryQueue()
 
     // State
+    this.tokenCache = {}
+    this.tokenCacheCnt = 0
     this.txCache = {}
     this.txCacheCnt = 0
 
@@ -406,15 +413,16 @@ class Transaction {
     }
 
     // Return results if they've been cached.
-    const cachedVal = _this.txCache[txid]
+    const cachedVal = _this.tokenCache[txid]
     if (cachedVal) return cachedVal
 
     // const txDetails = await _this.rpc.getRawTransaction(txid)
     // Auto-retry if call to full node fails.
-    const txDetails = await this.queue.addToQueue(
-      this.rpc.getRawTransaction,
-      txid
-    )
+    // const txDetails = await this.queue.addToQueue(
+    //   this.rpc.getRawTransaction,
+    //   txid
+    // )
+    const txDetails = await this.getTxWithRetry(txid)
     // console.log('txDetails: ', txDetails)
 
     // SLP spec expects OP_RETURN to be the first output of the transaction.
@@ -457,10 +465,16 @@ class Transaction {
     }
     // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
-    _this.txCache[txid] = tokenData
-    _this.txCacheCnt++
-    if (_this.txCacheCnt % 100 === 0) {
-      console.log(`decodeOpReturn cache has ${_this.txCacheCnt} cached txs`)
+    _this.tokenCache[txid] = tokenData
+    _this.tokenCacheCnt++
+    if (_this.tokenCacheCnt % 100 === 0) {
+      console.log(`decodeOpReturn cache has ${_this.tokenCacheCnt} cached txs`)
+    }
+
+    // Clear the token cache if it gets too big. Prevents memory leaks.
+    if (_this.tokenCacheCnt > 1000000) {
+      _this.tokenCache = {}
+      _this.tokenCacheCnt = 0
     }
 
     return tokenData
@@ -505,7 +519,8 @@ class Transaction {
       }
 
       // Get the TX details for the transaction under consideration.
-      const txDetails = await this.rpc.getRawTransaction(txid)
+      // const txDetails = await this.rpc.getRawTransaction(txid)
+      const txDetails = await this.getTxWithRetry(txid)
       // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
       const inAddrs = await this._getInputAddrs(txDetails)
@@ -551,10 +566,11 @@ class Transaction {
         // Get the TX details for the input, in order to retrieve the address of
         // the sender.
         // const txDetailsParent = await this.rpc.getRawTransaction(inputTxid)
-        const txDetailsParent = await this.queue.addToQueue(
-          this.rpc.getRawTransaction,
-          inputTxid
-        )
+        // const txDetailsParent = await this.queue.addToQueue(
+        //   this.rpc.getRawTransaction,
+        //   inputTxid
+        // )
+        const txDetailsParent = await this.getTxWithRetry(inputTxid)
 
         // console.log(
         //   `txDetailsParent: ${JSON.stringify(txDetailsParent, null, 2)}`
@@ -578,6 +594,46 @@ class Transaction {
       }
 
       console.error('Error in transaction.js/_getInputAddrs()')
+      throw err
+    }
+  }
+
+  // Wraps the rpc.getRawTransaction() function in the queue-with-retry lib.
+  // This will retrieve transaction data from the full node, and it will
+  // automatically retry if there is an issue when trying to talk to the full
+  // node.
+  async getTxWithRetry (txid) {
+    try {
+      // Validate the txid input.
+      if (!txid || txid === '' || typeof txid !== 'string') {
+        throw new Error('txid string must be included.')
+      }
+
+      // Return results if they've been cached.
+      const cachedVal = this.txCache[txid]
+      if (cachedVal) return cachedVal
+
+      const txData = await this.queue.addToQueue(
+        this.rpc.getRawTransaction,
+        txid
+      )
+
+      // Add the result to the cache.
+      this.txCache[txid] = txData
+      this.txCacheCnt++
+      if (this.txCacheCnt % 1000 === 0) {
+        console.log(`txCache has ${this.txCacheCnt} cached txs`)
+      }
+
+      // Clear the token cache if it gets too big. Prevents memory leaks.
+      if (this.txCacheCnt > 1000000) {
+        this.txCache = {}
+        this.txCacheCnt = 0
+      }
+
+      return txData
+    } catch (err) {
+      console.error('Error in getTxWithRetry()')
       throw err
     }
   }

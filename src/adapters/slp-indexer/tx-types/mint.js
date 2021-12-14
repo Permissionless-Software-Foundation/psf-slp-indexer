@@ -42,6 +42,7 @@ class Mint {
         'Must pass transaction DB instance when instantiating mint.js'
       )
     }
+    this.utxoDb = localConfig.utxoDb
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
@@ -199,6 +200,9 @@ class Mint {
       // Save updated address data to the database.
       await this.addrDb.put(thisAddr, addr)
 
+      // Remove the baton UTXO from the UTXO database.
+      await this.utxoDb.del(`${baton.txid}:${baton.vout}`)
+
       return true
     } catch (err) {
       console.error('Error in mint.js/removeBatonInAddr()')
@@ -246,6 +250,9 @@ class Mint {
 
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
+
+      // Add the utxo to the utxo database
+      await this.utxoDb.put(`${utxo.txid}:${utxo.vout}`, utxo)
 
       // Signal that the method completed successfully by returning the addr
       // object.
@@ -341,6 +348,9 @@ class Mint {
 
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
+
+      // Add the utxo to the utxo database
+      await this.utxoDb.put(`${utxo.txid}:${utxo.vout}`, utxo)
 
       return true
     } catch (err) {

@@ -51,6 +51,7 @@ class Send {
         'Must pass transaction DB instance when instantiating send.js'
       )
     }
+    this.utxoDb = localConfig.utxoDb
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
@@ -233,6 +234,9 @@ class Send {
 
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
+
+      // Add the utxo to the utxo database
+      await this.utxoDb.put(`${newUtxo.txid}:${newUtxo.vout}`, newUtxo)
 
       // console.log(`Stored addr data in database: ${JSON.stringify(addr, null, 2)}`)
 
@@ -436,6 +440,9 @@ class Send {
 
         // Save the updated address data to the database.
         await this.addrDb.put(thisVin.address, addrData)
+
+        // Delete the utxo from the utxo database
+        await this.utxoDb.del(`${utxoToDelete[0].txid}:${utxoToDelete[0].vout}`)
       }
 
       // Return true to indicate that the TX was processed.
