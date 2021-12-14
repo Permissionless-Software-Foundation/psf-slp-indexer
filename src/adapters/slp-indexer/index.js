@@ -8,7 +8,7 @@
 
 */
 
-const EPOCH = 50 // blocks between backups
+const EPOCH = 200 // blocks between backups
 const RETRY_CNT = 25 // Number of retries before exiting the indexer
 
 // Public npm libraries.
@@ -54,24 +54,34 @@ const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
   valueEncoding: 'json'
 })
 
+// The UTXO database is used as a sort of reverse-lookup. The key is the TXID
+// plus vout, in this format: 'txid:vout'.
+// and the value is the vout and address. This can be used to lookup what
+// address possesses the UTXO. This makes handling of 'controlled burn' txs
+// much faster.
+const utxoDb = level(`${__dirname.toString()}/../../../leveldb/current/utxos`, {
+  valueEncoding: 'json'
+})
+
 // let _this
 
 class SlpIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
+    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
       cache: this.cache,
       transaction: this.transaction,
       addrDb,
-      tokenDb
+      tokenDb,
+      utxoDb
     })
-    this.genesis = new Genesis({ addrDb, tokenDb })
-    this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
-    this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
+    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
+    this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
+    this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.startStop = new StartStop()
     this.zmq = new ZMQ()
     this.utils = new Utils()
@@ -120,13 +130,16 @@ class SlpIndexer {
 
       // Loop through the block heights and index every block.
       // Phase 1: Bulk indexing
-      for (
-        let blockHeight = status.syncedBlockHeight;
-        blockHeight < biggestBlockHeight + 1;
-        // blockHeight < 714475;
-        // blockHeight < status.syncedBlockHeight;
-        blockHeight++
-      ) {
+      // for (
+      //   let blockHeight = status.syncedBlockHeight;
+      //   blockHeight < biggestBlockHeight + 1;
+      //   // blockHeight < 717796;
+      //   // blockHeight < status.syncedBlockHeight;
+      //   blockHeight++
+      // ) {
+
+      let blockHeight = status.syncedBlockHeight
+      do {
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight
         await statusDb.put('status', status)
@@ -152,13 +165,18 @@ class SlpIndexer {
 
         // Wait a few seconds between loops.
         // await this.utils.sleep(1000)
-      }
+
+        blockHeight++
+        biggestBlockHeight = await this.rpc.getBlockCount()
+      } while (blockHeight <= biggestBlockHeight)
+      // } while (blockHeight < 551645)
+      // process.exit(0)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
       this.indexState = 'phase2'
 
-      let blockHeight = status.syncedBlockHeight
+      blockHeight = status.syncedBlockHeight
       // if (this.indexState === 'phase1') {
       //   // Update and save the sync status.
       //   status.syncedBlockHeight++

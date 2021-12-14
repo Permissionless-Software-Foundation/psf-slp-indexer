@@ -44,6 +44,12 @@ class FilterBlock {
         'Must pass token DB instance when instantiating filter-block.js'
       )
     }
+    this.utxoDb = localConfig.utxoDb
+    if (!this.utxoDb) {
+      throw new Error(
+        'Must pass utxo DB instance when instantiating filter-block.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.pQueue = new PQueue({ concurrency: 20 })
@@ -153,15 +159,33 @@ class FilterBlock {
     }
   }
 
+  // Lookup the address associated with a utxo
+  async getAddressFromTxid (txidIn, vout) {
+    let utxo = {}
+
+    // Try to get the utxo from the database.
+    try {
+      utxo = await this.utxoDb.get(`${txidIn}:${vout}`)
+    } catch (err) {
+      // Address (and thus input UTXO) is not in the database.
+      return false
+    }
+
+    return utxo.address
+  }
+
   // Check the input UTXOs for a TX that fails the OP_RETURN test. If any input
   // UTXOs exist in the database, they should be deleted as they are burned.
   async deleteBurnedUtxos (txidIn) {
     try {
-      const txDetails = await this.cache.get(txidIn)
+      // Get raw tx data from the full node.
+      let txDetails = await this.transaction.getTxWithRetry(txidIn)
+
+      // const txDetails = await this.cache.get(txidIn)
       // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
       const vins = txDetails.vin
-      // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
+      // // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
 
       // Loop through each input to the TX
       for (let i = 0; i < vins.length; i++) {
@@ -169,8 +193,11 @@ class FilterBlock {
 
         const txid = thisVin.txid
         const vout = thisVin.vout
-        const addr = thisVin.address
         let addrData = {}
+
+        // Use utxoDb to lookup address.
+        const addr = await this.getAddressFromTxid(txidIn, vout)
+        if (!addr) continue
 
         // Try to get the address from the database.
         try {
@@ -180,6 +207,9 @@ class FilterBlock {
           // input.
           continue
         }
+
+        // Get hydrated TX details.
+        txDetails = await this.cache.get(txidIn)
 
         // Loop through each UTXO associated with this address.
         const utxos = addrData.utxos
@@ -203,6 +233,9 @@ class FilterBlock {
             // Save the updated address data in the database.
             // console.log(`Updated addrData: ${JSON.stringify(addrData, null, 2)}`)
             await this.addrDb.put(addr, addrData)
+
+            // Delete the utxo from the utxo database
+            await this.utxoDb.del(`${thisUtxo.txid}:${thisUtxo.vout}`)
 
             // Add the amount of burned tokens to the token stats.
             const tokenData = await this.tokenDb.get(thisUtxo.tokenId)

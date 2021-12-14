@@ -51,6 +51,12 @@ class Send {
         'Must pass transaction DB instance when instantiating send.js'
       )
     }
+    this.utxoDb = localConfig.utxoDb
+    if (!this.utxoDb) {
+      throw new Error(
+        'Must pass utxo DB instance when instantiating send.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
@@ -81,10 +87,15 @@ class Send {
       }
 
       // Subtract the input UTXOs and balances from input addresses.
-      await this.subtractTokensFromInputAddr(data)
+      const spentBN = await this.subtractTokensFromInputAddr(data)
+      // console.log(`TXID ${txid} spent ${spentBN.toString()} tokens.`)
 
       // Add the output UTXOs to output addresses
-      await this.addTokensFromOutput(data)
+      const sentBN = await this.addTokensFromOutput(data)
+      // console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
+
+      // Detect and process a 'controlled burn' transaction.
+      await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
 
       let end = new Date()
       end = end.getTime()
@@ -98,9 +109,48 @@ class Send {
     }
   }
 
+  // This function expects two BigNumbers as an input, represent the amount
+  // spent (inputs) and sent (outputs). This info is used to detect a
+  // 'controlled burn' for a token. If a burn is detected, it updates the
+  // token stats.
+  async processControlledBurn (spentBN, sentBN, txid, tokenId) {
+    try {
+      const diffBN = spentBN.minus(sentBN)
+
+      // If the difference is positive, then it's a 'controlled burn' transaction.
+      if (diffBN.isGreaterThan(0)) {
+        console.log(`TXID ${txid} burned ${diffBN.toString()} tokens.`)
+
+        // Update the token data.
+        const tokenData = await this.tokenDb.get(tokenId)
+        console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+
+        const tokensInCirc = new BigNumber(tokenData.tokensInCirculationBN)
+        const totalBurned = new BigNumber(tokenData.totalBurned)
+
+        const diffCirc = tokensInCirc.minus(diffBN)
+        const newBurned = totalBurned.plus(diffBN)
+
+        tokenData.tokensInCirculationBN = diffCirc
+        tokenData.tokensInCirculationStr = diffCirc.toString()
+        tokenData.totalBurned = newBurned.toString()
+
+        console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
+        await this.tokenDb.put(tokenId, tokenData)
+      }
+
+      return diffBN
+    } catch (err) {
+      console.error('Error in processControlledBurn()')
+      throw err
+    }
+  }
+
   // Update the addresses in the database recieving the outputs of the tx.
   async addTokensFromOutput (data) {
     try {
+      let totalSentBN = new BigNumber(0)
+
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
       const { slpData } = data
 
@@ -108,12 +158,14 @@ class Send {
       for (let i = 0; i < slpData.amounts.length; i++) {
         // const recvrAddr = txData.vout[1 + i].scriptPubKey.addresses[0]
 
-        await this.updateOutputAddr(data, i + 1)
+        const sentBN = await this.updateOutputAddr(data, i + 1)
         // const addrObj = await this.updateOutputAddr(data, i + 1)
         // console.log(`addrObj: ${JSON.stringify(addrObj, null, 2)}`)
+
+        totalSentBN = totalSentBN.plus(sentBN)
       }
 
-      return true
+      return totalSentBN
     } catch (err) {
       console.error('Error in addTokensFromOutput()')
       throw err
@@ -157,16 +209,10 @@ class Send {
       // console.log(`addr: ${JSON.stringify(addr, null, 2)}`)
       // console.log(`UTXOs from database for addr ${recvrAddr}: ${JSON.stringify(addr.utxos, null, 2)}`)
 
-      // Get the addr database object and add the output UTXO to it.
+      // The token quantity in this output.
       const slpAmountStr = slpData.amounts[voutIndex - 1].toString()
-      // const addr = await this.addUtxoToOutputAddr(
-      //   data,
-      //   recvrAddr,
-      //   voutIndex,
-      //   slpAmountStr
-      // )
-      // console.log(`addr.utxo from DB: ${JSON.stringify(addr.utxos, null, 2)}`)
 
+      // Generate a new UTXO object.
       const newUtxo = await this.addUtxoToOutputAddr(
         data,
         recvrAddr,
@@ -186,16 +232,20 @@ class Send {
       this.util.addTxWithoutDuplicate(txObj, addr.txs)
 
       // Update balances
-      this.updateBalanceFromSend(addr, slpData, voutIndex - 1)
+      const qtyBN = this.updateBalanceFromSend(addr, slpData, voutIndex - 1)
+      // console.log(`qtyBN: ${qtyBN.toString()}`)
 
       // console.log(`Saving this UTXO data to database for addr ${recvrAddr}: ${JSON.stringify(addr.utxos, null, 2)}`)
 
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
 
+      // Add the utxo to the utxo database
+      await this.utxoDb.put(`${newUtxo.txid}:${newUtxo.vout}`, newUtxo)
+
       // console.log(`Stored addr data in database: ${JSON.stringify(addr, null, 2)}`)
 
-      return addr
+      return qtyBN
     } catch (err) {
       console.error('Error in updateOutputAddr()')
       throw err
@@ -230,7 +280,7 @@ class Send {
 
   // Update the balance for the given address with the given token data.
   // Modifies the balance of the addrObj, in-place.
-  // Returns true to signal that the function completed successfully.
+  // Returns a BigNumber instance of the quanity of tokens added to the address.
   updateBalanceFromSend (addrObj, slpData, amountIndex) {
     try {
       // console.log('addrObj: ', addrObj)
@@ -248,7 +298,7 @@ class Send {
       if (!tokenExists.length) {
         // Balance for this token does not exist in the address. Add it.
         addrObj.balances.push({ tokenId, qty: qty.toString() })
-        return true
+        return qty
       }
       // console.log(`token balance for ${tokenId} already exists`)
 
@@ -265,7 +315,7 @@ class Send {
 
         // console.log(`new balance: ${thisBalance.qty.toString()}`)
 
-        return true
+        return qty
       }
     } catch (err) {
       console.error('Error in updateBalanceFromSend()')
@@ -328,6 +378,8 @@ class Send {
         }
       }
 
+      let total = new BigNumber(0)
+
       // Loop through and process each input and delete the input UTXO
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
@@ -378,8 +430,11 @@ class Send {
         // console.log('addrData after utxo delete: ', addrData)
 
         // Subtract the token balance
-        this.subtractBalanceFromSend(addrData, utxoToDelete[0])
+        const negAmntBN = this.subtractBalanceFromSend(addrData, utxoToDelete[0])
         // console.log('addrData after subtractBalanceFromSend: ', addrData)
+
+        // Track the total quantity of deleted tokens.
+        total = total.plus(negAmntBN)
 
         // Add the txid to the transaction history.
         const txObj = {
@@ -390,10 +445,13 @@ class Send {
 
         // Save the updated address data to the database.
         await this.addrDb.put(thisVin.address, addrData)
+
+        // Delete the utxo from the utxo database
+        await this.utxoDb.del(`${utxoToDelete[0].txid}:${utxoToDelete[0].vout}`)
       }
 
       // Return true to indicate that the TX was processed.
-      return true
+      return total
       // const inputTx = await this.txDb.get()
     } catch (err) {
       console.error(
@@ -409,13 +467,15 @@ class Send {
       // console.log('addrObj: ', addrObj)
       // console.log('utxoToDelete: ', utxoToDelete)
 
+      let amountToSubtract
+
       // Subtract the balance of the utxoToDelete from the balance for that token.
       for (let i = 0; i < addrObj.balances.length; i++) {
         const thisBalance = addrObj.balances[i]
 
         if (thisBalance.tokenId === utxoToDelete.tokenId) {
           const currentBalance = new BigNumber(thisBalance.qty)
-          const amountToSubtract = new BigNumber(utxoToDelete.qty)
+          amountToSubtract = new BigNumber(utxoToDelete.qty)
 
           const difference = currentBalance.minus(amountToSubtract)
 
@@ -430,7 +490,7 @@ class Send {
         }
       }
 
-      return true
+      return amountToSubtract
     } catch (err) {
       console.error('Error in indexer/utils.js/updateBalance()')
       throw err

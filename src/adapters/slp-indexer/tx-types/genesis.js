@@ -19,6 +19,12 @@ class Genesis {
         'Instance of token DB required when instantiating genesis.js'
       )
     }
+    this.utxoDb = localConfig.utxoDb
+    if (!this.utxoDb) {
+      throw new Error(
+        'Instance of utxo DB required when instantiating genesis.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
@@ -136,6 +142,9 @@ class Genesis {
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
 
+      // Add the utxo to the utxo database
+      await this.utxoDb.put(`${utxo.txid}:${utxo.vout}`, utxo)
+
       return addr
     } catch (err) {
       console.error('Error in genesis.addReceiverAddress()')
@@ -195,6 +204,9 @@ class Genesis {
 
       // Save address to the database.
       await this.addrDb.put(recvrAddr, addr)
+
+      // Add the utxo to the utxo database
+      await this.utxoDb.put(`${utxo.txid}:${utxo.vout}`, utxo)
 
       return addr
     } catch (err) {

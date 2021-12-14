@@ -21,13 +21,14 @@ describe('#send.js', () => {
     const addrDb = new MockLevel()
     const tokenDb = new MockLevel()
     const txDb = new MockLevel()
+    const utxoDb = new MockLevel()
     txDb.get = () => {
       throw new Error('not in db')
     }
 
     const cache = new Cache({ txDb })
 
-    uut = new Send({ cache, addrDb, tokenDb, txDb })
+    uut = new Send({ cache, addrDb, tokenDb, txDb, utxoDb })
 
     mockData = cloneDeep(mockDataLib)
 
@@ -88,14 +89,30 @@ describe('#send.js', () => {
         assert.equal(err.message, 'Must pass transaction DB instance when instantiating send.js')
       }
     })
+
+    it('should throw error if utxo DB is not passed in', () => {
+      try {
+        const txDb = new MockLevel()
+        const cache = new Cache({ txDb })
+        const addrDb = new MockLevel()
+        const tokenDb = new MockLevel()
+
+        uut = new Send({ cache, addrDb, tokenDb, txDb })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(err.message, 'Must pass utxo DB instance when instantiating send.js')
+      }
+    })
   })
 
   describe('#subtractBalanceFromSend', () => {
     it('should subtract a balance from an address object', () => {
-      const result = uut.subtractBalanceFromSend(mockData.addrData01, mockData.utxo01)
+      let result = uut.subtractBalanceFromSend(mockData.addrData01, mockData.utxo01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '234123')
     })
 
     it('should catch and throw errors', async () => {
@@ -118,20 +135,22 @@ describe('#send.js', () => {
       // Force database to return previous address data
       sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData01)
 
-      const result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '234123')
     })
 
     it('should skip inputs without a matching token ID', async () => {
       // Force input token ID to be different
       mockData.sendData01.txData.vin[1].tokenId = 'fake-token-id'
 
-      const result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '0')
     })
 
     it('should mark token qty as 0 if input fails DAG validation', async () => {
@@ -192,10 +211,11 @@ describe('#send.js', () => {
       // Force database to return previous address data
       sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData02)
 
-      const result = await uut.subtractTokensFromInputAddr(mockData.sendData02)
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData02)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '0')
     })
   })
 
@@ -234,12 +254,13 @@ describe('#send.js', () => {
       const startVal = parseInt(mockData.addrData01.balances[0].qty.toString())
 
       // console.log(`starting mockData.addrData01: ${JSON.stringify(mockData.addrData01, null, 2)}`)
-      const result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      result = result.toString()
       // console.log('result: ', result)
 
       const endVal = parseInt(mockData.addrData01.balances[0].qty.toString())
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
 
       // Assert that the balance of the address is greater after the function
       // completes.
@@ -250,9 +271,11 @@ describe('#send.js', () => {
       // Force existing balance to be for a different token
       mockData.addrData01.balances[0].tokenId = 'other-token'
 
-      const result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      result = result.toString()
+      // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
 
       // console.log(`addrData: ${JSON.stringify(mockData.addrData01, null, 2)}`)
       assert.equal(mockData.addrData01.balances[0].qty, '234123')
@@ -266,9 +289,11 @@ describe('#send.js', () => {
         qty: new BigNumber('10000')
       })
 
-      const result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      result = result.toString()
+      // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
 
       // console.log(`addrData: ${JSON.stringify(mockData.addrData01, null, 2)}`)
       assert.equal(mockData.addrData01.balances[0].qty, '10000')
@@ -292,12 +317,11 @@ describe('#send.js', () => {
       // Force creation of new address object
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not found'))
 
-      const result = await uut.updateOutputAddr(mockData.sendData01, 1)
+      let result = await uut.updateOutputAddr(mockData.sendData01, 1)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.isArray(result.utxos)
-      assert.isArray(result.txs)
-      assert.isArray(result.balances)
+      assert.equal(result, '4354768657')
     })
 
     it('should handle corner-case where scriptPubKey does not exist', async () => {
@@ -327,10 +351,11 @@ describe('#send.js', () => {
       // Force creation of new address object
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not found'))
 
-      const result = await uut.addTokensFromOutput(mockData.sendData01)
+      let result = await uut.addTokensFromOutput(mockData.sendData01)
+      result = result.toString()
       // console.log('result: ', result)
 
-      assert.equal(result, true)
+      assert.equal(result, '4354768657')
     })
 
     it('should catch and throw errors', async () => {
@@ -349,11 +374,11 @@ describe('#send.js', () => {
     it('should process SEND data', async () => {
       // Mock dependencies
       sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
-      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves()
-      sandbox.stub(uut, 'addTokensFromOutput').resolves()
+      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves(new BigNumber(10))
+      sandbox.stub(uut, 'addTokensFromOutput').resolves(new BigNumber(10))
 
       const result = await uut.processTx(mockData.sendData01)
-      // console.log('result: ', result)
+      console.log('result: ', result)
 
       assert.equal(result, true)
     })
@@ -376,6 +401,42 @@ describe('#send.js', () => {
       } catch (err) {
         // console.log('err: ', err)
         assert.include(err.message, 'Cannot destructure property')
+      }
+    })
+  })
+
+  describe('#processControlledBurn', () => {
+    it('should detect a burn and update token stats', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(0)
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const spentBN = new BigNumber(1000)
+      const sentBN = new BigNumber(900)
+      const txid = 'fake-txid'
+      const tokenId = 'fake-token-id'
+
+      const result = await uut.processControlledBurn(spentBN, sentBN, txid, tokenId)
+      // console.log('result: ', result.toString())
+
+      assert.equal(result.toString(), '100')
+      assert.equal(tokenData.totalBurned.toString(), '100')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        await uut.processControlledBurn()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot read property')
       }
     })
   })

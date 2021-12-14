@@ -270,9 +270,10 @@ describe('#Transaction', () => {
     it('should catch and throw and error', async () => {
       try {
         // Force an error
-        sandbox
-          .stub(uut.rpc, 'getRawTransaction')
-          .rejects(new Error('test error'))
+        // sandbox
+        //   .stub(uut.rpc, 'getRawTransaction')
+        //   .rejects(new Error('test error'))
+        sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
 
         await uut._getInputAddrs(mockData.mockTxIn)
 
@@ -289,7 +290,7 @@ describe('#Transaction', () => {
     it('should return tx data with input addresses', async () => {
       // Mock dependencies
       sandbox
-        .stub(uut.rpc, 'getRawTransaction')
+        .stub(uut, 'getTxWithRetry')
         .resolves(mockData.nonSlpTxDetails)
       sandbox.stub(uut, '_getInputAddrs').resolves([
         {
@@ -309,7 +310,7 @@ describe('#Transaction', () => {
 
     it('should throw an error for a non-txid input', async () => {
       try {
-        await uut.getTxData(1234)
+        await uut.getTxData()
 
         assert.fail('Unexpected result')
       } catch (err) {
@@ -317,7 +318,7 @@ describe('#Transaction', () => {
 
         assert.include(
           err.message,
-          'Input to raw-transaction.js/getTxData() must be a string containg a TXID.'
+          'must be a string containg a TXID'
         )
       }
     })
@@ -326,7 +327,7 @@ describe('#Transaction', () => {
       try {
         // Force a network error.
         sandbox
-          .stub(uut.rpc, 'getRawTransaction')
+          .stub(uut, 'getTxWithRetry')
           .rejects(new Error('test error'))
 
         const txid =
@@ -859,6 +860,32 @@ describe('#Transaction', () => {
       assert.equal(result.vin[1].tokenQtyStr, '0')
       assert.equal(result.vin[1].tokenQty, 0)
       assert.equal(result.vin[1].isMintBaton, true)
+    })
+  })
+
+  describe('#getTxWithRetry', () => {
+    it('should return tx data', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.queue, 'addToQueue').resolves({ key: 'value' })
+
+      const result = await uut.getTxWithRetry('txid')
+      // console.log('result: ', result)
+
+      assert.property(result, 'key')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
+
+        await uut.getTxWithRetry('txid')
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'test error')
+      }
     })
   })
 })

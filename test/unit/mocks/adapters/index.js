@@ -53,4 +53,12 @@ const localdb = {
   }
 }
 
-module.exports = { ipfs, localdb }
+const slpIndexer = {
+  query: {
+    getAddress: () => {},
+    getTx: () => {},
+    getToken: () => {}
+  }
+}
+
+module.exports = { ipfs, localdb, slpIndexer }

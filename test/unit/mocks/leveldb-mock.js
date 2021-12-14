@@ -10,6 +10,10 @@ class MockLevel {
   put () {
     return {}
   }
+
+  del () {
+    return {}
+  }
 }
 
 module.exports = MockLevel

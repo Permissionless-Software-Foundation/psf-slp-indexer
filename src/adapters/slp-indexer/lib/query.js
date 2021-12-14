@@ -30,6 +30,12 @@ class Query {
 
     return result
   }
+
+  async getToken (tokenId) {
+    const result = await this.tokenDb.get(tokenId)
+
+    return result
+  }
 }
 
 module.exports = Query
