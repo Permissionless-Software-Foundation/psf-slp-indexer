@@ -217,6 +217,7 @@ describe('#filter-block.js', () => {
         .resolves(false)
         .onCall(4)
         .resolves(true)
+      sandbox.stub(uut, 'deleteBurnedUtxos').resolves(true)
 
       const slpTxs = await uut.filterSlpTxs(txs)
       // console.log(slpTxs)
