@@ -20,6 +20,11 @@ class Genesis {
       )
     }
     this.utxoDb = localConfig.utxoDb
+    if (!this.utxoDb) {
+      throw new Error(
+        'Instance of utxo DB required when instantiating genesis.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()

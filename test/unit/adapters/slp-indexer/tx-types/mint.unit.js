@@ -21,13 +21,14 @@ describe('#mint.js', () => {
     const addrDb = new MockLevel()
     const tokenDb = new MockLevel()
     const txDb = new MockLevel()
+    const utxoDb = new MockLevel()
     txDb.get = () => {
       throw new Error('not in db')
     }
 
     const cache = new Cache({ txDb })
 
-    uut = new Mint({ cache, addrDb, tokenDb, txDb })
+    uut = new Mint({ cache, addrDb, tokenDb, txDb, utxoDb })
 
     mockData = cloneDeep(mockDataLib)
 
@@ -86,6 +87,21 @@ describe('#mint.js', () => {
         assert.fail('Unexpected code path')
       } catch (err) {
         assert.equal(err.message, 'Must pass transaction DB instance when instantiating mint.js')
+      }
+    })
+
+    it('should throw error if utxo DB is not passed in', () => {
+      try {
+        const txDb = new MockLevel()
+        const cache = new Cache({ txDb })
+        const addrDb = new MockLevel()
+        const tokenDb = new MockLevel()
+
+        uut = new Mint({ cache, addrDb, tokenDb, txDb })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(err.message, 'Must pass utxo DB instance when instantiating mint.js')
       }
     })
   })

@@ -43,6 +43,11 @@ class Mint {
       )
     }
     this.utxoDb = localConfig.utxoDb
+    if (!this.utxoDb) {
+      throw new Error(
+        'Must pass utxo DB instance when instantiating mint.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
