@@ -23,7 +23,7 @@ class RetryQueue {
     this.pRetry = pRetry
 
     this.attempts = 5
-    this.retryPeriod = 10
+    this.retryPeriod = 1000
 
     _this = this
   }
