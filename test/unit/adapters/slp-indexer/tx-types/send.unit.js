@@ -376,6 +376,8 @@ describe('#send.js', () => {
       sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
       sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves(new BigNumber(10))
       sandbox.stub(uut, 'addTokensFromOutput').resolves(new BigNumber(10))
+      sandbox.stub(uut, 'processControlledBurn').resolves(new BigNumber(0))
+      sandbox.stub(uut, 'updateTokenStats').resolves()
 
       const result = await uut.processTx(mockData.sendData01)
       console.log('result: ', result)
@@ -438,6 +440,55 @@ describe('#send.js', () => {
         // console.log(err)
         assert.include(err.message, 'Cannot read property')
       }
+    })
+  })
+
+  describe('#updateTokenStats', () => {
+    it('should update token stats with a normal send', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(0),
+        txs: []
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(0)
+      const sentBN = new BigNumber(1000)
+
+      const result = await uut.updateTokenStats(mockData.sendData01, diffBN, sentBN)
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND')
+      assert.equal(result.txs[0].qty, '1000')
+    })
+
+    it('should update token stats with a controlled burn', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(100),
+        txs: []
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(100)
+      const sentBN = new BigNumber(1000)
+
+      const result = await uut.updateTokenStats(mockData.sendData01, diffBN, sentBN)
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND-BURN')
+      assert.equal(result.txs[0].qty, '1000')
+      assert.equal(result.txs[0].burned, '100')
     })
   })
 })

@@ -206,7 +206,8 @@ describe('#mint.js', () => {
       // Simulate token stats in the database
       sandbox.stub(uut.tokenDb, 'get').resolves({
         tokensInCirculationBN: new BigNumber(1),
-        tokensInCirculationStr: '1'
+        tokensInCirculationStr: '1',
+        txs: []
       })
 
       const result = await uut.updateTokenStats(mockData.mintData)
@@ -220,7 +221,8 @@ describe('#mint.js', () => {
       // Simulate token stats in the database
       sandbox.stub(uut.tokenDb, 'get').resolves({
         tokensInCirculationBN: new BigNumber(1),
-        tokensInCirculationStr: '1'
+        tokensInCirculationStr: '1',
+        txs: []
       })
 
       // Force mint baton to be inactive

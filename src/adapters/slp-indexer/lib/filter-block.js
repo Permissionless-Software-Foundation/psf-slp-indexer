@@ -12,6 +12,7 @@
 // Public npm libraries
 const PQueue = require('p-queue').default
 const pRetry = require('p-retry')
+const BigNumber = require('bignumber.js')
 
 // Local Libraries
 // const config = require('../../../config')
@@ -187,6 +188,9 @@ class FilterBlock {
       const vins = txDetails.vin
       // // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
 
+      let totalBurned = new BigNumber(0)
+      let tokenId
+
       // Loop through each input to the TX
       for (let i = 0; i < vins.length; i++) {
         const thisVin = vins[i]
@@ -238,20 +242,43 @@ class FilterBlock {
             await this.utxoDb.del(`${thisUtxo.txid}:${thisUtxo.vout}`)
 
             // Add the amount of burned tokens to the token stats.
-            const tokenData = await this.tokenDb.get(thisUtxo.tokenId)
+            tokenId = thisUtxo.tokenId
+            const tokenData = await this.tokenDb.get(tokenId)
             // console.log(`updated tokenData: ${JSON.stringify(tokenData, null, 2)}`)
             const newTokenData = this.utils.subtractBurnedTokens(thisUtxo, tokenData)
             // console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
-            await this.tokenDb.put(thisUtxo.tokenId, newTokenData)
+
+            // Amount of tokens burned by this UTXO.
+            const startBurn = new BigNumber(tokenData.totalBurned)
+            const endBurn = new BigNumber(newTokenData.totalBurned)
+            const diffBurn = endBurn.minus(startBurn)
+            totalBurned = totalBurned.plus(diffBurn)
+
+            // Update the token stats in the database.
+            await this.tokenDb.put(tokenId, newTokenData)
           }
         }
+      }
+
+      // Update transaction info in token stats.
+      if (totalBurned.isGreaterThan(0)) {
+        const tokenData = await this.tokenDb.get(tokenId)
+        const txInfo = {
+          txid: txidIn,
+          height: txDetails.blockheight,
+          type: 'BURN-UNCONTROLLED',
+          qty: '0',
+          burned: totalBurned.toString()
+        }
+        tokenData.txs.push(txInfo)
+        await this.tokenDb.put(tokenId, tokenData)
       }
 
       // Signal that this function completed successfully.
       return true
     } catch (err) {
       // console.log(`deleteBurnedUtxos error txid: ${txidIn}`)
-      // console.error('Error in deleteBurnedUtxos()')
+      // console.error('Error in deleteBurnedUtxos(): ', err)
       // throw err
 
       // Ignore any errors.

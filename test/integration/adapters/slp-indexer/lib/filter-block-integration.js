@@ -14,8 +14,8 @@ const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transac
 const MockLevel = require('../../../../unit/mocks/leveldb-mock')
 const FilterBlock = require('../../../../../src/adapters/slp-indexer/lib/filter-block')
 
-const RPC = require('../../../../../src/adapters/slp-indexer/lib/rpc')
-const rpc = new RPC()
+// const RPC = require('../../../../../src/adapters/slp-indexer/lib/rpc')
+// const rpc = new RPC()
 
 describe('#filter-block.js', () => {
   let uut, sandbox
@@ -27,11 +27,12 @@ describe('#filter-block.js', () => {
     const txDb = new MockLevel()
     const addrDb = new MockLevel()
     const tokenDb = new MockLevel()
+    const utxoDb = new MockLevel()
 
     const cache = new Cache({ bchjs, txDb })
     const transaction = new Transaction()
 
-    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb })
+    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb })
   })
 
   afterEach(() => sandbox.restore())
@@ -106,27 +107,27 @@ describe('#filter-block.js', () => {
   })
 
   describe('#filterAndSortSlpTxs2', () => {
-    it('should filter a block with a DAG', async () => {
-      // force cache to get data from the full node.
-      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
-
-      const blockHeight = 543413
-      const blockHash = await rpc.getBlockHash(blockHeight)
-      const block = await rpc.getBlock(blockHash)
-
-      const txs = block.tx
-      // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
-
-      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
-      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
-
-      // assert.equal(result.sortedTxids.length, 7)
-      // assert.equal(result.independentTxids.length, 1)
-
-      assert.equal(result.length, 8)
-      assert.include(result[0], '82a9') // Independent tx
-      assert.include(result[7], 'a333') // newest chained tx
-    })
+    // it('should filter a block with a DAG', async () => {
+    //   // force cache to get data from the full node.
+    //   sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+    //
+    //   const blockHeight = 543413
+    //   const blockHash = await rpc.getBlockHash(blockHeight)
+    //   const block = await rpc.getBlock(blockHash)
+    //
+    //   const txs = block.tx
+    //   // console.log(`original TXs: ${JSON.stringify(txs, null, 2)}`)
+    //
+    //   const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+    //   // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+    //
+    //   // assert.equal(result.sortedTxids.length, 7)
+    //   // assert.equal(result.independentTxids.length, 1)
+    //
+    //   assert.equal(result.length, 8)
+    //   assert.include(result[0], '82a9') // Independent tx
+    //   assert.include(result[7], 'a333') // newest chained tx
+    // })
 
     it('should sort different tx ordering', async () => {
       // force cache to get data from the full node.

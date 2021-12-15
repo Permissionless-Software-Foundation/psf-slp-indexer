@@ -639,7 +639,9 @@ const tokenData01 = {
   mintBatonIsActive: true,
   tokensInCirculationBN: '100100000000',
   tokensInCirculationStr: '100100000000',
-  blockCreated: 622414
+  blockCreated: 622414,
+  totalBurned: '0',
+  txs: []
 }
 
 module.exports = {

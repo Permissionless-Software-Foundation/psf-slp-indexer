@@ -58,6 +58,16 @@ class Genesis {
     try {
       const { slpData, blockHeight } = data
 
+      // Initialize the transaction array.
+      const txInfo = {
+        txid: slpData.tokenId,
+        height: blockHeight,
+        type: 'GENESIS',
+        qty: slpData.qty.toString()
+      }
+      const txArray = []
+      txArray.push(txInfo)
+
       // Add the new token to the token database.
       const token = {
         type: slpData.tokenType,
@@ -72,7 +82,8 @@ class Genesis {
         tokensInCirculationStr: slpData.qty.toString(),
         blockCreated: blockHeight,
         totalBurned: '0',
-        totalMinted: slpData.qty.toString()
+        totalMinted: slpData.qty.toString(),
+        txs: txArray
       }
 
       // Handle case if minting baton was created.

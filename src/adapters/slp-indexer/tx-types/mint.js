@@ -271,7 +271,7 @@ class Mint {
   // Update the token quantity in circulation.
   async updateTokenStats (data) {
     try {
-      const { slpData } = data
+      const { slpData, txData, blockHeight } = data
 
       // Get the token stats from the database.
       const tokenStats = await this.tokenDb.get(slpData.tokenId)
@@ -298,6 +298,15 @@ class Mint {
       } else {
         tokenStats.mintBatonIsActive = false
       }
+
+      // Update the transactions array
+      const txInfo = {
+        txid: txData.txid,
+        height: blockHeight,
+        type: 'MINT',
+        qty: slpData.qty.toString()
+      }
+      tokenStats.txs.push(txInfo)
 
       // Save updates to the database.
       await this.tokenDb.put(slpData.tokenId, tokenStats)

@@ -95,7 +95,10 @@ class Send {
       // console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // Detect and process a 'controlled burn' transaction.
-      await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
+      const diffBN = await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
+
+      // Update token stats
+      await this.updateTokenStats(data, diffBN, sentBN)
 
       let end = new Date()
       end = end.getTime()
@@ -105,6 +108,51 @@ class Send {
       return true
     } catch (err) {
       console.error('Error in send.processTx()')
+      throw err
+    }
+  }
+
+  // Update the transaction array for the token stats.
+  async updateTokenStats (data, diffBN, sentBN) {
+    try {
+      const { slpData, blockHeight, txData } = data
+      const tokenId = slpData.tokenId
+
+      // Update the token data.
+      const tokenData = await this.tokenDb.get(tokenId)
+      console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+
+      let txInfo = {}
+
+      if (diffBN.isGreaterThan(0)) {
+        // Controlled burn.
+
+        txInfo = {
+          txid: txData.txid,
+          height: blockHeight,
+          type: 'SEND-BURN',
+          qty: sentBN.toString(),
+          burned: diffBN.toString()
+        }
+      } else {
+        // Normal send transaction.
+
+        txInfo = {
+          txid: txData.txid,
+          height: blockHeight,
+          type: 'SEND',
+          qty: sentBN.toString()
+        }
+      }
+
+      tokenData.txs.push(txInfo)
+
+      console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
+      await this.tokenDb.put(tokenId, tokenData)
+
+      return tokenData
+    } catch (err) {
+      console.error('Error in updateTokenStats()')
       throw err
     }
   }
