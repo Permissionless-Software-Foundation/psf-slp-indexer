@@ -120,7 +120,7 @@ class Send {
 
       // Update the token data.
       const tokenData = await this.tokenDb.get(tokenId)
-      console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+      // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
       let txInfo = {}
 
@@ -147,7 +147,7 @@ class Send {
 
       tokenData.txs.push(txInfo)
 
-      console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
+      // console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
       await this.tokenDb.put(tokenId, tokenData)
 
       return tokenData
