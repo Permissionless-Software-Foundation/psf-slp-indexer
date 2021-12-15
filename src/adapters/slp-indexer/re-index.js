@@ -26,6 +26,7 @@ const Send = require('./tx-types/send')
 const Mint = require('./tx-types/mint')
 const StartStop = require('./lib/start-stop')
 const Utils = require('./lib/utils')
+const ManagePTXDB = require('./lib/ptxdb')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -48,6 +49,18 @@ const statusDb = level(
     valueEncoding: 'json'
   }
 )
+const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
+  valueEncoding: 'json'
+})
+
+// The UTXO database is used as a sort of reverse-lookup. The key is the TXID
+// plus vout, in this format: 'txid:vout'.
+// and the value is the vout and address. This can be used to lookup what
+// address possesses the UTXO. This makes handling of 'controlled burn' txs
+// much faster.
+const utxoDb = level(`${__dirname.toString()}/../../../leveldb/current/utxos`, {
+  valueEncoding: 'json'
+})
 
 let _this
 
@@ -55,18 +68,22 @@ class SlpReIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb })
+    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
       cache: this.cache,
-      transaction: this.transaction
+      transaction: this.transaction,
+      addrDb,
+      tokenDb,
+      utxoDb
     })
-    this.genesis = new Genesis({ addrDb, tokenDb })
-    this.send = new Send({ addrDb, tokenDb, txDb, cache: this.cache })
-    this.mint = new Mint({ addrDb, tokenDb, txDb, cache: this.cache })
+    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
+    this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
+    this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.startStop = new StartStop()
     this.utils = new Utils()
+    this.managePtxdb = new ManagePTXDB({ pTxDb })
 
     // State
     this.stopIndexing = false
@@ -111,6 +128,9 @@ class SlpReIndexer {
         (x) => x.height === status.syncedBlockHeight
       )
       console.log(`slpTxIndex: ${slpTxIndex}`)
+
+      // Clean up stale TXs in the pTxDb.
+      await this.managePtxdb.cleanPTXDB(status.syncedBlockHeight)
 
       // const lastBlockIndex = txMap.findIndex(x => x.height === 570650)
 
