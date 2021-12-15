@@ -75,7 +75,7 @@ class Genesis {
       }
 
       // Handle case if minting baton was created.
-      if (slpData.mintBatonVout !== null) {
+      if (slpData.mintBatonVout) {
         token.mintBatonIsActive = true
       }
 
@@ -84,7 +84,7 @@ class Genesis {
       // Store the token data in the database.
       await this.tokenDb.put(slpData.tokenId, token)
 
-      return true
+      return token
     } catch (err) {
       console.error('Error in genesis.addTokenToDB()')
       throw err
