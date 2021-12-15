@@ -71,7 +71,8 @@ class Genesis {
         tokensInCirculationBN: slpData.qty,
         tokensInCirculationStr: slpData.qty.toString(),
         blockCreated: blockHeight,
-        totalBurned: '0'
+        totalBurned: '0',
+        totalMinted: slpData.qty.toString()
       }
 
       // Handle case if minting baton was created.

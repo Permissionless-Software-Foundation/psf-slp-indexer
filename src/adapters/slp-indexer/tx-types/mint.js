@@ -287,6 +287,11 @@ class Mint {
       tokenStats.tokensInCirculationBN = qty
       tokenStats.tokensInCirculationStr = qtyStr
 
+      // Track the total minted.
+      const prevMinted = new BigNumber(tokenStats.totalMinted)
+      const totalMinted = prevMinted.plus(slpData.qty)
+      tokenStats.totalMinted = totalMinted.toString()
+
       // Update baton status
       if (slpData.mintBatonVout) {
         tokenStats.mintBatonIsActive = true
