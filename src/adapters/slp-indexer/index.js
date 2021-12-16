@@ -9,7 +9,7 @@
 */
 
 const EPOCH = 500 // blocks between backups
-const RETRY_CNT = 25 // Number of retries before exiting the indexer
+const RETRY_CNT = 10 // Number of retries before exiting the indexer
 
 // Public npm libraries.
 const level = require('level')
@@ -77,7 +77,8 @@ class SlpIndexer {
       transaction: this.transaction,
       addrDb,
       tokenDb,
-      utxoDb
+      utxoDb,
+      txDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
@@ -138,7 +139,7 @@ class SlpIndexer {
       //   blockHeight++
       // ) {
 
-      let blockHeight = status.syncedBlockHeight
+      let blockHeight = status.syncedBlockHeight + 1
       do {
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight

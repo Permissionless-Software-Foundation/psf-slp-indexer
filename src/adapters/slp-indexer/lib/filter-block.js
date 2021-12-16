@@ -51,6 +51,12 @@ class FilterBlock {
         'Must pass utxo DB instance when instantiating filter-block.js'
       )
     }
+    this.txDb = localConfig.txDb
+    if (!this.txDb) {
+      throw new Error(
+        'Must pass transaction DB instance when instantiating filter-block.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.pQueue = new PQueue({ concurrency: 20 })
@@ -199,7 +205,7 @@ class FilterBlock {
         const vout = thisVin.vout
         let addrData = {}
 
-        // Use utxoDb to lookup address.
+        // Use utxoDb to lookup the address associated with the UTXO.
         const addr = await this.getAddressFromTxid(txidIn, vout)
         if (!addr) continue
 
@@ -272,6 +278,10 @@ class FilterBlock {
         }
         tokenData.txs.push(txInfo)
         await this.tokenDb.put(tokenId, tokenData)
+
+        // Mark TX as invalid, in the transaction database.
+        txDetails.isValidSlp = false
+        await this.txDb.put(txidIn, txDetails)
       }
 
       // Signal that this function completed successfully.

@@ -66,6 +66,8 @@ class Send {
   // This is the top-level function. It calls all other subfunctions.
   async processTx (data) {
     try {
+      // console.log(`data.slpData: ${JSON.stringify(data.slpData, null, 2)}`)
+
       // console.log(`send.processTx() data: ${JSON.stringify(data, null, 2)}`)
       const { txData } = data
       const txid = txData.txid
@@ -88,14 +90,16 @@ class Send {
 
       // Subtract the input UTXOs and balances from input addresses.
       const spentBN = await this.subtractTokensFromInputAddr(data)
-      // console.log(`TXID ${txid} spent ${spentBN.toString()} tokens.`)
+      console.log(`TXID ${txid} spent ${spentBN.toString()} tokens.`)
 
       // Add the output UTXOs to output addresses
       const sentBN = await this.addTokensFromOutput(data)
-      // console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
+      console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // Detect and process a 'controlled burn' transaction.
-      const diffBN = await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
+      // const diffBN = await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
+      const diffBN = await this.processControlledBurn(spentBN, sentBN, data)
+      console.log(`TXID ${txid} difference is ${diffBN.toString()}`)
 
       // Update token stats
       await this.updateTokenStats(data, diffBN, sentBN)
@@ -134,6 +138,16 @@ class Send {
           qty: sentBN.toString(),
           burned: diffBN.toString()
         }
+      } else if (diffBN.isLessThan(0)) {
+        // Uncontrolled burn
+
+        txInfo = {
+          txid: txData.txid,
+          height: blockHeight,
+          type: 'BURN-UNCONTROLLED',
+          qty: '0',
+          burned: diffBN.absoluteValue().toString()
+        }
       } else {
         // Normal send transaction.
 
@@ -145,6 +159,7 @@ class Send {
         }
       }
 
+      console.log(`txInfo: ${JSON.stringify(txInfo, null, 2)}`)
       tokenData.txs.push(txInfo)
 
       // console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
@@ -161,8 +176,13 @@ class Send {
   // spent (inputs) and sent (outputs). This info is used to detect a
   // 'controlled burn' for a token. If a burn is detected, it updates the
   // token stats.
-  async processControlledBurn (spentBN, sentBN, txid, tokenId) {
+  async processControlledBurn (spentBN, sentBN, data) {
+  // async processControlledBurn (spentBN, sentBN, txid, tokenId) {
     try {
+      const { slpData, txData } = data
+      const txid = txData.txid
+      const tokenId = slpData.tokenId
+
       const diffBN = spentBN.minus(sentBN)
 
       // If the difference is positive, then it's a 'controlled burn' transaction.
@@ -185,11 +205,87 @@ class Send {
 
         console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
         await this.tokenDb.put(tokenId, tokenData)
+      } else if (diffBN.isLessThan(0)) {
+        console.log('Outputs exceed inputs. Uncontrolled burn detected.')
+        // Outputs exceed inputs, which make this an invalide TX, resulting in
+        // burn of all tokens. All changes made by addTokensFromOutput() need
+        // to be rolled back.
+        await this.reverseAddTokenFromOutput(data)
+
+        // Mark TX as invalid in tx database.
+        // This should get picked up in index.js/processData() to update the
+        // tx database.
+        data.txData.isValidSlp = false
+
+        // Update token stats.
+        const tokenData = await this.tokenDb.get(tokenId)
+        // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+
+        const tokensInCirc = new BigNumber(tokenData.tokensInCirculationBN)
+        const totalBurned = new BigNumber(tokenData.totalBurned)
+        console.log(`old total burned: ${totalBurned.toString()}`)
+
+        const diffCirc = tokensInCirc.minus(diffBN.absoluteValue())
+        const newBurned = totalBurned.plus(diffBN.absoluteValue())
+        console.log(`new total burned: ${newBurned.toString()}`)
+
+        tokenData.tokensInCirculationBN = diffCirc
+        tokenData.tokensInCirculationStr = diffCirc.toString()
+        tokenData.totalBurned = newBurned.toString()
+
+        // console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
+        await this.tokenDb.put(tokenId, tokenData)
       }
 
       return diffBN
     } catch (err) {
       console.error('Error in processControlledBurn()')
+      throw err
+    }
+  }
+
+  // Reverse the database changes that were made by addTokensFromOutput()
+  // A lot of the input validation is skipped, because it is assumed this
+  // function runs after addTokensFromOutput().
+  async reverseAddTokenFromOutput (data) {
+    try {
+      let totalBurnedBN = new BigNumber(0)
+
+      const { slpData, txData } = data
+
+      // Loop through each output in slpData
+      for (let i = 0; i < slpData.amounts.length; i++) {
+        const recvrAddr = txData.vout[1 + i].scriptPubKey.addresses[0]
+        const txid = txData.txid
+
+        // Get the address data from the database.
+        const addrData = await this.addrDb.get(recvrAddr)
+        // console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
+
+        // Get the UTXO entry that matches the current output.
+        const utxoToDelete = addrData.utxos.filter((x) => {
+          return x.txid === txid && x.vout === (1 + i)
+        })
+        console.log('utxoToDelete: ', utxoToDelete)
+
+        // Subtract the token balance
+        const negAmntBN = await this.subtractBalanceFromSend(addrData, utxoToDelete[0])
+        // console.log(`netAmntBN: ${negAmntBN.toString()}`)
+
+        // Track the total quantity of burned tokens.
+        totalBurnedBN = totalBurnedBN.plus(negAmntBN)
+        // console.log(`totalBurnedBN: ${totalBurnedBN.toString()}`)
+
+        // Save the updated address data to the database.
+        await this.addrDb.put(recvrAddr, addrData)
+
+        // Delete the utxo from the utxo database
+        await this.utxoDb.del(`${utxoToDelete[0].txid}:${utxoToDelete[0].vout}`)
+      }
+
+      return totalBurnedBN
+    } catch (err) {
+      console.error('Error in reverseAddtokenFromOutput()')
       throw err
     }
   }
