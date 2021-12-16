@@ -23,7 +23,7 @@ class RetryQueue {
     this.pRetry = pRetry
 
     // Note: Retry has exponential back-off, so 6-10 is the right number.
-    this.attempts = 8
+    this.attempts = 7
     this.retryPeriod = 1000
 
     _this = this
