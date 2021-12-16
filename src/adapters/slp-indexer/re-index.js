@@ -76,7 +76,8 @@ class SlpReIndexer {
       transaction: this.transaction,
       addrDb,
       tokenDb,
-      utxoDb
+      utxoDb,
+      txDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
@@ -145,10 +146,10 @@ class SlpReIndexer {
       // for (let i = slpTxIndex; i < lastBlockIndex; i++) {
         const blockHeight = txMap[i].height
 
-        if (blockHeight > 572330) {
-          console.log('\nTarget block reached.')
-          process.exit(0)
-        }
+        // if (blockHeight > 572330) {
+        //   console.log('\nTarget block reached.')
+        //   process.exit(0)
+        // }
 
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight

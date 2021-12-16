@@ -139,7 +139,7 @@ class SlpIndexer {
       //   blockHeight++
       // ) {
 
-      let blockHeight = status.syncedBlockHeight + 1
+      let blockHeight = status.syncedBlockHeight
       do {
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight
