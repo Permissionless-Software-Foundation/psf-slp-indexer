@@ -3,7 +3,7 @@
 */
 
 const tokenId =
-  '01e34c1524c523380707570ced7217024f644fd6f228c13413b12e97e4ca13e8'
+  '78d2901d10dd3ce9f836ce5fa473e3802451b082134fcd4c82f30a77a9b98cb4'
 
 const level = require('level')
 

@@ -70,6 +70,9 @@ class IndexerUtils {
     try {
       let deleteEntry = false
 
+      // Skip if this is a minting baton. No balance to subtract.
+      if (utxoObj.type === 'baton') return balancesArray
+
       for (let i = 0; i < balancesArray.length; i++) {
         const thisBalance = balancesArray[i]
 
@@ -112,6 +115,15 @@ class IndexerUtils {
   // Subtract a burned UTXO balance from the token data tracking that quantity.
   subtractBurnedTokens (utxoObj, tokenData) {
     try {
+      console.log(`utxoObj: ${JSON.stringify(utxoObj, null, 2)}`)
+
+      // Skip if this is a minting baton. No quantities to subtract.
+      if (utxoObj.type === 'baton') {
+        // Mark mint baton as burned.
+        tokenData.mintBatonIsActive = false
+        return tokenData
+      }
+
       const utxoQty = new BigNumber(utxoObj.qty)
       const tokensInCirculationBN = new BigNumber(tokenData.tokensInCirculationBN)
 

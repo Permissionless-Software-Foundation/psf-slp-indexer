@@ -228,7 +228,7 @@ class FilterBlock {
 
           // If the address contains the burned UTXO.
           if (thisUtxo.txid === txid && thisUtxo.vout === vout) {
-            console.log(`addrData: ${JSON.stringify(addrData, null, 2)}`)
+            console.log(`addrData for ${addr}: ${JSON.stringify(addrData, null, 2)}`)
             // Remove the UTXO from the address.
             addrData.utxos = this.utils.removeUtxoFromArray(thisUtxo, addrData.utxos)
 
@@ -251,9 +251,9 @@ class FilterBlock {
             // Add the amount of burned tokens to the token stats.
             tokenId = thisUtxo.tokenId
             const tokenData = await this.tokenDb.get(tokenId)
-            // console.log(`starting tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+            console.log(`starting tokenData: ${JSON.stringify(tokenData, null, 2)}`)
             const newTokenData = this.utils.subtractBurnedTokens(thisUtxo, tokenData)
-            // console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
+            console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
 
             // Amount of tokens burned by this UTXO.
             const startBurn = new BigNumber(tokenData.totalBurned)
