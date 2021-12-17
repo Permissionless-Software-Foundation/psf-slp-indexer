@@ -94,6 +94,14 @@ describe('#dag.js', () => {
         assert.isArray(result.dag)
         assert.equal(result.dag.length, 1)
       })
+
+      it('should invalidate if parent UTXO is invalid', async () => {
+        const txid = '1a8e0fb428fefe6c7413dba30c15e2814947f7efb7978de526c514d9128b266c'
+        const tokenId = '01e34c1524c523380707570ced7217024f644fd6f228c13413b12e97e4ca13e8'
+
+        const result = await uut.crawlDag(txid, tokenId)
+        console.log('result: ', result)
+      })
     })
   })
 })

@@ -6,7 +6,7 @@
 
 // Global constants
 const EPOCH = 1000 // blocks between backups
-const RETRY_CNT = 35 // Number of retries before exiting the indexer
+const RETRY_CNT = 5 // Number of retries before exiting the indexer
 
 // Load the TX map of SLP transactions in the blockchain
 const txMap = require('./tx-maps/tx-map.json')
@@ -146,10 +146,10 @@ class SlpReIndexer {
       // for (let i = slpTxIndex; i < lastBlockIndex; i++) {
         const blockHeight = txMap[i].height
 
-        // if (blockHeight > 572330) {
-        //   console.log('\nTarget block reached.')
-        //   process.exit(0)
-        // }
+        if (blockHeight > 576300) {
+          console.log('\nTarget block reached.')
+          process.exit(0)
+        }
 
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight

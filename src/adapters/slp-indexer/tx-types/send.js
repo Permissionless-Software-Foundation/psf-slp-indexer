@@ -102,7 +102,7 @@ class Send {
       console.log(`TXID ${txid} difference is ${diffBN.toString()}`)
 
       // Update token stats
-      await this.updateTokenStats(data, diffBN, sentBN)
+      await this.updateTokenStats(data, diffBN, spentBN, sentBN)
 
       let end = new Date()
       end = end.getTime()
@@ -117,7 +117,7 @@ class Send {
   }
 
   // Update the transaction array for the token stats.
-  async updateTokenStats (data, diffBN, sentBN) {
+  async updateTokenStats (data, diffBN, spentBN, sentBN) {
     try {
       const { slpData, blockHeight, txData } = data
       const tokenId = slpData.tokenId
@@ -146,7 +146,7 @@ class Send {
           height: blockHeight,
           type: 'BURN-UNCONTROLLED',
           qty: '0',
-          burned: diffBN.absoluteValue().toString()
+          burned: spentBN.toString()
         }
       } else {
         // Normal send transaction.
@@ -207,6 +207,7 @@ class Send {
         await this.tokenDb.put(tokenId, tokenData)
       } else if (diffBN.isLessThan(0)) {
         console.log('Outputs exceed inputs. Uncontrolled burn detected.')
+        console.log(`${spentBN} tokens burned.`)
         // Outputs exceed inputs, which make this an invalide TX, resulting in
         // burn of all tokens. All changes made by addTokensFromOutput() need
         // to be rolled back.
@@ -225,8 +226,10 @@ class Send {
         const totalBurned = new BigNumber(tokenData.totalBurned)
         console.log(`old total burned: ${totalBurned.toString()}`)
 
-        const diffCirc = tokensInCirc.minus(diffBN.absoluteValue())
-        const newBurned = totalBurned.plus(diffBN.absoluteValue())
+        // TODO: Get total of all inputs
+
+        const diffCirc = tokensInCirc.minus(spentBN)
+        const newBurned = totalBurned.plus(spentBN)
         console.log(`new total burned: ${newBurned.toString()}`)
 
         tokenData.tokensInCirculationBN = diffCirc
