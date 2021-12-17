@@ -500,10 +500,12 @@ describe('#send.js', () => {
 
       const diffBN = new BigNumber(0)
       const sentBN = new BigNumber(1000)
+      const spentBN = new BigNumber(1000)
 
       const result = await uut.updateTokenStats(
         mockData.sendData01,
         diffBN,
+        spentBN,
         sentBN
       )
       // console.log('result: ', result)
@@ -526,11 +528,13 @@ describe('#send.js', () => {
       sandbox.stub(uut.tokenDb, 'put').resolves()
 
       const diffBN = new BigNumber(100)
+      const spentBN = new BigNumber(1100)
       const sentBN = new BigNumber(1000)
 
       const result = await uut.updateTokenStats(
         mockData.sendData01,
         diffBN,
+        spentBN,
         sentBN
       )
       // console.log('result: ', result)
