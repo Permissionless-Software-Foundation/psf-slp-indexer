@@ -32,7 +32,7 @@ describe('#filter-block.js', () => {
     const cache = new Cache({ bchjs, txDb })
     const transaction = new Transaction()
 
-    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb })
+    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb, txDb })
   })
 
   afterEach(() => sandbox.restore())
@@ -304,6 +304,16 @@ describe('#filter-block.js', () => {
     //   const result = await uut.filterSlpTxs(txs)
     //   console.log('result: ', result)
     // })
+
+    it('should save uncontrolled burn tx to the database', async () => {
+      const txs = ['175ac1e083b86cf9e723acc1698e3c69d2ccbbe3f9901b015b817cdb0db5f9e7']
+
+      // Force desired code path
+      sandbox.stub(uut, 'getAddressFromTxid').resolves('bitcoincash:qq4kp3w3yhhvy4gm4jgeza4vus8vpxgrwc90n8rhxe')
+
+      const result = await uut.filterSlpTxs(txs)
+      console.log('result: ', result)
+    })
   })
 
   describe('#deleteBurnedUtxos', () => {
