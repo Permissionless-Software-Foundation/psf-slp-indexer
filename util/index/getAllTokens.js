@@ -15,7 +15,7 @@ async function getTokens () {
     stream.on('data', function (data) {
       // console.log(data.key, ' = ', data.value)
 
-      if (data.value.totalBurned !== '0') {
+      if (data.value.totalBurned !== '0' && data.value.totalBurned !== data.value.totalMinted) {
         data.value.totalTxs = data.value.txs.length
         console.log(data.key, ' = ', data.value)
       }
