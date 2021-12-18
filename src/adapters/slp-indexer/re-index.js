@@ -146,10 +146,10 @@ class SlpReIndexer {
       // for (let i = slpTxIndex; i < lastBlockIndex; i++) {
         const blockHeight = txMap[i].height
 
-        if (blockHeight > 576300) {
-          console.log('\nTarget block reached.')
-          process.exit(0)
-        }
+        // if (blockHeight > 576300) {
+        //   console.log('\nTarget block reached.')
+        //   process.exit(0)
+        // }
 
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight
