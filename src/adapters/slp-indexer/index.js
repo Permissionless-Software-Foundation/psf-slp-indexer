@@ -170,7 +170,7 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 552793)
+      // } while (blockHeight < 545411)
       // process.exit(0)
 
       // Debugging: state the current state of the indexer.
@@ -530,12 +530,14 @@ class SlpIndexer {
         console.log(`Send tx processed: ${txData.txid}`)
       }
 
-      // If a prior library did not explictely mark this TX as invalide,
+      // If a prior library did not explictely mark this TX as invalid,
       if (txData.isValidSlp !== false) {
-        // Mark TXID as valid and add the transaction to the database.
+        // Mark TXID as valid.
         txData.isValidSlp = true
-        await txDb.put(txData.txid, txData)
       }
+
+      // Add the transaction to the database
+      await txDb.put(txData.txid, txData)
 
       //
     } catch (err) {

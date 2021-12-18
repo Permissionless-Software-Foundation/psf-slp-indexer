@@ -2,7 +2,7 @@
   Utility tool to retrieve a single TX from the TX database.
 */
 
-const TXID = '175ac1e083b86cf9e723acc1698e3c69d2ccbbe3f9901b015b817cdb0db5f9e7'
+const TXID = 'a6cedb6460dc91f4ff06ab37e9e96f2d1864b7c5ca5b65c68c2e7c1b436e187c'
 // const TXID = '401aae1bef9246c42916808c9595d2834791384dcf2e298d2fc294e27b6f5273'
 
 const level = require('level')

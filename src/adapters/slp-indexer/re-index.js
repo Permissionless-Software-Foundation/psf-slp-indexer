@@ -349,12 +349,6 @@ class SlpReIndexer {
         `Rolling database back to this block height: ${rollbackHeight}`
       )
 
-      // throw new Error(errMsg)
-
-      // Round the hight to the nearest 100
-      // const rollbackHeight = Math.floor(targetBlockHeight / 100) * 100
-      // console.log(`Rolling database back to this block height: ${rollbackHeight}`)
-
       // Roll back the database to before the parent transaction.
       await this.dbBackup.unzipDb(rollbackHeight)
 
