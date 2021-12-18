@@ -262,7 +262,7 @@ class FilterBlock {
             tokenId = thisUtxo.tokenId
             const tokenData = await this.tokenDb.get(tokenId)
             const startBurn = new BigNumber(tokenData.totalBurned)
-            console.log(`starting tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+            // console.log(`starting tokenData: ${JSON.stringify(tokenData, null, 2)}`)
             const newTokenData = this.utils.subtractBurnedTokens(thisUtxo, tokenData)
             // console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
 
@@ -291,7 +291,7 @@ class FilterBlock {
               await this.txDb.put(txidIn, txDetails)
             }
 
-            console.log(`final tokenData: ${JSON.stringify(newTokenData, null, 2)}`)
+            // console.log(`final tokenData: ${JSON.stringify(newTokenData, null, 2)}`)
 
             // Update the token stats in the database.
             await this.tokenDb.put(tokenId, newTokenData)
