@@ -194,7 +194,7 @@ class FilterBlock {
       const vins = txDetails.vin
       // // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
 
-      let totalBurned = new BigNumber(0)
+      // let totalBurned = new BigNumber(0)
       let tokenId
 
       // Loop through each input to the TX
@@ -212,14 +212,14 @@ class FilterBlock {
         // Try to get the address from the database.
         try {
           addrData = await this.addrDb.get(addr)
-          console.log(`Got address data for ${addr}`)
-          console.log(`deleteBurnedUtxos() evaluating ${txidIn}`)
         } catch (err) {
           // Address (and thus input UTXO) is not in the database, so skip this
           // input.
           continue
         }
         // console.log(`addrData for ${addr}: ${JSON.stringify(addrData, null, 2)}`)
+
+        console.log(`Uncontrolled burn detected in TXID ${txidIn}, involving ${addr}`)
 
         // Get hydrated TX details.
         txDetails = await this.cache.get(txidIn)
@@ -264,26 +264,25 @@ class FilterBlock {
             const startBurn = new BigNumber(tokenData.totalBurned)
             console.log(`starting tokenData: ${JSON.stringify(tokenData, null, 2)}`)
             const newTokenData = this.utils.subtractBurnedTokens(thisUtxo, tokenData)
-            console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
+            // console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
 
             // Calculate amount of tokens burned by this UTXO.
             const endBurn = new BigNumber(newTokenData.totalBurned)
             const diffBurn = endBurn.minus(startBurn)
-            totalBurned = totalBurned.plus(diffBurn)
-            console.log(`totalBurned: ${totalBurned.toString()}`)
+            console.log(`totalBurned: ${diffBurn.toString()}`)
 
             // Update transaction info in token stats.
-            if (totalBurned.isGreaterThan(0)) {
+            if (diffBurn.isGreaterThan(0)) {
               // const tokenData = await this.tokenDb.get(tokenId)
               const txObj = {
                 txid: txidIn,
                 height: txDetails.blockheight,
                 type: 'BURN-UNCONTROLLED',
                 qty: '0',
-                burned: totalBurned.toString()
+                burned: diffBurn.toString()
               }
               // tokenData.txs.push(txInfo)
-              this.utils.addTxWithoutDuplicate(txObj, tokenData.txs)
+              this.utils.addTxWithoutDuplicate(txObj, newTokenData.txs)
               // await this.tokenDb.put(tokenId, tokenData)
 
               // Mark TX as invalid, in the transaction database.
@@ -291,6 +290,8 @@ class FilterBlock {
               txDetails.isValidSlp = false
               await this.txDb.put(txidIn, txDetails)
             }
+
+            console.log(`final tokenData: ${JSON.stringify(newTokenData, null, 2)}`)
 
             // Update the token stats in the database.
             await this.tokenDb.put(tokenId, newTokenData)

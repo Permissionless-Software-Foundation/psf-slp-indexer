@@ -170,7 +170,7 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 545724)
+      // } while (blockHeight < 552793)
       // process.exit(0)
 
       // Debugging: state the current state of the indexer.
