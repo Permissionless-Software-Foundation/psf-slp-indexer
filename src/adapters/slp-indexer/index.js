@@ -6,6 +6,8 @@
   - First Send tx occurs in block 543409, txid: 874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e
   - First Mint tx occurs in block 543614 txid: ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34
 
+  ToDo: Wrap rpc calls in processBlock() in a retry wrapper.
+
 */
 
 const EPOCH = 200 // blocks between backups
@@ -169,9 +171,10 @@ class SlpIndexer {
 
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
-      } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 545411)
-      // process.exit(0)
+      // } while (blockHeight <= biggestBlockHeight)
+      } while (blockHeight < 610564)
+      console.log('Target block height reached. Create new combined tx-map, then see if re-index works.')
+      process.exit(0)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
