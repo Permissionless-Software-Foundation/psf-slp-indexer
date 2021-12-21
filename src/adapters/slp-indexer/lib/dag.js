@@ -85,17 +85,7 @@ class DAG {
         }
 
         // Phase 1: retrieve the parent TX.
-
-        let parentTx = {}
-        try {
-          // Get the parent from the database
-          parentTx = await this.txDb.get(thisVin.txid)
-          // console.log(`parentTx from DB: ${JSON.stringify(parentTx, null, 2)}`)
-        } catch (err) {
-          // If DB lookup failed, retrieve the parent TX from the cache.
-          parentTx = await this.cache.get(thisVin.txid)
-          // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
-        }
+        const parentTx = await this.cache.get(thisVin.txid)
 
         // Phase 2: Evaluate relationship between parent and child.
 
@@ -135,11 +125,13 @@ class DAG {
             outObj.dag = txidAry
             return outObj
           }
-        } else if (parentTx.isValidSlp === false) {
-          endFound = false
-          outObj.dag = txidAry
-          return outObj
         }
+        // CT 12-21-21 - This was leading to false negatives in the Spice token.
+        // } else if (parentTx.isValidSlp === false) {
+        //   endFound = false
+        //   outObj.dag = txidAry
+        //   return outObj
+        // }
 
         // Phase 2c: Evaluate un-cached, un-evaluated parent
 

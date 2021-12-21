@@ -104,7 +104,7 @@ describe('#dag.js', () => {
       // })
 
       it('should inspect long SPICE DAG', async () => {
-        const txid = '06628694b0ac7a2458c6fefb8236727da549d43c46488c4df1efc2614c32bafd'
+        const txid = 'a154947de9239b93e28b7fc809627b8b4d7ecb494156ea964e96ce2eeefbfe14'
         // const txid = '57e76d0d3d3b76f66ca4276642557eddc8e5c1b92355add6866da958ec39afe5'
         // const txid = '23279ab149da98673cf3677c9c6d90bbc4bad4a8de2c0baea7181e8fba08cccc'
         // const txid = 'de30610b68be8dae2d1627cd0e7f7c0e18d916bc8881bbbff074c4c2c8e58e73'
