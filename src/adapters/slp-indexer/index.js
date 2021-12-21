@@ -171,10 +171,10 @@ class SlpIndexer {
 
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
-      // } while (blockHeight <= biggestBlockHeight)
-      } while (blockHeight < 610564)
-      console.log('Target block height reached. Create new combined tx-map, then see if re-index works.')
-      process.exit(0)
+      } while (blockHeight <= biggestBlockHeight)
+      // } while (blockHeight < 621237)
+      // console.log('Target block height reached. Create new combined tx-map, then see if re-index works.')
+      // process.exit(0)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
@@ -432,7 +432,7 @@ class SlpIndexer {
       )
 
       // Roll back the database to before the parent transaction.
-      await this.dbBackup.unzipDb(rollbackHeight)
+      // await this.dbBackup.unzipDb(rollbackHeight)
 
       // Kill the process, which will allow the app to shut down, and pm2 or Docker can
       // restart it at a block height prior to the problematic parent transaction.

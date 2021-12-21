@@ -17,6 +17,7 @@ async function getTokens () {
 
       if (data.value.totalBurned !== '0' && data.value.totalBurned !== data.value.totalMinted) {
         data.value.totalTxs = data.value.txs.length
+        data.value.txs = []
         console.log(data.key, ' = ', data.value)
       }
     })

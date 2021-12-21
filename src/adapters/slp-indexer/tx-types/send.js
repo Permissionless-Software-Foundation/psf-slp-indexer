@@ -191,7 +191,7 @@ class Send {
 
         // Update the token data.
         const tokenData = await this.tokenDb.get(tokenId)
-        console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+        // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
         const tokensInCirc = new BigNumber(tokenData.tokensInCirculationBN)
         const totalBurned = new BigNumber(tokenData.totalBurned)
@@ -203,7 +203,7 @@ class Send {
         tokenData.tokensInCirculationStr = diffCirc.toString()
         tokenData.totalBurned = newBurned.toString()
 
-        console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
+        // console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
         await this.tokenDb.put(tokenId, tokenData)
       } else if (diffBN.isLessThan(0)) {
         console.log('Outputs exceed inputs. Uncontrolled burn detected.')

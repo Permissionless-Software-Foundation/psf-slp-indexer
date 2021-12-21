@@ -95,12 +95,26 @@ describe('#dag.js', () => {
         assert.equal(result.dag.length, 1)
       })
 
-      it('should invalidate if parent UTXO is invalid', async () => {
-        const txid = '1a8e0fb428fefe6c7413dba30c15e2814947f7efb7978de526c514d9128b266c'
-        const tokenId = '01e34c1524c523380707570ced7217024f644fd6f228c13413b12e97e4ca13e8'
+      // it('should invalidate if parent UTXO is invalid', async () => {
+      //   const txid = '1a8e0fb428fefe6c7413dba30c15e2814947f7efb7978de526c514d9128b266c'
+      //   const tokenId = '01e34c1524c523380707570ced7217024f644fd6f228c13413b12e97e4ca13e8'
+      //
+      //   const result = await uut.crawlDag(txid, tokenId)
+      //   console.log('result: ', result)
+      // })
+
+      it('should inspect long SPICE DAG', async () => {
+        const txid = '06628694b0ac7a2458c6fefb8236727da549d43c46488c4df1efc2614c32bafd'
+        // const txid = '57e76d0d3d3b76f66ca4276642557eddc8e5c1b92355add6866da958ec39afe5'
+        // const txid = '23279ab149da98673cf3677c9c6d90bbc4bad4a8de2c0baea7181e8fba08cccc'
+        // const txid = 'de30610b68be8dae2d1627cd0e7f7c0e18d916bc8881bbbff074c4c2c8e58e73'
+        // const txid = 'e74ed9a8593d521eb64e527ac12d1ab00c689c8440931079f6e50d37097d2f7c'
+        // const txid = '58bbb866dd09bd348f20a367c706dd7c48cc8c642a28f4f9c442cb469f99aefb'
+        // const txid = '43cf6410d2b41a2087f38d83ba5340547a32dd99a5778e347667df2379708eee'
+        const tokenId = '4de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf'
 
         const result = await uut.crawlDag(txid, tokenId)
-        console.log('result: ', result)
+        console.log(`result: ${JSON.stringify(result, null, 2)}`)
       })
     })
   })

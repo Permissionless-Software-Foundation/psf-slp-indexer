@@ -8,7 +8,7 @@
   This data can then be used in unit tests.
 */
 
-const TXID = '3eb290fc7c26842003177af1936bdd23622ff1a9a4471301a6f7ee62b79d1ed0'
+const TXID = 'c94faf77fc2cd7057eb78d258c9bed007266c212e18b8d12254daa69a1e4bed1'
 
 const Transaction = require('../../src/adapters/slp-indexer/lib/transaction')
 const transaction = new Transaction()
