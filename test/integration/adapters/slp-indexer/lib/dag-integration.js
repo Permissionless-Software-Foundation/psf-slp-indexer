@@ -103,15 +103,23 @@ describe('#dag.js', () => {
       //   console.log('result: ', result)
       // })
 
-      it('should inspect long SPICE DAG', async () => {
-        const txid = 'a154947de9239b93e28b7fc809627b8b4d7ecb494156ea964e96ce2eeefbfe14'
-        // const txid = '57e76d0d3d3b76f66ca4276642557eddc8e5c1b92355add6866da958ec39afe5'
-        // const txid = '23279ab149da98673cf3677c9c6d90bbc4bad4a8de2c0baea7181e8fba08cccc'
-        // const txid = 'de30610b68be8dae2d1627cd0e7f7c0e18d916bc8881bbbff074c4c2c8e58e73'
-        // const txid = 'e74ed9a8593d521eb64e527ac12d1ab00c689c8440931079f6e50d37097d2f7c'
-        // const txid = '58bbb866dd09bd348f20a367c706dd7c48cc8c642a28f4f9c442cb469f99aefb'
-        // const txid = '43cf6410d2b41a2087f38d83ba5340547a32dd99a5778e347667df2379708eee'
-        const tokenId = '4de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf'
+      // it('should inspect long SPICE DAG', async () => {
+      //   const txid = 'a154947de9239b93e28b7fc809627b8b4d7ecb494156ea964e96ce2eeefbfe14'
+      //   // const txid = '57e76d0d3d3b76f66ca4276642557eddc8e5c1b92355add6866da958ec39afe5'
+      //   // const txid = '23279ab149da98673cf3677c9c6d90bbc4bad4a8de2c0baea7181e8fba08cccc'
+      //   // const txid = 'de30610b68be8dae2d1627cd0e7f7c0e18d916bc8881bbbff074c4c2c8e58e73'
+      //   // const txid = 'e74ed9a8593d521eb64e527ac12d1ab00c689c8440931079f6e50d37097d2f7c'
+      //   // const txid = '58bbb866dd09bd348f20a367c706dd7c48cc8c642a28f4f9c442cb469f99aefb'
+      //   // const txid = '43cf6410d2b41a2087f38d83ba5340547a32dd99a5778e347667df2379708eee'
+      //   const tokenId = '4de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf'
+      //
+      //   const result = await uut.crawlDag(txid, tokenId)
+      //   console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // })
+
+      it('should inspect problematic MINT tx', async () => {
+        const txid = 'a98686df3ced24b5ce7f47762631b8a8dc87086aa7b9ee2be59bcdde7886264a'
+        const tokenId = 'd912758f9f2c9c365e31f4d87e1c79675ec09b35364db2484061413651d0ccd4'
 
         const result = await uut.crawlDag(txid, tokenId)
         console.log(`result: ${JSON.stringify(result, null, 2)}`)

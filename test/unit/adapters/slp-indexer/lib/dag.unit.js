@@ -211,25 +211,27 @@ describe('#dag.js', () => {
     // })
 
     // Simulates parent tx being marked isValid=false from the DB.
-    it('should return false for cached invalid parent', async () => {
-      // Force parent tx to be valid.
-      mockData.slpGenesisTxData01.isValidSlp = false
-
-      // Mock dependencies
-      sandbox.stub(uut.cache, 'get')
-        .onCall(0).resolves(mockData.slpSendTxData01)
-        .onCall(1).resolves(mockData.slpGenesisTxData01)
-
-      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
-      const tokenId =
-        '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
-
-      const result = await uut.crawlDag(txid, tokenId)
-      // console.log('result: ', result)
-
-      assert.equal(result.isValid, false)
-      assert.equal(result.dag.length, 1)
-    })
+    // CT 12-21-21 - Commented out because the part of the code tested by this
+    // test case, was leading to false negatives.
+    // it('should return false for cached invalid parent', async () => {
+    //   // Force parent tx to be valid.
+    //   mockData.slpGenesisTxData01.isValidSlp = false
+    //
+    //   // Mock dependencies
+    //   sandbox.stub(uut.cache, 'get')
+    //     .onCall(0).resolves(mockData.slpSendTxData01)
+    //     .onCall(1).resolves(mockData.slpGenesisTxData01)
+    //
+    //   const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+    //   const tokenId =
+    //     '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+    //
+    //   const result = await uut.crawlDag(txid, tokenId)
+    //   console.log('result: ', result)
+    //
+    //   assert.equal(result.isValid, false)
+    //   assert.equal(result.dag.length, 1)
+    // })
 
     it('should throw an error if parent has different tokenId', async () => {
       // Force parent to have different token ID

@@ -65,10 +65,26 @@ class Mint {
       // Validate the TX against the SLP DAG.
       const txid = data.txData.txid
       const tokenId = data.txData.tokenId
-      const { isValid } = await this.dag.crawlDag(txid, tokenId)
+      // const { isValid } = await this.dag.crawlDag(txid, tokenId)
+      const { isValid, dag } = await this.dag.crawlDag(txid, tokenId)
       // console.log('isValid: ', isValid)
       if (!isValid) {
         console.log(`MINT TXID ${txid} failed DAG validation. Skipping.`)
+
+        // Mark TX as invalid and save in database.
+        data.txData.isValidSlp = false
+        await this.txDb.put(data.txData.txid, data.txData)
+
+        return
+      }
+
+      console.log('isValid: ', isValid)
+      console.log(`dag: ${JSON.stringify(dag, null, 2)}`)
+
+      // Ensure the inputs to the tx have a valid mint baton.
+      const batonVin = this.findBatonInput(data)
+      if (batonVin === null) {
+        console.log(`MINT TXID ${txid} has no baton input UTXOs. Skipping`)
 
         // Mark TX as invalid and save in database.
         data.txData.isValidSlp = false
@@ -93,6 +109,38 @@ class Mint {
       return true
     } catch (err) {
       console.error('Error in mint.processTx()')
+      throw err
+    }
+  }
+
+  // Returns the vin index that contains the minting baton. If no minting
+  // baton is found, returns null.
+  findBatonInput (data) {
+    try {
+      // Default output
+      let output = null
+
+      const tokenId = data.slpData.tokenId
+      const txData = data.txData
+
+      // Loop through each input.
+      for (let i = 0; i < txData.vin.length; i++) {
+        const thisVin = txData.vin[i]
+
+        // Test the input to see if it's the baton we're looking for.
+        const tokenIdMatches = thisVin.tokenId === tokenId
+        const isBaton = thisVin.isMintBaton
+
+        if (tokenIdMatches && isBaton) {
+          // Baton match found.
+          output = i
+          break
+        }
+      }
+
+      return output
+    } catch (err) {
+      console.error('Error in findBatonInput()')
       throw err
     }
   }
@@ -275,7 +323,7 @@ class Mint {
 
       // Get the token stats from the database.
       const tokenStats = await this.tokenDb.get(slpData.tokenId)
-      console.log('MINT update to tokenStats: ', tokenStats)
+      // console.log('MINT update to tokenStats: ', tokenStats)
 
       // Add tokens using BigNumber math.
       const qty = slpData.qty.plus(

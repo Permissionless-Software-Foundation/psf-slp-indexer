@@ -314,4 +314,20 @@ describe('#mint.js', () => {
       }
     })
   })
+
+  describe('#findBatonInput', () => {
+    it('should return baton vin', () => {
+      const result = uut.findBatonInput(mockData.mintData)
+      // console.log('result: ', result)
+
+      assert.equal(result, 1)
+    })
+
+    it('should return null for invalid mint tx', () => {
+      const result = uut.findBatonInput(mockData.invalidMintData01)
+      // console.log('result: ', result)
+
+      assert.equal(result, null)
+    })
+  })
 })
