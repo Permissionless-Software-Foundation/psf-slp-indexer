@@ -18,6 +18,12 @@ services:
     container_name: ipfs
     environment:
       MY_ENV_VAR: 'placeholder'
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '10'
+    mem_limit: 2000mb
     ports:
       - 4001:4001
       - 5001:5001
