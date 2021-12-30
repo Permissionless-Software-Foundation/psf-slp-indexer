@@ -1,6 +1,6 @@
 # Start the service with the command 'docker-compose up -d'
 
-version: '2'
+version: '3.9'
 
 services:
   mongo-ipfs-service:
@@ -11,6 +11,29 @@ services:
     volumes:
       - ../data/database:/data/db
     command: mongod --logpath=/dev/null # -- quiet
+    restart: always
+
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    container_name: ipfs
+    environment:
+      MY_ENV_VAR: 'placeholder'
+    ports:
+      - 4001:4001
+      - 5001:5001
+      - 8080:8080
+    volumes:
+      - ../data/go-ipfs/data:/data/ipfs
+      - ../data/go-ipfs/export:/export
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#command
+    # https://github.com/ipfs/go-ipfs/blob/91c52657166bcf86f2476926e4fe56694dc26562/Dockerfile#L115
+    command:
+      [
+        'daemon',
+        '--migrate=true',
+        '--agent-version-suffix=docker',
+        '--enable-pubsub-experiment'
+      ]
     restart: always
 
   ipfs-service:
@@ -24,10 +47,9 @@ services:
     mem_limit: 500mb
     links:
       - mongo-ipfs-service
+      - ipfs
     ports:
-      - '5001:5001' # <host port>:<container port>
-      - '5268:5268' # IPFS TCP
-      - '5269:5269' # IPFS WS
+      - '5010:5010' # <host port>:<container port>
     volumes:
       - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
     restart: always

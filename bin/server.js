@@ -104,8 +104,18 @@ class Server {
       return app
     } catch (err) {
       console.error('Could not start server. Error: ', err)
+
+      console.log(
+        'Exiting after 5 seconds. Depending on process manager to restart.'
+      )
+      await sleep(5000)
+      process.exit(1)
     }
   }
+}
+
+function sleep (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 module.exports = Server
