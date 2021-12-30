@@ -1,6 +1,6 @@
 {
   "name": "ipfs-service-provider",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "A Koa-based combination of a REST API and IPFS JSON RPC. Boilerplate for starting new projects.",
   "main": "index.js",
   "scripts": {
