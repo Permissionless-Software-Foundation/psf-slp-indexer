@@ -10,7 +10,8 @@
 
 // Global npm libraries
 // const IPFS = require('ipfs')
-const IPFS = require('@chris.troutner/ipfs')
+// const IPFS = require('@chris.troutner/ipfs')
+const IPFS = require('ipfs')
 const fs = require('fs')
 
 // Local libraries
