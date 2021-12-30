@@ -26,12 +26,16 @@ export DEBUG_LEVEL=1
 export DBURL=mongodb://172.17.0.1:5555/ipfs-service-prod
 
 # Configure IPFS ports
-export IPFS_TCP_PORT=5268
-export IPFS_WS_PORT=5269
+#export IPFS_TCP_PORT=5268
+#export IPFS_WS_PORT=5269
 
 
 # Configure REST API port
-export PORT=5001
+export PORT=5010
 
+# Production settings using external go-ipfs node.
 export SVC_ENV=production
+export IPFS_HOST=172.17.0.1
+export IPFS_API_PORT=5001
+
 npm start
