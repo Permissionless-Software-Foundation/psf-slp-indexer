@@ -26,8 +26,8 @@ services:
     mem_limit: 2000mb
     ports:
       - 4001:4001
-      - 5001:5001
-      - 8080:8080
+      - 172.17.0.1:5001:5001
+      - 172.17.0.1:8080:8080
     volumes:
       - ../data/go-ipfs/data:/data/ipfs
       - ../data/go-ipfs/export:/export

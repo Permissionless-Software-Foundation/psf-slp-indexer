@@ -17,18 +17,13 @@ export COORD_NAME=ipfs-service-provider-generic
 #export CR_DOMAIN=subdomain.yourdomain.com
 
 # Debug level. 0 = minimal info. 2 = max info.
-export DEBUG_LEVEL=1
+export DEBUG_LEVEL=2
 
 # END: Optional configuration settings
 
 
 # Production database connection string.
 export DBURL=mongodb://172.17.0.1:5555/ipfs-service-prod
-
-# Configure IPFS ports
-#export IPFS_TCP_PORT=5268
-#export IPFS_WS_PORT=5269
-
 
 # Configure REST API port
 export PORT=5010
@@ -37,5 +32,7 @@ export PORT=5010
 export SVC_ENV=production
 export IPFS_HOST=172.17.0.1
 export IPFS_API_PORT=5001
+export IPFS_TCP_PORT=4001
+#export IPFS_WS_PORT=5269
 
 npm start
