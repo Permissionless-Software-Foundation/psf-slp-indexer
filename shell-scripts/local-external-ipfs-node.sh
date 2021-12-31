@@ -13,13 +13,17 @@ export COORD_NAME=ipfs-service-provider-generic
 export MNEMONIC="churn aisle shield silver ladder swear hunt slim pen demand spoil veteran"
 
 # 0 = less verbose. 3 = most verbose
-export DEBUG_LEVEL=1
+export DEBUG_LEVEL=2
 
 # Production settings that use external IPFS node.
 # https://github.com/christroutner/docker-ipfs
 export SVC_ENV=production
 export IPFS_HOST=localhost
 export IPFS_API_PORT=5001
+
+# Configure IPFS ports
+export IPFS_TCP_PORT=4001
+#export IPFS_WS_PORT=5269
 
 # MongoDB connection string.
 export DBURL=mongodb://localhost:27017/ipfs-service-dev
