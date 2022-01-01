@@ -14,7 +14,7 @@ services:
     restart: always
 
   ipfs:
-    image: ipfs/go-ipfs:latest
+    image: ipfs/go-ipfs:v0.11.0
     container_name: ipfs
     environment:
       MY_ENV_VAR: 'placeholder'
