@@ -136,6 +136,12 @@ class SlpReIndexer {
       )
       console.log(`slpTxIndex: ${slpTxIndex}`)
 
+      // Bail out if the block height can not be determined.
+      if (slpTxIndex < 0) {
+        console.log('tx-map index can not be determined from current block height! Exiting.')
+        process.exit(-1)
+      }
+
       // Clean up stale TXs in the pTxDb.
       await this.managePtxdb.cleanPTXDB(status.syncedBlockHeight)
 

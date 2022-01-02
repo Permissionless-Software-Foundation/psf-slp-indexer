@@ -125,13 +125,16 @@ class DAG {
             outObj.dag = txidAry
             return outObj
           }
+          // }
+          // CT 12-21-21 - This was leading to false negatives in the Spice token.
+          // CT 01-02-22 - Adding additional constraint that several parents
+          // have already been considered. This is in hope that it will speed
+          // up validation, which become much slower after taking the code out.
+        } else if (parentTx.isValidSlp === false && txidAry.length > 10) {
+          endFound = false
+          outObj.dag = txidAry
+          return outObj
         }
-        // CT 12-21-21 - This was leading to false negatives in the Spice token.
-        // } else if (parentTx.isValidSlp === false) {
-        //   endFound = false
-        //   outObj.dag = txidAry
-        //   return outObj
-        // }
 
         // Phase 2c: Evaluate un-cached, un-evaluated parent
 
