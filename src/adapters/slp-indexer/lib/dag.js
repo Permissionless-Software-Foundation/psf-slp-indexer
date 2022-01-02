@@ -130,7 +130,7 @@ class DAG {
           // CT 01-02-22 - Adding additional constraint that several parents
           // have already been considered. This is in hope that it will speed
           // up validation, which become much slower after taking the code out.
-        } else if (parentTx.isValidSlp === false && txidAry.length > 10) {
+        } else if (parentTx.isValidSlp === false && txidAry.length > 30) {
           endFound = false
           outObj.dag = txidAry
           return outObj
