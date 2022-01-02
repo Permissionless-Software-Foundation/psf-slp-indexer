@@ -100,7 +100,13 @@ class SlpReIndexer {
       // Capture keyboard input to determine when to shut down.
       this.startStop.initStartStop()
 
-      const firstBlock = txMap[0].height
+      // Sometimes the first entry in tx-map.json is empty.
+      let firstBlock = txMap[0].height
+      if (!firstBlock) {
+        firstBlock = txMap[1].height
+      }
+      console.log('firstBlock: ', firstBlock)
+
       const lastBlock = txMap[txMap.length - 1].height
 
       // Get the current sync status.
@@ -135,6 +141,8 @@ class SlpReIndexer {
 
       // const lastBlockIndex = txMap.findIndex(x => x.height === 570650)
 
+      let lastIndex = 0
+
       // Loop through the block heights and index every block.
       // for (
       //   let blockHeight = status.syncedBlockHeight;
@@ -143,6 +151,7 @@ class SlpReIndexer {
       //   blockHeight++
       // ) {
       for (let i = slpTxIndex; i < txMap.length; i++) {
+      // for (let i = slpTxIndex; i < slpTxIndex + 10; i++) {
       // for (let i = slpTxIndex; i < lastBlockIndex; i++) {
         const blockHeight = txMap[i].height
 
@@ -223,7 +232,16 @@ class SlpReIndexer {
 
         // Progressively processes TXs in the array.
         await this.processSlpTxs(slpTxs, blockHeight)
+
+        lastIndex = i
       }
+
+      // Update and save the sync status.
+      const blockHeight = txMap[lastIndex + 1].height
+      status.syncedBlockHeight = blockHeight
+      await statusDb.put('status', status)
+
+      process.exit(0)
     } catch (err) {
       console.log('Error in re-index.js: ', err)
       // Don't throw an error. This is a top-level function.
