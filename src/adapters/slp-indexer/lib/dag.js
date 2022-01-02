@@ -58,6 +58,10 @@ class DAG {
         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       }
 
+      if (txidAry.length > 50) {
+        console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
+      }
+
       // If this is the genesis TX, then exit immediately.
       // This happens when evaluating the first send TX after a genesis TX.
       if (txid === tokenId) {
