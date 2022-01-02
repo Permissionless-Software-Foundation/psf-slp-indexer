@@ -28,7 +28,7 @@
     "bcryptjs": "2.4.3",
     "glob": "7.1.6",
     "ipfs": "0.60.0",
-    "ipfs-coord": "6.8.9",
+    "ipfs-coord": "6.8.10",
     "ipfs-http-client": "55.0.0",
     "jsonrpc-lite": "2.2.0",
     "jsonwebtoken": "8.5.1",
