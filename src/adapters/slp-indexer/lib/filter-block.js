@@ -12,6 +12,7 @@
 // Public npm libraries
 const PQueue = require('p-queue').default
 const pRetry = require('p-retry')
+const BigNumber = require('bignumber.js')
 
 // Local Libraries
 // const config = require('../../../config')
@@ -48,6 +49,12 @@ class FilterBlock {
     if (!this.utxoDb) {
       throw new Error(
         'Must pass utxo DB instance when instantiating filter-block.js'
+      )
+    }
+    this.txDb = localConfig.txDb
+    if (!this.txDb) {
+      throw new Error(
+        'Must pass transaction DB instance when instantiating filter-block.js'
       )
     }
 
@@ -187,6 +194,9 @@ class FilterBlock {
       const vins = txDetails.vin
       // // console.log(`vins: ${JSON.stringify(vins, null, 2)}`)
 
+      // let totalBurned = new BigNumber(0)
+      let tokenId
+
       // Loop through each input to the TX
       for (let i = 0; i < vins.length; i++) {
         const thisVin = vins[i]
@@ -195,8 +205,8 @@ class FilterBlock {
         const vout = thisVin.vout
         let addrData = {}
 
-        // Use utxoDb to lookup address.
-        const addr = await this.getAddressFromTxid(txidIn, vout)
+        // Use utxoDb to lookup the address associated with the UTXO.
+        const addr = await this.getAddressFromTxid(txid, vout)
         if (!addr) continue
 
         // Try to get the address from the database.
@@ -207,9 +217,14 @@ class FilterBlock {
           // input.
           continue
         }
+        // console.log(`addrData for ${addr}: ${JSON.stringify(addrData, null, 2)}`)
+
+        console.log(`Uncontrolled burn detected in TXID ${txidIn}, involving ${addr}`)
 
         // Get hydrated TX details.
         txDetails = await this.cache.get(txidIn)
+        // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+        // console.log('tx details should have been saved to the database.')
 
         // Loop through each UTXO associated with this address.
         const utxos = addrData.utxos
@@ -218,6 +233,7 @@ class FilterBlock {
 
           // If the address contains the burned UTXO.
           if (thisUtxo.txid === txid && thisUtxo.vout === vout) {
+            console.log(`Utxo found to remove: ${JSON.stringify(thisUtxo, null, 2)}`)
             // Remove the UTXO from the address.
             addrData.utxos = this.utils.removeUtxoFromArray(thisUtxo, addrData.utxos)
 
@@ -225,10 +241,15 @@ class FilterBlock {
             addrData.balances = this.utils.subtractUtxoBalance(thisUtxo, addrData.balances, thisUtxo.tokenId)
 
             // Add the TXID to the transaction history
-            addrData.txs.push({
+            const txObj = {
               txid: txidIn,
               height: txDetails.blockheight
-            })
+            }
+            this.utils.addTxWithoutDuplicate(txObj, addrData.txs)
+            // addrData.txs.push({
+            //   txid: txidIn,
+            //   height: txDetails.blockheight
+            // })
 
             // Save the updated address data in the database.
             // console.log(`Updated addrData: ${JSON.stringify(addrData, null, 2)}`)
@@ -238,11 +259,42 @@ class FilterBlock {
             await this.utxoDb.del(`${thisUtxo.txid}:${thisUtxo.vout}`)
 
             // Add the amount of burned tokens to the token stats.
-            const tokenData = await this.tokenDb.get(thisUtxo.tokenId)
-            // console.log(`updated tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+            tokenId = thisUtxo.tokenId
+            const tokenData = await this.tokenDb.get(tokenId)
+            const startBurn = new BigNumber(tokenData.totalBurned)
+            // console.log(`starting tokenData: ${JSON.stringify(tokenData, null, 2)}`)
             const newTokenData = this.utils.subtractBurnedTokens(thisUtxo, tokenData)
             // console.log(`newTokenData: ${JSON.stringify(newTokenData, null, 2)}`)
-            await this.tokenDb.put(thisUtxo.tokenId, newTokenData)
+
+            // Calculate amount of tokens burned by this UTXO.
+            const endBurn = new BigNumber(newTokenData.totalBurned)
+            const diffBurn = endBurn.minus(startBurn)
+            console.log(`totalBurned: ${diffBurn.toString()}`)
+
+            // Update transaction info in token stats.
+            if (diffBurn.isGreaterThan(0)) {
+              // const tokenData = await this.tokenDb.get(tokenId)
+              const txObj = {
+                txid: txidIn,
+                height: txDetails.blockheight,
+                type: 'BURN-UNCONTROLLED',
+                qty: '0',
+                burned: diffBurn.toString()
+              }
+              // tokenData.txs.push(txInfo)
+              this.utils.addTxWithoutDuplicate(txObj, newTokenData.txs)
+              // await this.tokenDb.put(tokenId, tokenData)
+
+              // Mark TX as invalid, in the transaction database.
+              console.log(`Saving ${txidIn} to txDb`)
+              txDetails.isValidSlp = false
+              await this.txDb.put(txidIn, txDetails)
+            }
+
+            // console.log(`final tokenData: ${JSON.stringify(newTokenData, null, 2)}`)
+
+            // Update the token stats in the database.
+            await this.tokenDb.put(tokenId, newTokenData)
           }
         }
       }
@@ -251,7 +303,7 @@ class FilterBlock {
       return true
     } catch (err) {
       // console.log(`deleteBurnedUtxos error txid: ${txidIn}`)
-      // console.error('Error in deleteBurnedUtxos()')
+      // console.error('Error in deleteBurnedUtxos(): ', err)
       // throw err
 
       // Ignore any errors.

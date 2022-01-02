@@ -2,7 +2,7 @@
   Mock data for the genesis.unit.js test library
 */
 
-const genesisData = {
+const genesisData01 = {
   slpData: {
     tokenType: 1,
     txType: 'GENESIS',
@@ -140,7 +140,106 @@ const addrMock = {
   ]
 }
 
+const genesisData02 = {
+  slpData: {
+    tokenType: 1,
+    txType: 'GENESIS',
+    ticker: 'Treatment',
+    name: 'Treatment',
+    tokenId: 'ffa1b0f89750c74ebe1d0267a7774e635896f6050e836b59449b0a5581f1ff2b',
+    documentUri: 'https://www.localvisibility.com.au/',
+    documentHash: '',
+    decimals: 8,
+    mintBatonVout: 0,
+    qty: '10000000000000000000'
+  },
+  blockHeight: 600518,
+  txData: {
+    txid: 'ffa1b0f89750c74ebe1d0267a7774e635896f6050e836b59449b0a5581f1ff2b',
+    hash: 'ffa1b0f89750c74ebe1d0267a7774e635896f6050e836b59449b0a5581f1ff2b',
+    version: 1,
+    size: 315,
+    locktime: 600517,
+    vin: [
+      {
+        txid: 'a76e7825c400ad986257149b98dc6cf13b4a49de6e5ab71c87a1481edc72a88c',
+        vout: 2,
+        scriptSig: {
+          asm: '31e18a20e77569bed32d1ad262159af92783e71354ede1bbb9670a97285d9566f2d3e6e6955263e5da433bb450cea57a1e31c2dcdb7b1a7e96b6e5023beadc6a[ALL|FORKID] 02e67502804cb4f239d1b787b6bd0e48806a1fb2207f7d2ae0fef6b7c1633d9e77',
+          hex: '4131e18a20e77569bed32d1ad262159af92783e71354ede1bbb9670a97285d9566f2d3e6e6955263e5da433bb450cea57a1e31c2dcdb7b1a7e96b6e5023beadc6a412102e67502804cb4f239d1b787b6bd0e48806a1fb2207f7d2ae0fef6b7c1633d9e77'
+        },
+        sequence: 4294967294,
+        address: 'bitcoincash:qrd8z8kp0j6qfqevtnzxl0rmjj6jswycevyw6tl35d',
+        value: 0.00061017,
+        tokenQty: 0,
+        tokenQtyStr: '0',
+        tokenId: null
+      }
+    ],
+    vout: [
+      {
+        value: 0,
+        n: 0,
+        scriptPubKey: {
+          asm: 'OP_RETURN 5262419 1 47454e45534953 54726561746d656e74 54726561746d656e74 68747470733a2f2f7777772e6c6f63616c7669736962696c6974792e636f6d2e61752f 0 8 0 8ac7230489e80000',
+          hex: '6a04534c500001010747454e455349530954726561746d656e740954726561746d656e742368747470733a2f2f7777772e6c6f63616c7669736962696c6974792e636f6d2e61752f4c0001084c00088ac7230489e80000',
+          type: 'nulldata'
+        },
+        tokenQtyStr: '0',
+        tokenQty: 0,
+        isMintBaton: true
+      },
+      {
+        value: 0.00000546,
+        n: 1,
+        scriptPubKey: {
+          asm: 'OP_DUP OP_HASH160 6e6873cb9ac2ce58dae7d82009fadd694dbc48e9 OP_EQUALVERIFY OP_CHECKSIG',
+          hex: '76a9146e6873cb9ac2ce58dae7d82009fadd694dbc48e988ac',
+          reqSigs: 1,
+          type: 'pubkeyhash',
+          addresses: [
+            'bitcoincash:qphxsu7tntpvukx6ulvzqz06m455m0zgayznyljrfd'
+          ]
+        },
+        tokenQtyStr: '100000000000',
+        tokenQty: 100000000000
+      },
+      {
+        value: 0.00060156,
+        n: 2,
+        scriptPubKey: {
+          asm: 'OP_DUP OP_HASH160 a7ed25905a54f70826b6762a0a6dfecfcba817ff OP_EQUALVERIFY OP_CHECKSIG',
+          hex: '76a914a7ed25905a54f70826b6762a0a6dfecfcba817ff88ac',
+          reqSigs: 1,
+          type: 'pubkeyhash',
+          addresses: [
+            'bitcoincash:qzn76fvstf20wzpxkemz5zndlm8uh2qhluhsalmy9t'
+          ]
+        },
+        tokenQtyStr: '0',
+        tokenQty: 0
+      }
+    ],
+    hex: '01000000018ca872dc1e48a1871cb75a6ede494a3bf16cdc989b14576298ad00c425786ea702000000644131e18a20e77569bed32d1ad262159af92783e71354ede1bbb9670a97285d9566f2d3e6e6955263e5da433bb450cea57a1e31c2dcdb7b1a7e96b6e5023beadc6a412102e67502804cb4f239d1b787b6bd0e48806a1fb2207f7d2ae0fef6b7c1633d9e77feffffff030000000000000000576a04534c500001010747454e455349530954726561746d656e740954726561746d656e742368747470733a2f2f7777772e6c6f63616c7669736962696c6974792e636f6d2e61752f4c0001084c00088ac7230489e8000022020000000000001976a9146e6873cb9ac2ce58dae7d82009fadd694dbc48e988acfcea0000000000001976a914a7ed25905a54f70826b6762a0a6dfecfcba817ff88acc5290900',
+    blockhash: '0000000000000000005b17222cc0d0861a404427d7b4c8b0599897697a765af7',
+    confirmations: 117998,
+    time: 1568644882,
+    blocktime: 1568644882,
+    blockheight: 600518,
+    isSlpTx: true,
+    tokenTxType: 'GENESIS',
+    tokenId: 'ffa1b0f89750c74ebe1d0267a7774e635896f6050e836b59449b0a5581f1ff2b',
+    tokenType: 1,
+    tokenTicker: 'Treatment',
+    tokenName: 'Treatment',
+    tokenDecimals: 8,
+    tokenUri: 'https://www.localvisibility.com.au/',
+    tokenDocHash: ''
+  }
+}
+
 module.exports = {
-  genesisData,
-  addrMock
+  genesisData01,
+  addrMock,
+  genesisData02
 }

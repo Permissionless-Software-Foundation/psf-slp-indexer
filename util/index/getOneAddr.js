@@ -3,9 +3,11 @@
 */
 
 // const addr = 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx'
-const addr = 'bitcoincash:qrqy3kj7r822ps6628vwqq5k8hyjl6ey3y4eea2m4s'
+let addr = 'bitcoincash:qq4kp3w3yhhvy4gm4jgeza4vus8vpxgrwc90n8rhxe'
 
 const level = require('level')
+const BCHJS = require('@psf/bch-js')
+const bchjs = new BCHJS()
 
 const addrDb = level(`${__dirname.toString()}/../../leveldb/current/addrs`, {
   valueEncoding: 'json'
@@ -13,6 +15,8 @@ const addrDb = level(`${__dirname.toString()}/../../leveldb/current/addrs`, {
 
 async function getAddr () {
   try {
+    addr = bchjs.SLP.Address.toCashAddress(addr)
+
     const addrData = await addrDb.get(addr)
 
     console.log(`${JSON.stringify(addrData, null, 2)}`)

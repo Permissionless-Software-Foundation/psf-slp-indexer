@@ -13,7 +13,13 @@ async function getTokens () {
     const stream = tokenDb.createReadStream()
 
     stream.on('data', function (data) {
-      console.log(data.key, ' = ', data.value)
+      // console.log(data.key, ' = ', data.value)
+
+      if (data.value.totalBurned !== '0' && data.value.totalBurned !== data.value.totalMinted) {
+        data.value.totalTxs = data.value.txs.length
+        data.value.txs = []
+        console.log(data.key, ' = ', data.value)
+      }
     })
   } catch (err) {
     console.error(err)

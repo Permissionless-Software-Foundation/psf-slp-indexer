@@ -22,7 +22,8 @@ class RetryQueue {
     this.queue = new PQueue({ concurrency: 1 })
     this.pRetry = pRetry
 
-    this.attempts = 5
+    // Note: Retry has exponential back-off, so 6-10 is the right number.
+    this.attempts = 7
     this.retryPeriod = 1000
 
     _this = this

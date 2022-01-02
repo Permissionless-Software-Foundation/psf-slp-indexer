@@ -206,7 +206,8 @@ describe('#mint.js', () => {
       // Simulate token stats in the database
       sandbox.stub(uut.tokenDb, 'get').resolves({
         tokensInCirculationBN: new BigNumber(1),
-        tokensInCirculationStr: '1'
+        tokensInCirculationStr: '1',
+        txs: []
       })
 
       const result = await uut.updateTokenStats(mockData.mintData)
@@ -220,7 +221,8 @@ describe('#mint.js', () => {
       // Simulate token stats in the database
       sandbox.stub(uut.tokenDb, 'get').resolves({
         tokensInCirculationBN: new BigNumber(1),
-        tokensInCirculationStr: '1'
+        tokensInCirculationStr: '1',
+        txs: []
       })
 
       // Force mint baton to be inactive
@@ -310,6 +312,22 @@ describe('#mint.js', () => {
         // console.log('err: ', err)
         assert.include(err.message, 'Cannot read property')
       }
+    })
+  })
+
+  describe('#findBatonInput', () => {
+    it('should return baton vin', () => {
+      const result = uut.findBatonInput(mockData.mintData)
+      // console.log('result: ', result)
+
+      assert.equal(result, 1)
+    })
+
+    it('should return null for invalid mint tx', () => {
+      const result = uut.findBatonInput(mockData.invalidMintData01)
+      // console.log('result: ', result)
+
+      assert.equal(result, null)
     })
   })
 })

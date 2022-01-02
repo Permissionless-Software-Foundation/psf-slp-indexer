@@ -44,7 +44,10 @@ describe('#send.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must pass cache instance when instantiating send.js')
+        assert.equal(
+          err.message,
+          'Must pass cache instance when instantiating send.js'
+        )
       }
     })
 
@@ -57,7 +60,10 @@ describe('#send.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must pass address DB instance when instantiating send.js')
+        assert.equal(
+          err.message,
+          'Must pass address DB instance when instantiating send.js'
+        )
       }
     })
 
@@ -71,7 +77,10 @@ describe('#send.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must pass token DB instance when instantiating send.js')
+        assert.equal(
+          err.message,
+          'Must pass token DB instance when instantiating send.js'
+        )
       }
     })
 
@@ -86,7 +95,10 @@ describe('#send.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must pass transaction DB instance when instantiating send.js')
+        assert.equal(
+          err.message,
+          'Must pass transaction DB instance when instantiating send.js'
+        )
       }
     })
 
@@ -101,14 +113,20 @@ describe('#send.js', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.equal(err.message, 'Must pass utxo DB instance when instantiating send.js')
+        assert.equal(
+          err.message,
+          'Must pass utxo DB instance when instantiating send.js'
+        )
       }
     })
   })
 
   describe('#subtractBalanceFromSend', () => {
     it('should subtract a balance from an address object', () => {
-      let result = uut.subtractBalanceFromSend(mockData.addrData01, mockData.utxo01)
+      let result = uut.subtractBalanceFromSend(
+        mockData.addrData01,
+        mockData.utxo01
+      )
       result = result.toString()
       // console.log('result: ', result)
 
@@ -163,7 +181,7 @@ describe('#send.js', () => {
 
     it('should throw an error if there are no UTXOs to delete', async () => {
       try {
-      // Force DAG validation to succeed
+        // Force DAG validation to succeed
         sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
 
         // Force UTXO to fail filter
@@ -182,7 +200,7 @@ describe('#send.js', () => {
 
     it('should throw an error if utxo can not be found in database', async () => {
       try {
-      // Force DAG validation to succeed
+        // Force DAG validation to succeed
         sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
 
         // Force UTXO to fail filter
@@ -190,9 +208,12 @@ describe('#send.js', () => {
         badAddrData.utxos[0].txid = 'bad-txid'
 
         // Mock response from addr database
-        sandbox.stub(uut.addrDb, 'get')
-          .onCall(0).resolves(mockData.addrData01)
-          .onCall(1).resolves(badAddrData)
+        sandbox
+          .stub(uut.addrDb, 'get')
+          .onCall(0)
+          .resolves(mockData.addrData01)
+          .onCall(1)
+          .resolves(badAddrData)
 
         await uut.subtractTokensFromInputAddr(mockData.sendData01)
 
@@ -224,7 +245,12 @@ describe('#send.js', () => {
       const recvrAddr = 'bitcoincash:qqzewa0ljnm9cp8g56z8ua8tnqya3nthnvhv5hpu8y'
       const voutIndex = 1
       const slpAmountStr = '4354768657'
-      const result = await uut.addUtxoToOutputAddr(mockData.sendData01, recvrAddr, voutIndex, slpAmountStr)
+      const result = await uut.addUtxoToOutputAddr(
+        mockData.sendData01,
+        recvrAddr,
+        voutIndex,
+        slpAmountStr
+      )
       // console.log('result: ', result)
 
       assert.hasAllKeys(result, [
@@ -254,7 +280,11 @@ describe('#send.js', () => {
       const startVal = parseInt(mockData.addrData01.balances[0].qty.toString())
 
       // console.log(`starting mockData.addrData01: ${JSON.stringify(mockData.addrData01, null, 2)}`)
-      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(
+        mockData.addrData01,
+        mockData.sendData01.slpData,
+        0
+      )
       result = result.toString()
       // console.log('result: ', result)
 
@@ -271,7 +301,11 @@ describe('#send.js', () => {
       // Force existing balance to be for a different token
       mockData.addrData01.balances[0].tokenId = 'other-token'
 
-      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(
+        mockData.addrData01,
+        mockData.sendData01.slpData,
+        0
+      )
       result = result.toString()
       // console.log('result: ', result)
 
@@ -289,7 +323,11 @@ describe('#send.js', () => {
         qty: new BigNumber('10000')
       })
 
-      let result = uut.updateBalanceFromSend(mockData.addrData01, mockData.sendData01.slpData, 0)
+      let result = uut.updateBalanceFromSend(
+        mockData.addrData01,
+        mockData.sendData01.slpData,
+        0
+      )
       result = result.toString()
       // console.log('result: ', result)
 
@@ -374,8 +412,12 @@ describe('#send.js', () => {
     it('should process SEND data', async () => {
       // Mock dependencies
       sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
-      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves(new BigNumber(10))
+      sandbox
+        .stub(uut, 'subtractTokensFromInputAddr')
+        .resolves(new BigNumber(10))
       sandbox.stub(uut, 'addTokensFromOutput').resolves(new BigNumber(10))
+      sandbox.stub(uut, 'processControlledBurn').resolves(new BigNumber(0))
+      sandbox.stub(uut, 'updateTokenStats').resolves()
 
       const result = await uut.processTx(mockData.sendData01)
       console.log('result: ', result)
@@ -419,10 +461,12 @@ describe('#send.js', () => {
 
       const spentBN = new BigNumber(1000)
       const sentBN = new BigNumber(900)
-      const txid = 'fake-txid'
-      const tokenId = 'fake-token-id'
 
-      const result = await uut.processControlledBurn(spentBN, sentBN, txid, tokenId)
+      const result = await uut.processControlledBurn(
+        spentBN,
+        sentBN,
+        mockData.sendData01
+      )
       // console.log('result: ', result.toString())
 
       assert.equal(result.toString(), '100')
@@ -436,8 +480,91 @@ describe('#send.js', () => {
         assert.fail('Unexpected code path')
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot destructure property')
       }
+    })
+  })
+
+  describe('#updateTokenStats', () => {
+    it('should update token stats with a normal send', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(0),
+        txs: []
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(0)
+      const sentBN = new BigNumber(1000)
+      const spentBN = new BigNumber(1000)
+
+      const result = await uut.updateTokenStats(
+        mockData.sendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND')
+      assert.equal(result.txs[0].qty, '1000')
+    })
+
+    it('should update token stats with a controlled burn', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(100),
+        txs: []
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(100)
+      const spentBN = new BigNumber(1100)
+      const sentBN = new BigNumber(1000)
+
+      const result = await uut.updateTokenStats(
+        mockData.sendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND-BURN')
+      assert.equal(result.txs[0].qty, '1000')
+      assert.equal(result.txs[0].burned, '100')
+    })
+  })
+
+  describe('#reverseAddTokenFromOutput', () => {
+    // This test uses the txid of a token tx that spent more outputs than inputs,
+    // which results in a complete burn.
+    it('should delete database entries', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.addrDb, 'get')
+        .onCall(0)
+        .resolves(mockData.greaterOutputAddr01)
+        .onCall(1)
+        .resolves(mockData.greaterOutputAddr02)
+      sandbox.stub(uut, 'subtractBalanceFromSend').resolves(new BigNumber(10))
+
+      const data = mockData.greaterOutputBurn
+
+      const result = await uut.reverseAddTokenFromOutput(data)
+      // console.log('result: ', result.toString())
+
+      assert.equal(result.toString(), '20')
     })
   })
 })

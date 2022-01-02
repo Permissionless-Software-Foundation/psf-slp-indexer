@@ -6,10 +6,12 @@
   - First Send tx occurs in block 543409, txid: 874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e
   - First Mint tx occurs in block 543614 txid: ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34
 
+  ToDo: Wrap rpc calls in processBlock() in a retry wrapper.
+
 */
 
 const EPOCH = 200 // blocks between backups
-const RETRY_CNT = 25 // Number of retries before exiting the indexer
+const RETRY_CNT = 10 // Number of retries before exiting the indexer
 
 // Public npm libraries.
 const level = require('level')
@@ -77,7 +79,8 @@ class SlpIndexer {
       transaction: this.transaction,
       addrDb,
       tokenDb,
-      utxoDb
+      utxoDb,
+      txDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
@@ -169,7 +172,8 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 551645)
+      // } while (blockHeight < 657507)
+      // console.log('Target block height reached. Create new combined tx-map, then see if re-index works.')
       // process.exit(0)
 
       // Debugging: state the current state of the indexer.
@@ -515,7 +519,7 @@ class SlpIndexer {
 
         console.log(`Genesis tx processed: ${txData.txid}`)
       } else if (slpData.txType.includes('MINT')) {
-        console.log('Mint tx')
+        console.log(`Mint tx for token ID: ${slpData.tokenId}`)
 
         // console.log(`Mint data: ${JSON.stringify(data, null, 2)}`)
         await this.mint.processTx(data)
@@ -529,12 +533,14 @@ class SlpIndexer {
         console.log(`Send tx processed: ${txData.txid}`)
       }
 
-      // If a prior library did not explictely mark this TX as invalide,
+      // If a prior library did not explictely mark this TX as invalid,
       if (txData.isValidSlp !== false) {
-        // Mark TXID as valid and add the transaction to the database.
+        // Mark TXID as valid.
         txData.isValidSlp = true
-        await txDb.put(txData.txid, txData)
       }
+
+      // Add the transaction to the database
+      await txDb.put(txData.txid, txData)
 
       //
     } catch (err) {

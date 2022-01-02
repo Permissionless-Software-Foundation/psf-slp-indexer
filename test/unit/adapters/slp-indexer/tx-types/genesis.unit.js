@@ -69,8 +69,14 @@ describe('#genesis.js', () => {
 
   describe('#addTokenToDB', () => {
     it('should add a new token to the database', async () => {
-      const result = await uut.addTokenToDB(mockData.genesisData)
-      assert.equal(result, true)
+      const result = await uut.addTokenToDB(mockData.genesisData01)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that expected values exist.
+      assert.equal(result.decimals, 8)
+      assert.equal(result.mintBatonIsActive, true)
+      assert.equal(result.blockCreated, 543751)
+      assert.equal(result.totalBurned, 0)
     })
 
     it('should catch and throw errors', async () => {
@@ -83,14 +89,25 @@ describe('#genesis.js', () => {
         assert.include(err.message, 'Cannot destructure property')
       }
     })
+
+    it('should handle mint baton is set to 0', async () => {
+      const result = await uut.addTokenToDB(mockData.genesisData02)
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that expected values exist.
+      assert.equal(result.decimals, 8)
+      assert.equal(result.mintBatonIsActive, false)
+      assert.equal(result.blockCreated, 600518)
+      assert.equal(result.totalBurned, 0)
+    })
   })
 
   describe('#updateBalanceFromGenesis', () => {
     it('should update addr object', () => {
       // Convert slpData to BigNumber
-      mockData.genesisData.slpData.qty = new BigNumber(mockData.genesisData.slpData.qty)
+      mockData.genesisData01.slpData.qty = new BigNumber(mockData.genesisData01.slpData.qty)
 
-      const result = uut.updateBalanceFromGenesis(mockData.addrMock, mockData.genesisData.slpData)
+      const result = uut.updateBalanceFromGenesis(mockData.addrMock, mockData.genesisData01.slpData)
       // console.log('result: ', result)
 
       assert.equal(result, true)
@@ -98,7 +115,7 @@ describe('#genesis.js', () => {
 
     it('should skip token not associated with this tx', () => {
       // Convert slpData to BigNumber
-      mockData.genesisData.slpData.qty = new BigNumber(mockData.genesisData.slpData.qty)
+      mockData.genesisData01.slpData.qty = new BigNumber(mockData.genesisData01.slpData.qty)
 
       // Force function to skip this token entry.
       mockData.addrMock.balances.unshift({
@@ -106,7 +123,7 @@ describe('#genesis.js', () => {
         qty: '10000000000000000'
       })
 
-      const result = uut.updateBalanceFromGenesis(mockData.addrMock, mockData.genesisData.slpData)
+      const result = uut.updateBalanceFromGenesis(mockData.addrMock, mockData.genesisData01.slpData)
       // console.log('result: ', result)
 
       assert.equal(result, true)
@@ -129,7 +146,7 @@ describe('#genesis.js', () => {
       // Force code to generate new address.
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not in db'))
 
-      const result = await uut.addReceiverAddress(mockData.genesisData)
+      const result = await uut.addReceiverAddress(mockData.genesisData01)
       // console.log('result: ', result)
 
       assert.equal(result.utxos.length, 1)
@@ -144,9 +161,9 @@ describe('#genesis.js', () => {
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not in db'))
 
       // Force corner case by deleting scriptPubKey.
-      delete mockData.genesisData.txData.vout[1].scriptPubKey
+      delete mockData.genesisData01.txData.vout[1].scriptPubKey
 
-      const result = await uut.addReceiverAddress(mockData.genesisData)
+      const result = await uut.addReceiverAddress(mockData.genesisData01)
       // console.log('result: ', result)
 
       assert.equal(result, true)
@@ -169,7 +186,7 @@ describe('#genesis.js', () => {
       // Force code to generate new address.
       sandbox.stub(uut.addrDb, 'get').rejects(new Error('not in db'))
 
-      const result = await uut.addBatonAddress(mockData.genesisData)
+      const result = await uut.addBatonAddress(mockData.genesisData01)
       // console.log('result: ', result)
 
       assert.equal(result.utxos.length, 1)
@@ -179,9 +196,9 @@ describe('#genesis.js', () => {
 
     it('should exit if mint baton is dead-ended', async () => {
       // Force mint baton to be null.
-      mockData.genesisData.slpData.mintBatonVout = null
+      mockData.genesisData01.slpData.mintBatonVout = null
 
-      const result = await uut.addBatonAddress(mockData.genesisData)
+      const result = await uut.addBatonAddress(mockData.genesisData01)
       // console.log('result: ', result)
 
       assert.equal(result, undefined)
@@ -189,9 +206,9 @@ describe('#genesis.js', () => {
 
     it('should handle corner-case of mint vout = 1', async () => {
       // Force mint baton to be null.
-      mockData.genesisData.slpData.mintBatonVout = 1
+      mockData.genesisData01.slpData.mintBatonVout = 1
 
-      const result = await uut.addBatonAddress(mockData.genesisData)
+      const result = await uut.addBatonAddress(mockData.genesisData01)
       // console.log('result: ', result)
 
       assert.equal(result, undefined)
@@ -199,9 +216,9 @@ describe('#genesis.js', () => {
 
     it('should handle corner-case of mint vout does not exist', async () => {
       // Force mint baton to be null.
-      mockData.genesisData.slpData.mintBatonVout = 10
+      mockData.genesisData01.slpData.mintBatonVout = 10
 
-      const result = await uut.addBatonAddress(mockData.genesisData)
+      const result = await uut.addBatonAddress(mockData.genesisData01)
       // console.log('result: ', result)
 
       assert.equal(result, undefined)
@@ -226,7 +243,7 @@ describe('#genesis.js', () => {
       sandbox.stub(uut, 'addReceiverAddress').resolves()
       sandbox.stub(uut, 'addBatonAddress').resolves()
 
-      const result = await uut.processTx(mockData.genesisData)
+      const result = await uut.processTx(mockData.genesisData01)
       assert.equal(result, true)
     })
 
@@ -235,7 +252,7 @@ describe('#genesis.js', () => {
         // Force an error
         sandbox.stub(uut, 'addTokenToDB').rejects(new Error('test error'))
 
-        await uut.processTx(mockData.genesisData)
+        await uut.processTx(mockData.genesisData01)
 
         assert.fail('Unexpected code path')
       } catch (err) {

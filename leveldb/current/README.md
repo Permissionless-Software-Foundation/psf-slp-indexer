@@ -1,1 +1,1 @@
-This directory hold the current working database.
+This directory hold the active database.

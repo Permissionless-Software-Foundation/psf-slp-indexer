@@ -33,7 +33,7 @@ describe('#filter-block.js', () => {
     const cache = new Cache({ txDb })
     const transaction = new Transaction()
 
-    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb })
+    uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb, txDb })
   })
 
   afterEach(() => sandbox.restore())
@@ -118,6 +118,26 @@ describe('#filter-block.js', () => {
         assert.equal(
           err.message,
           'Must pass utxo DB instance when instantiating filter-block.js'
+        )
+      }
+    })
+
+    it('should throw error if tx DB is not passed in', () => {
+      try {
+        const txDb = new MockLevel()
+        const addrDb = new MockLevel()
+        const tokenDb = new MockLevel()
+        const utxoDb = new MockLevel()
+        const cache = new Cache({ txDb })
+        const transaction = new Transaction()
+
+        uut = new FilterBlock({ cache, transaction, addrDb, tokenDb, utxoDb })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(
+          err.message,
+          'Must pass transaction DB instance when instantiating filter-block.js'
         )
       }
     })
