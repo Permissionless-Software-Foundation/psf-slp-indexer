@@ -14,6 +14,7 @@
 const IPFSembedded = require('ipfs')
 const IPFSexternal = require('ipfs-http-client')
 const fs = require('fs')
+const http = require('http')
 
 // Local libraries
 const config = require('../../../config')
@@ -74,7 +75,8 @@ class IpfsAdapter {
 
       const ipfsOptionsExternal = {
         host: this.config.ipfsHost,
-        port: this.config.ipfsApiPort
+        port: this.config.ipfsApiPort,
+        agent: http.Agent({ keepAlive: true, maxSockets: 2000 })
       }
 
       let ipfsOptions = ipfsOptionsEmbedded
