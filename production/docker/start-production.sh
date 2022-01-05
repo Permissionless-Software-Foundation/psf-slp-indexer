@@ -23,7 +23,7 @@ export DEBUG_LEVEL=1
 
 
 # Production database connection string.
-export DBURL=mongodb://172.17.0.1:5555/ipfs-service-prod
+export DBURL=mongodb://172.17.0.1:5555/psf-slp-indexer-prod
 
 # Configure IPFS ports
 export IPFS_TCP_PORT=5268

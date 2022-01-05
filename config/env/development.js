@@ -7,6 +7,6 @@
 module.exports = {
   session: 'secret-boilerplate-token',
   token: 'secret-jwt-token',
-  database: 'mongodb://localhost:27017/ipfs-service-dev',
+  database: 'mongodb://localhost:27017/psf-slp-indexer-dev',
   env: 'dev'
 }
