@@ -35,10 +35,12 @@ const Query = require('./lib/query')
 // Instantiate LevelDB databases
 console.log('Opening LevelDB databases...')
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
-  valueEncoding: 'json'
+  valueEncoding: 'json',
+  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
 })
 const txDb = level(`${__dirname.toString()}/../../../leveldb/current/txs`, {
-  valueEncoding: 'json'
+  valueEncoding: 'json',
+  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
 })
 const tokenDb = level(
   `${__dirname.toString()}/../../../leveldb/current/tokens`,
@@ -90,6 +92,7 @@ class SlpIndexer {
     this.utils = new Utils()
     this.managePtxdb = new ManagePTXDB({ pTxDb })
     this.query = new Query({ addrDb, tokenDb, txDb, statusDb, pTxDb })
+    this.statusDb = statusDb
 
     // state
     this.indexState = 'phase0'
@@ -127,6 +130,10 @@ class SlpIndexer {
       let biggestBlockHeight = await this.rpc.getBlockCount()
       console.log('Current chain block height: ', biggestBlockHeight)
       console.log('Starting bulk indexing.')
+
+      // Update the status database with the chain block height.
+      status.chainBlockHeight = biggestBlockHeight
+      await statusDb.put('status', status)
 
       // Clean up stale TXs in the pTxDb.
       await this.managePtxdb.cleanPTXDB(status.syncedBlockHeight)
