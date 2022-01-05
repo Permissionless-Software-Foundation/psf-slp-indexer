@@ -44,3 +44,8 @@ const txid = '43cf6410d2b41a2087f38d83ba5340547a32dd99a5778e347667df2379708eee'
 // const TXID = 'ab406b2ddac910067e987c2d32bf5acf01396be4f5982555483e55a2975d609d'
 // const TXID = 'f36b94aa9e282d71ad9d578e4818c2d401eb928168793a8b04c3c2bb591d892b'
 // const TXID = 'c94faf77fc2cd7057eb78d258c9bed007266c212e18b8d12254daa69a1e4bed1'
+
+**UIOP2 token**
+- Token ID: 3257135d7c351f8b2f46ab2b5e610620beb7a957f3885ce1787cffa90582f503
+
+There is a pretty big discrepancy in the `totalBurned` value between psf-slp-indexer and SLPDB. This discrepency is worth investigating. 

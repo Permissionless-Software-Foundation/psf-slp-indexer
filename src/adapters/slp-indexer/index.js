@@ -35,10 +35,12 @@ const Query = require('./lib/query')
 // Instantiate LevelDB databases
 console.log('Opening LevelDB databases...')
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
-  valueEncoding: 'json'
+  valueEncoding: 'json',
+  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
 })
 const txDb = level(`${__dirname.toString()}/../../../leveldb/current/txs`, {
-  valueEncoding: 'json'
+  valueEncoding: 'json',
+  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
 })
 const tokenDb = level(
   `${__dirname.toString()}/../../../leveldb/current/tokens`,
