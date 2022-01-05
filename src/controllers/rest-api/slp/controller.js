@@ -315,6 +315,24 @@ class UserRESTControllerLib {
     }
   }
 
+  // curl -H "Content-Type: application/json" -X GET localhost:5001/slp/status
+  async status (ctx) {
+    try {
+      // const address = ctx.request.body.address
+
+      // const result = await _this.adapters.slpIndexer.query.getAddress(address)
+
+      const status = await _this.adapters.slpIndexer.statusDb.get('status')
+      // console.log('status: ', status)
+
+      ctx.body = {
+        status
+      }
+    } catch (err) {
+      _this.handleError(ctx, err)
+    }
+  }
+
   // DRY error handler
   handleError (ctx, err) {
     // If an HTTP status is specified by the buisiness logic, use that.

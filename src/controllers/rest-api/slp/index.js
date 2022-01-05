@@ -51,7 +51,7 @@ class SlpRouter {
     }
 
     // Define the routes and attach the controller.
-    // TODO: .get('/status') report sync status.
+    this.router.get('/status', this.slpRESTController.status)
     this.router.post('/address', this.slpRESTController.address)
     this.router.post('/tx', this.slpRESTController.tx)
     this.router.post('/token', this.slpRESTController.token)
