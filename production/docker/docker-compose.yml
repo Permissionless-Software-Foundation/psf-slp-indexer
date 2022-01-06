@@ -21,7 +21,7 @@ services:
       options:
         max-size: '10m'
         max-file: '10'
-    mem_limit: 500mb
+    #mem_limit: 500mb
     links:
       - mongo-slp-indexer
     ports:
@@ -29,4 +29,4 @@ services:
     volumes:
       - ../data/ipfsdata:/home/safeuser/psf-slp-indexer/.ipfsdata
       - ../data/leveldb:/home/safeuser/psf-slp-indexer/leveldb
-    restart: always
+    #restart: always
