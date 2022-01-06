@@ -13,6 +13,6 @@ module.exports = {
   // database: 'mongodb://172.17.0.1:5555/ipfs-service-prod',
   database: process.env.DBURL
     ? process.env.DBURL
-    : 'mongodb://172.17.0.1:5555/ipfs-service-prod',
+    : 'mongodb://172.17.0.1:5555/psf-slp-indexer-prod',
   env: 'prod'
 }

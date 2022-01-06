@@ -87,5 +87,12 @@ module.exports = {
   rpcPort: process.env.RPC_PORT ? process.env.RPC_PORT : '8332',
   zmqPort: process.env.ZMQ_PORT ? process.env.ZMQ_PORT : '28332',
   rpcUser: process.env.RPC_USER ? process.env.RPC_USER : 'bitcoin',
-  rpcPass: process.env.RPC_PASS ? process.env.RPC_PASS : 'password'
+  rpcPass: process.env.RPC_PASS ? process.env.RPC_PASS : 'password',
+
+  // Settings for production, using external go-ipfs node.
+  isProduction: process.env.SVC_ENV === 'production' ? true : false,
+  ipfsHost: process.env.IPFS_HOST ? process.env.IPFS_HOST : 'localhost',
+  ipfsApiPort: process.env.IPFS_API_PORT
+    ? parseInt(process.env.IPFS_API_PORT)
+    : 5001
 }

@@ -73,9 +73,11 @@ class Server {
       app.use(passport.session())
 
       // Attach REST API and JSON RPC controllers to the app.
-      await this.controllers.attachRESTControllers(app)
+      const Controllers = require('../src/controllers')
+      const controllers = new Controllers()
+      await controllers.attachRESTControllers(app)
 
-      app.controllers = this.controllers
+      app.controllers = controllers
 
       // Enable CORS for testing
       // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
