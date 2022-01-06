@@ -57,7 +57,7 @@ class IpfsCoordAdapter {
       }
     }
 
-    this.ipfsCoord = new this.IpfsCoord({
+    const ipfsCoordOptions = {
       ipfs: this.ipfs,
       type: 'node.js',
       // type: 'browser',
@@ -68,7 +68,14 @@ class IpfsCoordAdapter {
       apiInfo: this.config.apiInfo,
       announceJsonLd: this.config.announceJsonLd,
       debugLevel: this.config.debugLevel
-    })
+    }
+
+    // Production env uses external go-ipfs node.
+    if (this.config.isProduction) {
+      ipfsCoordOptions.nodeType = 'external'
+    }
+
+    this.ipfsCoord = new this.IpfsCoord(ipfsCoordOptions)
 
     // Wait for the ipfs-coord library to signal that it is ready.
     await this.ipfsCoord.start()

@@ -1,11 +1,11 @@
 # Start the service with the command 'docker-compose up -d'
 
-version: '2'
+version: '3.9'
 
 services:
-  mongo-ipfs-service:
+  mongo-slp-indexer:
     image: mongo
-    container_name: mongo-ipfs-service
+    container_name: mongo-slp-indexer
     ports:
       - '5555:27017' # <host port>:<container port>
     volumes:
@@ -13,9 +13,9 @@ services:
     command: mongod --logpath=/dev/null # -- quiet
     restart: always
 
-  ipfs-service:
+  slp-indexer:
     build: .
-    container_name: ipfs-service
+    container_name: slp-indexer
     logging:
       driver: 'json-file'
       options:
@@ -23,11 +23,9 @@ services:
         max-file: '10'
     mem_limit: 500mb
     links:
-      - mongo-ipfs-service
+      - mongo-slp-indexer
     ports:
-      - '5001:5001' # <host port>:<container port>
-      - '5268:5268' # IPFS TCP
-      - '5269:5269' # IPFS WS
+      - '5010:5010' # <host port>:<container port>
     volumes:
       - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
     restart: always

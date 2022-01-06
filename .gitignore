@@ -69,5 +69,6 @@ leveldb/
 logs/
 tx-map.json
 slp-tx-map.zip
+data/
 
 !README.md
