@@ -135,9 +135,6 @@ class SlpIndexer {
       status.chainBlockHeight = biggestBlockHeight
       await statusDb.put('status', status)
 
-      // Clean up stale TXs in the pTxDb.
-      await this.managePtxdb.cleanPTXDB(status.syncedBlockHeight)
-
       // Loop through the block heights and index every block.
       // Phase 1: Bulk indexing
       // for (
@@ -296,6 +293,9 @@ class SlpIndexer {
         console.log(`this.indexState: ${this.indexState}`)
         console.log(`Creating zip archive of database at block ${blockHeight}`)
         await this.dbBackup.zipDb(blockHeight, EPOCH)
+
+        // Clean up stale TXs in the pTxDb.
+        await this.managePtxdb.cleanPTXDB(blockHeight)
       }
 
       // Filter and sort block transactions, to make indexing more efficient
