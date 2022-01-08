@@ -4,7 +4,7 @@
   "description": "Indexer for validating SLP transactions. Uses LevelDB.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node --max_old_space_size=8000 index.js",
     "test": "npm run test:all",
     "test:all": "export SVC_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 --recursive test/unit test/e2e/automated/",
     "test:unit": "export SVC_ENV=test && mocha --exit --timeout 15000 --recursive test/unit/",

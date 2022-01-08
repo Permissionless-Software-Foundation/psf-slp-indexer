@@ -315,7 +315,36 @@ class UserRESTControllerLib {
     }
   }
 
-  // curl -H "Content-Type: application/json" -X GET localhost:5001/slp/status
+  /**
+   * @api {get} /slp/status Indexer Status
+   * @apiPermission public
+   * @apiName Status
+   * @apiGroup REST SLP
+   * @apiDescription Get the indexer status
+   *
+   * @apiExample Example usage:
+   * curl -H "Content-Type: application/json" -X GET localhost:5001/slp/status
+   *
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   * {
+   *   "status": {
+   *     "startBlockHeight": 543376,
+   *     "syncedBlockHeight": "543378",
+   *     "chainBlockHeight": "722004"
+   *   }
+   * }
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *     HTTP/1.1 422 Unprocessable Entity
+   *     {
+   *       "status": 422,
+   *       "error": "Unprocessable Entity"
+   *     }
+   */
   async status (ctx) {
     try {
       // const address = ctx.request.body.address

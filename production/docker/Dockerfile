@@ -9,7 +9,7 @@ MAINTAINER Chris Troutner <chris.troutner@gmail.com>
 
 #Update the OS and install any OS packages needed.
 RUN apt-get update
-RUN apt-get install -y sudo git curl nano gnupg wget
+RUN apt-get install -y sudo git curl nano gnupg wget zip unzip
 
 #Install Node and NPM
 RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
@@ -61,6 +61,16 @@ RUN npm install
 RUN npm run docs
 
 VOLUME /home/safeuser/keys
+
+# Make leveldb folders
+#RUN mkdir leveldb
+WORKDIR /home/safeuser/psf-slp-indexer/leveldb
+#RUN mkdir current
+#RUN mkdir zips
+RUN mkdir backup
+WORKDIR /home/safeuser/psf-slp-indexer/leveldb/zips
+COPY restore-auto.sh restore-auto.sh
+WORKDIR /home/safeuser/psf-slp-indexer
 
 # Expose the port the API will be served on.
 EXPOSE 5010

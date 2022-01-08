@@ -116,8 +116,10 @@ class DbBackup {
       const deleteBackup = parseInt(process.env.DELETE_BACKUP)
       if (deleteBackup && epoch) {
         // Delete the old backup.
-        const oldHeight = height + epoch
-        this.shell.rm(`${dbDir}/zips/slp-indexer-${oldHeight}.zip`)
+        const oldHeight = height - epoch
+        const rmStr = `${dbDir}/zips/slp-indexer-${oldHeight}.zip`
+        console.log(`rmStr: ${rmStr}`)
+        this.shell.rm(rmStr)
       }
 
       // Reopen the databases.
