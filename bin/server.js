@@ -91,8 +91,11 @@ class Server {
       const success = await this.adminLib.createSystemUser()
       if (success) console.log('System admin user created.')
 
-      // Attach the other IPFS controllers
-      await controllers.attachControllers(app)
+      // Attach the other IPFS controllers.
+      // Skip if this is a test environment.
+      if (config.env !== 'test') {
+        await controllers.attachControllers(app)
+      }
 
       // ipfs-coord has a memory leak. This app shuts down after 4 hours. It
       // expects to be run by Docker or pm2, which can automatically restart
