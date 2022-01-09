@@ -52,15 +52,19 @@ class ManagePTXDB {
 
         // If the value is older than the cutoff, delete the db entry.
         if (value <= cutoff) {
-          await this.pTxDb.del(thisKey)
-          this.cleanCnt++
+          try {
+            await this.pTxDb.del(thisKey)
+            this.cleanCnt++
+          } catch (err) {
+            console.log(`Could not delete ${thisKey} from the pTxDB`)
+          }
         }
 
         // Temp code. Delete this after 12/12/21
-        if (value === true) {
-          await this.pTxDb.del(thisKey)
-          this.cleanCnt++
-        }
+        // if (value === true) {
+        //   await this.pTxDb.del(thisKey)
+        //   this.cleanCnt++
+        // }
       }
 
       console.log(`Cleaned ${this.cleanCnt} entries from the pTxDb.`)
