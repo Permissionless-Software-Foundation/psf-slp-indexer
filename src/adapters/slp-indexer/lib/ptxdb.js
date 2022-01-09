@@ -48,7 +48,14 @@ class ManagePTXDB {
       // Loop through each TX in the database.
       for (let i = 0; i < this.keys.length; i++) {
         const thisKey = this.keys[i]
-        const value = await this.pTxDb.get(thisKey)
+
+        let value
+        try {
+          value = await this.pTxDb.get(thisKey)
+        } catch (err) {
+          // Skip if value can't be found.
+          continue
+        }
 
         // If the value is older than the cutoff, delete the db entry.
         if (value <= cutoff) {
@@ -59,15 +66,10 @@ class ManagePTXDB {
             console.log(`Could not delete ${thisKey} from the pTxDB`)
           }
         }
-
-        // Temp code. Delete this after 12/12/21
-        // if (value === true) {
-        //   await this.pTxDb.del(thisKey)
-        //   this.cleanCnt++
-        // }
       }
 
       console.log(`Cleaned ${this.cleanCnt} entries from the pTxDb.`)
+      this.cleanCnt = 0
 
       return true
     } catch (err) {
