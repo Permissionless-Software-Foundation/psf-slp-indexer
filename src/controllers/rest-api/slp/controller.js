@@ -312,8 +312,10 @@ class UserRESTControllerLib {
       const isInBlacklist = _this.adapters.slpIndexer.blacklist.checkBlacklist(tokenId)
       if (isInBlacklist) {
         ctx.body = {
+          // ToDo: Create a better mock that aligns better with existing tokens.
           tokenData: {
-            tokenId: null
+            tokenId,
+            name: 'not-available'
           }
         }
         return
