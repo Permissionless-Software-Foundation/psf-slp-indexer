@@ -53,6 +53,8 @@ class ManagePTXDB {
         try {
           value = await this.pTxDb.get(thisKey)
         } catch (err) {
+          console.log(`Warning: Could not find ${thisKey} in pTxDb`)
+
           // Skip if value can't be found.
           continue
         }
@@ -70,6 +72,7 @@ class ManagePTXDB {
 
       console.log(`Cleaned ${this.cleanCnt} entries from the pTxDb.`)
       this.cleanCnt = 0
+      this.keys = []
 
       return true
     } catch (err) {
