@@ -27,6 +27,7 @@ const Mint = require('./tx-types/mint')
 const StartStop = require('./lib/start-stop')
 const Utils = require('./lib/utils')
 const ManagePTXDB = require('./lib/ptxdb')
+const Blacklist = require('./lib/blacklist')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -85,6 +86,7 @@ class SlpReIndexer {
     this.startStop = new StartStop()
     this.utils = new Utils()
     this.managePtxdb = new ManagePTXDB({ pTxDb })
+    this.blacklist = new Blacklist()
 
     // State
     this.stopIndexing = false
@@ -399,6 +401,14 @@ class SlpReIndexer {
         // console.log('slpData: ', slpData)
 
         // console.log('height: ', blockHeight)
+
+        // Skip this TX if it is for a token that is in the blacklist.
+        const tokenId = slpData.tokenId
+        const isInBlacklist = this.blacklist.checkBlacklist(tokenId)
+        if (isInBlacklist) {
+          console.log(`Skipping TX ${tx}, it contains...\ntoken ${tokenId} which is in the blacklist.`)
+          throw new Error('TX is for token in blacklist')
+        }
 
         // Get the transaction information.
         const txData = await _this.cache.get(tx)

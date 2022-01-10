@@ -481,7 +481,6 @@ class SlpIndexer {
 
         // Skip this TX if it is for a token that is in the blacklist.
         const tokenId = slpData.tokenId
-        // console.log(`Checking token ID ${tokenId} against blacklist`)
         const isInBlacklist = this.blacklist.checkBlacklist(tokenId)
         if (isInBlacklist) {
           console.log(`Skipping TX ${tx}, it contains...\ntoken ${tokenId} which is in the blacklist.`)
