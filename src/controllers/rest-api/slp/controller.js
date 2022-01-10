@@ -2,6 +2,8 @@
   REST API Controller library for the /slp route
 */
 
+// Local libraries
+const config = require('../../../../config')
 // const { wlogger } = require('../../../adapters/wlogger')
 
 let _this
@@ -23,6 +25,7 @@ class UserRESTControllerLib {
     }
 
     // Encapsulate dependencies
+    this.config = config
     // this.UserModel = this.adapters.localdb.Users
     // this.userUseCases = this.useCases.user
 
@@ -304,6 +307,17 @@ class UserRESTControllerLib {
   async token (ctx) {
     try {
       const tokenId = ctx.request.body.tokenId
+
+      // Intercept if token is in the blacklist.
+      const isInBlacklist = _this.adapters.slpIndexer.blacklist.checkBlacklist(tokenId)
+      if (isInBlacklist) {
+        ctx.body = {
+          tokenData: {
+            tokenId: null
+          }
+        }
+        return
+      }
 
       const result = await _this.adapters.slpIndexer.query.getToken(tokenId)
 
