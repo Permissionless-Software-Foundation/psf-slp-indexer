@@ -58,6 +58,9 @@ const slpIndexer = {
     getAddress: () => {},
     getTx: () => {},
     getToken: () => {}
+  },
+  blacklist: {
+    checkBlacklist: () => {}
   }
 }
 
