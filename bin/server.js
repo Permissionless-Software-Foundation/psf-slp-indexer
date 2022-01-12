@@ -68,16 +68,17 @@ class Server {
       app.use(passport.initialize())
       app.use(passport.session())
 
+      // Enable CORS for testing
+      // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
+      // Dev Note: This line must come BEFORE controllers.attachRESTControllers()
+      app.use(cors({ origin: '*' }))
+
       // Attach REST API and JSON RPC controllers to the app.
       const Controllers = require('../src/controllers')
       const controllers = new Controllers()
       await controllers.attachRESTControllers(app)
 
       app.controllers = controllers
-
-      // Enable CORS for testing
-      // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
-      app.use(cors({ origin: '*' }))
 
       // MIDDLEWARE END
 
