@@ -40,7 +40,7 @@ class UserRESTControllerLib {
    * @apiDescription Get information about an address and its SLP balances.
    *
    * @apiExample Example usage:
-   * curl -H "Content-Type: application/json" -X POST -d '{ "user": { "email": "email@format.com", "name": "my name", "password": "secretpasas" } }' localhost:5001/users
+   * curl -H "Content-Type: application/json" -X POST -d '{ "address": "bitcoincash:qqlrzp23w08434twmvr4fxw672whkjy0py26r63g3d" }' localhost:5001/slp/address
    *
    *
    * @apiSuccessExample {json} Success-Response:
