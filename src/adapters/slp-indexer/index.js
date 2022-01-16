@@ -73,6 +73,12 @@ const utxoDb = level(`${__dirname.toString()}/../../../leveldb/current/utxos`, {
 class SlpIndexer {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
+    this.addrDb = addrDb
+    this.tokenDb = tokenDb
+    this.txDb = txDb
+    this.statusDb = statusDb
+    this.pTxDb = pTxDb
+    this.utxoDb = utxoDb
     this.rpc = new RPC()
     this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb })
     this.cache = new Cache({ txDb })
@@ -111,19 +117,7 @@ class SlpIndexer {
       this.startStop.initStartStop()
 
       // Get the current sync status.
-      let status
-      try {
-        status = await statusDb.get('status')
-      } catch (err) {
-        console.log('Error trying to get status from leveldb')
-        // New database, so there is no status. Create it.
-        status = {
-          startBlockHeight: 543376,
-          syncedBlockHeight: 543376
-        }
-
-        await statusDb.put('status', status)
-      }
+      const status = await this.getStatus()
       console.log(
         `Indexer is currently synced to height ${status.syncedBlockHeight}`
       )
@@ -266,6 +260,26 @@ class SlpIndexer {
 
       // For debugging purposes, exit if there is an error.
       process.exit(0)
+    }
+  }
+
+  // Get the status of the indexer from the status database. Initialize if
+  // this is a new run.
+  async getStatus () {
+    try {
+      const status = await this.statusDb.get('status')
+      return status
+    } catch (err) {
+      console.log('Error trying to get status from leveldb')
+      // New database, so there is no status. Create it.
+      const status = {
+        startBlockHeight: 543376,
+        syncedBlockHeight: 543376
+      }
+
+      await this.statusDb.put('status', status)
+
+      return status
     }
   }
 

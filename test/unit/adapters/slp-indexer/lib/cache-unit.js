@@ -2,6 +2,7 @@
   unit tests for the Cache library
 */
 
+// Global npm libraries
 const assert = require('chai').assert
 const sinon = require('sinon')
 
