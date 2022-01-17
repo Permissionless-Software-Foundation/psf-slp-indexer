@@ -313,7 +313,7 @@ class SlpIndexer {
         // Get the first element in the slpTxs array.
         const tx = slpTxs.shift()
         console.log(`tx: ${JSON.stringify(tx, null, 2)}`)
-        console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+        console.log(`slpTxs: ${slpTxs.length}`)
 
         try {
           // Attempt to process TX
