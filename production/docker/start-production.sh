@@ -48,5 +48,8 @@ export DELETE_BACKUP=1
 # make directories
 mkdir leveldb
 mkdir leveldb/current
+mkdir leveldb/backup
+mkdir leveldb/zips
+cp restore-auto.sh leveldb/zips/
 
 npm start
