@@ -31,7 +31,6 @@ class Adapters {
     this.jsonFiles = new JSONFiles()
     this.bchjs = new BCHJS()
     this.config = config
-    this.slpIndexer = new SlpIndexer()
 
     // Get a valid JWT API key and instance bch-js.
     this.fullStackJwt = new FullStackJWT(config)
@@ -49,10 +48,18 @@ class Adapters {
 
       // Start the IPFS node.
       // await this.ipfs.start()
+
+      // Start the indexer.
+      this.startIndexer()
     } catch (err) {
       console.error('Error in adapters/index.js/start()')
       throw err
     }
+  }
+
+  startIndexer () {
+    console.log('Instantiating SlpIndexer() in adapters/index.js')
+    this.slpIndexer = new SlpIndexer()
   }
 }
 
