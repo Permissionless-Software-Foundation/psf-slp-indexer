@@ -285,8 +285,8 @@ class SlpIndexer {
         txs,
         blockHeight
       )
-      console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-      console.log(`slpTxs.length: ${slpTxs.length}`)
+      // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      console.log(`slpTxs: ${slpTxs.length}`)
 
       // If the block has no txs after filtering for SLP txs, then return.
       if (!slpTxs.length) return
