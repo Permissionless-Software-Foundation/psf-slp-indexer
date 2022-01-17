@@ -171,7 +171,7 @@ class SlpIndexer {
       await this.zmq.connect()
       console.log('Connected to ZMQ port of full node.')
 
-      // Enter permanent loop.
+      // Enter permanent loop, processing ZMQ input.
       do {
         blockHeight = await this.rpc.getBlockCount()
         // console.log('Current chain block height: ', blockHeight)
@@ -204,9 +204,12 @@ class SlpIndexer {
 
           // process.exit(0)
 
-          await this.processBlock(blockHeight)
+          // Update the status DB.
           status.syncedBlockHeight = blockHeight
           await this.statusDb.put('status', status)
+
+          // Process the block.
+          await this.processBlock(blockHeight)
         }
 
         // Check for block re-org. Roll back database if one is encountered.
