@@ -414,6 +414,7 @@ class Send {
         txid: txData.txid,
         vout: vout,
         type: 'token',
+        tokenType: slpData.tokenType,
         qty: slpAmountStr,
         tokenId: slpData.tokenId,
         address: recvrAddr
