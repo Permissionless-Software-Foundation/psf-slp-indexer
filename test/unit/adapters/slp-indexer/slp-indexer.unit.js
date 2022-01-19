@@ -22,6 +22,10 @@ describe('#slpIndexer', () => {
 
   afterEach(() => sandbox.restore())
 
+  after(async () => {
+
+  })
+
   describe('#getStatus()', () => {
     it('should get status from the database', async () => {
       uut.statusDb = new MockLevel()
