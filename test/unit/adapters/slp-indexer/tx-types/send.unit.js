@@ -259,7 +259,8 @@ describe('#send.js', () => {
         'type',
         'qty',
         'tokenId',
-        'address'
+        'address',
+        'tokenType'
       ])
     })
 

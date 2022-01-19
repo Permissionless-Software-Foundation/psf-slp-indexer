@@ -491,7 +491,7 @@ class FilterBlock {
       // Filter out all the non-SLP transactions.
       let slpTxs = await this.filterSlpTxs(txids)
       console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
-      console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
+      // console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
 
       // No SLP txids in the array? Exit.
       if (!slpTxs.length) return []
@@ -576,8 +576,10 @@ class FilterBlock {
       // return { sortedTxids, independentTxids }
 
       // For debugging:
-      console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
-      console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
+      // console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
+      // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
+      console.log(`independentTxids: ${independentTxids.length}`)
+      console.log(`sortedTxids: ${sortedTxids.length}`)
 
       // Combine arrays with the independent txids first.
       let combined = independentTxids.concat(sortedTxids)

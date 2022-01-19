@@ -135,6 +135,7 @@ class Genesis {
         type: 'token',
         qty: slpData.qty.toString(),
         tokenId: slpData.tokenId,
+        tokenType: slpData.tokenType,
         address: recvrAddr
       }
       addr.utxos.push(utxo)

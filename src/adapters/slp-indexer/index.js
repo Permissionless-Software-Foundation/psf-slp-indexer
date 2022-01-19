@@ -10,14 +10,13 @@
 
 */
 
+// Constants use to configure indexing thresholds. Customize as needed.
 const EPOCH = 200 // blocks between backups
 const RETRY_CNT = 10 // Number of retries before exiting the indexer
 
-// Public npm libraries.
-const level = require('level')
-
 // Local libraries
 const { wlogger } = require('../wlogger')
+const LevelDb = require('./lib/level-db')
 const RPC = require('./lib/rpc')
 const DbBackup = require('./lib/db-backup')
 const Cache = require('./lib/cache')
@@ -33,45 +32,18 @@ const ManagePTXDB = require('./lib/ptxdb')
 const Query = require('./lib/query')
 const Blacklist = require('./lib/blacklist')
 
-// Instantiate LevelDB databases
-console.log('Opening LevelDB databases...')
-const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
-  valueEncoding: 'json',
-  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
-})
-const txDb = level(`${__dirname.toString()}/../../../leveldb/current/txs`, {
-  valueEncoding: 'json',
-  cacheSize: 1 * 1024 * 1024 * 1024 // 1 GB
-})
-const tokenDb = level(
-  `${__dirname.toString()}/../../../leveldb/current/tokens`,
-  {
-    valueEncoding: 'json'
-  }
-)
-const statusDb = level(
-  `${__dirname.toString()}/../../../leveldb/current/status`,
-  {
-    valueEncoding: 'json'
-  }
-)
-const pTxDb = level(`${__dirname.toString()}/../../../leveldb/current/ptxs`, {
-  valueEncoding: 'json'
-})
-
-// The UTXO database is used as a sort of reverse-lookup. The key is the TXID
-// plus vout, in this format: 'txid:vout'.
-// and the value is the vout and address. This can be used to lookup what
-// address possesses the UTXO. This makes handling of 'controlled burn' txs
-// much faster.
-const utxoDb = level(`${__dirname.toString()}/../../../leveldb/current/utxos`, {
-  valueEncoding: 'json'
-})
-
-// let _this
-
 class SlpIndexer {
   constructor (localConfig = {}) {
+    // Open the indexer databases.
+    this.levelDb = new LevelDb()
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = this.levelDb.openDbs()
+    this.addrDb = addrDb
+    this.tokenDb = tokenDb
+    this.txDb = txDb
+    this.statusDb = statusDb
+    this.pTxDb = pTxDb
+    this.utxoDb = utxoDb
+
     // Encapsulate dependencies
     this.rpc = new RPC()
     this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb })
@@ -104,26 +76,13 @@ class SlpIndexer {
 
   async start () {
     try {
-      console.log('starting SLP indexer...\n')
       wlogger.info('starting SLP indexer...')
 
       // Capture keyboard input to determine when to shut down.
       this.startStop.initStartStop()
 
       // Get the current sync status.
-      let status
-      try {
-        status = await statusDb.get('status')
-      } catch (err) {
-        console.log('Error trying to get status from leveldb')
-        // New database, so there is no status. Create it.
-        status = {
-          startBlockHeight: 543376,
-          syncedBlockHeight: 543376
-        }
-
-        await statusDb.put('status', status)
-      }
+      const status = await this.getStatus()
       console.log(
         `Indexer is currently synced to height ${status.syncedBlockHeight}`
       )
@@ -135,7 +94,7 @@ class SlpIndexer {
 
       // Update the status database with the chain block height.
       status.chainBlockHeight = biggestBlockHeight
-      await statusDb.put('status', status)
+      await this.statusDb.put('status', status)
 
       // Loop through the block heights and index every block.
       // Phase 1: Bulk indexing
@@ -151,7 +110,7 @@ class SlpIndexer {
       do {
         // Update and save the sync status.
         status.syncedBlockHeight = blockHeight
-        await statusDb.put('status', status)
+        await this.statusDb.put('status', status)
         // console.log(`Indexing block ${blockHeight}`)
 
         // Shut down elegantly if the 'q' key was detected.
@@ -212,7 +171,7 @@ class SlpIndexer {
       await this.zmq.connect()
       console.log('Connected to ZMQ port of full node.')
 
-      // Enter permanent loop.
+      // Enter permanent loop, processing ZMQ input.
       do {
         blockHeight = await this.rpc.getBlockCount()
         // console.log('Current chain block height: ', blockHeight)
@@ -245,9 +204,12 @@ class SlpIndexer {
 
           // process.exit(0)
 
-          await this.processBlock(blockHeight)
+          // Update the status DB.
           status.syncedBlockHeight = blockHeight
-          await statusDb.put('status', status)
+          await this.statusDb.put('status', status)
+
+          // Process the block.
+          await this.processBlock(blockHeight)
         }
 
         // Check for block re-org. Roll back database if one is encountered.
@@ -266,6 +228,26 @@ class SlpIndexer {
 
       // For debugging purposes, exit if there is an error.
       process.exit(0)
+    }
+  }
+
+  // Get the status of the indexer from the status database. Initialize if
+  // this is a new run.
+  async getStatus () {
+    try {
+      const status = await this.statusDb.get('status')
+      return status
+    } catch (err) {
+      console.log('Error trying to get status from leveldb')
+      // New database, so there is no status. Create it.
+      const status = {
+        startBlockHeight: 543376,
+        syncedBlockHeight: 543376
+      }
+
+      await this.statusDb.put('status', status)
+
+      return status
     }
   }
 
@@ -306,8 +288,8 @@ class SlpIndexer {
         txs,
         blockHeight
       )
-      console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-      console.log(`slpTxs.length: ${slpTxs.length}`)
+      // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      console.log(`slpTxs: ${slpTxs.length}`)
 
       // If the block has no txs after filtering for SLP txs, then return.
       if (!slpTxs.length) return
@@ -334,7 +316,7 @@ class SlpIndexer {
         // Get the first element in the slpTxs array.
         const tx = slpTxs.shift()
         console.log(`tx: ${JSON.stringify(tx, null, 2)}`)
-        console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+        console.log(`slpTxs: ${slpTxs.length}`)
 
         try {
           // Attempt to process TX
@@ -463,7 +445,7 @@ class SlpIndexer {
       // processed. If so, skip it.
       try {
         // Will throw an error if tx is not found, which is the same as false.
-        await pTxDb.get(tx)
+        await this.pTxDb.get(tx)
 
         // If TXID exists in the DB, then it's been processed. Exit.
         console.log(`${tx} already processed. Skipping.`)
@@ -509,7 +491,7 @@ class SlpIndexer {
       }
 
       // Save the TX to the processed database.
-      await pTxDb.put(tx, blockHeight)
+      await this.pTxDb.put(tx, blockHeight)
 
       // console.log(`Completed ${tx}`)
     } catch (err) {
@@ -557,7 +539,7 @@ class SlpIndexer {
       }
 
       // Add the transaction to the database
-      await txDb.put(txData.txid, txData)
+      await this.txDb.put(txData.txid, txData)
 
       //
     } catch (err) {

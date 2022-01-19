@@ -64,13 +64,13 @@ VOLUME /home/safeuser/keys
 
 # Make leveldb folders
 #RUN mkdir leveldb
-WORKDIR /home/safeuser/psf-slp-indexer/leveldb
+#WORKDIR /home/safeuser/psf-slp-indexer/leveldb
 #RUN mkdir current
 #RUN mkdir zips
-RUN mkdir backup
-WORKDIR /home/safeuser/psf-slp-indexer/leveldb/zips
+#RUN mkdir backup
+#WORKDIR /home/safeuser/psf-slp-indexer/leveldb/zips
 COPY restore-auto.sh restore-auto.sh
-WORKDIR /home/safeuser/psf-slp-indexer
+#WORKDIR /home/safeuser/psf-slp-indexer
 
 # Expose the port the API will be served on.
 EXPOSE 5010

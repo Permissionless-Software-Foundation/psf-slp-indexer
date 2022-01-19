@@ -72,16 +72,16 @@ class Server {
       app.use(passport.initialize())
       app.use(passport.session())
 
+      // Enable CORS for testing
+      // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
+      app.use(cors({ origin: '*' }))
+
       // Attach REST API and JSON RPC controllers to the app.
       const Controllers = require('../src/controllers')
       const controllers = new Controllers()
       await controllers.attachRESTControllers(app)
 
       app.controllers = controllers
-
-      // Enable CORS for testing
-      // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
-      app.use(cors({ origin: '*' }))
 
       // MIDDLEWARE END
 
@@ -95,8 +95,11 @@ class Server {
       const success = await this.adminLib.createSystemUser()
       if (success) console.log('System admin user created.')
 
-      // Attach the other IPFS controllers
-      await app.controllers.attachControllers(app)
+      // Attach the other IPFS controllers.
+      // Skip if this is a test environment.
+      if (config.env !== 'test') {
+        await controllers.attachControllers(app)
+      }
 
       // ipfs-coord has a memory leak. This app shuts down after 4 hours. It
       // expects to be run by Docker or pm2, which can automatically restart

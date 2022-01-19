@@ -59,7 +59,8 @@ class DAG {
       }
 
       if (txidAry.length > 50) {
-        console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
+        // console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
+        console.log(`Large DAG detected: ${txidAry.length} txs`)
       }
 
       // If this is the genesis TX, then exit immediately.
