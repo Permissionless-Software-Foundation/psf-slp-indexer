@@ -57,6 +57,7 @@ class Genesis {
   async addTokenToDB (data) {
     try {
       const { slpData, blockHeight } = data
+      console.log(`Genesis slpData: ${JSON.stringify(slpData, null, 2)}`)
 
       // Initialize the transaction array.
       const txInfo = {
