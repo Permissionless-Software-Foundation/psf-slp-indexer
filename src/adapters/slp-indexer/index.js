@@ -483,7 +483,7 @@ class SlpIndexer {
 
           // Mark the transaction validity as 'null' to signal that this tx
           // has not been processed and the UTXO should be ignored.
-          tx.isValidSlp = null
+          txData.isValidSlp = null
           await this.txDb.put(tx, txData)
 
           // Save the TX to the processed database.
