@@ -36,7 +36,8 @@ class SlpIndexer {
   constructor (localConfig = {}) {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = this.levelDb.openDbs()
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
+      this.levelDb.openDbs()
     this.addrDb = addrDb
     this.tokenDb = tokenDb
     this.txDb = txDb
@@ -46,7 +47,14 @@ class SlpIndexer {
 
     // Encapsulate dependencies
     this.rpc = new RPC()
-    this.dbBackup = new DbBackup({ addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb })
+    this.dbBackup = new DbBackup({
+      addrDb,
+      tokenDb,
+      txDb,
+      statusDb,
+      pTxDb,
+      utxoDb
+    })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
     this.filterBlock = new FilterBlock({
@@ -461,17 +469,28 @@ class SlpIndexer {
 
         // console.log('height: ', blockHeight)
 
+        // Get the transaction information.
+        const txData = await this.cache.get(tx)
+        // console.log('txData: ', txData)
+
         // Skip this TX if it is for a token that is in the blacklist.
         const tokenId = slpData.tokenId
         const isInBlacklist = this.blacklist.checkBlacklist(tokenId)
         if (isInBlacklist) {
-          console.log(`Skipping TX ${tx}, it contains...\ntoken ${tokenId} which is in the blacklist.`)
+          console.log(
+            `Skipping TX ${tx}, it contains...\ntoken ${tokenId} which is in the blacklist.`
+          )
+
+          // Mark the transaction validity as 'null' to signal that this tx
+          // has not been processed and the UTXO should be ignored.
+          txData.isValidSlp = null
+          await this.txDb.put(tx, txData)
+
+          // Save the TX to the processed database.
+          await this.pTxDb.put(tx, blockHeight)
+
           throw new Error('TX is for token in blacklist')
         }
-
-        // Get the transaction information.
-        const txData = await this.cache.get(tx)
-        // console.log('txData: ', txData)
 
         // Combine available data for further processing.
         dataToProcess = {
@@ -508,7 +527,20 @@ class SlpIndexer {
       // console.log('slpData: ', slpData)
 
       // For now, skip tokens that are not of type 1 (fungable SLP)
-      if (slpData.tokenType !== 1) return
+      // But mark the TX as 'null', to signal to wallets that the UTXO should
+      // be segregated so that it's not burned.
+      if (slpData.tokenType !== 1) {
+        console.log(
+          `Skipping TX ${txData.txid}, it is tokenType ${slpData.tokenType}, which is not yet supported.`
+        )
+
+        // Mark the transaction validity as 'null' to signal that this tx
+        // has not been processed and the UTXO should be ignored.
+        txData.isValidSlp = null
+        await this.txDb.put(txData.txid, txData)
+
+        return
+      }
 
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
 
@@ -533,7 +565,7 @@ class SlpIndexer {
       }
 
       // If a prior library did not explictely mark this TX as invalid,
-      if (txData.isValidSlp !== false) {
+      if (txData.isValidSlp !== false && txData.isValidSlp !== null) {
         // Mark TXID as valid.
         txData.isValidSlp = true
       }
