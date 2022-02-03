@@ -307,6 +307,7 @@ class UserRESTControllerLib {
   async token (ctx) {
     try {
       const tokenId = ctx.request.body.tokenId
+      const withTxHistory = ctx.request.body.withTxHistory
 
       // Intercept if token is in the blacklist.
       const isInBlacklist = _this.adapters.slpIndexer.blacklist.checkBlacklist(tokenId)
@@ -322,6 +323,14 @@ class UserRESTControllerLib {
       }
 
       const result = await _this.adapters.slpIndexer.query.getToken(tokenId)
+
+      // Delete the tx history if the user does not explicitely want it. This
+      // significantly reduces the size of the payload going across the internet.
+      if (!withTxHistory) {
+        delete result.txs
+      }
+
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       ctx.body = {
         tokenData: result
