@@ -389,6 +389,15 @@ class Mint {
         addr = this.util.getNewAddrObj()
       }
 
+      // Calculate the effective quantity
+      const decimals = txData.tokenDecimals
+      let effectiveQty = new BigNumber(slpData.qty).dividedBy(10 ** decimals)
+      effectiveQty = effectiveQty.toString()
+
+      // Get the BCH in the output for this utxo.
+      const output = txData.vout[1]
+      const value = output.value
+
       // Create a token UTXO.
       const utxo = {
         txid: txData.txid,
@@ -397,8 +406,13 @@ class Mint {
         qty: slpData.qty.toString(),
         tokenId: slpData.tokenId,
         tokenType: slpData.tokenType,
-        address: recvrAddr
+        address: recvrAddr,
+        effectiveQty,
+        decimals,
+        value
       }
+      // console.log(`mint utxo: ${JSON.stringify(utxo, null, 2)}`)
+
       addr.utxos.push(utxo)
       // this.util.addWithoutDuplicate(utxo, addr.utxos)
 
