@@ -407,8 +407,17 @@ class Send {
   // output of the transaction.
   async addUtxoToOutputAddr (data, recvrAddr, vout, slpAmountStr) {
     try {
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      // console.log(`addUtxoToOutputAddr data: ${JSON.stringify(data, null, 2)}`)
       const { slpData, txData } = data
+
+      // Calculate the effective quantity
+      const decimals = txData.tokenDecimals
+      let effectiveQty = new BigNumber(slpAmountStr).dividedBy(10 ** decimals)
+      effectiveQty = effectiveQty.toString()
+
+      // Get the BCH in the output for this utxo.
+      const output = txData.vout[vout]
+      const value = output.value
 
       const utxo = {
         txid: txData.txid,
@@ -417,8 +426,12 @@ class Send {
         tokenType: slpData.tokenType,
         qty: slpAmountStr,
         tokenId: slpData.tokenId,
-        address: recvrAddr
+        address: recvrAddr,
+        decimals,
+        effectiveQty,
+        value
       }
+      // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       return utxo
     } catch (err) {

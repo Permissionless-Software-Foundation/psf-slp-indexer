@@ -260,7 +260,10 @@ describe('#send.js', () => {
         'qty',
         'tokenId',
         'address',
-        'tokenType'
+        'tokenType',
+        'value',
+        'decimals',
+        'effectiveQty'
       ])
     })
 

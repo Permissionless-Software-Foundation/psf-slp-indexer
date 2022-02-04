@@ -3,6 +3,7 @@
 */
 
 const IndexerUtils = require('../lib/utils')
+const BigNumber = require('bignumber.js')
 
 class Genesis {
   constructor (localConfig = {}) {
@@ -130,6 +131,15 @@ class Genesis {
         addr = this.util.getNewAddrObj()
       }
 
+      // Calculate the effective quantity
+      const decimals = txData.tokenDecimals
+      let effectiveQty = new BigNumber(slpData.qty).dividedBy(10 ** decimals)
+      effectiveQty = effectiveQty.toString()
+
+      // Get the BCH in the output for this utxo.
+      const output = txData.vout[1]
+      const value = output.value
+
       const utxo = {
         txid: txData.txid,
         vout: 1,
@@ -137,11 +147,15 @@ class Genesis {
         qty: slpData.qty.toString(),
         tokenId: slpData.tokenId,
         tokenType: slpData.tokenType,
-        address: recvrAddr
+        address: recvrAddr,
+        effectiveQty,
+        decimals,
+        value
       }
+      // console.log(`genesis utxo: ${JSON.stringify(utxo, null, 2)}`)
+
       addr.utxos.push(utxo)
       // this.util.addWithoutDuplicate(utxo, addr.utxos)
-      console.log(`genesis utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       // Add the txid to the transaction history.
       const txObj = {
