@@ -529,18 +529,18 @@ class SlpIndexer {
       // For now, skip tokens that are not of type 1 (fungable SLP)
       // But mark the TX as 'null', to signal to wallets that the UTXO should
       // be segregated so that it's not burned.
-      if (slpData.tokenType !== 1) {
-        console.log(
-          `Skipping TX ${txData.txid}, it is tokenType ${slpData.tokenType}, which is not yet supported.`
-        )
-
-        // Mark the transaction validity as 'null' to signal that this tx
-        // has not been processed and the UTXO should be ignored.
-        txData.isValidSlp = null
-        await this.txDb.put(txData.txid, txData)
-
-        return
-      }
+      // if (slpData.tokenType !== 1) {
+      //   console.log(
+      //     `Skipping TX ${txData.txid}, it is tokenType ${slpData.tokenType}, which is not yet supported.`
+      //   )
+      //
+      //   // Mark the transaction validity as 'null' to signal that this tx
+      //   // has not been processed and the UTXO should be ignored.
+      //   txData.isValidSlp = null
+      //   await this.txDb.put(txData.txid, txData)
+      //
+      //   return
+      // }
 
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
 
