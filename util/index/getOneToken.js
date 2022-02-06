@@ -16,7 +16,7 @@ async function getOneToken () {
     const tokenData = await tokenDb.get(tokenId)
 
     tokenData.txsTotal = tokenData.txs.length
-    tokenData.txs = []
+    // tokenData.txs = []
 
     console.log(`${JSON.stringify(tokenData, null, 2)}`)
   } catch (err) {
