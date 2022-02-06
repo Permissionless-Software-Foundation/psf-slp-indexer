@@ -3,7 +3,7 @@
 */
 
 const tokenId =
-  '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0'
+  'ed503628d6f3cbc986518aa674ed7544472571ee31a2eb3777b4bd8d68175a6d'
 
 const level = require('level')
 
@@ -16,7 +16,7 @@ async function getOneToken () {
     const tokenData = await tokenDb.get(tokenId)
 
     tokenData.txsTotal = tokenData.txs.length
-    tokenData.txs = []
+    // tokenData.txs = []
 
     console.log(`${JSON.stringify(tokenData, null, 2)}`)
   } catch (err) {
