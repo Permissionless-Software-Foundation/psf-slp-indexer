@@ -5,7 +5,7 @@
 */
 
 // Global constants
-const EPOCH = 500 // blocks between backups
+const EPOCH = 400 // blocks between backups
 const RETRY_CNT = 15 // Number of retries before exiting the indexer
 
 // Load the TX map of SLP transactions in the blockchain
