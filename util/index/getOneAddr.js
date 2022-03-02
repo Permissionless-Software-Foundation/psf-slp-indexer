@@ -3,7 +3,7 @@
 */
 
 // const addr = 'bitcoincash:qq59p3sway2l5gxkv0dezf57xn4t85d2lyaa2jptwx'
-let addr = 'bitcoincash:qq4kp3w3yhhvy4gm4jgeza4vus8vpxgrwc90n8rhxe'
+let addr = 'bitcoincash:qqtjf8frmn3833fyv0qxwnyc5hlvtv277sq4nsv0nl'
 
 const level = require('level')
 const BCHJS = require('@psf/bch-js')

@@ -5,7 +5,7 @@
 */
 
 // Global constants
-const EPOCH = 200 // blocks between backups
+const EPOCH = 400 // blocks between backups
 const RETRY_CNT = 15 // Number of retries before exiting the indexer
 
 // Load the TX map of SLP transactions in the blockchain
@@ -445,8 +445,21 @@ class SlpReIndexer {
       const { slpData, txData } = data
       // console.log('slpData: ', slpData)
 
-      // For now, skip tokens that are not of type 1 (fungable SLP)
-      if (slpData.tokenType !== 1) return
+      // Skip tokens with an unknown token type.
+      // But mark the TX as 'null', to signal to wallets that the UTXO should
+      // be segregated so that it's not burned.
+      if (slpData.tokenType !== 1 && slpData.tokenType !== 65 && slpData.tokenType !== 129) {
+        console.log(
+          `Skipping TX ${txData.txid}, it is tokenType ${slpData.tokenType}, which is not yet supported.`
+        )
+
+        // Mark the transaction validity as 'null' to signal that this tx
+        // has not been processed and the UTXO should be   ignored.
+        txData.isValidSlp = null
+        await this.txDb.put(txData.txid, txData)
+
+        return
+      }
 
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
 

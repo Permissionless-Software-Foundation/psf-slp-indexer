@@ -145,8 +145,8 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 657507)
-      // console.log('Target block height reached. Create new combined tx-map, then see if re-index works.')
+      // } while (blockHeight < 729606)
+      // console.log('Target block height reached.')
       // process.exit(0)
 
       // Debugging: state the current state of the indexer.
@@ -526,16 +526,16 @@ class SlpIndexer {
       const { slpData, txData } = data
       // console.log('slpData: ', slpData)
 
-      // For now, skip tokens that are not of type 1 (fungable SLP)
+      // Skip tokens with an unknown token type.
       // But mark the TX as 'null', to signal to wallets that the UTXO should
       // be segregated so that it's not burned.
-      if (slpData.tokenType !== 1) {
+      if (slpData.tokenType !== 1 && slpData.tokenType !== 65 && slpData.tokenType !== 129) {
         console.log(
           `Skipping TX ${txData.txid}, it is tokenType ${slpData.tokenType}, which is not yet supported.`
         )
 
         // Mark the transaction validity as 'null' to signal that this tx
-        // has not been processed and the UTXO should be ignored.
+        // has not been processed and the UTXO should be   ignored.
         txData.isValidSlp = null
         await this.txDb.put(txData.txid, txData)
 

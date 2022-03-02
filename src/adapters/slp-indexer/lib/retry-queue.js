@@ -46,7 +46,12 @@ class RetryQueue {
       )
       return returnVal
     } catch (err) {
-      console.error('Error in addToQueue(): ', err)
+      if (err.message.includes('500')) {
+        console.log('Error code 500 typically indicates a TXID that does not exist. This is expected, and indexing can continue.')
+      } else {
+        console.error('Error in addToQueue(): ', err)
+      }
+
       throw err
     }
   }
