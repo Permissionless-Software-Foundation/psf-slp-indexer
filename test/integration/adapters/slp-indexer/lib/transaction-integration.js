@@ -36,7 +36,18 @@ describe('#transaction.js', () => {
       const txid = '9eb460161344c0e1e69d22c518b9706cc6db37d492d009790dcf4e55b635df71'
 
       const result = await uut.decodeOpReturn(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.tokenType, 65)
+    })
+
+    it('should properly handle a documentHash property in GENESIS tx', async () => {
+      const txid = '79a6e7caa57b8eedfbeef799bf502b02f98055d0bed9a84296346bbdb00ec003'
+
+      const result = await uut.decodeOpReturn(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.documentHash, '54ff82df2f6f19844e884e386972c5aa7a2638efb33f49c70f4f2733c47eeba5')
     })
   })
 

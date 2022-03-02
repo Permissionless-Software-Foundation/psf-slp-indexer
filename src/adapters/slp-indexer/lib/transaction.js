@@ -449,7 +449,8 @@ class Transaction {
         name: parsedData.data.name.toString(),
         tokenId: txid,
         documentUri: parsedData.data.documentUri.toString(),
-        documentHash: parsedData.data.documentHash.toString(),
+        // documentHash: parsedData.data.documentHash.toString(),
+        documentHash: parsedData.data.documentHash.toString('hex'),
         decimals: parsedData.data.decimals,
         mintBatonVout: parsedData.data.mintBatonVout,
         qty: parsedData.data.qty
