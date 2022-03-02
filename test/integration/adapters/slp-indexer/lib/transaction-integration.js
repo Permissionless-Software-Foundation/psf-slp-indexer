@@ -112,6 +112,17 @@ describe('#transaction.js', () => {
 
       assert.property(result, 'txid')
     })
+
+    it('should get details about an NFT Group Genesis TX', async () => {
+      const txid =
+        '7e0b2c51417f2ebdbee1b2fa87935682dd23ef10c6601253e2426ffa20e8a1f5'
+
+      const result = await uut.get(txid)
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.tokenType, 129)
+      assert.equal(result.isSlpTx, true)
+    })
   })
 
   describe('#getTokenInfo', () => {

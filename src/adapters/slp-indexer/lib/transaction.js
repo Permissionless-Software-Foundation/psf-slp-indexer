@@ -86,6 +86,7 @@ class Transaction {
       }
 
       // Set default as not an SLP tx
+      // TODO: Should this be null instead of false?
       txDetails.isSlpTx = false
 
       // Get Token Data
