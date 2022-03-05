@@ -74,8 +74,9 @@ describe('#IPFS', () => {
           }
         },
         adapters: {
-          orbit: {
-            privateLog: () => {}
+          pubsub: {
+            privateLog: () => {
+            }
           }
         }
       }

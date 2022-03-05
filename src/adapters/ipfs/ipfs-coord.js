@@ -91,7 +91,7 @@ class IpfsCoordAdapter {
   attachRPCRouter (router) {
     try {
       _this.ipfsCoord.privateLog = router
-      _this.ipfsCoord.adapters.orbit.privateLog = router
+      _this.ipfsCoord.adapters.pubsub.privateLog = router
     } catch (err) {
       console.error('Error in attachRPCRouter()')
       throw err
