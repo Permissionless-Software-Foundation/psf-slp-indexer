@@ -15,7 +15,7 @@ describe('#IPFS', () => {
 
   beforeEach(() => {
     const ipfs = IPFSMock.create()
-    uut = new IPFSCoordAdapter({ ipfs})
+    uut = new IPFSCoordAdapter({ ipfs })
 
     sandbox = sinon.createSandbox()
   })
