@@ -132,7 +132,7 @@ class Transaction {
 
   // Used for processing NFT (child) tokens.
   async getNftTx (txDetails, txTokenData) {
-    console.log('Processing NFT (child) GENESIS')
+    console.log('Processing NFT (child)')
 
     // Process TX Outputs
     // Add the token quantity to each output.
@@ -184,13 +184,21 @@ class Transaction {
 
         let tokenQty = 0 // Default value
 
-        // Add the decoded OP_RETURN data to the first vout
         if (i === 0) {
+          // Add the decoded OP_RETURN data to the first vout
           thisVout.opReturnData = txTokenData
 
+          thisVout.tokenQtyStr = '0'
+          thisVout.tokenQty = 0
+
+          if (i === txTokenData.mintBatonVout) {
+            // Optional dead-ended Mint baton
+            thisVout.isMintBaton = true
+          }
+        } else if (i === 1) {
           // Only vout[1] of a Genesis or Mint transaction represents the tokens.
           // Any other outputs in that transaction are normal BCH UTXOs.
-        } else if (i === 1) {
+
           tokenQty = txTokenData.qty
           // console.log(`tokenQty: ${JSON.stringify(tokenQty, null, 2)}`)
 
@@ -226,9 +234,9 @@ class Transaction {
 
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
-      console.log(
-              `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-      )
+      // console.log(
+      //         `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+      // )
 
       // Corner case: Ensure the token ID is the same.
       const vinTokenIdIsTheSame = vinTokenData.tokenId === txDetails.tokenId
@@ -348,6 +356,9 @@ class Transaction {
 
   // Used for processing 'normal' Type 1 tokens, as well as Group NFT tokens.
   async getTx01 (txDetails, txTokenData) {
+    console.log('Entering getTx01()')
+    // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+
     // Process TX Outputs
     // Add the token quantity to each output.
     // 'i' starts at 1, because vout[0] is the OP_RETURN
@@ -398,13 +409,21 @@ class Transaction {
 
         let tokenQty = 0 // Default value
 
-        // Add the decoded OP_RETURN data to the first vout
         if (i === 0) {
+          // Add the decoded OP_RETURN data to the first vout
           thisVout.opReturnData = txTokenData
 
+          thisVout.tokenQtyStr = '0'
+          thisVout.tokenQty = 0
+
+          if (i === txTokenData.mintBatonVout) {
+            // Optional dead-ended Mint baton
+            thisVout.isMintBaton = true
+          }
+        } else if (i === 1) {
           // Only vout[1] of a Genesis or Mint transaction represents the tokens.
           // Any other outputs in that transaction are normal BCH UTXOs.
-        } else if (i === 1) {
+
           tokenQty = txTokenData.qty
           // console.log(`tokenQty: ${JSON.stringify(tokenQty, null, 2)}`)
 
@@ -440,9 +459,9 @@ class Transaction {
 
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
-      console.log(
-              `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-      )
+      // console.log(
+      //         `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+      // )
 
       // Corner case: Ensure the token ID is the same.
       const vinTokenIdIsTheSame = vinTokenData.tokenId === txDetails.tokenId
