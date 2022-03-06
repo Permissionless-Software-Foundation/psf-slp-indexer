@@ -118,10 +118,18 @@ describe('#transaction.js', () => {
         '7e0b2c51417f2ebdbee1b2fa87935682dd23ef10c6601253e2426ffa20e8a1f5'
 
       const result = await uut.get(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(result.tokenType, 129)
       assert.equal(result.isSlpTx, true)
+    })
+
+    // This is the creation of an NFT (child) from an NFT Group token.
+    it('should get details about an NFT Genesis TX', async () => {
+      const txid = '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9'
+
+      const result = await uut.get(txid)
+      console.log(`result: ${JSON.stringify(result, null, 2)}`)
     })
   })
 
