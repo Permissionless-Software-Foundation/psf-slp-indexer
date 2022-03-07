@@ -134,6 +134,9 @@ class Transaction {
   async getNftTx (txDetails, txTokenData) {
     console.log('Processing NFT (child)')
 
+    // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+    // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+
     // Process TX Outputs
     // Add the token quantity to each output.
     // 'i' starts at 1, because vout[0] is the OP_RETURN
@@ -176,7 +179,7 @@ class Transaction {
         // )
       } else if (
         txTokenData.txType === 'GENESIS' ||
-              txTokenData.txType === 'MINT'
+        txTokenData.txType === 'MINT'
       ) {
         // console.log(
         //   `output txTokenData: ${JSON.stringify(txTokenData, null, 2)}`
@@ -234,16 +237,26 @@ class Transaction {
 
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
-      // console.log(
-      //         `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-      // )
+      // console.log(`vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`)
 
-      // Corner case: Ensure the token ID is the same.
+      // Is the input token ID the same? It should be for a SEND.
       const vinTokenIdIsTheSame = vinTokenData.tokenId === txDetails.tokenId
+      // console.log('vinTokenIdIsTheSame: ', vinTokenIdIsTheSame)
 
-      // If the input is not a token input, or if the tokenID is not the same,
-      // then mark the token output as null.
-      if (!vinTokenData || !vinTokenIdIsTheSame) {
+      // Is the input token ID from a Group token? It should be for a GENESIS
+      const vinTokenIsGroup =
+        vinTokenData.tokenId !== txDetails.tokenId &&
+        vinTokenData.tokenType === 129
+      // console.log('vinTokenIsGroup: ', vinTokenIsGroup)
+
+      if (vinTokenIsGroup) {
+        // If this is a NFT Genesis TX, then one of the inputs should be a Group token.
+        thisVin.tokenQty = parseFloat(vinTokenData.qty)
+        thisVin.tokenQtyStr = vinTokenData.qty
+        thisVin.tokenId = vinTokenData.tokenId
+      } else if (!vinTokenData || !vinTokenIdIsTheSame) {
+        // If the input is not a token input, or if the tokenID is not the same,
+        // then mark the token output as null.
         thisVin.tokenQty = 0
         thisVin.tokenQtyStr = '0'
         thisVin.tokenId = null
@@ -345,7 +358,7 @@ class Transaction {
         }
       } else {
         console.log(
-                `Unknown vinTokenData: ${JSON.stringify(vinTokenData, null, 2)}`
+          `Unknown vinTokenData: ${JSON.stringify(vinTokenData, null, 2)}`
         )
         throw new Error('Unknown token type in input')
       }
@@ -401,7 +414,7 @@ class Transaction {
         // )
       } else if (
         txTokenData.txType === 'GENESIS' ||
-              txTokenData.txType === 'MINT'
+        txTokenData.txType === 'MINT'
       ) {
         // console.log(
         //   `output txTokenData: ${JSON.stringify(txTokenData, null, 2)}`
@@ -570,7 +583,7 @@ class Transaction {
         }
       } else {
         console.log(
-                `Unknown vinTokenData: ${JSON.stringify(vinTokenData, null, 2)}`
+          `Unknown vinTokenData: ${JSON.stringify(vinTokenData, null, 2)}`
         )
         throw new Error('Unknown token type in input')
       }

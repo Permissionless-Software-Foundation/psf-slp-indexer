@@ -125,11 +125,20 @@ describe('#transaction.js', () => {
     })
 
     // This is the creation of an NFT (child) from an NFT Group token.
-    it('should get details about an NFT Genesis TX', async () => {
+    it('should get details about an NFT (Child) Genesis TX', async () => {
       const txid = '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9'
 
       const result = await uut.get(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 5)
+      assert.equal(result.vin[0].tokenId, 'e8c8d85f03aedd0a4ec4b5ff8885c0bad33517ba2188ed29cfcefbd76e3959ca')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
     })
   })
 
