@@ -139,11 +139,11 @@ class SlpIndexer {
 
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
-      // } while (blockHeight <= biggestBlockHeight)
+      } while (blockHeight <= biggestBlockHeight)
       // } while (blockHeight < 730199)
-      } while (blockHeight < 730296)
-      console.log('Target block height reached.')
-      process.exit(0)
+      // } while (blockHeight < 730296)
+      // console.log('Target block height reached.')
+      // process.exit(0)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
