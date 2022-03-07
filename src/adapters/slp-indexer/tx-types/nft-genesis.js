@@ -7,7 +7,6 @@ const BigNumber = require('bignumber.js')
 
 // Local libraries
 const IndexerUtils = require('../lib/utils')
-const DAG = require('../lib/dag')
 
 class NftGenesis {
   constructor (localConfig = {}) {
@@ -45,7 +44,6 @@ class NftGenesis {
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
-    this.dag = new DAG(localConfig)
   }
 
   // Primary function. Processes GENESIS transaction.
@@ -56,6 +54,7 @@ class NftGenesis {
         `Processing Genesis txid ${data.txData.txid} with ticker '${data.slpData.ticker}' and name '${data.slpData.name}'`
       )
       // const { slpData, blockHeight, txData } = data
+      // console.log(`slpData: ${JSON.stringify(data.slpData, null, 2)}`)
 
       // Verify the required inputs exist to make this a valid NFT transaction.
       const inputsAreValid = await this.validateInputs(data)
@@ -73,9 +72,6 @@ class NftGenesis {
         await this.txDb.put(txid, data.txData)
 
         return false
-      } else {
-        console.log(`nft-genesis validateInputs() succeeded for txid ${txid}`)
-        console.log(`txData with valid inputs: ${JSON.stringify(data.txData.vin, null, 2)}`)
       }
 
       // Subtract the input UTXOs and balances from input addresses.
@@ -85,8 +81,6 @@ class NftGenesis {
       await this.addTokenToDB(data)
 
       await this.addReceiverAddress(data)
-
-      // await this.addBatonAddress(data)
 
       // Signal that call completed successfully.
       return true
@@ -102,7 +96,7 @@ class NftGenesis {
   // Retui
   async validateInputs (data) {
     try {
-      console.log('Entering nft-genesis.js validateInputs()')
+      // console.log('Entering nft-genesis.js validateInputs()')
 
       const { txData } = data
       // console.log(`slpData: ${JSON.stringify(slpData, null, 2)}`)
@@ -111,7 +105,8 @@ class NftGenesis {
       // GENESIS must include spending a valid NFT1 parent token (quantity > 0) at transaction input index 0
       const groupQty = txData.vin[0].tokenQty
       if (!groupQty) {
-        console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+        // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+
         console.log(`Group token quantity is not greater than zero: ${txData.vin[0].tokenQty}`)
         return false
       }
@@ -120,6 +115,7 @@ class NftGenesis {
       const groupId = txData.vin[0].tokenId
       const groupInfo = await this.cache.get(groupId)
       // console.log(`groupInfo: ${JSON.stringify(groupInfo, null, 2)}`)
+
       if (groupInfo.tokenType !== 129) {
         console.log(`First input is not a group token: ${groupInfo.tokenType}`)
         return false
@@ -136,7 +132,7 @@ class NftGenesis {
   async addTokenToDB (data) {
     try {
       const { slpData, blockHeight } = data
-      console.log(`Genesis slpData: ${JSON.stringify(slpData, null, 2)}`)
+      // console.log(`Genesis slpData: ${JSON.stringify(slpData, null, 2)}`)
 
       // Initialize the transaction array.
       const txInfo = {
@@ -173,7 +169,7 @@ class NftGenesis {
       //   token.mintBatonIsActive = true
       // }
 
-      console.log(`NFT token Genesis: ${JSON.stringify(token, null, 2)}`)
+      // console.log(`NFT token Genesis: ${JSON.stringify(token, null, 2)}`)
 
       // Store the token data in the database.
       await this.tokenDb.put(slpData.tokenId, token)
@@ -261,70 +257,6 @@ class NftGenesis {
     }
   }
 
-  // TODO: Remove
-  // Add the address to the database, for the address recieving the minting
-  // baton.
-  async addBatonAddress (data) {
-    try {
-      const { slpData, txData, blockHeight } = data
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
-
-      // Exit if the mint baton is null or 0.
-      if (!slpData.mintBatonVout) return
-
-      // Exit if mintBatonVout is 1. That is not allowed.
-      if (slpData.mintBatonVout === 1) return
-
-      let recvrAddr
-      try {
-        recvrAddr = txData.vout[slpData.mintBatonVout].scriptPubKey.addresses[0]
-      } catch (err) {
-        // Corner case: Mint baton was specified but the output does not actually
-        // exist. In that case, the mint baton is actually burned.
-        return
-      }
-
-      // Update/add reciever address.
-      let addr
-      try {
-        // Address exists in the database
-        addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
-      } catch (err) {
-        // New address.
-        addr = this.util.getNewAddrObj()
-      }
-
-      const utxo = {
-        txid: txData.txid,
-        vout: slpData.mintBatonVout,
-        type: 'baton',
-        tokenId: slpData.tokenId,
-        address: recvrAddr
-      }
-      addr.utxos.push(utxo)
-      console.log(`mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)
-
-      // Add the txid to the transaction history.
-      const txObj = {
-        txid: txData.txid,
-        height: blockHeight
-      }
-      this.util.addTxWithoutDuplicate(txObj, addr.txs)
-
-      // Save address to the database.
-      await this.addrDb.put(recvrAddr, addr)
-
-      // Add the utxo to the utxo database
-      await this.utxoDb.put(`${utxo.txid}:${utxo.vout}`, utxo)
-
-      return addr
-    } catch (err) {
-      console.error('Error in nftGenesis.addBatonAddress()')
-      throw err
-    }
-  }
-
   // Update the balance for the given address with the given token data.
   updateBalanceFromGenesis (addrObj, slpData) {
     try {
@@ -344,6 +276,10 @@ class NftGenesis {
         addrObj.balances.push({ tokenId, qty })
         return true
       }
+
+      // TODO: I think this for-loop can be removed, since it's not possible for
+      // an address to have an existing balance of an NFT.
+      // This function was copied send.js.
 
       // Token exists in the address object, update the balance.
       for (let i = 0; i < addrObj.balances.length; i++) {
@@ -381,25 +317,6 @@ class NftGenesis {
         // If there are no tokens in this input, then skip it.
         if (!thisVin.tokenQty) continue
 
-        // If the token IDs do not match, skip it.
-        // if (thisVin.tokenId !== txData.tokenId) continue
-
-        // Do a DAG validation of the input.
-        // console.log(`crawling txid ${thisVin.txid} for token ${txData.tokenId}`)
-        // const inputIsValid = await this.dag.validateTxid(thisVin.txid)
-        // const { isValid } = await this.dag.crawlDag(
-        //   thisVin.txid,
-        //   txData.tokenId
-        // )
-        // console.log(`send.js subtractTokensFromInputAddr() crawlDag result: ${isValid}`)
-        // console.log(`dag: ${JSON.stringify(dag, null, 2)}`)
-        // if (!isValid) {
-        //   thisVin.tokenId = null
-        //   thisVin.tokenQty = 0
-        //   thisVin.tokenQtyStr = '0'
-        //   continue
-        // }
-
         // Get the DB entry for this address.
         const addrData = await this.addrDb.get(thisVin.address)
         // console.log(`data: ${JSON.stringify(data, null, 2)}`)
@@ -414,7 +331,7 @@ class NftGenesis {
         })
 
         if (!utxoToDelete.length) {
-          console.log(`\nthisVin: ${JSON.stringify(thisVin, null, 2)}`)
+          // console.log(`\nthisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
           throw new Error(`Input UTXO with TXID ${thisVin.txid} could not be found in database.
             Skipping processing of ${data.txData.txid}`)
@@ -427,7 +344,7 @@ class NftGenesis {
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        // console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // GENESIS must include spending a valid NFT1 parent token (quantity > 0) at transaction input index 0
         if (i === 0) {
@@ -458,19 +375,20 @@ class NftGenesis {
         // due to several chained UTXOs in the block, which are rapidly spending
         // tokens.
         if (!utxoToDelete.length) {
-          console.log(`\nthisVin: ${JSON.stringify(thisVin, null, 2)}`)
-          console.log(
-            `addrData.utxos: ${JSON.stringify(addrData.utxos, null, 2)}`
-          )
+          // console.log(`\nthisVin: ${JSON.stringify(thisVin, null, 2)}`)
+          // console.log(
+          //   `addrData.utxos: ${JSON.stringify(addrData.utxos, null, 2)}`
+          // )
+
           throw new Error(
             `Could not find UTXO in address ${thisVin.address} to delete when processing TX inputs.
             TXID: ${data.txData.txid}`
           )
         }
 
-        console.log(
-          `Deleting input UTXO: ${JSON.stringify(utxoToDelete[0], null, 2)}`
-        )
+        // console.log(
+        //   `Deleting input UTXO: ${JSON.stringify(utxoToDelete[0], null, 2)}`
+        // )
 
         // Delete the UTXO that was just spent.
         addrData.utxos = this.util.removeUtxoFromArray(
