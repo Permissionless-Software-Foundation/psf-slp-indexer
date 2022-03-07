@@ -132,7 +132,7 @@ class Transaction {
 
   // Used for processing NFT (child) tokens.
   async getNftTx (txDetails, txTokenData) {
-    console.log('Processing NFT (child)')
+    console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
 
     // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
     // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)

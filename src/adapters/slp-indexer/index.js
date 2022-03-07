@@ -67,7 +67,7 @@ class SlpIndexer {
       txDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
-    this.nftGenesis = new NftGenesis({ addrDb, tokenDb, utxoDb })
+    this.nftGenesis = new NftGenesis({ addrDb, tokenDb, utxoDb, txDb, cache: this.cache })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.startStop = new StartStop()
@@ -108,13 +108,6 @@ class SlpIndexer {
 
       // Loop through the block heights and index every block.
       // Phase 1: Bulk indexing
-      // for (
-      //   let blockHeight = status.syncedBlockHeight;
-      //   blockHeight < biggestBlockHeight + 1;
-      //   // blockHeight < 717796;
-      //   // blockHeight < status.syncedBlockHeight;
-      //   blockHeight++
-      // ) {
 
       let blockHeight = status.syncedBlockHeight
       do {
@@ -147,7 +140,8 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 729606)
+      // } while (blockHeight < 730199)
+      // } while (blockHeight < 730296)
       // console.log('Target block height reached.')
       // process.exit(0)
 
