@@ -128,7 +128,13 @@ describe('#transaction.js', () => {
       const txid = '046c686382c5930cc320d5c4f8675cb62adc0cbbbf86b4456067a704963a4e59'
 
       const result = await uut.get(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.vout[0].tokenQty, 0)
+      assert.equal(result.vout[1].tokenQty, 5)
+      assert.equal(result.vout[2].isMintBaton, true)
+      assert.equal(result.vout[2].tokenQty, 0)
+      assert.equal(result.vout[3].tokenQty, 0)
     })
 
     // This is the creation of an NFT (child) from an NFT Group token.
@@ -137,7 +143,7 @@ describe('#transaction.js', () => {
       const txid = '91884ea8e320ac9d133c09cfed84c1d7c063f07f5f2370d018f41018dc68a3e6'
 
       const result = await uut.get(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       // Assert that properties unique to an NFT Genesis TX exist in the output.
       assert.equal(result.vin[0].tokenQty, 5)
