@@ -132,7 +132,7 @@ class Transaction {
 
   // Used for processing NFT (child) tokens.
   async getNftTx (txDetails, txTokenData) {
-    console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
+    // console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
 
     // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
     // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
@@ -369,7 +369,7 @@ class Transaction {
 
   // Used for processing 'normal' Type 1 tokens, as well as Group NFT tokens.
   async getTx01 (txDetails, txTokenData) {
-    console.log('Entering getTx01()')
+    // console.log('Entering getTx01()')
     // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
 
     // Process TX Outputs
