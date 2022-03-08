@@ -7,7 +7,7 @@ const fs = require('fs')
 const shell = require('shelljs')
 
 const url =
-  'https://bafybeiczupejc63ppae7q5g2ulbooanbwuaxxfvvo2krn3cvl63tfvqw7i.ipfs.dweb.link/slp-tx-map.zip'
+  'https://bafybeigmljzmjbknx7bb5vwcmm5oowxuteawpvzgggqzojqatw6jibqita.ipfs.dweb.link/slp-tx-map.zip'
 
 async function getTxMap () {
   try {
