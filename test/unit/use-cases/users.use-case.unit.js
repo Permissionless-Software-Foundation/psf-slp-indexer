@@ -153,7 +153,7 @@ describe('#users-use-case', () => {
       await uut.getAllUsers()
       // console.log(`users: ${JSON.stringify(users, null, 2)}`)
 
-      // assert.isArray(users)
+    // assert.isArray(users)
     })
 
     it('should catch and throw an error', async () => {
@@ -228,8 +228,8 @@ describe('#users-use-case', () => {
       // Assert that the expected properties for the user model exist.
       // assert.property(result, 'type')
       assert.property(result, '_id')
-      // assert.property(result, 'email')
-      // assert.property(result, 'name')
+    // assert.property(result, 'email')
+    // assert.property(result, 'name')
     })
   })
 
@@ -241,7 +241,7 @@ describe('#users-use-case', () => {
         assert.fail('Unexpected code path')
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
 
@@ -346,7 +346,7 @@ describe('#users-use-case', () => {
     //   assert.equal(result.name, 'testy tester')
     // })
 
-    // TODO: verify that an admin can change the type of a user
+  // TODO: verify that an admin can change the type of a user
   })
 
   describe('#authUser', () => {
@@ -356,9 +356,9 @@ describe('#users-use-case', () => {
       await uut.authUser('test@test.com', 'password')
       // console.log('user: ', user)
 
-      // assert.property(user, '_id')
-      // assert.property(user, 'email')
-      // assert.property(user, 'name')
+    // assert.property(user, '_id')
+    // assert.property(user, 'email')
+    // assert.property(user, 'name')
     })
 
     it('should throw an error if no user matches the login', async () => {
@@ -399,7 +399,7 @@ describe('#users-use-case', () => {
         assert.fail('Unexpected code path.')
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
 
