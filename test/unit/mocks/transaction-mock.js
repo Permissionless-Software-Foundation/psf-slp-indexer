@@ -1120,6 +1120,116 @@ const mockTxIn = {
   ]
 }
 
+const nftGenesisTx01 = {
+  txid: '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9',
+  hash: '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9',
+  version: 2,
+  size: 454,
+  locktime: 0,
+  vin: [
+    {
+      txid: 'e8c8d85f03aedd0a4ec4b5ff8885c0bad33517ba2188ed29cfcefbd76e3959ca',
+      vout: 1,
+      scriptSig: {
+        asm: '3045022100f00641c2114af5248d7f6fffaa4d66a9d27c648d3e146aebb97da32bb0d07c850220556c234169bd77c8d588f7037d6d10f6b3bdc6ca2fc81647cbe82222120c7e0f[ALL|FORKID] 0260b1dbfdc44c961fb70aaf2723af36b2eaa68c2c9084a9fc9458c980bb8484e1',
+        hex: '483045022100f00641c2114af5248d7f6fffaa4d66a9d27c648d3e146aebb97da32bb0d07c850220556c234169bd77c8d588f7037d6d10f6b3bdc6ca2fc81647cbe82222120c7e0f41210260b1dbfdc44c961fb70aaf2723af36b2eaa68c2c9084a9fc9458c980bb8484e1'
+      },
+      sequence: 4294967295,
+      address: 'bitcoincash:qq4cufcxuwedzppke0hw883488hqfzw07qd3xtttaq',
+      value: 0.00000546
+    },
+    {
+      txid: 'e8c8d85f03aedd0a4ec4b5ff8885c0bad33517ba2188ed29cfcefbd76e3959ca',
+      vout: 3,
+      scriptSig: {
+        asm: '3045022100a91fb9754fcd34d1bea375cff735ef4aef5fe8c4a5286d0dbf2891da1892063c022030f06627676f7930ea1536b62c9c4fc9e4d152666c753169768007326c6db56f[ALL|FORKID] 0260b1dbfdc44c961fb70aaf2723af36b2eaa68c2c9084a9fc9458c980bb8484e1',
+        hex: '483045022100a91fb9754fcd34d1bea375cff735ef4aef5fe8c4a5286d0dbf2891da1892063c022030f06627676f7930ea1536b62c9c4fc9e4d152666c753169768007326c6db56f41210260b1dbfdc44c961fb70aaf2723af36b2eaa68c2c9084a9fc9458c980bb8484e1'
+      },
+      sequence: 4294967295,
+      address: 'bitcoincash:qq4cufcxuwedzppke0hw883488hqfzw07qd3xtttaq',
+      value: 0.0005054
+    }
+  ],
+  vout: [
+    {
+      value: 0,
+      n: 0,
+      scriptPubKey: {
+        asm: 'OP_RETURN 5262419 65 47454e45534953 4e4654303031 4e4654204368696c64 68747470733a2f2f46756c6c537461636b2e63617368 0 0 0 0000000000000001',
+        hex: '6a04534c500001410747454e45534953064e4654303031094e4654204368696c641668747470733a2f2f46756c6c537461636b2e636173684c0001004c00080000000000000001',
+        type: 'nulldata'
+      }
+    },
+    {
+      value: 0.00000546,
+      n: 1,
+      scriptPubKey: {
+        asm: 'OP_DUP OP_HASH160 2b8e2706e3b2d10436cbeee39e3539ee0489cff0 OP_EQUALVERIFY OP_CHECKSIG',
+        hex: '76a9142b8e2706e3b2d10436cbeee39e3539ee0489cff088ac',
+        reqSigs: 1,
+        type: 'pubkeyhash',
+        addresses: [
+          'bitcoincash:qq4cufcxuwedzppke0hw883488hqfzw07qd3xtttaq'
+        ]
+      }
+    },
+    {
+      value: 0.0004999,
+      n: 2,
+      scriptPubKey: {
+        asm: 'OP_DUP OP_HASH160 2b8e2706e3b2d10436cbeee39e3539ee0489cff0 OP_EQUALVERIFY OP_CHECKSIG',
+        hex: '76a9142b8e2706e3b2d10436cbeee39e3539ee0489cff088ac',
+        reqSigs: 1,
+        type: 'pubkeyhash',
+        addresses: [
+          'bitcoincash:qq4cufcxuwedzppke0hw883488hqfzw07qd3xtttaq'
+        ]
+      }
+    }
+  ],
+  hex: '0200000002ca59396ed7fbcecf29ed8821ba1735d3bac08588ffb5c44e0addae035fd8c8e8010000006b483045022100f00641c2114af5248d7f6fffaa4d66a9d27c648d3e146aebb97da32bb0d07c850220556c234169bd77c8d588f7037d6d10f6b3bdc6ca2fc81647cbe82222120c7e0f41210260b1dbfdc44c961fb70aaf2723af36b2eaa68c2c9084a9fc9458c980bb8484e1ffffffffca59396ed7fbcecf29ed8821ba1735d3bac08588ffb5c44e0addae035fd8c8e8030000006b483045022100a91fb9754fcd34d1bea375cff735ef4aef5fe8c4a5286d0dbf2891da1892063c022030f06627676f7930ea1536b62c9c4fc9e4d152666c753169768007326c6db56f41210260b1dbfdc44c961fb70aaf2723af36b2eaa68c2c9084a9fc9458c980bb8484e1ffffffff030000000000000000476a04534c500001410747454e45534953064e4654303031094e4654204368696c641668747470733a2f2f46756c6c537461636b2e636173684c0001004c0008000000000000000122020000000000001976a9142b8e2706e3b2d10436cbeee39e3539ee0489cff088ac46c30000000000001976a9142b8e2706e3b2d10436cbeee39e3539ee0489cff088ac00000000',
+  blockhash: '0000000000000000010a67a2b3d62902af82e8391ef6e5df93751dd05547cfde',
+  confirmations: 10,
+  time: 1646605243,
+  blocktime: 1646605243,
+  blockheight: 730198,
+  isSlpTx: true,
+  tokenTxType: 'GENESIS',
+  tokenId: '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9',
+  tokenType: 65,
+  tokenTicker: 'NFT001',
+  tokenName: 'NFT Child',
+  tokenDecimals: 0,
+  tokenUri: 'https://FullStack.cash',
+  tokenDocHash: ''
+}
+
+const nftGenesisTokenData01 = {
+  tokenType: 65,
+  txType: 'GENESIS',
+  ticker: 'NFT001',
+  name: 'NFT Child',
+  tokenId: '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9',
+  documentUri: 'https://FullStack.cash',
+  documentHash: '',
+  decimals: 0,
+  mintBatonVout: 0,
+  qty: '1'
+}
+
+const nftGenesisTokenData02 = {
+  tokenType: 129,
+  txType: 'GENESIS',
+  ticker: 'NFTTT',
+  name: 'NFT Test Token',
+  tokenId: 'e8c8d85f03aedd0a4ec4b5ff8885c0bad33517ba2188ed29cfcefbd76e3959ca',
+  documentUri: 'https://FullStack.cash',
+  documentHash: '',
+  decimals: 0,
+  mintBatonVout: 2,
+  qty: '5'
+}
+
 module.exports = {
   nonSlpTxDetails,
   nonSLPTxDetailsWithOpReturn,
@@ -1150,5 +1260,8 @@ module.exports = {
   txDetailsSLPNftGenesis,
   txDetailsSLPNftChild,
   mockParentTx1,
-  mockTxIn
+  mockTxIn,
+  nftGenesisTx01,
+  nftGenesisTokenData01,
+  nftGenesisTokenData02
 }

@@ -11,7 +11,7 @@
 */
 
 // Constants use to configure indexing thresholds. Customize as needed.
-const EPOCH = 200 // blocks between backups
+const EPOCH = 400 // blocks between backups
 const RETRY_CNT = 10 // Number of retries before exiting the indexer
 
 // Local libraries
@@ -23,6 +23,7 @@ const Cache = require('./lib/cache')
 const Transaction = require('./lib/transaction')
 const FilterBlock = require('./lib/filter-block')
 const Genesis = require('./tx-types/genesis')
+const NftGenesis = require('./tx-types/nft-genesis')
 const Send = require('./tx-types/send')
 const Mint = require('./tx-types/mint')
 const StartStop = require('./lib/start-stop')
@@ -66,6 +67,7 @@ class SlpIndexer {
       txDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
+    this.nftGenesis = new NftGenesis({ addrDb, tokenDb, utxoDb, txDb, cache: this.cache })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.startStop = new StartStop()
@@ -106,13 +108,6 @@ class SlpIndexer {
 
       // Loop through the block heights and index every block.
       // Phase 1: Bulk indexing
-      // for (
-      //   let blockHeight = status.syncedBlockHeight;
-      //   blockHeight < biggestBlockHeight + 1;
-      //   // blockHeight < 717796;
-      //   // blockHeight < status.syncedBlockHeight;
-      //   blockHeight++
-      // ) {
 
       let blockHeight = status.syncedBlockHeight
       do {
@@ -145,7 +140,8 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 729606)
+      // } while (blockHeight < 730199)
+      // } while (blockHeight < 730296)
       // console.log('Target block height reached.')
       // process.exit(0)
 
@@ -546,9 +542,19 @@ class SlpIndexer {
 
       // Route the data for processing, based on the type of transaction.
       if (slpData.txType.includes('GENESIS')) {
-        await this.genesis.processTx(data)
+        if (slpData.tokenType === 65) {
+          // NFT Genesis
 
-        console.log(`Genesis tx processed: ${txData.txid}`)
+          await this.nftGenesis.processTx(data)
+
+          console.log(`NFT Genesis tx processed: ${txData.txid}`)
+        } else {
+          // Type 1 and Group GENESIS
+
+          await this.genesis.processTx(data)
+
+          console.log(`Genesis tx processed: ${txData.txid}`)
+        }
       } else if (slpData.txType.includes('MINT')) {
         console.log(`Mint tx for token ID: ${slpData.tokenId}`)
 

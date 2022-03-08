@@ -118,10 +118,41 @@ describe('#transaction.js', () => {
         '7e0b2c51417f2ebdbee1b2fa87935682dd23ef10c6601253e2426ffa20e8a1f5'
 
       const result = await uut.get(txid)
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(result.tokenType, 129)
       assert.equal(result.isSlpTx, true)
+    })
+
+    it('should get details for a Group Genesis TX', async () => {
+      const txid = '046c686382c5930cc320d5c4f8675cb62adc0cbbbf86b4456067a704963a4e59'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.equal(result.vout[0].tokenQty, 0)
+      assert.equal(result.vout[1].tokenQty, 5)
+      assert.equal(result.vout[2].isMintBaton, true)
+      assert.equal(result.vout[2].tokenQty, 0)
+      assert.equal(result.vout[3].tokenQty, 0)
+    })
+
+    // This is the creation of an NFT (child) from an NFT Group token.
+    it('should get details about an NFT (Child) Genesis TX', async () => {
+      // const txid = '526b5a95bb33cbe1b7da49e90656451a964dfb5ec0b80f1e75ae83c5d009afe9'
+      const txid = '91884ea8e320ac9d133c09cfed84c1d7c063f07f5f2370d018f41018dc68a3e6'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 5)
+      // assert.equal(result.vin[0].tokenId, 'e8c8d85f03aedd0a4ec4b5ff8885c0bad33517ba2188ed29cfcefbd76e3959ca')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
     })
   })
 

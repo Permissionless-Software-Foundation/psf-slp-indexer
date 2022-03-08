@@ -362,6 +362,28 @@ describe('#Transaction', () => {
     })
   })
 
+  describe('#getNftTx', () => {
+    it('should hydrate an NFT (child) Genesis Tx', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo').resolves(mockData.nftGenesisTokenData02)
+
+      const txDetails = mockData.nftGenesisTx01
+      const txTokenData = mockData.nftGenesisTokenData01
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 5)
+      assert.equal(result.vin[0].tokenId, mockData.nftGenesisTokenData02.tokenId)
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
+    })
+  })
+
   describe('#get', () => {
     it('should throw an error if txid is not specified', async () => {
       try {

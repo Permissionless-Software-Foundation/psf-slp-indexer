@@ -275,7 +275,7 @@ class Genesis {
         return true
       }
     } catch (err) {
-      console.error('Error in indexer/utils.js/updateBalance()')
+      console.error('Error in genesis.updateBalanceFromGenesis()')
       throw err
     }
   }

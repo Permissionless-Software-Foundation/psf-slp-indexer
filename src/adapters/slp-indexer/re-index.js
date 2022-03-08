@@ -28,6 +28,7 @@ const StartStop = require('./lib/start-stop')
 const Utils = require('./lib/utils')
 const ManagePTXDB = require('./lib/ptxdb')
 const Blacklist = require('./lib/blacklist')
+const NftGenesis = require('./tx-types/nft-genesis')
 
 // Instantiate LevelDB databases
 const addrDb = level(`${__dirname.toString()}/../../../leveldb/current/addrs`, {
@@ -83,6 +84,7 @@ class SlpReIndexer {
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
+    this.nftGenesis = new NftGenesis({ addrDb, tokenDb, utxoDb, txDb, cache: this.cache })
     this.startStop = new StartStop()
     this.utils = new Utils()
     this.managePtxdb = new ManagePTXDB({ pTxDb })
@@ -465,9 +467,19 @@ class SlpReIndexer {
 
       // Route the data for processing, based on the type of transaction.
       if (slpData.txType.includes('GENESIS')) {
-        await this.genesis.processTx(data)
+        if (slpData.tokenType === 65) {
+          // NFT Genesis
 
-        console.log(`Genesis tx processed: ${txData.txid}`)
+          await this.nftGenesis.processTx(data)
+
+          console.log(`NFT Genesis tx processed: ${txData.txid}`)
+        } else {
+          // Type 1 and Group GENESIS
+
+          await this.genesis.processTx(data)
+
+          console.log(`Genesis tx processed: ${txData.txid}`)
+        }
       } else if (slpData.txType.includes('MINT')) {
         console.log('Mint tx')
 
