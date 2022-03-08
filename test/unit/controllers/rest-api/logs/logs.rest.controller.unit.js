@@ -14,7 +14,8 @@ let ctx
 const mockContext = require('../../../../unit/mocks/ctx-mock').context
 
 describe('Logapi', () => {
-  before(async () => {})
+  before(async () => {
+  })
 
   beforeEach(() => {
     uut = new LogsApiController()
@@ -35,7 +36,7 @@ describe('Logapi', () => {
         assert.fail('Unexpected result')
       } catch (err) {
         assert.equal(err.status, 422)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
 

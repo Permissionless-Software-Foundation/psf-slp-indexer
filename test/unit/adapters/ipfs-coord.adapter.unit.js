@@ -97,7 +97,7 @@ describe('#IPFS', () => {
 
         assert.fail('Unexpected code path')
       } catch (err) {
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
   })

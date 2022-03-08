@@ -69,7 +69,7 @@ describe('#Users-REST-Controller', () => {
       } catch (err) {
         // console.log(err)
         assert.equal(err.status, 422)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
 
@@ -91,9 +91,9 @@ describe('#Users-REST-Controller', () => {
       assert.property(ctx.response.body, 'user')
       assert.property(ctx.response.body, 'token')
 
-      // Used by downstream tests.
-      // testUser = ctx.response.body.user
-      // console.log('testUser: ', testUser)
+    // Used by downstream tests.
+    // testUser = ctx.response.body.user
+    // console.log('testUser: ', testUser)
     })
   })
 
@@ -181,7 +181,7 @@ describe('#Users-REST-Controller', () => {
       } catch (err) {
         // console.log(err)
         assert.equal(err.status, 422)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
 
@@ -223,7 +223,7 @@ describe('#Users-REST-Controller', () => {
       } catch (err) {
         // console.log(err)
         assert.equal(err.status, 422)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
 
