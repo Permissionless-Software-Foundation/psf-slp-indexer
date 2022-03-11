@@ -52,12 +52,6 @@ class FullStackJWT {
   // Get's a JWT token from FullStack.cash.
   async getJWT () {
     try {
-      // Skip connecting FullStack.cash auth server to the network if this is an E2E test.
-      if (process.env.TEST_TYPE === 'e2e') {
-        this.apiToken = 'faketoken'
-        return this.apiToken
-      }
-
       // Log into the auth server.
       await this.jwtLib.register()
 

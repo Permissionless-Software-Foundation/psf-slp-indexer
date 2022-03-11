@@ -74,6 +74,7 @@ class Server {
 
       // Enable CORS for testing
       // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
+      // Dev Note: This line must come BEFORE controllers.attachRESTControllers()
       app.use(cors({ origin: '*' }))
 
       // Attach REST API and JSON RPC controllers to the app.
@@ -100,13 +101,6 @@ class Server {
       if (config.env !== 'test') {
         await controllers.attachControllers(app)
       }
-
-      // ipfs-coord has a memory leak. This app shuts down after 4 hours. It
-      // expects to be run by Docker or pm2, which can automatically restart
-      // the app.
-      // setTimeout(function () {
-      //   process.exit(0)
-      // }, 60000 * 60 * 2) // 2 hours
 
       // Start the SLP Indexer
       app.controllers.adapters.slpIndexer.start()
