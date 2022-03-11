@@ -276,6 +276,9 @@ class Transaction {
         let realQty = new BigNumber(tokenQty).dividedBy(
           10 ** parseInt(txDetails.tokenDecimals)
         )
+
+        if (isNaN(realQty)) realQty = 0
+
         realQty = realQty.toString()
         // realQty = parseFloat(realQty)
 
@@ -363,6 +366,8 @@ class Transaction {
         throw new Error('Unknown token type in input')
       }
     }
+
+    // console.log(`hydrated txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
     return txDetails
   }
