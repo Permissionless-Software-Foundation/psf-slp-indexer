@@ -51,7 +51,7 @@ class NftGenesis {
     try {
       // console.log(`data: ${JSON.stringify(data, null, 2)}`)
       console.log(
-        `Processing Genesis txid ${data.txData.txid} with ticker '${data.slpData.ticker}' and name '${data.slpData.name}'`
+        `Processing NFT Genesis txid ${data.txData.txid} with ticker '${data.slpData.ticker}' and name '${data.slpData.name}'`
       )
       // const { slpData, blockHeight, txData } = data
       // console.log(`slpData: ${JSON.stringify(data.slpData, null, 2)}`)

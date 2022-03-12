@@ -113,6 +113,7 @@ class Send {
       return true
     } catch (err) {
       console.error('Error in send.processTx()')
+
       throw err
     }
   }
