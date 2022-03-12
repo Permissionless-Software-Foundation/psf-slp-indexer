@@ -154,6 +154,17 @@ class DAG {
 
           //
         } else if (parentTx.txid === tokenId) {
+          // Handle corner case with NFTs. 3/11/22 CT
+          // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+          const isNFT = parentTx.tokenType !== 1
+          const groupTokenOnVin0 = parentTx.vin[0].tokenQty > 0
+          if (isNFT && !groupTokenOnVin0) {
+            endFound = true
+            outObj.isValid = false
+            outObj.dag = []
+            return outObj
+          }
+
           // GENESIS TX Found. End of DAG.
           txidAry.unshift(parentTx.txid)
 

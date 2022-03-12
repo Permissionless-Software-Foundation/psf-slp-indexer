@@ -117,16 +117,15 @@ class Send {
       // Discard invalid SLP transaction
       // 3/11/22: Added this now that psf-slp-indexer has been running in production
       // for a couple months. Now enforcing rules that may not be enforced by SLPDB.
-
-      if (err.message.includes('could not be found in database') || err.message.includes('Key not found in database')) {
-        console.log('Error message: ', err.message)
-        console.log('Skipping transaction.')
-
-        // Mark as invalid
-        data.txData.isValidSlp = false
-
-        return false
-      }
+      // if (err.message.includes('could not be found in database') || err.message.includes('Key not found in database')) {
+      //   console.log('Error message: ', err.message)
+      //   console.log('Skipping transaction.')
+      //
+      //   // Mark as invalid
+      //   data.txData.isValidSlp = false
+      //
+      //   return false
+      // }
 
       throw err
     }
