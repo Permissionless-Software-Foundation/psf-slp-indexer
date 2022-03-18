@@ -23,7 +23,7 @@ describe('#IPFS-adapter', () => {
     sandbox.restore()
   })
 
-  describe('#Constructor', () => {
+  describe('#constructor', () => {
     it('should instantiate IPFS Lib in dev mode.', async () => {
       const _uut = new IPFSLib()
       assert.exists(_uut)
@@ -40,6 +40,7 @@ describe('#IPFS-adapter', () => {
       config.isProduction = false
     })
   })
+
   describe('#start', () => {
     it('should return a promise that resolves into an instance of IPFS.', async () => {
       // Mock dependencies.
@@ -52,6 +53,7 @@ describe('#IPFS-adapter', () => {
 
       assert.property(result, 'config')
     })
+    
     it('should return a promise that resolves into an instance of IPFS in production mode.', async () => {
       // Mock dependencies.
       uut.IPFS = IPFSMock
