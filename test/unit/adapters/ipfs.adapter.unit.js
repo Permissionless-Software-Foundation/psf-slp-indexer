@@ -53,7 +53,7 @@ describe('#IPFS-adapter', () => {
 
       assert.property(result, 'config')
     })
-    
+
     it('should return a promise that resolves into an instance of IPFS in production mode.', async () => {
       // Mock dependencies.
       uut.IPFS = IPFSMock
