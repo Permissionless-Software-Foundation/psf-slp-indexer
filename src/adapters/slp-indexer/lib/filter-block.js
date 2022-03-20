@@ -112,6 +112,7 @@ class FilterBlock {
   async filterSlpTxs (txids) {
     try {
       const slpTxs = []
+      // const nonSlpTxs = []
 
       // Add Tx to slpTxs array if it passes the OP_RETURN check.
       // This function is used below with the queue.
@@ -122,6 +123,9 @@ class FilterBlock {
         if (isSlp) {
           slpTxs.push(txid)
         } else {
+          // TODO:
+          // nonSlpTxs.push(txid)
+
           // Check if any input UTXOs are in the database. If so, delete them,
           // since they are officially burned.
           const result = await this.deleteBurnedUtxos(txid)
