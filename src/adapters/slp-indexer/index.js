@@ -288,10 +288,12 @@ class SlpIndexer {
 
       // Filter and sort block transactions, to make indexing more efficient
       // and easier to debug.
-      const slpTxs = await this.filterBlock.filterAndSortSlpTxs2(
+      const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2(
         txs,
         blockHeight
       )
+      const slpTxs = filteredTxs.combined
+      const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
       console.log(`slpTxs: ${slpTxs.length}`)
 
@@ -300,6 +302,18 @@ class SlpIndexer {
 
       // Progressively processes TXs in the array.
       await this.processSlpTxs(slpTxs, blockHeight)
+
+      // Do a second round of this.filterBlock.deleteBurnedUtxos() for
+      // all non-SLP transactions. Handles corner-case where a token UTXO
+      // is burned in the same block that it was created.
+      for (let i = 0; i < nonSlpTxs.length; i++) {
+        const thisTxid = nonSlpTxs[i]
+        const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)
+
+        if (!burnResult) {
+          console.log(`deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`)
+        }
+      }
     } catch (err) {
       console.error('Error in processBlock()')
       throw err

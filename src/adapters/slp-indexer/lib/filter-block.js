@@ -112,7 +112,7 @@ class FilterBlock {
   async filterSlpTxs (txids) {
     try {
       const slpTxs = []
-      // const nonSlpTxs = []
+      const nonSlpTxs = []
 
       // Add Tx to slpTxs array if it passes the OP_RETURN check.
       // This function is used below with the queue.
@@ -124,7 +124,7 @@ class FilterBlock {
           slpTxs.push(txid)
         } else {
           // TODO:
-          // nonSlpTxs.push(txid)
+          nonSlpTxs.push(txid)
 
           // Check if any input UTXOs are in the database. If so, delete them,
           // since they are officially burned.
@@ -163,7 +163,7 @@ class FilterBlock {
       // This should be redundent.
       await this.pQueue.onEmpty()
 
-      return slpTxs
+      return { slpTxs, nonSlpTxs }
     } catch (err) {
       console.error('Error in filterSlpTxs()')
       throw err
@@ -493,7 +493,7 @@ class FilterBlock {
       console.log(`txids before filtering: ${txids.length}`)
 
       // Filter out all the non-SLP transactions.
-      let slpTxs = await this.filterSlpTxs(txids)
+      let { slpTxs, nonSlpTxs } = await this.filterSlpTxs(txids)
       console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
       // console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
 
@@ -584,6 +584,7 @@ class FilterBlock {
       // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
       console.log(`independentTxids: ${independentTxids.length}`)
       console.log(`sortedTxids: ${sortedTxids.length}`)
+      console.log(`nonSlpTxs: ${nonSlpTxs.length}`)
 
       // Combine arrays with the independent txids first.
       let combined = independentTxids.concat(sortedTxids)
@@ -592,7 +593,7 @@ class FilterBlock {
       // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
       combined = [...new Set(combined)]
 
-      return combined
+      return { combined, nonSlpTxs }
     } catch (err) {
       console.error('Error in fitlerAndSortSlpTxs2()')
       // console.log(err)
