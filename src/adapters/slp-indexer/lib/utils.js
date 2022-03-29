@@ -115,7 +115,7 @@ class IndexerUtils {
   // Subtract a burned UTXO balance from the token data tracking that quantity.
   subtractBurnedTokens (utxoObj, tokenData) {
     try {
-      console.log(`utxoObj: ${JSON.stringify(utxoObj, null, 2)}`)
+      // console.log(`utxoObj: ${JSON.stringify(utxoObj, null, 2)}`)
 
       // Skip if this is a minting baton. No quantities to subtract.
       if (utxoObj.type === 'baton') {

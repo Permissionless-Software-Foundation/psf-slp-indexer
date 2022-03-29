@@ -103,9 +103,9 @@ class IpfsAdapter {
       console.error('Error in ipfs.js/start()')
 
       // If IPFS crashes because the /blocks directory is full, wipe the directory.
-      if (err.message.includes('No space left on device')) {
-        this.rmBlocksDir()
-      }
+      // if (err.message.includes('No space left on device')) {
+      //   this.rmBlocksDir()
+      // }
 
       throw err
     }
@@ -121,21 +121,21 @@ class IpfsAdapter {
   // Dev Note: It's assumed this node is not pinning any data and that
   // everything in this directory is transient. This folder will regularly
   // fill up and prevent IPFS from starting.
-  rmBlocksDir () {
-    try {
-      const dir = `${IPFS_DIR}/blocks`
-      console.log(`Deleting ${dir} directory...`)
-
-      this.fs.rmdirSync(dir, { recursive: true })
-
-      console.log(`${dir} directory is deleted!`)
-
-      return true // Signal successful execution.
-    } catch (err) {
-      console.log('Error in rmBlocksDir()')
-      throw err
-    }
-  }
+  // rmBlocksDir () {
+  //  try {
+  //    const dir = `${IPFS_DIR}/blocks`
+  //    console.log(`Deleting ${dir} directory...`)
+  //
+  //    this.fs.rmdirSync(dir, { recursive: true })
+  //
+  //    console.log(`${dir} directory is deleted!`)
+  //
+  //    return true // Signal successful execution.
+  //  } catch (err) {
+  //    console.log('Error in rmBlocksDir()')
+  //    throw err
+  //  }
+  // }
 }
 
 module.exports = IpfsAdapter

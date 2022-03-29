@@ -4,10 +4,11 @@
 
 const assert = require('chai').assert
 const sinon = require('sinon')
-
 const IPFSLib = require('../../../src/adapters/ipfs/ipfs')
 const IPFSMock = require('../mocks/ipfs-mock')
+const config = require('../../../config')
 
+// config.isProduction =  true;
 describe('#IPFS-adapter', () => {
   let uut
   let sandbox
@@ -18,13 +19,45 @@ describe('#IPFS-adapter', () => {
     sandbox = sinon.createSandbox()
   })
 
-  afterEach(() => sandbox.restore())
+  afterEach(() => {
+    sandbox.restore()
+  })
+
+  describe('#constructor', () => {
+    it('should instantiate IPFS Lib in dev mode.', async () => {
+      const _uut = new IPFSLib()
+      assert.exists(_uut)
+      assert.isFunction(_uut.start)
+      assert.isFunction(_uut.stop)
+    })
+
+    it('should instantiate dev IPFS Lib in production mode.', async () => {
+      config.isProduction = true
+      const _uut = new IPFSLib()
+      assert.exists(_uut)
+      assert.isFunction(_uut.start)
+      assert.isFunction(_uut.stop)
+      config.isProduction = false
+    })
+  })
 
   describe('#start', () => {
     it('should return a promise that resolves into an instance of IPFS.', async () => {
       // Mock dependencies.
       uut.IPFS = IPFSMock
 
+      const result = await uut.start()
+      // console.log('result: ', result)
+
+      assert.equal(uut.isReady, true)
+
+      assert.property(result, 'config')
+    })
+
+    it('should return a promise that resolves into an instance of IPFS in production mode.', async () => {
+      // Mock dependencies.
+      uut.IPFS = IPFSMock
+      uut.config.isProduction = true
       const result = await uut.start()
       // console.log('result: ', result)
 

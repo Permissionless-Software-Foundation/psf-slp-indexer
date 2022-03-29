@@ -141,7 +141,7 @@ class SlpIndexer {
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
       // } while (blockHeight < 638340)
-      // } while (blockHeight < 638338)
+      // } while (blockHeight < 688826)
       // console.log('Target block height reached.')
       // process.exit(0)
 
@@ -288,18 +288,33 @@ class SlpIndexer {
 
       // Filter and sort block transactions, to make indexing more efficient
       // and easier to debug.
-      const slpTxs = await this.filterBlock.filterAndSortSlpTxs2(
+      const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2(
         txs,
         blockHeight
       )
+      const slpTxs = filteredTxs.combined
+      const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-      console.log(`slpTxs: ${slpTxs.length}`)
 
       // If the block has no txs after filtering for SLP txs, then return.
-      if (!slpTxs.length) return
+      if (!slpTxs || !slpTxs.length) return
+
+      console.log(`slpTxs: ${slpTxs.length}`)
 
       // Progressively processes TXs in the array.
       await this.processSlpTxs(slpTxs, blockHeight)
+
+      // Do a second round of this.filterBlock.deleteBurnedUtxos() for
+      // all non-SLP transactions. Handles corner-case where a token UTXO
+      // is burned in the same block that it was created.
+      for (let i = 0; i < nonSlpTxs.length; i++) {
+        const thisTxid = nonSlpTxs[i]
+        const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)
+
+        if (!burnResult) {
+          console.log(`deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`)
+        }
+      }
     } catch (err) {
       console.error('Error in processBlock()')
       throw err

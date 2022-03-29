@@ -239,10 +239,11 @@ describe('#filter-block.js', () => {
         .resolves(true)
       sandbox.stub(uut, 'deleteBurnedUtxos').resolves(true)
 
-      const slpTxs = await uut.filterSlpTxs(txs)
+      const { slpTxs, nonSlpTxs } = await uut.filterSlpTxs(txs)
       // console.log(slpTxs)
 
       assert.isArray(slpTxs)
+      assert.isArray(nonSlpTxs)
       assert.equal(slpTxs.length, 1)
       assert.equal(slpTxs[0], txs[4])
     })
@@ -382,7 +383,7 @@ describe('#filter-block.js', () => {
       ]
 
       // Mock dependencies
-      sandbox.stub(uut, 'filterSlpTxs').resolves(txs)
+      sandbox.stub(uut, 'filterSlpTxs').resolves({ slpTxs: txs, nonSlpTxs: [] })
       sandbox
         .stub(uut, 'checkForParent2')
         .onCall(0)
@@ -398,12 +399,13 @@ describe('#filter-block.js', () => {
           unsortedArray: [txs[1]]
         })
 
-      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
-      assert.equal(result.length, 3)
-      assert.include(result[0], '82a9') // Independent tx
-      assert.include(result[2], 'e5ff') // newest chained tx
+      assert.equal(combined.length, 3)
+      assert.include(combined[0], '82a9') // Independent tx
+      assert.include(combined[2], 'e5ff') // newest chained tx
+      assert.isArray(nonSlpTxs)
     })
 
     it('should return an empty array if given an empty array', async () => {
