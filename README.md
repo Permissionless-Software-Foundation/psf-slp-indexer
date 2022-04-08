@@ -4,6 +4,8 @@
 
 This application crawls the Bitcoin Cash (BCH) blockchain and indexes all the SLP token transactions. This code base is intended to be a replacement for [SLPDB](https://github.com/Permissionless-Software-Foundation/docker-slpdb). The work is based on [this report](https://gist.github.com/christroutner/77c46f1fa9adaf593074d41a508a6401) and the work was funded by [this Flipstarter](https://flipstarter.fullstack.cash/).
 
+This indexer is one part of a collection of blockchain infrastructure. To understand how all the pieces fit together, read the [Cash Stack Documentation](https://permissionless-software-foundation.github.io/cashstack.info/).
+
 ## Development Status
 
 Current status: **Beta**
