@@ -4,18 +4,26 @@
 
 This application crawls the Bitcoin Cash (BCH) blockchain and indexes all the SLP token transactions. This code base is intended to be a replacement for [SLPDB](https://github.com/Permissionless-Software-Foundation/docker-slpdb). The work is based on [this report](https://gist.github.com/christroutner/77c46f1fa9adaf593074d41a508a6401) and the work was funded by [this Flipstarter](https://flipstarter.fullstack.cash/).
 
+This indexer is one part of a collection of blockchain infrastructure. To understand how all the pieces fit together, read the [Cash Stack Documentation](https://permissionless-software-foundation.github.io/cashstack.info/).
+
 ## Development Status
 
-Current status: **Alpha**
+Current status: **Beta**
 
 This project is using conventional development milestones:
 - Alpha = Under active development. Bugs are expected, things are expected to break.
-- Beta = Some bugs still exist, but code is mature enough for other professional developers to play with and contribute to.
+- Beta = Some bugs still exist, but code is mature enough for careful roll-out into production.
 - Production = Code has been heavily tested and code commits have slowed in frequency. App is ready for normal operators.
 
 Regular status updates will be reported at the [bi-weekly PSF Technical Steering Committee meetings](https://github.com/Permissionless-Software-Foundation/TSC/issues). Updates will also be reported in [this Telegram channel](https://t.me/psf_slp).
 
 **See the [developer documentation](./dev-docs) for more information.**
+
+### Videos
+
+- [Installing the psf-slp-indexer](https://youtu.be/5gF4ON9lRHI)
+- [Additional Infrastructure Videos](https://psfoundation.cash/video/) in the 'Dev Ops & Infrastructure' section.
+
 
 ## Features
 

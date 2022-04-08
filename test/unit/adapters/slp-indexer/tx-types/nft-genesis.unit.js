@@ -176,7 +176,7 @@ describe('#nft-genesis.js', () => {
         assert.fail('Unexpected code path')
       } catch (err) {
         // console.log('err: ', err)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
   })

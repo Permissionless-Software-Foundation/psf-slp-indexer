@@ -63,7 +63,7 @@ describe('#utils.js', () => {
         uut.addTxWithoutDuplicate()
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
   })
@@ -87,7 +87,7 @@ describe('#utils.js', () => {
         uut.removeUtxoFromArray()
       } catch (err) {
         // console.log(err)
-        assert.include(err.message, 'Cannot read property')
+        assert.include(err.message, 'Cannot read')
       }
     })
   })
