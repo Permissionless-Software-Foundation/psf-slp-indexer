@@ -393,11 +393,18 @@ class SlpIndexer {
   }
 
   // This function is used to roll back to a previous snapshot, when the indexer
-  // get stuck.
+  // gets stuck.
   // It determines the block height of the problematic parent transaction, then
   // rolls the database to a block height before that transaction.
   async handleProcessFailure (blockHeight, tx, errMsg) {
     try {
+      // Subtract one from the block height. This ensure we roll back to a block
+      // before where the problem  happened.
+      // This protects against a corner-case where restoring from a problematic
+      // backup, causes the indexer to get stuck in a look trying to restore the
+      // same problematic backup over and over.
+      blockHeight = blockHeight - 1
+
       console.log(`Block height: ${blockHeight}`)
       console.log(`errMsg: ${errMsg}`)
 
