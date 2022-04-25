@@ -6,7 +6,11 @@
   exiting. This library controls the backup and restore functionality.
 */
 
+// Global npm librares
 const shell = require('shelljs')
+
+// Local libraries
+const config = require('../../../../config')
 
 const dbDir = `${__dirname.toString()}/../../../../leveldb`
 
@@ -23,6 +27,7 @@ class DbBackup {
 
     // Encapsulate dependencies
     this.shell = shell
+    this.config = config
 
     // Create the backup directory if it doesn't already exist.
     // this.shell.mkdir(`${dbDir}/backup`)
@@ -113,10 +118,11 @@ class DbBackup {
         `zip -r ${dbDir}/zips/slp-indexer-${height}.zip ${dbDir}/current`
       )
 
-      const deleteBackup = parseInt(process.env.DELETE_BACKUP)
-      if (deleteBackup && epoch) {
-        // Delete the old backup.
-        const oldHeight = height - epoch
+      // const deleteBackup = parseInt(process.env.DELETE_BACKUP)
+      const backupQty = this.config.backupQty
+      if (backupQty && epoch) {
+        // Delete the oldest backup.
+        const oldHeight = height - (epoch * backupQty)
         const rmStr = `${dbDir}/zips/slp-indexer-${oldHeight}.zip`
         console.log(`rmStr: ${rmStr}`)
         this.shell.rm(rmStr)
