@@ -105,5 +105,5 @@ module.exports = {
       ],
 
   // Number of backups to retain.
-  backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5
+  backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 3
 }
