@@ -411,7 +411,7 @@ class Mint {
         decimals,
         value
       }
-      // console.log(`mint utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`mint utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       addr.utxos.push(utxo)
       // this.util.addWithoutDuplicate(utxo, addr.utxos)
