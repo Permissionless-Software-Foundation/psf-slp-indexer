@@ -185,7 +185,7 @@ class Genesis {
   async addBatonAddress (data) {
     try {
       const { slpData, txData, blockHeight } = data
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // Exit if the mint baton is null or 0.
       if (!slpData.mintBatonVout) return
@@ -218,7 +218,8 @@ class Genesis {
         vout: slpData.mintBatonVout,
         type: 'baton',
         tokenId: slpData.tokenId,
-        address: recvrAddr
+        address: recvrAddr,
+        tokenType: slpData.tokenType
       }
       addr.utxos.push(utxo)
       console.log(`mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)

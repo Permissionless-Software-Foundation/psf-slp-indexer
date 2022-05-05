@@ -3,6 +3,7 @@
 */
 
 // Public npm libraries
+const sinon = require('sinon')
 
 // Local libraries
 const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
@@ -11,8 +12,8 @@ const Mint = require('../../../../../src/adapters/slp-indexer/tx-types/mint')
 const MockLevel = require('../../../../unit/mocks/leveldb-mock')
 const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
 
-describe('#send.js', () => {
-  let uut
+describe('#mint.js', () => {
+  let uut, sandbox
 
   beforeEach(() => {
     const addrDb = new MockLevel()
@@ -26,16 +27,35 @@ describe('#send.js', () => {
     const cache = new Cache({ txDb })
 
     uut = new Mint({ cache, addrDb, tokenDb, txDb, utxoDb })
+
+    // Restore the sandbox before each test.
+    sandbox = sinon.createSandbox()
   })
 
+  afterEach(() => sandbox.restore())
+
+  // This test is not working.
   describe('#processTx', () => {
     it('should processes multisig tx', async () => {
-      const txid = '9f6cd0e64aa52086e43fe7a90b4e4e9619e81eb8ea8dced841ebfa8d3a7cf76c'
+      const txid = '7f530b22748c227dd125ffbc045dbce23fa0d0e9826a8daab3ca5837dba1d382'
 
       const data = await getData(txid)
 
+      // Stub removeBatonInAddr() as there is likely not an input to remove in the test.
+      sandbox.stub(uut, 'removeBatonInAddr').resolves()
+
+      // Stub update token stats
+      sandbox.stub(uut, 'updateTokenStats').resolves()
+
       const result = await uut.processTx(data)
       console.log('result: ', result)
+    })
+
+    it('should process Group baton', async () => {
+      const txid = '805b85ae1a7e1c1a770429a1158a8364cc8f6f1421115bcd0557cca9437d2769'
+
+      const data = await getData(txid)
+      console.log(`data: ${JSON.stringify(data, null, 2)}`)
     })
   })
 })
