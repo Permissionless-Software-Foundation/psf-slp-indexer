@@ -276,16 +276,6 @@ class SlpIndexer {
         } transactions. ${now.toLocaleString()}`
       )
 
-      // Create a zip-file backup every 'epoch' of blocks
-      if (blockHeight % EPOCH === 0 && this.indexState !== 'phase0') {
-        // Clean up stale TXs in the pTxDb.
-        await this.managePtxdb.cleanPTXDB(blockHeight)
-
-        console.log(`this.indexState: ${this.indexState}`)
-        console.log(`Creating zip archive of database at block ${blockHeight}`)
-        await this.dbBackup.zipDb(blockHeight, EPOCH)
-      }
-
       // Filter and sort block transactions, to make indexing more efficient
       // and easier to debug.
       const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2(
@@ -314,6 +304,18 @@ class SlpIndexer {
         if (!burnResult) {
           console.log(`deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`)
         }
+      }
+
+      // CT 5/6/22: Making this the last code paragraph in processBlock(), to
+      // see if it fixes issues with restoring backups.
+      // Create a zip-file backup every 'epoch' of blocks
+      if (blockHeight % EPOCH === 0 && this.indexState !== 'phase0') {
+        // Clean up stale TXs in the pTxDb.
+        await this.managePtxdb.cleanPTXDB(blockHeight)
+
+        console.log(`this.indexState: ${this.indexState}`)
+        console.log(`Creating zip archive of database at block ${blockHeight}`)
+        await this.dbBackup.zipDb(blockHeight, EPOCH)
       }
     } catch (err) {
       console.error('Error in processBlock()')
