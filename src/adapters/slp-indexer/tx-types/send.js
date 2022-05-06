@@ -210,6 +210,8 @@ class Send {
       } else if (diffBN.isLessThan(0)) {
         console.log('Outputs exceed inputs. Uncontrolled burn detected.')
         console.log(`${spentBN} tokens burned.`)
+        // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+
         // Outputs exceed inputs, which make this an invalide TX, resulting in
         // burn of all tokens. All changes made by addTokensFromOutput() need
         // to be rolled back.
@@ -276,6 +278,13 @@ class Send {
         // Subtract the token balance
         const negAmntBN = await this.subtractBalanceFromSend(addrData, utxoToDelete[0])
         // console.log(`netAmntBN: ${negAmntBN.toString()}`)
+
+        // Delete the burned UTXO
+        addrData.utxos = this.util.removeUtxoFromArray(
+          utxoToDelete[0],
+          addrData.utxos
+        )
+        // console.log('addrData after utxo delete: ', addrData)
 
         // Track the total quantity of burned tokens.
         totalBurnedBN = totalBurnedBN.plus(negAmntBN)
