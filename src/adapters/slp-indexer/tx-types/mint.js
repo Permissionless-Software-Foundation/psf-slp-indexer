@@ -290,7 +290,8 @@ class Mint {
         vout: slpData.mintBatonVout,
         type: 'baton',
         tokenId: slpData.tokenId,
-        address: recvrAddr
+        address: recvrAddr,
+        tokenType: slpData.tokenType
       }
       addr.utxos.push(utxo)
 
