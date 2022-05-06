@@ -93,6 +93,7 @@ class DAG {
 
         // Phase 1: retrieve the parent TX.
         const parentTx = await this.cache.get(thisVin.txid)
+        // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
 
         // Phase 2: Evaluate relationship between parent and child.
 
@@ -179,6 +180,19 @@ class DAG {
           //
         } else {
           // chainedParentsDetected = true
+
+          // If the DAG grows beyond a certain cut-off point, and it hasn't been
+          // invalidated prior to that point, then assume it's valid. This reduces
+          // excessive computing from really large DAGs.
+          const DAG_CUTOFF = 500
+          if (parentTx.isSlpTx && txidAry.length > DAG_CUTOFF) {
+            console.log(`Large DAG cut-off at ${DAG_CUTOFF} transactions. Assumed valid.`)
+
+            endFound = true
+            outObj.isValid = true
+            outObj.dag = txidAry
+            return outObj
+          }
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
