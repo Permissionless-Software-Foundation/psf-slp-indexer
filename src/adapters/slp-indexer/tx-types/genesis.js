@@ -58,7 +58,7 @@ class Genesis {
   async addTokenToDB (data) {
     try {
       const { slpData, blockHeight } = data
-      console.log(`Genesis slpData: ${JSON.stringify(slpData, null, 2)}`)
+      // console.log(`Genesis slpData: ${JSON.stringify(slpData, null, 2)}`)
 
       // Initialize the transaction array.
       const txInfo = {
@@ -185,7 +185,7 @@ class Genesis {
   async addBatonAddress (data) {
     try {
       const { slpData, txData, blockHeight } = data
-      console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // Exit if the mint baton is null or 0.
       if (!slpData.mintBatonVout) return
