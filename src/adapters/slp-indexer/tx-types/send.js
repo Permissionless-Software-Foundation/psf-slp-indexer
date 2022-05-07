@@ -29,9 +29,7 @@ class Send {
     // Dependency injection
     this.cache = localConfig.cache
     if (!this.cache) {
-      throw new Error(
-        'Must pass cache instance when instantiating send.js'
-      )
+      throw new Error('Must pass cache instance when instantiating send.js')
     }
     this.addrDb = localConfig.addrDb
     if (!this.addrDb) {
@@ -41,9 +39,7 @@ class Send {
     }
     this.tokenDb = localConfig.tokenDb
     if (!this.tokenDb) {
-      throw new Error(
-        'Must pass token DB instance when instantiating send.js'
-      )
+      throw new Error('Must pass token DB instance when instantiating send.js')
     }
     this.txDb = localConfig.txDb
     if (!this.txDb) {
@@ -53,9 +49,7 @@ class Send {
     }
     this.utxoDb = localConfig.utxoDb
     if (!this.utxoDb) {
-      throw new Error(
-        'Must pass utxo DB instance when instantiating send.js'
-      )
+      throw new Error('Must pass utxo DB instance when instantiating send.js')
     }
 
     // Encapsulate dependencies
@@ -179,7 +173,7 @@ class Send {
   // 'controlled burn' for a token. If a burn is detected, it updates the
   // token stats.
   async processControlledBurn (spentBN, sentBN, data) {
-  // async processControlledBurn (spentBN, sentBN, txid, tokenId) {
+    // async processControlledBurn (spentBN, sentBN, txid, tokenId) {
     try {
       const { slpData, txData } = data
       const txid = txData.txid
@@ -271,12 +265,15 @@ class Send {
 
         // Get the UTXO entry that matches the current output.
         const utxoToDelete = addrData.utxos.filter((x) => {
-          return x.txid === txid && x.vout === (1 + i)
+          return x.txid === txid && x.vout === 1 + i
         })
         console.log('utxoToDelete: ', utxoToDelete)
 
         // Subtract the token balance
-        const negAmntBN = await this.subtractBalanceFromSend(addrData, utxoToDelete[0])
+        const negAmntBN = await this.subtractBalanceFromSend(
+          addrData,
+          utxoToDelete[0]
+        )
         // console.log(`netAmntBN: ${negAmntBN.toString()}`)
 
         // Delete the burned UTXO
@@ -519,14 +516,35 @@ class Send {
         // Do a DAG validation of the input.
         // console.log(`crawling txid ${thisVin.txid} for token ${txData.tokenId}`)
         // const inputIsValid = await this.dag.validateTxid(thisVin.txid)
-        const { isValid } = await this.dag.crawlDag(thisVin.txid, txData.tokenId)
-        // console.log(`send.js subtractTokensFromInputAddr() crawlDag result: ${isValid}`)
+        const { isValid } = await this.dag.crawlDag(
+          thisVin.txid,
+          txData.tokenId
+        )
+        // console.log(
+        //   `send.js subtractTokensFromInputAddr() crawlDag result: ${isValid}`
+        // )
         // console.log(`dag: ${JSON.stringify(dag, null, 2)}`)
         if (!isValid) {
           thisVin.tokenId = null
           thisVin.tokenQty = 0
           thisVin.tokenQtyStr = '0'
           continue
+        }
+
+        // Check to see if this Vin TX is in the database.
+        try {
+          const checkTxData = await this.txDb.get(thisVin.txid)
+
+          // Skip this input if it was marked invalid
+          if (checkTxData.isValidSlp === false) {
+            thisVin.tokenId = null
+            thisVin.tokenQty = 0
+            thisVin.tokenQtyStr = '0'
+            continue
+          }
+        } catch (err) {
+          // console.log(`txid ${thisVin.txid} not found in the tx database`)
+          /* exit quietly */
         }
 
         // Get the DB entry for this address.
@@ -602,7 +620,10 @@ class Send {
         // console.log('addrData after utxo delete: ', addrData)
 
         // Subtract the token balance
-        const negAmntBN = this.subtractBalanceFromSend(addrData, utxoToDelete[0])
+        const negAmntBN = this.subtractBalanceFromSend(
+          addrData,
+          utxoToDelete[0]
+        )
         // console.log('addrData after subtractBalanceFromSend: ', addrData)
 
         // Track the total quantity of deleted tokens.
