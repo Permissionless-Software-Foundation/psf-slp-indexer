@@ -2,8 +2,13 @@
   Utility tool to retrieve token stats on a specific token
 */
 
+// Group
 const tokenId =
-  '9e2b6321faf7830d4f1fa952d8c90ad6a7bc204802978c09ecafd78832c85509'
+  'b0f842e4170fc2e3a0a178990509914e02bf5e20a3f395b32a3a3d96fe428eff'
+
+// NFT
+// const tokenId =
+//   '6f5c47c1a0d22781e6b28c5f119affd73de287b958ce8760ee02211626d4734e'
 
 const level = require('level')
 

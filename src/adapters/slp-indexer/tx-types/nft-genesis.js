@@ -49,10 +49,11 @@ class NftGenesis {
   // Primary function. Processes GENESIS transaction.
   async processTx (data) {
     try {
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      // console.log(`NFT Genesis data: ${JSON.stringify(data, null, 2)}`)
       console.log(
         `Processing NFT Genesis txid ${data.txData.txid} with ticker '${data.slpData.ticker}' and name '${data.slpData.name}'`
       )
+
       // const { slpData, blockHeight, txData } = data
       // console.log(`slpData: ${JSON.stringify(data.slpData, null, 2)}`)
 
@@ -75,10 +76,10 @@ class NftGenesis {
       }
 
       // Subtract the input UTXOs and balances from input addresses.
-      const spentBN = await this.subtractTokensFromInputAddr(data)
+      const { spentBN, groupTokenId } = await this.subtractTokensFromInputAddr(data)
       console.log(`NFT TXID ${txid} spent ${spentBN.toString()} Group tokens.`)
 
-      await this.addTokenToDB(data)
+      await this.addTokenToDB(data, groupTokenId)
 
       await this.addReceiverAddress(data)
 
@@ -129,7 +130,7 @@ class NftGenesis {
   }
 
   // Process a GENESIS transaction by adding the new token to the token database.
-  async addTokenToDB (data) {
+  async addTokenToDB (data, groupTokenId) {
     try {
       const { slpData, blockHeight } = data
       // console.log(`Genesis slpData: ${JSON.stringify(slpData, null, 2)}`)
@@ -161,7 +162,8 @@ class NftGenesis {
         blockCreated: blockHeight,
         totalBurned: '0',
         totalMinted: '1', // Force 1 as per NFT1 spec
-        txs: txArray
+        txs: txArray,
+        parentGroupId: groupTokenId
       }
 
       // Handle case if minting baton was created.
@@ -173,6 +175,13 @@ class NftGenesis {
 
       // Store the token data in the database.
       await this.tokenDb.put(slpData.tokenId, token)
+
+      // Add this token ID to the NFTs array of the Group token that spawned it.
+      const groupToken = await this.tokenDb.get(groupTokenId)
+      if (Array.isArray(groupToken.nfts)) {
+        groupToken.nfts.push(slpData.tokenId)
+        await this.tokenDb.put(groupToken.tokenId, groupToken)
+      }
 
       return token
     } catch (err) {
@@ -339,14 +348,16 @@ class NftGenesis {
       }
 
       let total = new BigNumber(0)
+      let groupTokenId = ''
 
       // Loop through and process each input and delete the input UTXO
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        // console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
-        // GENESIS must include spending a valid NFT1 parent token (quantity > 0) at transaction input index 0
+        // GENESIS must include spending a valid NFT1 parent token
+        // (quantity > 0) at transaction input index 0
         if (i === 0) {
           if (!thisVin.tokenQty) {
             throw new Error('NFT does not have Group token as input.')
@@ -358,6 +369,9 @@ class NftGenesis {
 
         // If the token IDs do not match, skip it.
         // if (thisVin.tokenId !== txData.tokenId) continue
+
+        groupTokenId = thisVin.tokenId
+        console.log(`Group Token ID used to generate this NFT: ${groupTokenId}`)
 
         // Get the DB entry for this address.
         const addrData = await this.addrDb.get(thisVin.address)
@@ -421,8 +435,10 @@ class NftGenesis {
         await this.utxoDb.del(`${utxoToDelete[0].txid}:${utxoToDelete[0].vout}`)
       }
 
-      // Return true to indicate that the TX was processed.
-      return total
+      // Return the amount of Group tokens consumed
+      const spentBN = total
+      return { spentBN, groupTokenId }
+
       // const inputTx = await this.txDb.get()
     } catch (err) {
       console.error(
