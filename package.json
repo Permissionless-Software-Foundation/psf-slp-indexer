@@ -25,7 +25,7 @@
   "repository": "Permissionless-Software-Foundation/psf-slp-indexer",
   "dependencies": {
     "@chris.troutner/slp-validate": "1.2.2",
-    "@psf/bch-js": "6.2.9",
+    "@psf/bch-js": "6.4.0",
     "@psf/bitcoincash-zmq-decoder": "0.1.5",
     "axios": "0.21.1",
     "bcryptjs": "2.4.3",
