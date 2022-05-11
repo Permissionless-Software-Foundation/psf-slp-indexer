@@ -93,6 +93,11 @@ class Genesis {
         token.mintBatonIsActive = true
       }
 
+      // Add NFT array for Group tokens
+      if (slpData.tokenType === 129) {
+        token.nfts = []
+      }
+
       console.log(`token Genesis: ${JSON.stringify(token, null, 2)}`)
 
       // Store the token data in the database.

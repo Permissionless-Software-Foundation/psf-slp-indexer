@@ -191,11 +191,12 @@ describe('#nft-genesis.js', () => {
         blockHeight: 730295
       }
 
-      let result = await uut.subtractTokensFromInputAddr(data)
-      result = result.toString()
-      // console.log('result: ', result)
+      const { spentBN, groupTokenId } = await uut.subtractTokensFromInputAddr(data)
+      // result = result.toString()
+      // console.log('groupTokenId: ', groupTokenId)
 
-      assert.equal(result, '5')
+      assert.equal(spentBN.toString(), '5')
+      assert.equal(groupTokenId, '046c686382c5930cc320d5c4f8675cb62adc0cbbbf86b4456067a704963a4e59')
     })
 
     it('should throw an error if there are no UTXOs to delete', async () => {
@@ -374,7 +375,7 @@ describe('#nft-genesis.js', () => {
     it('should execute lower functions', async () => {
       // Mock dependencies
       sandbox.stub(uut, 'validateInputs').resolves(true)
-      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves('1')
+      sandbox.stub(uut, 'subtractTokensFromInputAddr').resolves({ spentBN: '1', groupTokenId: 'fakeId' })
       sandbox.stub(uut, 'addTokenToDB').resolves()
       sandbox.stub(uut, 'addReceiverAddress').resolves()
 
