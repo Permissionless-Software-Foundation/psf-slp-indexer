@@ -148,6 +148,17 @@ describe('#dag.js', () => {
         assert.equal(result.isValid, false)
         assert.equal(result.dag.length, 0)
       })
+
+      // This is from MIST token, which has very large DAGs.
+      it('should inspect large DAG from MIST token', async () => {
+        const txid = '0cb4824d3e41790f4af5fe1c402c26d2c75767c250a14eb9b03982a802569c62'
+        const tokenId = 'd6876f0fce603be43f15d34348bb1de1a8d688e1152596543da033a060cff798'
+
+        const result = await uut.crawlDag(txid, tokenId)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+        assert.equal(result.isValid, true)
+      })
     })
   })
 })

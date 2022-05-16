@@ -65,8 +65,8 @@ class Mint {
       // Validate the TX against the SLP DAG.
       const txid = data.txData.txid
       const tokenId = data.txData.tokenId
-      // const { isValid } = await this.dag.crawlDag(txid, tokenId)
-      const { isValid, dag } = await this.dag.crawlDag(txid, tokenId)
+      const { isValid } = await this.dag.crawlDag(txid, tokenId)
+      // const { isValid, dag } = await this.dag.crawlDag(txid, tokenId)
       // console.log('isValid: ', isValid)
       if (!isValid) {
         console.log(`MINT TXID ${txid} failed DAG validation. Skipping.`)
@@ -79,7 +79,7 @@ class Mint {
       }
 
       console.log('isValid: ', isValid)
-      console.log(`dag: ${JSON.stringify(dag, null, 2)}`)
+      // console.log(`dag: ${JSON.stringify(dag, null, 2)}`)
 
       // Ensure the inputs to the tx have a valid mint baton.
       const batonVin = this.findBatonInput(data)

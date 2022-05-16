@@ -39,7 +39,9 @@ class Cache {
 
     // Try to get txData from the database.
     try {
+      // console.log(`key: ${key}`)
       txData = await this.txDb.get(key)
+      // console.log('~~>Result coming from database')
 
       return txData
     } catch (err) {
@@ -49,6 +51,7 @@ class Cache {
     // Get TX Data from full node if it's not in the cache.
     txData = await this.transaction.get(key)
     // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+    // console.log('~~>Result coming from full node')
 
     // Save the data to the *local* cache.
     this.put(key, txData)
