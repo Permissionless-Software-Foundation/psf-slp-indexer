@@ -71,13 +71,11 @@ npm install
 The [docker](./production/docker) directory contains a Dockerfile for building a production deployment.
 
 ```
-docker-compose build --no-cache
+docker-compose pull
 docker-compose up -d
 ```
 
-- Bring the containers up once, then take them back down with `docker-compose down`.
-- Copy the [swarm.key](./swarm.key) file to `ipfs-service-provider/production/data/go-ipfs/data/swarm.key`.
-- Bring the containers back up with `docker-compose up -d`.
+You can bring the containers back up with `docker-compose up -d`.
 
 ### Operation Notes
 
