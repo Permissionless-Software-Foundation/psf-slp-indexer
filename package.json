@@ -23,7 +23,7 @@
   },
   "repository": "Permissionless-Software-Foundation/ipfs-service-provider",
   "dependencies": {
-    "@psf/bch-js": "6.2.1",
+    "@psf/bch-js": "6.4.1",
     "axios": "0.21.1",
     "bcryptjs": "2.4.3",
     "glob": "7.1.6",
