@@ -99,7 +99,7 @@ class Server {
       }
 
       // Display configuration settings
-      console.log(`\nConfiguration:`)
+      console.log('\nConfiguration:')
       console.log(`Circuit Relay: ${config.isCircuitRelay}`)
       console.log(`IPFS TCP port: ${config.ipfsTcpPort}`)
       console.log(`IPFS WS port: ${config.ipfsWsPort}\n`)
