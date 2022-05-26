@@ -2,6 +2,7 @@
   top-level IPFS library that combines the individual IPFS-based libraries.
 */
 
+// Local libraries
 const IpfsAdapter = require('./ipfs')
 const IpfsCoordAdapter = require('./ipfs-coord')
 
@@ -35,6 +36,9 @@ class IPFS {
       })
       await this.ipfsCoordAdapter.start()
       console.log('ipfs-coord is ready.')
+
+      // Subscribe to the chat pubsub channel
+      await this.ipfsCoordAdapter.subscribeToChat()
 
       return true
     } catch (err) {

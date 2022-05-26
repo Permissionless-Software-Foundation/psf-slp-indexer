@@ -98,6 +98,12 @@ class Server {
         await controllers.attachControllers(app)
       }
 
+      // Display configuration settings
+      console.log('\nConfiguration:')
+      console.log(`Circuit Relay: ${config.isCircuitRelay}`)
+      console.log(`IPFS TCP port: ${config.ipfsTcpPort}`)
+      console.log(`IPFS WS port: ${config.ipfsWsPort}\n`)
+
       return app
     } catch (err) {
       console.error('Could not start server. Error: ', err)
