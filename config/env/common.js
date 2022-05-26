@@ -85,5 +85,7 @@ module.exports = {
   ipfsHost: process.env.IPFS_HOST ? process.env.IPFS_HOST : 'localhost',
   ipfsApiPort: process.env.IPFS_API_PORT
     ? parseInt(process.env.IPFS_API_PORT)
-    : 5001
+    : 5001,
+
+  chatPubSubChan: 'psf-ipfs-chat-001'
 }
