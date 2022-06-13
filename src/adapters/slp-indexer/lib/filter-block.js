@@ -17,6 +17,7 @@ const BigNumber = require('bignumber.js')
 // Local Libraries
 // const config = require('../../../config')
 const Utils = require('./utils')
+const Blacklist = require('./blacklist')
 
 class FilterBlock {
   constructor (localConfig = {}) {
@@ -62,6 +63,7 @@ class FilterBlock {
     this.pQueue = new PQueue({ concurrency: 20 })
     this.pRetry = pRetry
     this.utils = new Utils()
+    this.blacklist = new Blacklist()
 
     // Number of retry attempts
     this.attempts = 5
@@ -118,12 +120,20 @@ class FilterBlock {
       // This function is used below with the queue.
       const processTx = async (txid) => {
         // Is the TX an SLP TX?
-        const isSlp = await this.transaction.getTokenInfo(txid)
+        let isSlp = await this.transaction.getTokenInfo(txid)
+        // console.log(`isSlp: ${JSON.stringify(isSlp, null, 2)}`)
+
+        // Force TX to be non-token, if it *is* a token in the blacklist.
+        if (isSlp) {
+          const isInBlacklist = this.blacklist.checkBlacklist(isSlp.tokenId)
+
+          if (isInBlacklist) isSlp = false
+        }
 
         if (isSlp) {
           slpTxs.push(txid)
         } else {
-          // TODO:
+          // Non-token TX
           nonSlpTxs.push(txid)
 
           // Check if any input UTXOs are in the database. If so, delete them,

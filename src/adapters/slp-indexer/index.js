@@ -67,7 +67,13 @@ class SlpIndexer {
       txDb
     })
     this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
-    this.nftGenesis = new NftGenesis({ addrDb, tokenDb, utxoDb, txDb, cache: this.cache })
+    this.nftGenesis = new NftGenesis({
+      addrDb,
+      tokenDb,
+      utxoDb,
+      txDb,
+      cache: this.cache
+    })
     this.send = new Send({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.mint = new Mint({ addrDb, tokenDb, txDb, utxoDb, cache: this.cache })
     this.startStop = new StartStop()
@@ -175,8 +181,11 @@ class SlpIndexer {
       await this.zmq.connect()
       console.log('Connected to ZMQ port of full node.')
 
+      let loopCnt = 0
+
       // Enter permanent loop, processing ZMQ input.
       do {
+        // TODO: add getBlockCounty to a auto-retry in case it fails.
         blockHeight = await this.rpc.getBlockCount()
         // console.log('Current chain block height: ', blockHeight)
         // console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
@@ -222,6 +231,15 @@ class SlpIndexer {
 
         // Wait a few seconds between loops.
         await this.utils.sleep(50)
+
+        // Periodically print to the console to indicate that the ZMQ is being
+        // monitored.
+        loopCnt++
+        if (loopCnt > 100) {
+          loopCnt = 0
+          const now = new Date()
+          console.log(`Checked ZMQ. ${now.toLocaleString()}`)
+        }
       } while (1)
     } catch (err) {
       console.log('Error in indexer: ', err)
@@ -302,7 +320,9 @@ class SlpIndexer {
         const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)
 
         if (!burnResult) {
-          console.log(`deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`)
+          console.log(
+            `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
+          )
         }
       }
 
@@ -549,7 +569,11 @@ class SlpIndexer {
       // Skip tokens with an unknown token type.
       // But mark the TX as 'null', to signal to wallets that the UTXO should
       // be segregated so that it's not burned.
-      if (slpData.tokenType !== 1 && slpData.tokenType !== 65 && slpData.tokenType !== 129) {
+      if (
+        slpData.tokenType !== 1 &&
+        slpData.tokenType !== 65 &&
+        slpData.tokenType !== 129
+      ) {
         console.log(
           `Skipping TX ${txData.txid}, it is tokenType ${slpData.tokenType}, which is not yet supported.`
         )
