@@ -79,7 +79,7 @@ class ZMQ {
 
   // Get the next TX in the queue
   getTx () {
-    console.log(`this.txQueue.length: ${this.txQueue.length}`)
+    // console.log(`this.txQueue.length: ${this.txQueue.length}`)
     let nextTx = this.txQueue.shift()
     // console.log(`nextTx: ${JSON.stringify(nextTx, null, 2)}`)
 
@@ -90,7 +90,7 @@ class ZMQ {
 
   // Get the next block in the queue
   getBlock () {
-    console.log(`this.blockQueue.length: ${this.blockQueue.length}`)
+    // console.log(`this.blockQueue.length: ${this.blockQueue.length}`)
     let nextBlock = _this.blockQueue.shift()
 
     if (nextBlock === undefined) nextBlock = false
