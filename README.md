@@ -14,7 +14,7 @@ This repository has been forked from the [koa-api-boilerplate](https://github.co
 - User management
 - Access and rate-limit control using [JWT tokens](https://jwt.io/).
 
-This boilerplate extends that code to provide the basic features required to be a 'service provider' on the [IPFS](https://ipfs.io) network. See [this article](https://troutsblog.com/blog/ipfs-api) if you're new to the concept of service providers on IPFS. These basic features include:
+This boilerplate extends that code to provide the basic features required to be a 'service provider' on the [IPFS](https://ipfs.io) network. This is a core concept in the [web3 Cash Stack](https://cashstack.info). These basic features include:
 
 - [ipfs-coord](https://www.npmjs.com/package/ipfs-coord) for coordinating service providers and consumers across the IPFS network.
 - JSON RPC for creating an API between providers and consumers.
