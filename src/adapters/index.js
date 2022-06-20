@@ -47,6 +47,8 @@ class Adapters {
 
       // Start the IPFS node.
       await this.ipfs.start()
+
+      return true
     } catch (err) {
       console.error('Error in adapters/index.js/start()')
       throw err
