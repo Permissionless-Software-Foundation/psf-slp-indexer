@@ -33,6 +33,7 @@ class Server {
     this.controllers = new Controllers()
     this.mongoose = mongoose
     this.config = config
+    this.process = process
   }
 
   async startServer () {
@@ -88,7 +89,7 @@ class Server {
       console.log(`Running server in environment: ${this.config.env}`)
       wlogger.info(`Running server in environment: ${this.config.env}`)
 
-      await app.listen(this.config.port)
+      this.server = await app.listen(this.config.port)
       console.log(`Server started on ${this.config.port}`)
 
       // Create the system admin user.
@@ -114,14 +115,14 @@ class Server {
       console.log(
         'Exiting after 5 seconds. Depending on process manager to restart.'
       )
-      await sleep(5000)
-      process.exit(1)
+      await this.sleep(5000)
+      this.process.exit(1)
     }
   }
-}
 
-function sleep (ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  sleep (ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+  }
 }
 
 module.exports = Server
