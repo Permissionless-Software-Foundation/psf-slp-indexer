@@ -192,8 +192,9 @@ class SlpIndexer {
 
         // On a new transaction, process it.
         const tx = this.zmq.getTx()
-        // console.log('tx: ', tx)
+
         if (tx) {
+          // console.log('tx: ', tx)
           try {
             const inData = {
               tx,
@@ -445,7 +446,7 @@ class SlpIndexer {
         // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // Skip any non-token inputs.
-        if (!thisVin.tokenQty) continue
+        if (!thisVin.tokenQty && !thisVin.isMintBaton) continue
 
         // Get parent TX data
         const parentTxData = await this.cache.get(thisVin.txid)
@@ -503,15 +504,13 @@ class SlpIndexer {
       }
 
       try {
+        // Dev Note: Call this code paragraph before calling cache.get().
+        // Otherwise, blacklisted tokens will hydrate (which is computationally
+        // expensive) right before rejecting the TX.
+
         // Is the TX an SLP TX? If not, it will throw an error.
         const slpData = await this.transaction.decodeOpReturn(tx)
         // console.log('slpData: ', slpData)
-
-        // console.log('height: ', blockHeight)
-
-        // Get the transaction information.
-        const txData = await this.cache.get(tx)
-        // console.log('txData: ', txData)
 
         // Skip this TX if it is for a token that is in the blacklist.
         const tokenId = slpData.tokenId
@@ -523,7 +522,11 @@ class SlpIndexer {
 
           // Mark the transaction validity as 'null' to signal that this tx
           // has not been processed and the UTXO should be ignored.
-          txData.isValidSlp = null
+          const txData = {
+            txid: tx,
+            blockHeight,
+            isValidSlp: null
+          }
           await this.txDb.put(tx, txData)
 
           // Save the TX to the processed database.
@@ -531,6 +534,11 @@ class SlpIndexer {
 
           throw new Error('TX is for token in blacklist')
         }
+
+        // Get the transaction information.
+        // See dev note above.
+        const txData = await this.cache.get(tx)
+        // console.log('txData: ', txData)
 
         // Combine available data for further processing.
         dataToProcess = {
