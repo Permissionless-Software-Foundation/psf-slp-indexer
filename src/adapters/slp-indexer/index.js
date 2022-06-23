@@ -536,6 +536,7 @@ class SlpIndexer {
         }
 
         // Get the transaction information.
+        // See dev note above.
         const txData = await this.cache.get(tx)
         // console.log('txData: ', txData)
 
