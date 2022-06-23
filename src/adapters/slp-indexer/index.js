@@ -446,7 +446,7 @@ class SlpIndexer {
         // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // Skip any non-token inputs.
-        if (!thisVin.tokenQty) continue
+        if (!thisVin.tokenQty && !thisVin.isMintBaton) continue
 
         // Get parent TX data
         const parentTxData = await this.cache.get(thisVin.txid)
