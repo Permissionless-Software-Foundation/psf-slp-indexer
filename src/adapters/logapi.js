@@ -135,8 +135,10 @@ class LogsApi {
         if (!filename || typeof filename !== 'string') {
           throw new Error('filename must be a string')
         }
-        // Throw an error if the file does not exist.
 
+        console.log('readLines() filename: ', filename)
+
+        // Throw an error if the file does not exist.
         if (!_this.fs.existsSync(filename)) {
           throw new Error('file does not exist')
         }

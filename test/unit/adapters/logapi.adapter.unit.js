@@ -32,6 +32,9 @@ describe('#LogsApiLib', () => {
     })
 
     it('should return log', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'generateFileName').returns(`${__dirname.toString()}/../mocks/adapters/test.log`)
+
       const pass = 'test'
       const result = await uut.getLogs(pass)
       // console.log('result', result)
@@ -201,13 +204,15 @@ describe('#LogsApiLib', () => {
       // About yields
       sandbox.stub(uut.lineReader, 'eachLine').yieldsRight({}, true)
 
-      const fileName = context.fileName
+      const fileName = `${__dirname.toString()}/../mocks/adapters/test.log`
+
       const result = await uut.readLines(fileName)
       assert.isArray(result)
     })
 
     it('should return data', async () => {
-      const fileName = context.fileName
+      const fileName = `${__dirname.toString()}/../mocks/adapters/test.log`
+
       const result = await uut.readLines(fileName)
 
       assert.isArray(result)
