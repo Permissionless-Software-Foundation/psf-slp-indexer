@@ -47,4 +47,17 @@ describe('#use-cases', () => {
       }
     })
   })
+
+  describe('#start', () => {
+    it('should initialize async use cases', async () => {
+      const result = await uut.start()
+
+      assert.equal(result, true)
+    })
+
+    // it('should catch and throw errors', async () => {
+    //   // Force an error
+    //   sandbox.stub()
+    // })
+  })
 })
