@@ -32,19 +32,15 @@ describe('#LogsApiLib', () => {
     })
 
     it('should return log', async () => {
-      try {
-        const pass = 'test'
-        const result = await uut.getLogs(pass)
-        // console.log('result', result)
+      const pass = 'test'
+      const result = await uut.getLogs(pass)
+      // console.log('result', result)
 
-        assert.isTrue(result.success)
-        assert.isArray(result.data)
-        assert.property(result.data[0], 'message')
-        assert.property(result.data[0], 'level')
-        assert.property(result.data[0], 'timestamp')
-      } catch (err) {
-        assert(false, 'Unexpected result')
-      }
+      assert.isTrue(result.success)
+      assert.isArray(result.data)
+      assert.property(result.data[0], 'message')
+      assert.property(result.data[0], 'level')
+      assert.property(result.data[0], 'timestamp')
     })
 
     it('should return false if files are not found!', async () => {
@@ -201,31 +197,23 @@ describe('#LogsApiLib', () => {
     })
 
     it('should ignore fileReader callback errors', async () => {
-      try {
-        // https://sinonjs.org/releases/latest/stubs/
-        // About yields
-        sandbox.stub(uut.lineReader, 'eachLine').yieldsRight({}, true)
+      // https://sinonjs.org/releases/latest/stubs/
+      // About yields
+      sandbox.stub(uut.lineReader, 'eachLine').yieldsRight({}, true)
 
-        const fileName = context.fileName
-        const result = await uut.readLines(fileName)
-        assert.isArray(result)
-      } catch (err) {
-        assert.fail('Unexpected result')
-      }
+      const fileName = context.fileName
+      const result = await uut.readLines(fileName)
+      assert.isArray(result)
     })
 
     it('should return data', async () => {
-      try {
-        const fileName = context.fileName
-        const result = await uut.readLines(fileName)
+      const fileName = context.fileName
+      const result = await uut.readLines(fileName)
 
-        assert.isArray(result)
-        assert.property(result[1], 'message')
-        assert.property(result[1], 'level')
-        assert.property(result[1], 'timestamp')
-      } catch (err) {
-        assert.fail('Unexpected result')
-      }
+      assert.isArray(result)
+      assert.property(result[1], 'message')
+      assert.property(result[1], 'level')
+      assert.property(result[1], 'timestamp')
     })
   })
 })
