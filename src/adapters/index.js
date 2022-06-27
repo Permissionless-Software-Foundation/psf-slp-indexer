@@ -46,7 +46,12 @@ class Adapters {
       }
 
       // Start the IPFS node.
-      await this.ipfs.start()
+      // Do not start these adapters if this is an e2e test.
+      if (this.config.env !== 'test') {
+        await this.ipfs.start()
+      }
+
+      console.log('Async Adapters have been started.')
 
       return true
     } catch (err) {

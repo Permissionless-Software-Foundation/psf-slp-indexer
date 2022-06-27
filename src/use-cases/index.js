@@ -18,6 +18,17 @@ class UseCases {
     // console.log('use-cases/index.js localConfig: ', localConfig)
     this.user = new UserUseCases(localConfig)
   }
+
+  // Run any startup Use Cases at the start of the app.
+  async start () {
+    try {
+      console.log('Async Use Cases have been started.')
+    } catch (err) {
+      console.error('Error in use-cases/index.js/startUseCases()')
+      console.log(err)
+      throw err
+    }
+  }
 }
 
 module.exports = UseCases

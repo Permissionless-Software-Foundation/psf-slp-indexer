@@ -24,6 +24,8 @@ describe('#server', () => {
     it('should start the server', async () => {
       // Mock dependencies
       sandbox.stub(uut.mongoose, 'connect').resolves()
+      sandbox.stub(uut.controllers, 'initAdapters').resolves()
+      sandbox.stub(uut.controllers, 'initUseCases').resolves()
       sandbox.stub(uut.controllers, 'attachRESTControllers').resolves()
       sandbox.stub(uut.adminLib, 'createSystemUser').resolves(true)
       sandbox.stub(uut.controllers, 'attachControllers').resolves()

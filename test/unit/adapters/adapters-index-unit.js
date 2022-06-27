@@ -37,8 +37,9 @@ describe('#adapters', () => {
 
     it('should catch and throw an error', async () => {
       try {
-      // Force an error
+        // Force an error
         uut.config.getJwtAtStartup = false
+        uut.config.env = 'dev'
         sandbox.stub(uut.ipfs, 'start').rejects(new Error('test error'))
 
         await uut.start()
