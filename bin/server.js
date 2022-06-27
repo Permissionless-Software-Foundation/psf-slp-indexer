@@ -79,6 +79,12 @@ class Server {
       // Dev Note: This line must come BEFORE controllers.attachRESTControllers()
       app.use(cors({ origin: '*' }))
 
+      // Wait for any adapters to initialize.
+      await this.controllers.initAdapters()
+
+      // Wait for any use-libraries to initialize.
+      await this.controllers.initUseCases()
+
       // Attach REST API and JSON RPC controllers to the app.
       await this.controllers.attachRESTControllers(app)
 

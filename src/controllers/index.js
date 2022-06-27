@@ -25,14 +25,14 @@ class Controllers {
     this.useCases = new UseCases({ adapters: this.adapters })
   }
 
-  async attachControllers (app) {
-    // Wait for any startup processes to complete for the Adapters libraries.
+  // Spin up any adapter libraries that have async startup needs.
+  async initAdapters () {
     await this.adapters.start()
+  }
 
-    // Attach the REST controllers to the Koa app.
-    // this.attachRESTControllers(app)
-
-    this.attachRPCControllers()
+  // Run any Use Cases to startup the app.
+  async initUseCases () {
+    await this.useCases.start()
   }
 
   // Top-level function for this library.
@@ -45,6 +45,17 @@ class Controllers {
 
     // Attach the REST API Controllers associated with the boilerplate code to the Koa app.
     restControllers.attachRESTControllers(app)
+  }
+
+  // Attach any other controllers other than REST API controllers.
+  async attachControllers (app) {
+    // Wait for any startup processes to complete for the Adapters libraries.
+    // await this.adapters.start()
+
+    // Attach the REST controllers to the Koa app.
+    // this.attachRESTControllers(app)
+
+    this.attachRPCControllers()
   }
 
   // Add the JSON RPC router to the ipfs-coord adapter.
