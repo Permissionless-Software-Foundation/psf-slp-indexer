@@ -4,7 +4,11 @@
 
 class IpfsAdapter {
   constructor () {
-    this.ipfs = {}
+    this.ipfs = {
+      files: {
+        stat: () => {}
+      }
+    }
   }
 }
 
@@ -24,6 +28,7 @@ const ipfs = {
   ipfsAdapter: new IpfsAdapter(),
   ipfsCoordAdapter: new IpfsCoordAdapter()
 }
+ipfs.ipfs = ipfs.ipfsAdapter.ipfs
 
 const localdb = {
   Users: class Users {
