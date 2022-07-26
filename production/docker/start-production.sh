@@ -33,6 +33,6 @@ export SVC_ENV=production
 export IPFS_HOST=172.17.0.1
 export IPFS_API_PORT=5001
 export IPFS_TCP_PORT=4001
-#export IPFS_WS_PORT=5269
+export IPFS_WS_PORT=4003
 
 npm start
