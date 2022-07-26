@@ -44,8 +44,8 @@ services:
     restart: always
 
   ipfs-service:
-    #build: .
-    image: christroutner/ipfs-service-provider:v2.2.1
+    build: .
+    #image: christroutner/ipfs-service-provider:v2.2.1
     container_name: ipfs-service
     logging:
       driver: 'json-file'
@@ -60,4 +60,5 @@ services:
       - '5010:5010' # <host port>:<container port>
     volumes:
       - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+      - ./start-production.sh:/home/safeuser/ipfs-service-provider/start-production.sh
     restart: always

@@ -69,7 +69,7 @@ VOLUME /home/safeuser/keys
 EXPOSE 5010
 
 # Start the application.
-COPY start-production.sh start-production.sh
+#COPY start-production.sh start-production.sh
 CMD ["./start-production.sh"]
 
 #CMD ["npm", "start"]
