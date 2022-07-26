@@ -44,8 +44,8 @@ services:
     restart: always
 
   ipfs-service:
-    build: .
-    #image: christroutner/ipfs-service-provider:v2.2.1
+    #build: .
+    image: christroutner/ipfs-service-provider:v2.2.12
     container_name: ipfs-service
     logging:
       driver: 'json-file'
