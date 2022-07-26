@@ -4,7 +4,7 @@ version: '3.9'
 
 services:
   mongo-ipfs-service:
-    image: mongo
+    image: mongo:4.2.0
     container_name: mongo-ipfs-service
     ports:
       - '5555:27017' # <host port>:<container port>
@@ -14,7 +14,7 @@ services:
     restart: always
 
   ipfs:
-    image: ipfs/go-ipfs:v0.12.0
+    image: ipfs/go-ipfs:v0.14.0
     container_name: ipfs
     environment:
       MY_ENV_VAR: 'placeholder'
@@ -26,11 +26,12 @@ services:
     mem_limit: 2000mb
     ports:
       - 4001:4001
+      - 4003:4003
       - 172.17.0.1:5001:5001
       - 172.17.0.1:8080:8080
     volumes:
       - ../data/go-ipfs/data:/data/ipfs
-      - ../../swarm.key:/data/ipfs/swarm.key
+    #  - ../../swarm.key:/data/ipfs/swarm.key
     # https://docs.docker.com/compose/compose-file/compose-file-v3/#command
     # https://github.com/ipfs/go-ipfs/blob/91c52657166bcf86f2476926e4fe56694dc26562/Dockerfile#L115
     command:
