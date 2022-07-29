@@ -11,7 +11,7 @@
 */
 
 // Constants use to configure indexing thresholds. Customize as needed.
-const EPOCH = 400 // blocks between backups
+const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10 // Number of retries before exiting the indexer
 
 // Local libraries
@@ -239,7 +239,7 @@ class SlpIndexer {
         if (loopCnt > 100) {
           loopCnt = 0
           const now = new Date()
-          console.log(`Checked ZMQ. ${now.toLocaleString()}`)
+          console.log(`Checked ZMQ. ${now.toLocaleString()}, block height: ${blockHeight}`)
         }
       } while (1)
     } catch (err) {
@@ -327,16 +327,29 @@ class SlpIndexer {
         }
       }
 
-      // CT 5/6/22: Making this the last code paragraph in processBlock(), to
-      // see if it fixes issues with restoring backups.
-      // Create a zip-file backup every 'epoch' of blocks
-      if (blockHeight % EPOCH === 0 && this.indexState !== 'phase0') {
+      // Create a zip-file backup every 'epoch' of blocks, but only in phase 1.
+      if (blockHeight % EPOCH === 0 && this.indexState === 'phase1') {
         // Clean up stale TXs in the pTxDb.
         await this.managePtxdb.cleanPTXDB(blockHeight)
 
         console.log(`this.indexState: ${this.indexState}`)
         console.log(`Creating zip archive of database at block ${blockHeight}`)
         await this.dbBackup.zipDb(blockHeight, EPOCH)
+      } else if ((blockHeight - 1) % EPOCH === 0 && this.indexState === 'phase2') {
+        // In phase 2 (ZMQ), roll back to the last backup and resync, to generate
+        // a new backup. This prevents the backup file from being corrupted by ZMQ
+        // transaction processing while in phase2.
+
+        const rollbackHeight = blockHeight - 1 - EPOCH
+
+        // Roll back the database to the last epoch.
+        await this.dbBackup.unzipDb(rollbackHeight)
+
+        // Kill the process, which will allow the app to shut down, and pm2 or Docker can
+        // restart it at a block height to resync and take a proper backup while
+        // in phase1.
+        console.log('Killing process, expecting process manager to restart this app.')
+        process.exit(0)
       }
     } catch (err) {
       console.error('Error in processBlock()')
@@ -465,7 +478,7 @@ class SlpIndexer {
       }
       console.log(`targetBlockHeight: ${targetBlockHeight}`)
 
-      // Round the hight to the nearest 50
+      // Round the hight to the nearest epoch
       const rollbackHeight = Math.floor(targetBlockHeight / EPOCH) * EPOCH
       console.log(
         `Rolling database back to this block height: ${rollbackHeight}`
