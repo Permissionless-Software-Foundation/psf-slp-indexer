@@ -335,13 +335,12 @@ class SlpIndexer {
         console.log(`this.indexState: ${this.indexState}`)
         console.log(`Creating zip archive of database at block ${blockHeight}`)
         await this.dbBackup.zipDb(blockHeight, EPOCH)
-
-      } else if((blockHeight-1) % EPOCH === 0 && this.indexState === 'phase2') {
+      } else if ((blockHeight - 1) % EPOCH === 0 && this.indexState === 'phase2') {
         // In phase 2 (ZMQ), roll back to the last backup and resync, to generate
         // a new backup. This prevents the backup file from being corrupted by ZMQ
         // transaction processing while in phase2.
 
-        const rollbackHeight = blockHeight-1-EPOCH
+        const rollbackHeight = blockHeight - 1 - EPOCH
 
         // Roll back the database to the last epoch.
         await this.dbBackup.unzipDb(rollbackHeight)
@@ -349,6 +348,7 @@ class SlpIndexer {
         // Kill the process, which will allow the app to shut down, and pm2 or Docker can
         // restart it at a block height to resync and take a proper backup while
         // in phase1.
+        console.log('Killing process, expecting process manager to restart this app.')
         process.exit(0)
       }
     } catch (err) {
