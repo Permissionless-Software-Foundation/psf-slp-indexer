@@ -14,10 +14,15 @@ services:
     restart: always
 
   ipfs:
-    image: ipfs/go-ipfs:v0.14.0
+    image: christroutner/trickle-ipfs:v1.0.1
+    #build:
+    #  context: ./
+    #  dockerfile: Dockerfile
     container_name: ipfs
     environment:
-      MY_ENV_VAR: 'placeholder'
+      IPFS_DAEMON_ARGUMENTS: '--enable-pubsub-experiment --migrate=true --agent-version-suffix=docker --routing=dhtclient'
+      UPLOAD_KBPS: '1000'
+      DOWNLOAD_KBPS: '1000'
     logging:
       driver: 'json-file'
       options:
@@ -29,18 +34,11 @@ services:
       - 4003:4003
       - 172.17.0.1:5001:5001
       - 172.17.0.1:8080:8080
+    command: [
+      './start-ipfs.sh'
+    ]
     volumes:
-      - ../data/go-ipfs/data:/data/ipfs
-    #  - ../../swarm.key:/data/ipfs/swarm.key
-    # https://docs.docker.com/compose/compose-file/compose-file-v3/#command
-    # https://github.com/ipfs/go-ipfs/blob/91c52657166bcf86f2476926e4fe56694dc26562/Dockerfile#L115
-    command:
-      [
-        'daemon',
-        '--migrate=true',
-        '--agent-version-suffix=docker',
-        '--enable-pubsub-experiment'
-      ]
+      - ../data/go-ipfs/data:/root/.ipfs
     restart: always
 
   ipfs-service:
