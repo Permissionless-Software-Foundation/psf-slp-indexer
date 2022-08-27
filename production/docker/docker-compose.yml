@@ -14,6 +14,7 @@ services:
     restart: always
 
   ipfs:
+    # https://github.com/christroutner/trickle-ipfs
     image: christroutner/trickle-ipfs:v1.0.1
     #build:
     #  context: ./
