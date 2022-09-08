@@ -4,7 +4,7 @@
   This is the environment run by the test suite.
 */
 
-module.exports = {
+export default {
   session: 'secret-boilerplate-token',
   token: 'secret-jwt-token',
   database: 'mongodb://localhost:27017/ipfs-service-test',

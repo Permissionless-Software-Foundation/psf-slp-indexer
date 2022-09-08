@@ -1,11 +1,15 @@
-const assert = require('chai').assert
-const fs = require('fs')
-const sinon = require('sinon')
+import { assert } from 'chai'
+import fs from 'fs'
+import sinon from 'sinon'
+import util from 'util'
 
-const util = require('util')
+import JsonFiles from '../../../src/adapters/json-files.js'
+
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
 util.inspect.defaultOptions = { depth: 1 }
-
-const JsonFiles = require('../../../src/adapters/json-files')
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const JSON_FILE = 'test-json-file.json'
 const JSON_PATH = `${__dirname.toString()}/${JSON_FILE}`

@@ -3,11 +3,12 @@
 */
 
 // Public npm libraries
-const sinon = require('sinon')
-const assert = require('chai').assert
+import sinon from 'sinon'
+
+import { assert } from 'chai'
 
 // Local libraries
-const AboutRPC = require('../../../../src/controllers/json-rpc/about')
+import AboutRPC from '../../../../src/controllers/json-rpc/about/index.js'
 
 describe('#AboutRPC', () => {
   let uut

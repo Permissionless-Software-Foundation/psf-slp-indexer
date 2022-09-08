@@ -4,11 +4,11 @@
 
 'use strict'
 
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import config from '../config/index.js'
 
 // Force test environment
 process.env.KOA_ENV = 'test'
-const config = require('../config')
 
 async function cleanDb () {
   // Connect to the Mongo Database.

@@ -66,4 +66,4 @@ const localdb = {
   }
 }
 
-module.exports = { ipfs, localdb }
+export default { ipfs, localdb };

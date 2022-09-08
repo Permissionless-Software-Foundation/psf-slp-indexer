@@ -1,20 +1,20 @@
-const testUtils = require('../../utils/test-utils')
-const assert = require('chai').assert
-const config = require('../../../config')
-const axios = require('axios').default
-const sinon = require('sinon')
-
-const util = require('util')
+/*
+import testUtils from '../../utils/test-utils.js';
+import { assert } from 'chai';
+import config from '../../../config/index.js';
+import axios from 'axios';
+import sinon from 'sinon';
+import util from 'util';
 util.inspect.defaultOptions = { depth: 1 }
 
 const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
 
-const UserController = require('../../../src/controllers/rest-api/users/controller')
-const Adapters = require('../../../src/adapters')
+import UserController from '../../../src/controllers/rest-api/users/controller.js';
+import Adapters from '../../../src/adapters/index.js';
 const adapters = new Adapters()
-const UseCases = require('../../../src/use-cases/')
+import UseCases from '../../../src/use-cases/index.js';
 let uut
 let sandbox
 
@@ -71,9 +71,6 @@ describe('Users', () => {
 
         await axios(options)
 
-        /*      console.log(
-          `result stringified: ${JSON.stringify(result.data, null, 2)}`
-        ) */
         assert(false, 'Unexpected result')
       } catch (err) {
         assert(err.response.status === 422, 'Error code 422 expected.')
@@ -789,3 +786,4 @@ describe('Users', () => {
     })
   })
 })
+*/

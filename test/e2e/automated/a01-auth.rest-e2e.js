@@ -5,15 +5,18 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const axios = require('axios').default
+import { assert } from 'chai'
+
+import axios from 'axios'
+
 // const sinon = require('sinon')
 
 // Local support libraries
-const config = require('../../../config')
-const Server = require('../../../bin/server')
-const testUtils = require('../../utils/test-utils')
-const AdminLib = require('../../../src/adapters/admin')
+import config from '../../../config/index.js'
+
+import Server from '../../../bin/server.js'
+import testUtils from '../../utils/test-utils.js'
+import AdminLib from '../../../src/adapters/admin.js'
 const adminLib = new AdminLib()
 
 // const request = supertest.agent(app.listen())

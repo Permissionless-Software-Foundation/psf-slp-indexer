@@ -3,9 +3,10 @@
 */
 
 // Local libraries
-const IpfsAdapter = require('./ipfs')
-const IpfsCoordAdapter = require('./ipfs-coord')
-const config = require('../../../config')
+import IpfsAdapter from './ipfs.js'
+
+import IpfsCoordAdapter from './ipfs-coord.js'
+import config from '../../../config/index.js'
 
 class IPFS {
   constructor (localConfig = {}) {
@@ -59,4 +60,4 @@ class IPFS {
   }
 }
 
-module.exports = IPFS
+export default IPFS

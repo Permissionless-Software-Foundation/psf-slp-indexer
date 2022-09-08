@@ -2,10 +2,11 @@
   REST API validator middleware.
 */
 
-const User = require('../../../adapters/localdb/models/users')
-const config = require('../../../../config')
-const jwt = require('jsonwebtoken')
-const { wlogger } = require('../../../adapters/wlogger')
+import User from '../../../adapters/localdb/models/users.js'
+
+import config from '../../../../config/index.js'
+import jwt from 'jsonwebtoken'
+import wlogger from '../../../adapters/wlogger.js'
 
 let _this
 
@@ -166,4 +167,4 @@ class Validators {
   }
 }
 
-module.exports = Validators
+export default Validators
