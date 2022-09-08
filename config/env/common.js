@@ -9,7 +9,6 @@
 import { readFileSync } from 'fs'
 const pkgInfo = JSON.parse(readFileSync('package.json'))
 
-
 const version = pkgInfo.version
 
 const ipfsCoordName = process.env.COORD_NAME
