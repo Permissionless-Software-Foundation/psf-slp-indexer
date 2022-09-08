@@ -6,10 +6,10 @@
 */
 
 // Public npm libraries
-const jsonrpc = require('jsonrpc-lite')
+import jsonrpc from 'jsonrpc-lite'
 
 // Local libraries
-const config = require('../../../../config')
+import config from '../../../../config/index.js'
 
 class AboutRPC {
   constructor (localConfig) {
@@ -48,4 +48,4 @@ class AboutRPC {
   }
 }
 
-module.exports = AboutRPC
+export default AboutRPC

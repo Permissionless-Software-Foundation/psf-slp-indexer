@@ -5,17 +5,19 @@
 */
 
 // Public npm libraries
-const jsonrpc = require('jsonrpc-lite')
-const sinon = require('sinon')
-const assert = require('chai').assert
-const { v4: uid } = require('uuid')
+import jsonrpc from 'jsonrpc-lite'
+
+import sinon from 'sinon'
+import { assert } from 'chai'
+import { v4 as uid } from 'uuid'
+
+// Local libraries
+import Validators from '../../../../src/controllers/json-rpc/validators.js'
+
+import adapters from '../../mocks/adapters/index.js'
 
 // Set the environment variable to signal this is a test.
 process.env.SVC_ENV = 'test'
-
-// Local libraries
-const Validators = require('../../../../src/controllers/json-rpc/validators')
-const adapters = require('../../mocks/adapters')
 
 describe('#validators', () => {
   let uut

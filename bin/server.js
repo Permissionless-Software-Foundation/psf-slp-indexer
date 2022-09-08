@@ -8,23 +8,26 @@
 */
 
 // npm libraries
-const Koa = require('koa')
-const bodyParser = require('koa-bodyparser')
-const convert = require('koa-convert')
-const logger = require('koa-logger')
-const mongoose = require('mongoose')
-const session = require('koa-generic-session')
-const passport = require('koa-passport')
-const mount = require('koa-mount')
-const serve = require('koa-static')
-const cors = require('kcors')
+import Koa from 'koa'
+
+import bodyParser from 'koa-bodyparser'
+import convert from 'koa-convert'
+import logger from 'koa-logger'
+import mongoose from 'mongoose'
+import session from 'koa-generic-session'
+import passport from 'koa-passport'
+import mount from 'koa-mount'
+import serve from 'koa-static'
+import cors from 'kcors'
 
 // Local libraries
-const config = require('../config') // this first.
-const AdminLib = require('../src/adapters/admin')
-const errorMiddleware = require('../src/controllers/rest-api/middleware/error')
-const { wlogger } = require('../src/adapters/wlogger')
-const Controllers = require('../src/controllers')
+import config from '../config/index.js' // this first.
+
+import AdminLib from '../src/adapters/admin.js'
+import errorMiddleware from '../src/controllers/rest-api/middleware/error.js'
+import wlogger from '../src/adapters/wlogger.js'
+import Controllers from '../src/controllers/index.js'
+import applyPassportMods from '../config/passport.js'
 
 class Server {
   constructor () {
@@ -70,7 +73,8 @@ class Server {
       app.use(mount('/logs', serve(`${process.cwd()}/config/logs`)))
 
       // User Authentication
-      require('../config/passport')
+      // require('../config/passport')
+      applyPassportMods(passport)
       app.use(passport.initialize())
       app.use(passport.session())
 
@@ -131,4 +135,4 @@ class Server {
   }
 }
 
-module.exports = Server
+export default Server

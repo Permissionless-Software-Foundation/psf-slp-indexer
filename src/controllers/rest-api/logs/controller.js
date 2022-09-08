@@ -1,4 +1,4 @@
-const LogsApiLib = require('../../../adapters/logapi')
+import LogsApiLib from '../../../adapters/logapi.js'
 const logsApiLib = new LogsApiLib()
 let _this
 
@@ -62,4 +62,4 @@ class LogsApi {
   }
 }
 
-module.exports = LogsApi
+export default LogsApi

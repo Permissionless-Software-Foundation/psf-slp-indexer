@@ -3,12 +3,14 @@
 */
 
 // Public NPM libraries
-const mongoose = require('mongoose')
-const axios = require('axios').default
+import mongoose from 'mongoose'
+
+import axios from 'axios'
 
 // Local libraries
-const config = require('../../config')
-const User = require('../../src/adapters/localdb/models/users')
+import config from '../../config/index.js'
+
+import User from '../../src/adapters/localdb/models/users.js'
 
 const LOCALHOST = `http://localhost:${config.port}`
 
@@ -160,7 +162,7 @@ async function getAdminJWT () {
   }
 }
 
-module.exports = {
+export default {
   cleanDb,
   createUser,
   loginTestUser,

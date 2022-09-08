@@ -1,30 +1,6 @@
-const passport = require('koa-passport')
-const User = require('../src/adapters/localdb/models/users')
-const Strategy = require('passport-local')
-
-passport.serializeUser((user, done) => {
-  done(null, user.id)
-})
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id, '-password')
-    done(null, user)
-  } catch (err) {
-    done(err)
-  }
-})
-
-passport.use(
-  'local',
-  new Strategy(
-    {
-      usernameField: 'email',
-      passwordField: 'password'
-    },
-    passportCallback
-  )
-)
+// import passport from 'koa-passport';
+import User from '../src/adapters/localdb/models/users.js'
+import Strategy from 'passport-local'
 
 async function passportCallback (email, password, done) {
   try {
@@ -49,5 +25,32 @@ async function passportCallback (email, password, done) {
   }
 }
 
+function applyPassportMods (passport) {
+  passport.serializeUser((user, done) => {
+    done(null, user.id)
+  })
+
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id, '-password')
+      done(null, user)
+    } catch (err) {
+      done(err)
+    }
+  })
+
+  passport.use(
+    'local',
+    new Strategy(
+      {
+        usernameField: 'email',
+        passwordField: 'password'
+      },
+      passportCallback
+    )
+  )
+}
+
 // For testing
-module.exports = { passport, passportCallback }
+// export default { passport, passportCallback };
+export default applyPassportMods

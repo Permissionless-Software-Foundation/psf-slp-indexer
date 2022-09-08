@@ -6,14 +6,16 @@
 /* eslint  no-unneeded-ternary:0 */
 
 // Get the version from the package.json file.
-const pkgInfo = require('../../package.json')
+import { readFileSync } from 'fs'
+const pkgInfo = JSON.parse(readFileSync('package.json'))
+
 const version = pkgInfo.version
 
 const ipfsCoordName = process.env.COORD_NAME
   ? process.env.COORD_NAME
   : 'ipfs-bch-wallet-service'
 
-module.exports = {
+export default {
   // Configure TCP port.
   port: process.env.PORT || 5001,
 

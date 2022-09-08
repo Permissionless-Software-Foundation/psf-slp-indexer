@@ -1,4 +1,4 @@
-const Server = require('./bin/server.js')
+import Server from './bin/server.js'
 const server = new Server()
 
 server.startServer()

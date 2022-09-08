@@ -1,12 +1,15 @@
-const assert = require('chai').assert
+import { assert } from 'chai'
+import sinon from 'sinon'
+import util from 'util'
 
-const sinon = require('sinon')
+import LogsApiLib from '../../../src/adapters/logapi.js'
+import mockData from '../mocks/log-api-mock.js'
 
-const util = require('util')
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
 util.inspect.defaultOptions = { depth: 1 }
-
-const LogsApiLib = require('../../../src/adapters/logapi')
-const mockData = require('../mocks/log-api-mock')
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const context = {}
 let sandbox
