@@ -7,14 +7,14 @@
   "scripts": {
     "start": "node index.js",
     "test": "npm run test:all",
-    "test:all": "export SVC_ENV=test && nyc --reporter=text mocha --exit --timeout 15000 --recursive test/unit test/e2e/automated/",
+    "test:all": "export SVC_ENV=test && c8 --reporter=text mocha --exit --timeout 15000 --recursive test/unit test/e2e/automated/",
     "test:unit": "export SVC_ENV=test && mocha --exit --timeout 15000 --recursive test/unit/",
     "test:e2e:auto": "export SVC_ENV=test && mocha --exit --timeout 15000 test/e2e/automated/",
     "test:temp": "export SVC_ENV=test && mocha --exit --timeout 15000 -g '#rate-limit' test/unit/json-rpc/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coverage:report": "export SVC_ENV=test && nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/ test/e2e/automated/"
+    "coverage": "c8 report --reporter=text-lcov | coveralls",
+    "coverage:report": "export SVC_ENV=test && c8 --reporter=html mocha --exit --timeout 15000 --recursive test/unit/ test/e2e/automated/"
   },
   "author": "Chris Troutner <chris.troutner@gmail.com>",
   "license": "MIT",
@@ -55,11 +55,11 @@
   },
   "devDependencies": {
     "apidoc": "0.51.1",
+    "c8": "7.12.0",
     "chai": "4.3.0",
     "coveralls": "3.1.0",
     "husky": "4.3.8",
     "mocha": "10.0.0",
-    "nyc": "15.1.0",
     "semantic-release": "19.0.3",
     "sinon": "9.2.4",
     "standard": "17.0.0",
