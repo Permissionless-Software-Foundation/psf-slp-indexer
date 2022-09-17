@@ -25,12 +25,12 @@ import JsonFiles from '../adapters/json-files.js'
 // Hack to get __dirname back.
 // https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
 import * as url from 'url'
-
-const jsonFiles = new JsonFiles()
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
+const jsonFiles = new JsonFiles()
+
 const JSON_FILE = `system-user-${config.env}.json`
-const JSON_PATH = `${__dirname.toString()}/../../config/${JSON_FILE}`
+const JSON_PATH = `${__dirname.toString()}../../config/${JSON_FILE}`
 
 const LOCALHOST = `http://localhost:${config.port}`
 const context = {}
@@ -90,6 +90,8 @@ class Admin {
       // applications like the Task Manager and the test scripts can access.
 
       await jsonFiles.writeJSON(context, JSON_PATH)
+      // console.log('context: ', context)
+      // console.log('JSON_PATH: ', JSON_PATH)
 
       return context
     } catch (err) {

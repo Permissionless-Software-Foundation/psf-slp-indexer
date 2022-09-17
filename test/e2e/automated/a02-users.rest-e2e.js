@@ -1,20 +1,19 @@
-/*
-import testUtils from '../../utils/test-utils.js';
-import { assert } from 'chai';
-import config from '../../../config/index.js';
-import axios from 'axios';
-import sinon from 'sinon';
-import util from 'util';
+import testUtils from '../../utils/test-utils.js'
+import { assert } from 'chai'
+import config from '../../../config/index.js'
+import axios from 'axios'
+import sinon from 'sinon'
+import util from 'util'
+
+import UserController from '../../../src/controllers/rest-api/users/controller.js'
+import Adapters from '../../../src/adapters/index.js'
+import UseCases from '../../../src/use-cases/index.js'
 util.inspect.defaultOptions = { depth: 1 }
 
 const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
-
-import UserController from '../../../src/controllers/rest-api/users/controller.js';
-import Adapters from '../../../src/adapters/index.js';
 const adapters = new Adapters()
-import UseCases from '../../../src/use-cases/index.js';
 let uut
 let sandbox
 
@@ -39,7 +38,7 @@ describe('Users', () => {
 
     // Get the JWT used to log in as the admin 'system' user.
     const adminJWT = await testUtils.getAdminJWT()
-    // console.log(`adminJWT: ${admi  nJWT}`)
+    console.log(`adminJWT: ${adminJWT}`)
     context.adminJWT = adminJWT
 
     // const admin = await testUtils.loginAdminUser()
@@ -786,4 +785,3 @@ describe('Users', () => {
     })
   })
 })
-*/

@@ -5,9 +5,14 @@
 
 /* eslint  no-unneeded-ternary:0 */
 
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+
 // Get the version from the package.json file.
 import { readFileSync } from 'fs'
-const pkgInfo = JSON.parse(readFileSync('package.json'))
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+const pkgInfo = JSON.parse(readFileSync(`${__dirname.toString()}/../../package.json`))
 
 const version = pkgInfo.version
 
@@ -17,7 +22,7 @@ const ipfsCoordName = process.env.COORD_NAME
 
 export default {
   // Configure TCP port.
-  port: process.env.PORT || 5001,
+  port: process.env.PORT || 5020,
 
   // Password for HTML UI that displays logs.
   logPass: 'test',
