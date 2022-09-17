@@ -76,5 +76,5 @@ logger.outputToConsole()
 
 const wlogger = logger.wlogger
 
-// export default { wlogger, Wlogger };
-export default wlogger
+export { wlogger as default, Wlogger }
+// export default wlogger
