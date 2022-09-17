@@ -6,7 +6,6 @@
 
 // Public npm libraries
 import { assert } from 'chai'
-
 import sinon from 'sinon'
 
 // Local support libraries
@@ -331,22 +330,23 @@ describe('#users-use-case', () => {
       }
     })
 
-    // it('should update the user model', async () => {
-    //   const newData = {
-    //     email: 'test@test.com',
-    //     password: 'password',
-    //     name: 'testy tester'
-    //   }
-    //
-    //   const result = await uut.updateUser(testUser, newData)
-    //
-    //   // Assert that expected properties and values exist.
-    //   assert.property(result, '_id')
-    //   assert.property(result, 'email')
-    //   assert.equal(result.email, 'test@test.com')
-    //   assert.property(result, 'name')
-    //   assert.equal(result.name, 'testy tester')
-    // })
+    it('should update the user model', async () => {
+      const newData = {
+        email: 'test@test.com',
+        password: 'password',
+        name: 'testy tester'
+      }
+      testUser.save = async () => {}
+
+      const result = await uut.updateUser(testUser, newData)
+
+      // Assert that expected properties and values exist.
+      assert.property(result, '_id')
+      assert.property(result, 'email')
+      assert.equal(result.email, 'test@test.com')
+      assert.property(result, 'name')
+      assert.equal(result.name, 'testy tester')
+    })
 
   // TODO: verify that an admin can change the type of a user
   })
