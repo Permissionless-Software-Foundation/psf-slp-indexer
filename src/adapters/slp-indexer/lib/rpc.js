@@ -20,6 +20,9 @@ class RPC {
     this.config = config
 
     _this = this
+
+    // Bind 'this' object to subfunctions
+    this.getBlockCount = this.getBlockCount.bind(this)
   }
 
   // Axios options used when calling axios.post() to talk with a full node.

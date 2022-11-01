@@ -14,6 +14,9 @@
 const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10 // Number of retries before exiting the indexer
 
+// Global npm libraries
+const RetryQueue = require('@chris.troutner/retry-queue-commonjs')
+
 // Local libraries
 const { wlogger } = require('../wlogger')
 const LevelDb = require('./lib/level-db')
@@ -83,6 +86,7 @@ class SlpIndexer {
     this.query = new Query({ addrDb, tokenDb, txDb, statusDb, pTxDb })
     this.statusDb = statusDb
     this.blacklist = new Blacklist()
+    this.retryQueue = new RetryQueue()
 
     // state
     this.indexState = 'phase0'
@@ -104,7 +108,7 @@ class SlpIndexer {
       )
 
       // Get the current block height
-      let biggestBlockHeight = await this.rpc.getBlockCount()
+      let biggestBlockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
       console.log('Current chain block height: ', biggestBlockHeight)
       console.log('Starting bulk indexing.')
 
@@ -144,7 +148,7 @@ class SlpIndexer {
         // await this.utils.sleep(1000)
 
         blockHeight++
-        biggestBlockHeight = await this.rpc.getBlockCount()
+        biggestBlockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
       } while (blockHeight <= biggestBlockHeight)
       // } while (blockHeight < 763998)
       // } while (blockHeight < 739707)
@@ -171,7 +175,7 @@ class SlpIndexer {
       // await this.dbBackup.zipDb(status.syncedBlockHeight)
 
       // Get the current block height
-      biggestBlockHeight = await this.rpc.getBlockCount()
+      biggestBlockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
       console.log('Current chain block height: ', biggestBlockHeight)
       console.log('Starting indexing of mempool')
 
@@ -186,7 +190,7 @@ class SlpIndexer {
       // Enter permanent loop, processing ZMQ input.
       do {
         // TODO: add getBlockCounty to a auto-retry in case it fails.
-        blockHeight = await this.rpc.getBlockCount()
+        blockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
         // console.log('Current chain block height: ', blockHeight)
         // console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
 
@@ -220,6 +224,7 @@ class SlpIndexer {
 
           // Update the status DB.
           status.syncedBlockHeight = blockHeight
+          status.chainBlockHeight = blockHeight
           await this.statusDb.put('status', status)
 
           // Process the block.
