@@ -146,7 +146,7 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.rpc.getBlockCount()
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 610766)
+      // } while (blockHeight < 763998)
       // } while (blockHeight < 739707)
       // console.log('Target block height reached.')
       // process.exit(0)
@@ -305,29 +305,32 @@ class SlpIndexer {
       const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
 
-      // If the block has no txs after filtering for SLP txs, then return.
-      if (!slpTxs || !slpTxs.length) return
+      // If the block has no txs after filtering for SLP txs, then skip processing.
+      if (slpTxs && slpTxs.length) {
+        console.log(`slpTxs: ${slpTxs.length}`)
 
-      console.log(`slpTxs: ${slpTxs.length}`)
+        // Progressively processes TXs in the array.
+        await this.processSlpTxs(slpTxs, blockHeight)
 
-      // Progressively processes TXs in the array.
-      await this.processSlpTxs(slpTxs, blockHeight)
+        // Do a second round of this.filterBlock.deleteBurnedUtxos() for
+        // all non-SLP transactions. Handles corner-case where a token UTXO
+        // is burned in the same block that it was created.
+        for (let i = 0; i < nonSlpTxs.length; i++) {
+          const thisTxid = nonSlpTxs[i]
+          const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)
 
-      // Do a second round of this.filterBlock.deleteBurnedUtxos() for
-      // all non-SLP transactions. Handles corner-case where a token UTXO
-      // is burned in the same block that it was created.
-      for (let i = 0; i < nonSlpTxs.length; i++) {
-        const thisTxid = nonSlpTxs[i]
-        const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)
-
-        if (!burnResult) {
-          console.log(
-            `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
-          )
+          if (!burnResult) {
+            console.log(
+              `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
+            )
+          }
         }
       }
 
+
+
       // Create a zip-file backup every 'epoch' of blocks, but only in phase 1.
+      // console.log(`blockHeight: ${blockHeight}, indexState: ${this.indexState}`)
       if (blockHeight % EPOCH === 0 && this.indexState === 'phase1') {
         // Clean up stale TXs in the pTxDb.
         await this.managePtxdb.cleanPTXDB(blockHeight)
