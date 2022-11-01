@@ -155,7 +155,7 @@ class Send {
         }
       }
 
-      console.log(`txInfo: ${JSON.stringify(txInfo, null, 2)}`)
+      // console.log(`txInfo: ${JSON.stringify(txInfo, null, 2)}`)
       tokenData.txs.push(txInfo)
 
       // console.log(`new token data: ${JSON.stringify(tokenData, null, 2)}`)
@@ -436,7 +436,9 @@ class Send {
         address: recvrAddr,
         decimals,
         effectiveQty,
-        value
+        value,
+        name: txData.tokenName,
+        ticker: txData.tokenTicker
       }
       // console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
