@@ -216,7 +216,7 @@ class SlpIndexer {
         if (block) {
           console.log('block: ', block)
 
-          const blockHeader = await this.rpc.getBlockHeader(block.hash)
+          const blockHeader = await this.retryQueue.addToQueue(this.rpc.getBlockHeader, block.hash)
           blockHeight = blockHeader.height
           console.log(`processing block ${blockHeight}`)
 
