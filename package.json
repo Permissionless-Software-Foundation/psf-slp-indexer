@@ -24,6 +24,7 @@
   },
   "repository": "Permissionless-Software-Foundation/psf-slp-indexer",
   "dependencies": {
+    "@chris.troutner/retry-queue-commonjs": "1.0.8",
     "@chris.troutner/slp-validate": "1.2.2",
     "@psf/bch-js": "6.4.0",
     "@psf/bitcoincash-zmq-decoder": "0.1.5",
