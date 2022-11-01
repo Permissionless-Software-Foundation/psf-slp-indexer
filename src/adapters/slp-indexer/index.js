@@ -327,8 +327,6 @@ class SlpIndexer {
         }
       }
 
-
-
       // Create a zip-file backup every 'epoch' of blocks, but only in phase 1.
       // console.log(`blockHeight: ${blockHeight}, indexState: ${this.indexState}`)
       if (blockHeight % EPOCH === 0 && this.indexState === 'phase1') {
