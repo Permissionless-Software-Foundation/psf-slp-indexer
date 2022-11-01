@@ -224,6 +224,7 @@ class SlpIndexer {
 
           // Update the status DB.
           status.syncedBlockHeight = blockHeight
+          status.chainBlockHeight = blockHeight
           await this.statusDb.put('status', status)
 
           // Process the block.
