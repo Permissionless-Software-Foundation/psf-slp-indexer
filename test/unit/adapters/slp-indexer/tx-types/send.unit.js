@@ -263,7 +263,9 @@ describe('#send.js', () => {
         'tokenType',
         'value',
         'decimals',
-        'effectiveQty'
+        'effectiveQty',
+        'name',
+        'ticker'
       ])
     })
 
