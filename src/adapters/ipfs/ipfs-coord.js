@@ -8,7 +8,7 @@
 import IpfsCoord from 'ipfs-coord-esm'
 
 // import BCHJS from '@psf/bch-js';
-import SlpWallet from 'minimal-slp-wallet/index.js'
+import SlpWallet from 'minimal-slp-wallet'
 import publicIp from 'public-ip'
 
 // Local libraries
