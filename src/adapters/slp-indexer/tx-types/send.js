@@ -134,6 +134,11 @@ class Send {
           qty: sentBN.toString(),
           burned: diffBN.toString()
         }
+
+        // If the token is an NFT, mark the holder address as null
+        if (tokenData.type === 65) {
+          tokenData.nftHolder = null
+        }
       } else if (diffBN.isLessThan(0)) {
         // Uncontrolled burn
 
@@ -144,6 +149,11 @@ class Send {
           qty: '0',
           burned: spentBN.toString()
         }
+
+        // If the token is an NFT, mark the holder address as null
+        if (tokenData.type === 65) {
+          tokenData.nftHolder = null
+        }
       } else {
         // Normal send transaction.
 
@@ -152,6 +162,14 @@ class Send {
           height: blockHeight,
           type: 'SEND',
           qty: sentBN.toString()
+        }
+
+        // If the token is an NFT, save address of the current holder of the NFT.
+        if (tokenData.type === 65) {
+          const addr = txData.vout[1].scriptPubKey.addresses[0]
+          console.log('updateTokenStats() current NFT address: ', addr)
+
+          tokenData.nftHolder = addr
         }
       }
 
