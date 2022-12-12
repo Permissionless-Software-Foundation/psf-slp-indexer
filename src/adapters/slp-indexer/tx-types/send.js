@@ -136,7 +136,7 @@ class Send {
         }
 
         // If the token is an NFT, mark the holder address as null
-        if(tokenData.type === 65) {
+        if (tokenData.type === 65) {
           tokenData.nftHolder = null
         }
       } else if (diffBN.isLessThan(0)) {
@@ -151,7 +151,7 @@ class Send {
         }
 
         // If the token is an NFT, mark the holder address as null
-        if(tokenData.type === 65) {
+        if (tokenData.type === 65) {
           tokenData.nftHolder = null
         }
       } else {
@@ -165,7 +165,7 @@ class Send {
         }
 
         // If the token is an NFT, save address of the current holder of the NFT.
-        if(tokenData.type === 65) {
+        if (tokenData.type === 65) {
           const addr = txData.vout[1].scriptPubKey.addresses[0]
           console.log('updateTokenStats() current NFT address: ', addr)
 
