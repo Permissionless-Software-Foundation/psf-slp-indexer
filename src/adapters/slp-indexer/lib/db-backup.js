@@ -16,13 +16,14 @@ const dbDir = `${__dirname.toString()}/../../../../leveldb`
 
 class DbBackup {
   constructor (localConfig = {}) {
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = localConfig
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, claimDb } = localConfig
     this.addrDb = addrDb
     this.tokenDb = tokenDb
     this.txDb = txDb
     this.statusDb = statusDb
     this.pTxDb = pTxDb
     this.utxoDb = utxoDb
+    this.claimDb = claimDb
     // TODO: throw error if dbs are not passed in.
 
     // Encapsulate dependencies
@@ -43,6 +44,7 @@ class DbBackup {
       await this.statusDb.close()
       await this.pTxDb.close()
       await this.utxoDb.close()
+      await this.claimDb.close()
 
       // console.log(`dbDir: ${dbDir}`)
 
@@ -59,6 +61,7 @@ class DbBackup {
       this.shell.cp('-r', `${dbDir}/current/txs`, `${dbDir}/backup/`)
       this.shell.cp('-r', `${dbDir}/current/ptxs`, `${dbDir}/backup/`)
       this.shell.cp('-r', `${dbDir}/current/utxos`, `${dbDir}/backup/`)
+      this.shell.cp('-r', `${dbDir}/current/claims`, `${dbDir}/backup/`)
 
       // Reopen the databases.
       await this.addrDb.open()
@@ -67,6 +70,7 @@ class DbBackup {
       await this.statusDb.open()
       await this.pTxDb.open()
       await this.utxoDb.open()
+      await this.claimDb.open()
 
       return true
     } catch (err) {
@@ -84,6 +88,7 @@ class DbBackup {
       await this.statusDb.close()
       await this.pTxDb.close()
       await this.utxoDb.close()
+      await this.claimDb.close()
 
       // console.log(`dbDir: ${dbDir}`)
 
@@ -111,7 +116,8 @@ class DbBackup {
       await this.txDb.close()
       await this.statusDb.close()
       await this.pTxDb.close()
-      await this.utxoDb.close()
+      await this.utxoDb.close
+      await this.claimDb.close()
 
       // Create a zip backup of the current database.
       this.shell.exec(
@@ -136,6 +142,7 @@ class DbBackup {
       await this.statusDb.open()
       await this.pTxDb.open()
       await this.utxoDb.open()
+      await this.claimDb.open()
     } catch (err) {
       console.error('Error in zipDb')
       throw err
@@ -153,6 +160,7 @@ class DbBackup {
       await this.statusDb.close()
       await this.pTxDb.close()
       await this.utxoDb.close()
+      await this.claimDb.close()
 
       // Wipe the old database
       this.shell.cd(`${dbDir}/../`)

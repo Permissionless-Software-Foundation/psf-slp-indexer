@@ -59,13 +59,19 @@ class LevelDb {
       valueEncoding: 'json'
     })
 
+    // on-chain claims
+    this.claimDb = this.level(`${__dirname.toString()}/../../../../leveldb/current/claims`, {
+      valueEncoding: 'json'
+    })
+
     return {
       addrDb: this.addrDb,
       txDb: this.txDb,
       tokenDb: this.tokenDb,
       statusDb: this.statusDb,
       pTxDb: this.pTxDb,
-      utxoDb: this.utxoDb
+      utxoDb: this.utxoDb,
+      claimDb: this.claimDb
     }
   }
 
@@ -77,6 +83,7 @@ class LevelDb {
     await this.statusDb.close()
     await this.pTxDb.close()
     await this.utxoDb.close()
+    await this.claimDb.close()
 
     // Signal that the databases were close successfully.
     return true

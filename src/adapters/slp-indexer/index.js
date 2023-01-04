@@ -40,7 +40,7 @@ class SlpIndexer {
   constructor (localConfig = {}) {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, claimDb } =
       this.levelDb.openDbs()
     this.addrDb = addrDb
     this.tokenDb = tokenDb
@@ -48,6 +48,7 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.pTxDb = pTxDb
     this.utxoDb = utxoDb
+    this.claimDb = claimDb
 
     // Encapsulate dependencies
     this.rpc = new RPC()
@@ -57,7 +58,8 @@ class SlpIndexer {
       txDb,
       statusDb,
       pTxDb,
-      utxoDb
+      utxoDb,
+      claimDb
     })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
@@ -328,6 +330,21 @@ class SlpIndexer {
             console.log(
               `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
             )
+          }
+        }
+      }
+
+      // Check each of the non-SLP transaction to see if it matches the profile
+      // of a claim.
+      if (nonSlpTxs && nonSlpTxs.length) {
+        for (let i = 0; i < nonSlpTxs.length; i++) {
+          const thisTxid = nonSlpTxs[i]
+
+          // Check if this transaction is a Claim.
+          const isClaim = await this.transaction.isClaim(thisTxid)
+          if (isClaim) {
+            // Save the claim to the database.
+            await this.claimDb.put(isClaim.about, isClaim)
           }
         }
       }

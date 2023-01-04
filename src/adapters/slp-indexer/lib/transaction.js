@@ -10,6 +10,7 @@
 // Public npm libraries
 const BigNumber = require('bignumber.js')
 const slpParser = require('slp-parser')
+const BCHJS = require('@psf/bch-js')
 
 // Local libraries
 const RPC = require('./rpc')
@@ -24,6 +25,7 @@ class Transaction {
     this.rpc = new RPC()
     this.slpParser = slpParser
     this.queue = new RetryQueue()
+    this.bchjs = new BCHJS()
 
     // State
     this.tokenCache = {}
@@ -905,6 +907,63 @@ class Transaction {
       return txData
     } catch (err) {
       console.error('Error in getTxWithRetry()')
+      throw err
+    }
+  }
+
+  // Checks to see if a TX is a claim as per PS006.
+  async isClaim (txid) {
+    try {
+      // Validate the txid input.
+      if (!txid || txid === '' || typeof txid !== 'string') {
+        throw new Error('txid string must be included.')
+      }
+
+      // Return results if they've been cached.
+      const cachedVal = _this.tokenCache[txid]
+      if (cachedVal) return cachedVal
+
+      const txDetails = await this.getTxWithRetry(txid)
+      // console.log('txDetails: ', txDetails)
+
+      // SLP spec expects OP_RETURN to be the first output of the transaction.
+      const opReturn = txDetails.vout[0].scriptPubKey.hex
+      // console.log(`txid ${txid}, opReturn hex: ${opReturn}`)
+
+      const firstFourBytes = opReturn.slice(0, 12)
+      // console.log(`opReturn firstFourBytes: ${firstFourBytes}`)
+
+      // If the HEX of the OP_RETURN matches the signature of a claim.
+      if (firstFourBytes.includes('6a0400504d00')) {
+        // console.log('---->PING<-----')
+
+        // Decode the hex into normal text.
+        const script = this.bchjs.Script.toASM(
+          Buffer.from(opReturn, 'hex')
+        ).split(' ')
+        // console.log(`script: ${JSON.stringify(script, null, 2)}`);
+
+        const about = Buffer.from(script[2], 'hex').toString()
+        // console.log(`about: ${store.toString()}`)
+
+        const content = Buffer.from(script[3], 'hex').toString()
+        // console.log(`content: ${content.toString()}`)
+
+        const retObj = {
+          txid,
+          about,
+          content
+        }
+        console.log(`Claim found: ${JSON.stringify(retObj, null, 2)}`)
+
+        // Return the decoded claim data.
+        return retObj
+      }
+
+      // No claim found, return false.
+      return false
+    } catch (err) {
+      console.error('Error in transaction.js/isClaim()')
       throw err
     }
   }
