@@ -96,6 +96,12 @@ class Genesis {
       // Add NFT array for Group tokens
       if (slpData.tokenType === 129) {
         token.nfts = []
+
+        // Detect if this token is a potential PS006 simple-store-protocol store
+        token.isSsp = false
+        if(slpData.ticker.includes('SSP')) {
+          token.isSsp = true
+        }
       }
 
       console.log(`token Genesis: ${JSON.stringify(token, null, 2)}`)
