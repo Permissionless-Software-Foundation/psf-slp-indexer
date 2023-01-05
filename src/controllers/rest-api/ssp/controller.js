@@ -66,16 +66,72 @@ class SspRESTControllerLib {
     try {
       // const address = ctx.request.body.address
 
-      console.log('hello world')
+      // console.log('hello world')
 
       // const result = await _this.adapters.slpIndexer.query.getAddress(address)
 
-      // const status = await _this.adapters.slpIndexer.statusDb.get('status')
-      const status = true
+      // const storeList = await _this.adapters.slpIndexer.statusDb.get('sspList')
+      // const stores = JSON.parse(storeList)
+
+      const stores = await _this.adapters.slpIndexer.statusDb.get('sspList')
+
+      // const status = true
       // console.log('status: ', status)
 
       ctx.body = {
-        status
+        stores
+      }
+    } catch (err) {
+      _this.handleError(ctx, err)
+    }
+  }
+
+  /**
+   * @api {get} /ssp/stores SSP Stores
+   * @apiPermission public
+   * @apiName Stores
+   * @apiGroup REST SSP
+   * @apiDescription Get SSP indexed stores
+   *
+   * @apiExample Example usage:
+   * curl -H "Content-Type: application/json" -X GET localhost:5001/ssp/claims/9fe85e577562e120447f22e8fa0fbeec210d1f3844e05192e8819bde75366dc0
+   *
+   *
+   * @apiSuccessExample {json} Success-Response:
+   *  HTTP/1.1 200 OK
+   * {
+   *   "status": {
+   *     "startBlockHeight": 543376,
+   *     "syncedBlockHeight": "543378",
+   *     "chainBlockHeight": "722004"
+   *   }
+   * }
+   *
+   * @apiError UnprocessableEntity Missing required parameters
+   *
+   * @apiErrorExample {json} Error-Response:
+   *     HTTP/1.1 422 Unprocessable Entity
+   *     {
+   *       "status": 422,
+   *       "error": "Unprocessable Entity"
+   *     }
+   */
+  async getClaims (ctx) {
+    try {
+      const tokenId = ctx.params.tokenId
+
+      // const address = ctx.request.body.addres
+
+      // console.log('hello world')
+
+      // const result = await _this.adapters.slpIndexer.query.getAddress(address)
+
+      const claims = await _this.adapters.slpIndexer.claimDb.get(tokenId)
+      // const status = true
+      // console.log('status: ', status)
+
+      ctx.body = {
+        claims
       }
     } catch (err) {
       _this.handleError(ctx, err)

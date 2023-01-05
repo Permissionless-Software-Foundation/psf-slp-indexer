@@ -113,7 +113,7 @@ class Genesis {
           let sspList = []
           try {
             sspList = await this.statusDb.get('sspList')
-          } catch(err) {
+          } catch (err) {
             sspList = []
           }
 

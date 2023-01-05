@@ -349,7 +349,7 @@ class SlpIndexer {
             let tokenClaims = []
             try {
               tokenClaims = await this.claimDb.get(isClaim.about)
-            } catch(err) {
+            } catch (err) {
               tokenClaims = []
             }
 

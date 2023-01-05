@@ -52,6 +52,7 @@ class SspRouter {
 
     // Define the routes and attach the controller.
     this.router.get('/stores', this.sspRESTController.getStores)
+    this.router.get('/claims/:tokenId', this.sspRESTController.getClaims)
     // this.router.post('/address', this.slpRESTController.address)
     // this.router.post('/tx', this.slpRESTController.tx)
     // this.router.post('/token', this.slpRESTController.token)
