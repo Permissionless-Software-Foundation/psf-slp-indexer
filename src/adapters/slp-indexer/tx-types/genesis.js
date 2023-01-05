@@ -26,6 +26,12 @@ class Genesis {
         'Instance of utxo DB required when instantiating genesis.js'
       )
     }
+    this.statusDb = localConfig.statusDb
+    if (!this.statusDb) {
+      throw new Error(
+        'Instance of status DB required when instantiating genesis.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
@@ -99,8 +105,21 @@ class Genesis {
 
         // Detect if this token is a potential PS006 simple-store-protocol store
         token.isSsp = false
-        if(slpData.ticker.includes('SSP')) {
+        if (slpData.ticker.includes('SSP')) {
           token.isSsp = true
+
+          // Get the list of known SSP tokens from the status DB. Create it if
+          // it doesn't exist.
+          let sspList = []
+          try {
+            sspList = await this.statusDb.get('sspList')
+          } catch(err) {
+            sspList = []
+          }
+
+          // Add the token to the list
+          sspList.push(slpData.tokenId)
+          await this.statusDb.put('sspList', sspList)
         }
       }
 

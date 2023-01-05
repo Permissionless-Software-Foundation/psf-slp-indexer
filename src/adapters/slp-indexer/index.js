@@ -71,7 +71,7 @@ class SlpIndexer {
       utxoDb,
       txDb
     })
-    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
+    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb, statusDb })
     this.nftGenesis = new NftGenesis({
       addrDb,
       tokenDb,
@@ -343,8 +343,21 @@ class SlpIndexer {
           // Check if this transaction is a Claim.
           const isClaim = await this.transaction.isClaim(thisTxid)
           if (isClaim) {
+            // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
+
+            // Get the current claim data for this token. Create it if it doesn't exist.
+            let tokenClaims = []
+            try {
+              tokenClaims = await this.claimDb.get(isClaim.about)
+            } catch(err) {
+              tokenClaims = []
+            }
+
+            // Add the claim to the array of claims for this token.
+            tokenClaims.push(isClaim)
+
             // Save the claim to the database.
-            await this.claimDb.put(isClaim.about, isClaim)
+            await this.claimDb.put(isClaim.about, tokenClaims)
           }
         }
       }

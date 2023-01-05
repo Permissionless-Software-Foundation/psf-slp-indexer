@@ -17,17 +17,6 @@ async function getClaims () {
     const stream = claimDb.createReadStream()
     const claims = []
 
-    // function filterTokens (tokenData) {
-    //   try {
-    //     if (tokenData.type === 129) {
-    //       tokens.push(tokenData)
-    //     }
-    //   } catch (err) {
-    //     console.error('Error in filterTokens: ', err)
-    //     throw err
-    //   }
-    // }
-
     stream.on('data', async function (data) {
       try {
         // console.log('data.value: ', data.value)

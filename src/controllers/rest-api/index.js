@@ -12,6 +12,7 @@ const UserRouter = require('./users')
 const ContactRESTController = require('./contact')
 const LogsRESTController = require('./logs')
 const SlpRESTController = require('./slp')
+const SspRESTController = require('./ssp')
 
 class RESTControllers {
   constructor (localConfig = {}) {
@@ -56,6 +57,9 @@ class RESTControllers {
 
     const slpRESTController = new SlpRESTController(dependencies)
     slpRESTController.attach(app)
+
+    const sspRESTController = new SspRESTController(dependencies)
+    sspRESTController.attach(app)
   }
 }
 
