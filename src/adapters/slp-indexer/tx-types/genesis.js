@@ -2,8 +2,10 @@
   A class library for processing Genesis SLP transactions
 */
 
+// Global npm libraries
 const IndexerUtils = require('../lib/utils')
 const BigNumber = require('bignumber.js')
+const axios = require('axios')
 
 class Genesis {
   constructor (localConfig = {}) {
@@ -35,6 +37,7 @@ class Genesis {
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
+    this.axios = axios
   }
 
   // Primary function. Processes GENESIS transaction.
@@ -120,6 +123,9 @@ class Genesis {
           // Add the token to the list
           sspList.push(slpData.tokenId)
           await this.statusDb.put('sspList', sspList)
+
+          // Generate webhook to the ssp-api
+          await this.webhookNewToken(token)
         }
       }
 
@@ -131,6 +137,18 @@ class Genesis {
       return token
     } catch (err) {
       console.error('Error in genesis.addTokenToDB()')
+      throw err
+    }
+  }
+
+  // Generate a webhook to pass new SSP token data to the ssp-api.
+  async webhookNewToken(token) {
+    try {
+      const url = 'http://localhost:5020/webhook/token'
+
+      await this.axios.post(url, token)
+    } catch (err) {
+      console.error('Error in genesis.webhookNewToken(): ', err)
       throw err
     }
   }

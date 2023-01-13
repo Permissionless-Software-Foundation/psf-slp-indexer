@@ -11,6 +11,7 @@
 const BigNumber = require('bignumber.js')
 const slpParser = require('slp-parser')
 const BCHJS = require('@psf/bch-js')
+const axios = require('axios')
 
 // Local libraries
 const RPC = require('./rpc')
@@ -26,6 +27,7 @@ class Transaction {
     this.slpParser = slpParser
     this.queue = new RetryQueue()
     this.bchjs = new BCHJS()
+    this.axios = axios
 
     // State
     this.tokenCache = {}
@@ -956,6 +958,11 @@ class Transaction {
         }
         console.log(`Claim found: ${JSON.stringify(retObj, null, 2)}`)
 
+        // Make a webhook call to ssp-api to tell it a new claim has been found.
+        try {
+          this.webhookNewClaim(retObj)
+        } catch(err) {}
+
         // Return the decoded claim data.
         return retObj
       }
@@ -964,6 +971,20 @@ class Transaction {
       return false
     } catch (err) {
       console.error('Error in transaction.js/isClaim()')
+      throw err
+    }
+  }
+
+  // Generate a webhook to pass new claim data to the ssp-api.
+  async webhookNewClaim(claim) {
+    try {
+      const url = 'http://localhost:5020/webhook/claim'
+
+      await this.axios.post(url, claim)
+
+      return true
+    } catch (err) {
+      console.error('Error in transaction.webhookNewClaim(): ', err)
       throw err
     }
   }
