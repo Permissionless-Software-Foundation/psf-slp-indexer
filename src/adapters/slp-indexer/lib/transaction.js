@@ -985,7 +985,8 @@ class Transaction {
       return true
     } catch (err) {
       console.error('Error in transaction.webhookNewClaim(): ', err)
-      throw err
+      // throw err
+      console.log('Skipping error and continuing processing. Check ssp-api')
     }
   }
 }

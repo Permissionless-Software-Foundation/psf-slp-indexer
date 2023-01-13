@@ -13,7 +13,7 @@ const WIF = 'L3mFYy5TvWUSQeuiVBtn74XNYDSN83YQBwwWDbuWLHGtr7CyqD4p'
 const MESSAGE = 'ipfs://bafybeiejgelijpavmofaxe63ydql23n3focalc3n5z7znm2hjp45khpuxi'
 
 // Store token ID
-const STORE = '9fe85e577562e120447f22e8fa0fbeec210d1f3844e05192e8819bde75366dc0'
+const STORE = '52ceab087d42b3756ee1361c9832fbaefaa3787e3386e60360bb87aa650c4f08'
 
 const BCHJS = require('@psf/bch-js')
 const bchjs = new BCHJS()

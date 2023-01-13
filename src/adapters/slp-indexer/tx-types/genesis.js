@@ -149,7 +149,8 @@ class Genesis {
       await this.axios.post(url, token)
     } catch (err) {
       console.error('Error in genesis.webhookNewToken(): ', err)
-      throw err
+      console.log('skipping error and continuing processing. Check ssp-api.')
+      // throw err
     }
   }
 
