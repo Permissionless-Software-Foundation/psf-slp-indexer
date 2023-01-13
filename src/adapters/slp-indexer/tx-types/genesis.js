@@ -142,7 +142,7 @@ class Genesis {
   }
 
   // Generate a webhook to pass new SSP token data to the ssp-api.
-  async webhookNewToken(token) {
+  async webhookNewToken (token) {
     try {
       const url = 'http://localhost:5020/webhook/token'
 

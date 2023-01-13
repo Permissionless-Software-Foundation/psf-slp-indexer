@@ -961,7 +961,7 @@ class Transaction {
         // Make a webhook call to ssp-api to tell it a new claim has been found.
         try {
           this.webhookNewClaim(retObj)
-        } catch(err) {}
+        } catch (err) {}
 
         // Return the decoded claim data.
         return retObj
@@ -976,7 +976,7 @@ class Transaction {
   }
 
   // Generate a webhook to pass new claim data to the ssp-api.
-  async webhookNewClaim(claim) {
+  async webhookNewClaim (claim) {
     try {
       const url = 'http://localhost:5020/webhook/claim'
 
