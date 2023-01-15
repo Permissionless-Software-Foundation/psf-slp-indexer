@@ -943,16 +943,16 @@ class Transaction {
         const script = this.bchjs.Script.toASM(
           Buffer.from(opReturn, 'hex')
         ).split(' ')
-        console.log(`script: ${JSON.stringify(script, null, 2)}`);
+        console.log(`script: ${JSON.stringify(script, null, 2)}`)
 
         let type = 0
-        if(script[2].includes("OP_0")) {
+        if (script[2].includes('OP_0')) {
           type = 0
-        } else if(script[2].includes("OP_1")) {
+        } else if (script[2].includes('OP_1')) {
           type = 1
-        } else if(script[2].includes("OP_2")) {
+        } else if (script[2].includes('OP_2')) {
           type = 2
-        } else if(script[2].includes("OP_3")) {
+        } else if (script[2].includes('OP_3')) {
           type = 3
         }
 
