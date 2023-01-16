@@ -21,6 +21,9 @@ This boilerplate extends that code to provide the basic features required to be 
 
 If you are interested in creating your own service provider on the IPFS network, fork this repository and start building.
 
+## Branches
+This code repository was refactored from CommonJS format to ECMA Script Modules (ESM) format because js-ipfs made the same change, and this repository depends heavily on that one. A CommonJS format version of this code repository is maintained in the [`cjs` branch](https://github.com/Permissionless-Software-Foundation/ipfs-service-provider/tree/cjs). This is useful for projects that can not make use of ESM yet, like [Electron.js](https://www.electronjs.org/) and [P2WDB](https://p2wdb.com).
+
 ## Circuit Relay
 
 This 'production' environment for this boilerplate sets up a series of Docker containers, orchestrated with Docker Compose. This boilerplate code can be run without modification, in order to set up a [Circuit Relay](https://docs.libp2p.io/concepts/circuit-relay/) and support the PSF network. You can get paid a [bounty](https://github.com/Permissionless-Software-Foundation/bounties) for doing so, in PSF tokens. See the section below on setting up a Production Docker Container.
