@@ -945,16 +945,11 @@ class Transaction {
         ).split(' ')
         console.log(`script: ${JSON.stringify(script, null, 2)}`)
 
-        let type = 0
-        if (script[2].includes('OP_0')) {
-          type = 0
-        } else if (script[2].includes('OP_1')) {
-          type = 1
-        } else if (script[2].includes('OP_2')) {
-          type = 2
-        } else if (script[2].includes('OP_3')) {
-          type = 3
-        }
+        // Convert the type to a number
+        let type = Buffer.from(script[2]).toString()
+        console.log('type: ', type)
+        type = parseInt(type, 16)
+        console.log('type number: ', type)
 
         const about = Buffer.from(script[3], 'hex').toString()
         // console.log(`about: ${store.toString()}`)
