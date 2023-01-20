@@ -951,6 +951,9 @@ class Transaction {
         type = parseInt(type, 16)
         console.log('type number: ', type)
 
+        // Catch corner-case of older, ill-formed claim transactions.
+        if(type > 200) return false
+
         const about = Buffer.from(script[3], 'hex').toString()
         // console.log(`about: ${store.toString()}`)
 
