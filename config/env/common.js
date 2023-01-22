@@ -15,7 +15,7 @@ const ipfsCoordName = process.env.COORD_NAME
 
 module.exports = {
   // Configure TCP port.
-  port: process.env.PORT || 5001,
+  port: process.env.PORT || 5021,
 
   // Password for HTML UI that displays logs.
   logPass: 'test',
