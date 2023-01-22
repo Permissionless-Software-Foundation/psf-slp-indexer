@@ -191,7 +191,7 @@ class SlpIndexer {
 
       // Enter permanent loop, processing ZMQ input.
       do {
-        // TODO: add getBlockCounty to a auto-retry in case it fails.
+        // TODO: add getBlockCount to a auto-retry in case it fails.
         blockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
         // console.log('Current chain block height: ', blockHeight)
         // console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
