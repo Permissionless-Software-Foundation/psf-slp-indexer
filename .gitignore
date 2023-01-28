@@ -65,7 +65,7 @@ system-user-*.json
 orbitdb
 ipfsdata
 .ipfsdata
-#leveldb/
+leveldb/
 logs/
 tx-map.json
 slp-tx-map.zip
