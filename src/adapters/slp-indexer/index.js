@@ -354,7 +354,7 @@ class SlpIndexer {
             }
 
             // Skip this claim if it does not have an 'about' target.
-            if(!isClaim.about) continue
+            if (!isClaim.about) continue
 
             // Add the claim to the array of claims for this token.
             tokenClaims.push(isClaim)
