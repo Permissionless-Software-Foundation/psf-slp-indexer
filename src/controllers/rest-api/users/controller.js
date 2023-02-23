@@ -124,7 +124,7 @@ class UserRESTControllerLib {
 
       ctx.body = { users }
     } catch (err) {
-      wlogger.error('Error in users/controller.js/getUsers(): '.err)
+      wlogger.error('Error in users/controller.js/getUsers(): ', err)
       ctx.throw(422, err.message)
     }
   }
