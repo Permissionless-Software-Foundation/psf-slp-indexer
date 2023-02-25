@@ -28,6 +28,9 @@ describe('#Controllers', () => {
         attachRPCRouter: () => {}
       }
 
+      // Mock the timer controllers
+      sandbox.stub(uut.timerControllers, 'startTimers').returns()
+
       const app = {
         use: () => {}
       }
