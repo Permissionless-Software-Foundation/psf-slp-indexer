@@ -92,7 +92,7 @@ You can bring the containers back up with `docker-compose up -d`.
 
 ## Structure
 
-The file layout of this repository differs from the koa-api-boilerplate. Instead, it follows the file layout of [Clean Architecture](troutsblog.com/blog/clean-architecture).
+The file layout of this repository differs from the koa-api-boilerplate. Instead, it follows the file layout of [Clean Architecture](https://christroutner.github.io/trouts-blog/blog/clean-architecture).
 
 ## Usage
 
