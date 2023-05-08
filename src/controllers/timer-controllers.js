@@ -29,7 +29,7 @@ class TimerControllers {
     // Bind 'this' object to all subfunctions.
     this.exampleTimerFunc = this.exampleTimerFunc.bind(this)
 
-    this.startTimers()
+    // this.startTimers()
   }
 
   // Start all the time-based controllers.
