@@ -57,7 +57,8 @@ class JsonFiles {
               console.log(`err: ${JSON.stringify(err, null, 2)}`)
             }
 
-            throw err
+            // throw err
+            return reject(err)
           }
 
           const obj = JSON.parse(data)
