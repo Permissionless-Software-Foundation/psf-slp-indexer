@@ -56,6 +56,16 @@ describe('#Timer-Controllers', () => {
     })
   })
 
+  describe('#startTimers', () => {
+    it('should start the timers', () => {
+      const result = uut.startTimers()
+
+      uut.stopTimers()
+
+      assert.equal(result, true)
+    })
+  })
+
   describe('#exampleTimerFunc', () => {
     it('should kick off the Use Case', async () => {
       const result = await uut.exampleTimerFunc()
