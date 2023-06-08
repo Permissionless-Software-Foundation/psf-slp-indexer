@@ -311,6 +311,7 @@ class SlpIndexer {
       const slpTxs = filteredTxs.combined
       const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      console.log('processBlock() nonSlpTxs: ', nonSlpTxs.length)
 
       // If the block has no txs after filtering for SLP txs, then skip processing.
       if (slpTxs && slpTxs.length) {

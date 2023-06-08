@@ -960,6 +960,8 @@ class Transaction {
         const content = Buffer.from(script[4], 'hex').toString()
         // console.log(`content: ${content.toString()}`)
 
+        console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+
         const retObj = {
           txid,
           type,

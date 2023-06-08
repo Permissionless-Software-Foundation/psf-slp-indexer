@@ -415,8 +415,8 @@ describe('#filter-block.js', () => {
       const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
-      assert.isArray(result)
-      assert.equal(result.length, 0)
+      assert.isArray(result.combined)
+      assert.equal(result.combined.length, 0)
     })
 
     it('should catch and throw errors', async () => {
