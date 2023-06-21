@@ -7,6 +7,9 @@ const IndexerUtils = require('../lib/utils')
 const BigNumber = require('bignumber.js')
 const axios = require('axios')
 
+// Local libraries
+const config = require('../../../../config')
+
 class Genesis {
   constructor (localConfig = {}) {
     // LevelDBs
@@ -38,6 +41,7 @@ class Genesis {
     // Encapsulate dependencies
     this.util = new IndexerUtils()
     this.axios = axios
+    this.config = config
   }
 
   // Primary function. Processes GENESIS transaction.
@@ -144,7 +148,7 @@ class Genesis {
   // Generate a webhook to pass new SSP token data to the ssp-api.
   async webhookNewToken (token) {
     try {
-      const url = 'http://localhost:5020/webhook/token'
+      const url = `${this.config.sspUrl}/webhook/token`
 
       await this.axios.post(url, token)
     } catch (err) {

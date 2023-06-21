@@ -16,6 +16,7 @@ const axios = require('axios')
 // Local libraries
 const RPC = require('./rpc')
 const RetryQueue = require('./retry-queue')
+const config = require('../../../../config')
 
 // Global pointer to instance of this class
 let _this
@@ -28,6 +29,7 @@ class Transaction {
     this.queue = new RetryQueue()
     this.bchjs = new BCHJS()
     this.axios = axios
+    this.config = config
 
     // State
     this.tokenCache = {}
@@ -990,7 +992,7 @@ class Transaction {
   // Generate a webhook to pass new claim data to the ssp-api.
   async webhookNewClaim (claim) {
     try {
-      const url = 'http://localhost:5020/webhook/claim'
+      const url = `${this.config.sspUrl}/webhook/claim`
 
       await this.axios.post(url, claim)
 

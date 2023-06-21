@@ -105,5 +105,8 @@ module.exports = {
       ],
 
   // Number of backups to retain.
-  backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5
+  backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5,
+
+  // SSP-API settings
+  sspUrl: process.env.SSP_API_URL ? process.env.SSP_API_URL : 'http://localhost:5020'
 }
