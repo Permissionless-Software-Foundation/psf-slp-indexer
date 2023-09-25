@@ -5,17 +5,24 @@
 
 /* eslint  no-unneeded-ternary:0 */
 
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+
 // Get the version from the package.json file.
-const pkgInfo = require('../../package.json')
+import { readFileSync } from 'fs'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+const pkgInfo = JSON.parse(readFileSync(`${__dirname.toString()}/../../package.json`))
+
 const version = pkgInfo.version
 
 const ipfsCoordName = process.env.COORD_NAME
   ? process.env.COORD_NAME
   : 'psf-slp-indexer'
 
-module.exports = {
+export default {
   // Configure TCP port.
-  port: process.env.PORT || 5001,
+  port: process.env.PORT || 5020,
 
   // Password for HTML UI that displays logs.
   logPass: 'test',
@@ -47,6 +54,7 @@ module.exports = {
     : 'demo',
 
   // IPFS settings.
+  useIpfs: process.env.DISABLE_IPFS ? false : true, // Disable IPFS flag
   isCircuitRelay: process.env.ENABLE_CIRCUIT_RELAY ? true : false,
   // SSL domain used for websocket connection via browsers.
   crDomain: process.env.CR_DOMAIN ? process.env.CR_DOMAIN : '',
@@ -105,5 +113,7 @@ module.exports = {
       ],
 
   // Number of backups to retain.
-  backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5
+  backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5,
+
+  chatPubSubChan: 'psf-ipfs-chat-001'
 }

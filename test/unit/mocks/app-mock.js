@@ -6,4 +6,4 @@ const app = {
   use: () => {}
 }
 
-module.exports = app
+export default app;

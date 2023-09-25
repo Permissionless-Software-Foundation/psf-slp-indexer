@@ -1,15 +1,15 @@
-const config = require('../../../config')
-const axios = require('axios').default
-const assert = require('chai').assert
-const sinon = require('sinon')
+import config from '../../../config/index.js'
+import axios from 'axios'
+import { assert } from 'chai'
+import sinon from 'sinon'
+
+import { context as mockContext } from '../../unit/mocks/ctx-mock.js'
+import ContactController from '../../../src/controllers/rest-api/contact/controller.js'
 
 // Mock data
 // const mockData = require('./mocks/contact-mocks')
 
 const LOCALHOST = `http://localhost:${config.port}`
-
-const mockContext = require('../../unit/mocks/ctx-mock').context
-const ContactController = require('../../../src/controllers/rest-api/contact/controller')
 let uut
 let sandbox
 

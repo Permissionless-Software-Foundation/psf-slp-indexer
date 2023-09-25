@@ -39,4 +39,4 @@ class UseCasesMock {
   user = new UserUseCaseMock()
 }
 
-module.exports = UseCasesMock
+export default UseCasesMock;

@@ -1,12 +1,15 @@
-const assert = require('chai').assert
+import { assert } from 'chai'
+import sinon from 'sinon'
+import util from 'util'
 
-const sinon = require('sinon')
+import LogsApiLib from '../../../src/adapters/logapi.js'
+import mockData from '../mocks/log-api-mock.js'
 
-const util = require('util')
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
 util.inspect.defaultOptions = { depth: 1 }
-
-const LogsApiLib = require('../../../src/adapters/logapi')
-const mockData = require('../mocks/log-api-mock')
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const context = {}
 let sandbox
@@ -32,19 +35,18 @@ describe('#LogsApiLib', () => {
     })
 
     it('should return log', async () => {
-      try {
-        const pass = 'test'
-        const result = await uut.getLogs(pass)
-        // console.log('result', result)
+      // Mock dependencies
+      sandbox.stub(uut, 'generateFileName').returns(`${__dirname.toString()}/../mocks/adapters/fake-log`)
 
-        assert.isTrue(result.success)
-        assert.isArray(result.data)
-        assert.property(result.data[0], 'message')
-        assert.property(result.data[0], 'level')
-        assert.property(result.data[0], 'timestamp')
-      } catch (err) {
-        assert(false, 'Unexpected result')
-      }
+      const pass = 'test'
+      const result = await uut.getLogs(pass)
+      // console.log('result', result)
+
+      assert.isTrue(result.success)
+      assert.isArray(result.data)
+      assert.property(result.data[0], 'message')
+      assert.property(result.data[0], 'level')
+      assert.property(result.data[0], 'timestamp')
     })
 
     it('should return false if files are not found!', async () => {
@@ -201,31 +203,25 @@ describe('#LogsApiLib', () => {
     })
 
     it('should ignore fileReader callback errors', async () => {
-      try {
-        // https://sinonjs.org/releases/latest/stubs/
-        // About yields
-        sandbox.stub(uut.lineReader, 'eachLine').yieldsRight({}, true)
+      // https://sinonjs.org/releases/latest/stubs/
+      // About yields
+      sandbox.stub(uut.lineReader, 'eachLine').yieldsRight({}, true)
 
-        const fileName = context.fileName
-        const result = await uut.readLines(fileName)
-        assert.isArray(result)
-      } catch (err) {
-        assert.fail('Unexpected result')
-      }
+      const fileName = `${__dirname.toString()}/../mocks/adapters/fake-log`
+
+      const result = await uut.readLines(fileName)
+      assert.isArray(result)
     })
 
     it('should return data', async () => {
-      try {
-        const fileName = context.fileName
-        const result = await uut.readLines(fileName)
+      const fileName = `${__dirname.toString()}/../mocks/adapters/fake-log`
 
-        assert.isArray(result)
-        assert.property(result[1], 'message')
-        assert.property(result[1], 'level')
-        assert.property(result[1], 'timestamp')
-      } catch (err) {
-        assert.fail('Unexpected result')
-      }
+      const result = await uut.readLines(fileName)
+
+      assert.isArray(result)
+      assert.property(result[1], 'message')
+      assert.property(result[1], 'level')
+      assert.property(result[1], 'timestamp')
     })
   })
 })

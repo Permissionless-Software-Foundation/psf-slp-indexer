@@ -5,14 +5,15 @@
 */
 
 // Public npm libraries
-const sinon = require('sinon')
-const assert = require('chai').assert
+import sinon from 'sinon'
+
+import { assert } from 'chai'
+
+// Local libraries
+import RateLimit from '../../../../src/controllers/json-rpc/rate-limit.js'
 
 // Set the environment variable to signal this is a test.
 process.env.SVC_ENV = 'test'
-
-// Local libraries
-const RateLimit = require('../../../../src/controllers/json-rpc/rate-limit')
 
 describe('#rate-limit', () => {
   let uut

@@ -2,7 +2,7 @@
   REST API Controller library for the /user route
 */
 
-const { wlogger } = require('../../../adapters/wlogger')
+import wlogger from '../../../adapters/wlogger.js'
 
 let _this
 
@@ -36,7 +36,7 @@ class UserRESTControllerLib {
    * @apiGroup REST Users
    *
    * @apiExample Example usage:
-   * curl -H "Content-Type: application/json" -X POST -d '{ "user": { "email": "email@format.com", "name": "my name", "password": "secretpasas" } }' localhost:5001/users
+   * curl -H "Content-Type: application/json" -X POST -d '{ "user": { "email": "email@format.com", "name": "my name", "password": "secretpasas" } }' localhost:5010/users
    *
    * @apiParam {Object} user          User object (required)
    * @apiParam {String} user.email Email
@@ -124,7 +124,7 @@ class UserRESTControllerLib {
 
       ctx.body = { users }
     } catch (err) {
-      wlogger.error('Error in users/controller.js/getUsers(): '.err)
+      wlogger.error('Error in users/controller.js/getUsers(): ', err)
       ctx.throw(422, err.message)
     }
   }
@@ -136,7 +136,7 @@ class UserRESTControllerLib {
    * @apiGroup REST Users
    *
    * @apiExample Example usage:
-   * curl -H "Content-Type: application/json" -X GET localhost:5000/users/56bd1da600a526986cf65c80
+   * curl -H "Content-Type: application/json" -X GET localhost:5010/users/56bd1da600a526986cf65c80
    *
    * @apiSuccess {Object}   users           User object
    * @apiSuccess {ObjectId} users._id       User id
@@ -281,4 +281,4 @@ class UserRESTControllerLib {
   }
 }
 
-module.exports = UserRESTControllerLib
+export default UserRESTControllerLib

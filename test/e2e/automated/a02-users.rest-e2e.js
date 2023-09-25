@@ -1,20 +1,19 @@
-const testUtils = require('../../utils/test-utils')
-const assert = require('chai').assert
-const config = require('../../../config')
-const axios = require('axios').default
-const sinon = require('sinon')
+import testUtils from '../../utils/test-utils.js'
+import { assert } from 'chai'
+import config from '../../../config/index.js'
+import axios from 'axios'
+import sinon from 'sinon'
+import util from 'util'
 
-const util = require('util')
+import UserController from '../../../src/controllers/rest-api/users/controller.js'
+import Adapters from '../../../src/adapters/index.js'
+import UseCases from '../../../src/use-cases/index.js'
 util.inspect.defaultOptions = { depth: 1 }
 
 const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
-
-const UserController = require('../../../src/controllers/rest-api/users/controller')
-const Adapters = require('../../../src/adapters')
 const adapters = new Adapters()
-const UseCases = require('../../../src/use-cases/')
 let uut
 let sandbox
 
@@ -39,7 +38,7 @@ describe('Users', () => {
 
     // Get the JWT used to log in as the admin 'system' user.
     const adminJWT = await testUtils.getAdminJWT()
-    // console.log(`adminJWT: ${admi  nJWT}`)
+    console.log(`adminJWT: ${adminJWT}`)
     context.adminJWT = adminJWT
 
     // const admin = await testUtils.loginAdminUser()
@@ -71,9 +70,6 @@ describe('Users', () => {
 
         await axios(options)
 
-        /*      console.log(
-          `result stringified: ${JSON.stringify(result.data, null, 2)}`
-        ) */
         assert(false, 'Unexpected result')
       } catch (err) {
         assert(err.response.status === 422, 'Error code 422 expected.')

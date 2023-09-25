@@ -5,8 +5,9 @@
   for this file.
 */
 
-const JwtLib = require('jwt-bch-lib')
-const BCHJS = require('@psf/bch-js')
+import JwtLib from 'jwt-bch-lib'
+
+import BCHJS from '@psf/bch-js'
 
 class FullStackJWT {
   constructor (localConfig = {}) {
@@ -98,4 +99,4 @@ class FullStackJWT {
   }
 }
 
-module.exports = FullStackJWT
+export default FullStackJWT

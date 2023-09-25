@@ -1,0 +1,70 @@
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:36:43.907Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:36:43.909Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:36:43.910Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:36:43.912Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:36:43.915Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/sendEmail()","timestamp":"2022-06-27T17:36:58.979Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/sendEmail()","timestamp":"2022-06-27T17:36:58.980Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/sendEmail()","timestamp":"2022-06-27T17:36:58.981Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/sendEmail()","timestamp":"2022-06-27T17:36:58.982Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/sendEmail()","timestamp":"2022-06-27T17:36:58.983Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/validateEmailArray()","timestamp":"2022-06-27T17:36:59.002Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/validateEmailArray()","timestamp":"2022-06-27T17:36:59.003Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/getHtmlFromObject()","timestamp":"2022-06-27T17:36:59.005Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/getHtmlFromObject()","timestamp":"2022-06-27T17:36:59.006Z"}
+{"level":"error","message":"Error in lib/nodemailer.js/getHtmlFromObject()","timestamp":"2022-06-27T17:36:59.008Z"}
+{"level":"info","message":"Warning: Can not send JSON RPC response. Can not determine which peer this message came from.","timestamp":"2022-06-27T17:36:59.353Z"}
+{"level":"info","message":"Rejecting invalid JSON RPC command.","timestamp":"2022-06-27T17:36:59.354Z"}
+{"level":"info","message":"JSON RPC received from peerA, ID: ea442e78-2297-466a-823b-9cbb12c8ddd9, type: request, method: unknownMethod","timestamp":"2022-06-27T17:36:59.355Z"}
+{"level":"error","message":"Error in rpc router():  test error","stack":"Error: test error\n    at Context.<anonymous> (/home/trout/work/psf/code/ipfs-service-provider/test/unit/controllers/json-rpc/a10-rpc.unit.js:110:49)\n    at callFn (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:366:21)\n    at Test.Runnable.run (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:354:5)\n    at Runner.runTest (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:666:10)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:789:12\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:581:14)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:591:7\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:474:14)\n    at Immediate._onImmediate (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:559:5)\n    at processImmediate (node:internal/timers:466:21)","timestamp":"2022-06-27T17:36:59.357Z"}
+{"level":"info","message":"JSON RPC received from peerA, ID: 9ef6ad90-7fc3-4cb3-8769-4498e5512b3d, type: request, method: users","timestamp":"2022-06-27T17:36:59.358Z"}
+{"level":"info","message":"JSON RPC received from peerA, ID: bd57a1cf-7f2f-4ff2-93d4-6727eec4d778, type: request, method: auth","timestamp":"2022-06-27T17:36:59.359Z"}
+{"level":"info","message":"JSON RPC received from peerA, ID: 8fd9edc8-6a45-4042-ac06-9ace60567cbf, type: request, method: about","timestamp":"2022-06-27T17:36:59.361Z"}
+{"level":"info","message":"JSON RPC received from peerA, ID: 1b27624a-e698-4bbe-9183-b860a1a0d78d, type: request, method: unknownMethod","timestamp":"2022-06-27T17:36:59.363Z"}
+{"level":"info","message":"JSON RPC received from peerA, ID: 40fabddf-59c6-4910-a22c-63da7387f99a, type: request, method: unknownMethod","timestamp":"2022-06-27T17:36:59.365Z"}
+{"level":"error","message":"Error in authUser():  Login credential do not match","stack":"Error: Login credential do not match\n    at Context.<anonymous> (/home/trout/work/psf/code/ipfs-service-provider/test/unit/controllers/json-rpc/auth.json-rpc.controller.unit.js:144:18)\n    at callFn (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:366:21)\n    at Test.Runnable.run (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:354:5)\n    at Runner.runTest (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:666:10)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:789:12\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:581:14)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:591:7\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:474:14)\n    at Immediate.<anonymous> (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:559:5)\n    at processImmediate (node:internal/timers:466:21)","timestamp":"2022-06-27T17:37:04.421Z"}
+{"level":"error","message":"Error in authUser():  login must be specified","stack":"Error: login must be specified\n    at AuthRPC.authUser (/home/trout/work/psf/code/ipfs-service-provider/src/controllers/json-rpc/auth/index.js:78:93)\n    at Context.<anonymous> (/home/trout/work/psf/code/ipfs-service-provider/test/unit/controllers/json-rpc/auth.json-rpc.controller.unit.js:165:34)\n    at callFn (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:366:21)\n    at Test.Runnable.run (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:354:5)\n    at Runner.runTest (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:666:10)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:789:12\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:581:14)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:591:7\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:474:14)\n    at Immediate._onImmediate (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:559:5)\n    at processImmediate (node:internal/timers:466:21)","timestamp":"2022-06-27T17:37:04.423Z"}
+{"level":"error","message":"Error in authUser():  password must be specified","stack":"Error: password must be specified\n    at AuthRPC.authUser (/home/trout/work/psf/code/ipfs-service-provider/src/controllers/json-rpc/auth/index.js:78:284)\n    at Context.<anonymous> (/home/trout/work/psf/code/ipfs-service-provider/test/unit/controllers/json-rpc/auth.json-rpc.controller.unit.js:185:34)\n    at callFn (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:366:21)\n    at Test.Runnable.run (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runnable.js:354:5)\n    at Runner.runTest (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:666:10)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:789:12\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:581:14)\n    at /home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:591:7\n    at next (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:474:14)\n    at Immediate._onImmediate (/home/trout/work/psf/code/ipfs-service-provider/node_modules/mocha/lib/runner.js:559:5)\n    at processImmediate (node:internal/timers:466:21)","timestamp":"2022-06-27T17:37:04.425Z"}
+{"level":"error","timestamp":"2022-06-27T17:37:04.466Z"}
+{"level":"info","message":"Running server in environment: dev","timestamp":"2022-06-27T17:37:04.487Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:04.495Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:04.495Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:04.496Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:04.497Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:04.497Z"}
+{"level":"error","message":"Error in lib/users.js/getAllUsers()","timestamp":"2022-06-27T17:37:04.499Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:04.502Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:04.503Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:04.503Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:04.504Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:04.505Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:04.506Z"}
+{"level":"error","message":"Error in lib/users.js/deleteUser()","timestamp":"2022-06-27T17:37:04.508Z"}
+{"level":"info","message":"Running server in environment: test","timestamp":"2022-06-27T17:37:04.514Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:04.638Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:05.273Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:05.277Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:05.280Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:05.286Z"}
+{"level":"error","timestamp":"2022-06-27T17:37:05.412Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac1b4f08950b955d27f, Target user: 1","timestamp":"2022-06-27T17:37:05.441Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:05.448Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac1b4f08950b955d27f, Target user: 62b9eac1b4f08950b955d27d","timestamp":"2022-06-27T17:37:05.452Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:05.457Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:05.463Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:05.467Z"}
+{"level":"error","message":"Error in lib/users.js/updateUser()","timestamp":"2022-06-27T17:37:05.473Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac0b4f08950b955d274, Target user: 62b9eac1b4f08950b955d27d","timestamp":"2022-06-27T17:37:05.478Z"}
+{"level":"verbose","message":"It's ok. The user is an admin.","timestamp":"2022-06-27T17:37:05.478Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac1b4f08950b955d27f, Target user: 1","timestamp":"2022-06-27T17:37:05.600Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac1b4f08950b955d27f, Target user: 62b9eac1b4f08950b955d27d","timestamp":"2022-06-27T17:37:05.603Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac0b4f08950b955d274, Target user: 62b9eac1b4f08950b955d27d","timestamp":"2022-06-27T17:37:05.615Z"}
+{"level":"verbose","message":"It's ok. The user is an admin.","timestamp":"2022-06-27T17:37:05.615Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:37:05.619Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:37:05.622Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:37:05.624Z"}
+{"level":"error","message":"Error in lib/contact.js/sendEmail()","timestamp":"2022-06-27T17:37:05.627Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac1b4f08950b955d2a6, Target user: Target Id","timestamp":"2022-06-27T17:37:05.754Z"}
+{"level":"verbose","message":"Calling user and target user do not match! Calling user: 62b9eac0b4f08950b955d274, Target user: 62b9eac1b4f08950b955d2a6","timestamp":"2022-06-27T17:37:05.756Z"}
+{"level":"verbose","message":"It's ok. The user is an admin.","timestamp":"2022-06-27T17:37:05.756Z"}
+{"level":"error","message":"Error in lib/users.js/createUser()","timestamp":"2022-06-27T17:37:06.060Z"}

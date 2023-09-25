@@ -3,10 +3,10 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
+import { assert } from 'chai'
 
-const NodeMailer = require('../../../src/adapters/nodemailer')
+import sinon from 'sinon'
+import NodeMailer from '../../../src/adapters/nodemailer.js'
 
 let sandbox
 let uut

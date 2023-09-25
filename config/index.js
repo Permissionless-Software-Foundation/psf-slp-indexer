@@ -1,6 +1,21 @@
-const common = require('./env/common')
+import common from './env/common.js'
+
+import development from './env/development.js'
+import production from './env/production.js'
+import test from './env/test.js'
 
 const env = process.env.SVC_ENV || 'development'
-const config = require(`./env/${env}`)
+console.log(`Loading config for this environment: ${env}`)
 
-module.exports = Object.assign({}, common, config)
+let config = development
+if (env === 'test') {
+  config = test
+} else if (env === 'prod') {
+  config = production
+}
+
+// const importStr = `./env/${env}.js`
+// console.log('importStr: ', importStr)
+// import config from importStr
+
+export default Object.assign({}, common, config)
