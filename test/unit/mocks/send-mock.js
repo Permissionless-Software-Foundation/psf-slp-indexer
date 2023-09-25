@@ -1,7 +1,7 @@
 /*
   Mock data for send-unit.js
 */
-const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 const sendData01 = {
   slpData: {
@@ -445,7 +445,7 @@ const greaterOutputAddr02 = {
   ]
 }
 
-module.exports = {
+export default {
   sendData01,
   addrData01,
   utxo01,

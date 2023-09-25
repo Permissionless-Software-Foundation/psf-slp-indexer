@@ -2,10 +2,12 @@
   Unit tests for the retry-queue library.
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+import { assert } from 'chai'
+import sinon from 'sinon'
 
-const RetryQueue = require('../../../../../src/adapters/slp-indexer/lib/retry-queue')
+import RetryQueue from '../../../../../src/adapters/slp-indexer/lib/retry-queue.js'
 
 let uut
 let sandbox

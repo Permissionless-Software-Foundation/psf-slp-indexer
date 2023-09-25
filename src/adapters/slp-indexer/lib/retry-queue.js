@@ -9,8 +9,11 @@
   pay-to-write-access-controller.js depends on this library.
 */
 
-const PQueue = require('p-queue').default
-const pRetry = require('p-retry')
+// const PQueue = require('p-queue').default
+// const pRetry = require('p-retry')
+
+import PQueue from 'p-queue'
+import pRetry from 'p-retry'
 
 // const pRetry = require('p-retry')
 
@@ -110,4 +113,5 @@ class RetryQueue {
   }
 }
 
-module.exports = RetryQueue
+// module.exports = RetryQueue
+export default RetryQueue

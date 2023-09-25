@@ -516,7 +516,7 @@ const threeTxTestData03 = {
   tokenDocHash: ''
 }
 
-module.exports = {
+export default {
   slpSendTxData01,
   slpGenesisTxData01,
   threeTxTestData01,

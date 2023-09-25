@@ -3,16 +3,24 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
-const BigNumber = require('bignumber.js')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+// const cloneDeep = require('lodash.clonedeep')
+// const BigNumber = require('bignumber.js')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const NftGenesis = require('../../../../../src/adapters/slp-indexer/tx-types/nft-genesis')
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/nft-genesis-mock')
-const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
+// const NftGenesis = require('../../../../../src/adapters/slp-indexer/tx-types/nft-genesis')
+// const MockLevel = require('../../../../unit/mocks/leveldb-mock')
+// const mockDataLib = require('../../../../unit/mocks/nft-genesis-mock')
+// const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
+import NftGenesis from '../../../../../src/adapters/slp-indexer/tx-types/nft-genesis.js'
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/nft-genesis-mock.js'
+import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
 
 describe('#nft-genesis.js', () => {
   let uut, sandbox, mockData

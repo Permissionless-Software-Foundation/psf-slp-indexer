@@ -3,13 +3,18 @@
 */
 
 // Global npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+// const cloneDeep = require('lodash.clonedeep')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
 
 // local libraries
-const IndexerUtils = require('../../../../../src/adapters/slp-indexer/lib/utils')
-const mockDataLib = require('../../../mocks/utils-mock.js')
+// const IndexerUtils = require('../../../../../src/adapters/slp-indexer/lib/utils')
+// const mockDataLib = require('../../../mocks/utils-mock.js')
+import IndexerUtils from '../../../../../src/adapters/slp-indexer/lib/utils.js'
+import mockDataLib from '../../../mocks/utils-mock.js'
 
 describe('#utils.js', () => {
   let uut, sandbox, mockData

@@ -13,7 +13,7 @@ export COORD_NAME=ipfs-service-provider-generic
 export MNEMONIC="churn aisle shield silver ladder swear hunt slim pen demand spoil veteran"
 
 # 0 = less verbose. 3 = most verbose
-export DEBUG_LEVEL=2
+export DEBUG_LEVEL=0
 
 # Production settings that use external IPFS node.
 # https://github.com/christroutner/docker-ipfs

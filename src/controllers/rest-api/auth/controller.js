@@ -1,4 +1,4 @@
-const Passport = require('../../../adapters/passport')
+import Passport from '../../../adapters/passport.js'
 const passport = new Passport()
 
 let _this
@@ -96,4 +96,4 @@ class AuthRESTController {
   }
 }
 
-module.exports = AuthRESTController
+export default AuthRESTController

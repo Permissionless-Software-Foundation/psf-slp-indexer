@@ -12,8 +12,9 @@
 // const ctx = mockContext()
 // ...
 
-const Stream = require('stream')
-const Koa = require('koa')
+import Stream from 'stream';
+
+import Koa from 'koa';
 
 const context = (req, res, app) => {
   const socket = new Stream.Duplex()
@@ -43,8 +44,8 @@ const request = (req, res, app) => context(req, res, app).request
 
 const response = (req, res, app) => context(req, res, app).response
 
-module.exports = {
+export {
   context,
   request,
   response
-}
+};

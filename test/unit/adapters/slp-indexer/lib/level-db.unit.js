@@ -5,7 +5,8 @@
 // Global npm libraries
 // const assert = require('chai').assert
 
-const LevelDb = require('../../../../../src/adapters/slp-indexer/lib/level-db')
+// const LevelDb = require('../../../../../src/adapters/slp-indexer/lib/level-db')
+import LevelDb from '../../../../../src/adapters/slp-indexer/lib/level-db.js'
 
 describe('#level-db', () => {
   let uut

@@ -8,12 +8,14 @@
 */
 
 // Public npm libraries
-const BigNumber = require('bignumber.js')
-const slpParser = require('slp-parser')
+// const BigNumber = require('bignumber.js')
+// const slpParser = require('slp-parser')
+import BigNumber from 'bignumber.js'
+import slpParser from 'slp-parser'
 
 // Local libraries
-const RPC = require('./rpc')
-const RetryQueue = require('./retry-queue')
+import RPC from './rpc.js'
+import RetryQueue from './retry-queue.js'
 
 // Global pointer to instance of this class
 let _this
@@ -910,4 +912,5 @@ class Transaction {
   }
 }
 
-module.exports = Transaction
+// module.exports = Transaction
+export default Transaction

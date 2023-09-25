@@ -3,16 +3,24 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
-const BigNumber = require('bignumber.js')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+// const cloneDeep = require('lodash.clonedeep')
+// const BigNumber = require('bignumber.js')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const Mint = require('../../../../../src/adapters/slp-indexer/tx-types/mint')
-const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/mint-mock')
+// const Mint = require('../../../../../src/adapters/slp-indexer/tx-types/mint')
+// const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
+// const MockLevel = require('../../../../unit/mocks/leveldb-mock')
+// const mockDataLib = require('../../../../unit/mocks/mint-mock')
+import Mint from '../../../../../src/adapters/slp-indexer/tx-types/mint.js'
+import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/mint-mock.js'
 
 describe('#mint.js', () => {
   let uut, sandbox, mockData

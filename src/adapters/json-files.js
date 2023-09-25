@@ -1,8 +1,8 @@
 /*
   A utility file for reading and writing JSON files.
 */
-'use strict'
-const fs = require('fs')
+
+import fs from 'fs'
 
 let _this
 
@@ -57,7 +57,8 @@ class JsonFiles {
               console.log(`err: ${JSON.stringify(err, null, 2)}`)
             }
 
-            throw err
+            // throw err
+            return reject(err)
           }
 
           const obj = JSON.parse(data)
@@ -72,4 +73,4 @@ class JsonFiles {
   }
 }
 
-module.exports = JsonFiles
+export default JsonFiles

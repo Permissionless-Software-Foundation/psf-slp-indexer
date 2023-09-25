@@ -5,11 +5,11 @@
 */
 
 // Public npm libraries
-const BitcoinCashZmqDecoder = require('@psf/bitcoincash-zmq-decoder')
-const zmq = require('zeromq')
+import BitcoinCashZmqDecoder from '@psf/bitcoincash-zmq-decoder'
+import zmq from 'zeromq'
 
 // Local libraries
-const config = require('../../../../config')
+import config from '../../../../config/index.js'
 
 let _this
 
@@ -99,4 +99,5 @@ class ZMQ {
   }
 }
 
-module.exports = ZMQ
+// module.exports = ZMQ
+export default ZMQ

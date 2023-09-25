@@ -1,7 +1,6 @@
-const assert = require('chai').assert
-const PassportLib = require('../../../src/adapters/passport')
-
-const sinon = require('sinon')
+import { assert } from 'chai'
+import PassportLib from '../../../src/adapters/passport.js'
+import sinon from 'sinon'
 
 let uut
 let sandbox

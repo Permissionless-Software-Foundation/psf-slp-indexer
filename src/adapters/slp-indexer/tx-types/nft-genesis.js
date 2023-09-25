@@ -3,10 +3,12 @@
 */
 
 // Public npm libraries
-const BigNumber = require('bignumber.js')
+// const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const IndexerUtils = require('../lib/utils')
+// const IndexerUtils = require('../lib/utils')
+import IndexerUtils from '../lib/utils.js'
 
 class NftGenesis {
   constructor (localConfig = {}) {
@@ -485,4 +487,5 @@ class NftGenesis {
   }
 }
 
-module.exports = NftGenesis
+// module.exports = NftGenesis
+export default NftGenesis

@@ -7,10 +7,17 @@
 */
 
 // Global npm librares
-const shell = require('shelljs')
+// const shell = require('shelljs')
+import shell from 'shelljs'
 
 // Local libraries
-const config = require('../../../../config')
+// const config = require('../../../../config')
+import config from '../../../../config/index.js'
+
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const dbDir = `${__dirname.toString()}/../../../../leveldb`
 
@@ -175,4 +182,5 @@ class DbBackup {
   }
 }
 
-module.exports = DbBackup
+// module.exports = DbBackup
+export default DbBackup

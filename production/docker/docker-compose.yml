@@ -4,7 +4,7 @@ version: '3.9'
 
 services:
   mongo-slp-indexer:
-    image: mongo
+    image: mongo:4.2.0
     container_name: mongo-slp-indexer
     ports:
       - '5555:27017' # <host port>:<container port>

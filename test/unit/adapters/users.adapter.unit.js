@@ -2,15 +2,16 @@
   Unit tests for the users Mongoose model.
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
-const mongoose = require('mongoose')
+import { assert } from 'chai'
+
+import sinon from 'sinon'
+import mongoose from 'mongoose'
+
+import User from '../../../src/adapters/localdb/models/users.js'
+import config from '../../../config/index.js'
 
 // Set the environment variable to signal this is a test.
 process.env.SVC_ENV = 'test'
-
-const User = require('../../../src/adapters/localdb/models/users')
-const config = require('../../../config')
 
 describe('#User-Adapter', () => {
   // let uut
