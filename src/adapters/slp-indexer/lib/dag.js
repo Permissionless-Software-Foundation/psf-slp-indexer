@@ -227,4 +227,5 @@ class DAG {
   }
 }
 
-module.exports = DAG
+// module.exports = DAG
+export default DAG

@@ -4,7 +4,8 @@
 */
 
 // Global npm libraries
-const BigNumber = require('bignumber.js')
+// const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 class IndexerUtils {
   // Generate a new schema/template for an address object. This structure will
@@ -153,4 +154,5 @@ class IndexerUtils {
   }
 }
 
-module.exports = IndexerUtils
+// module.exports = IndexerUtils
+export default IndexerUtils

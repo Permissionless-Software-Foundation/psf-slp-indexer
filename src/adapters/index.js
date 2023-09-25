@@ -19,7 +19,7 @@ import Nodemailer from './nodemailer.js'
 import JSONFiles from './json-files.js'
 
 import FullStackJWT from './fullstack-jwt.js'
-import SlpIndexer from './slp-indexer.js'
+import SlpIndexer from './slp-indexer/index.js'
 import config from '../../config/index.js'
 
 class Adapters {

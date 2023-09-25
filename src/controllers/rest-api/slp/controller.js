@@ -3,12 +3,13 @@
 */
 
 // Local libraries
-const config = require('../../../../config')
+// const config = require('../../../../config')
+import config from '../../../../config/index.js'
 // const { wlogger } = require('../../../adapters/wlogger')
 
 let _this
 
-class UserRESTControllerLib {
+class SlpRESTControllerLib {
   constructor (localConfig = {}) {
     // Dependency Injection.
     this.adapters = localConfig.adapters
@@ -403,4 +404,5 @@ class UserRESTControllerLib {
   }
 }
 
-module.exports = UserRESTControllerLib
+// module.exports = UserRESTControllerLib
+export default SlpRESTControllerLib

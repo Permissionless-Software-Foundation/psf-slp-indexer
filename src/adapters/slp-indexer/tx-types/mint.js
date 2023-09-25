@@ -9,11 +9,14 @@
 */
 
 // Public npm libraries
-const BigNumber = require('bignumber.js')
+// const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const IndexerUtils = require('../lib/utils')
-const DAG = require('../lib/dag')
+// const IndexerUtils = require('../lib/utils')
+// const DAG = require('../lib/dag')
+import IndexerUtils from '../lib/utils.js'
+import DAG from '../lib/dag.js'
 
 class Mint {
   constructor (localConfig = {}) {
@@ -443,4 +446,5 @@ class Mint {
   }
 }
 
-module.exports = Mint
+// module.exports = Mint
+export default Mint

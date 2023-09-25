@@ -5,7 +5,8 @@
 */
 
 // Public npm libraries
-const readline = require('readline')
+// const readline = require('readline')
+import readline from 'readline'
 
 let _this
 
@@ -54,4 +55,5 @@ class StartStop {
   }
 }
 
-module.exports = StartStop
+// module.exports = StartStop
+export default StartStop

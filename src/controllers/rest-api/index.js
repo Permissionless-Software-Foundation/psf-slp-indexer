@@ -11,7 +11,7 @@ import AuthRESTController from './auth/index.js'
 import UserRouter from './users/index.js'
 import ContactRESTController from './contact/index.js'
 import LogsRESTController from './logs/index.js'
-import SlpRESTController from './slp'
+import SlpRESTController from './slp/index.js'
 
 class RESTControllers {
   constructor (localConfig = {}) {

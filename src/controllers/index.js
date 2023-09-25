@@ -8,7 +8,7 @@
 
 // Local libraries
 import Adapters from '../adapters/index.js'
-import JSONRPC from './json-rpc/index.js'
+// import JSONRPC from './json-rpc/index.js'
 import UseCases from '../use-cases/index.js'
 import RESTControllers from './rest-api/index.js'
 import TimerControllers from './timer-controllers.js'
@@ -61,15 +61,15 @@ class Controllers {
 
   // Add the JSON RPC router to the ipfs-coord adapter.
   attachRPCControllers () {
-    const jsonRpcController = new JSONRPC({
-      adapters: this.adapters,
-      useCases: this.useCases
-    })
-
-    // Attach the input of the JSON RPC router to the output of ipfs-coord.
-    this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(
-      jsonRpcController.router
-    )
+    // const jsonRpcController = new JSONRPC({
+    //   adapters: this.adapters,
+    //   useCases: this.useCases
+    // })
+    //
+    // // Attach the input of the JSON RPC router to the output of ipfs-coord.
+    // this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(
+    //   jsonRpcController.router
+    // )
   }
 }
 

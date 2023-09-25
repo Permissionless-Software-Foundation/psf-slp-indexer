@@ -3,11 +3,14 @@
 */
 
 // Public npm libraries
-const axios = require('axios')
+// const axios = require('axios')
+import axios from 'axios'
 
 // Local libraries
-const { wlogger } = require('../../wlogger')
-const config = require('../../../../config')
+// const { wlogger } = require('../../wlogger')
+// const config = require('../../../../config')
+import wlogger from '../../wlogger.js'
+import config from '../../../../config/index.js'
 
 // Global pointer to instance of this class
 let _this
@@ -157,4 +160,5 @@ class RPC {
   }
 }
 
-module.exports = RPC
+// module.exports = RPC
+export default RPC

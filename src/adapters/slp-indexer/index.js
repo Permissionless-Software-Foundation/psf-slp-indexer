@@ -11,30 +11,51 @@
 */
 
 // Constants use to configure indexing thresholds. Customize as needed.
-const EPOCH = 1000 // blocks between backups
-const RETRY_CNT = 10 // Number of retries before exiting the indexer
+// Number of retries before exiting the indexer
 
 // Global npm libraries
-const RetryQueue = require('@chris.troutner/retry-queue-commonjs')
+// const RetryQueue = require('@chris.troutner/retry-queue-commonjs')
+import RetryQueue from '@chris.troutner/retry-queue-commonjs'
 
 // Local libraries
-const { wlogger } = require('../wlogger')
-const LevelDb = require('./lib/level-db')
-const RPC = require('./lib/rpc')
-const DbBackup = require('./lib/db-backup')
-const Cache = require('./lib/cache')
-const Transaction = require('./lib/transaction')
-const FilterBlock = require('./lib/filter-block')
-const Genesis = require('./tx-types/genesis')
-const NftGenesis = require('./tx-types/nft-genesis')
-const Send = require('./tx-types/send')
-const Mint = require('./tx-types/mint')
-const StartStop = require('./lib/start-stop')
-const ZMQ = require('./lib/zmq')
-const Utils = require('./lib/utils')
-const ManagePTXDB = require('./lib/ptxdb')
-const Query = require('./lib/query')
-const Blacklist = require('./lib/blacklist')
+// const { wlogger } = require('../wlogger')
+// const LevelDb = require('./lib/level-db')
+// const RPC = require('./lib/rpc')
+// const DbBackup = require('./lib/db-backup')
+// const Cache = require('./lib/cache')
+// const Transaction = require('./lib/transaction')
+// const FilterBlock = require('./lib/filter-block')
+// const Genesis = require('./tx-types/genesis')
+// const NftGenesis = require('./tx-types/nft-genesis')
+// const Send = require('./tx-types/send')
+// const Mint = require('./tx-types/mint')
+// const StartStop = require('./lib/start-stop')
+// const ZMQ = require('./lib/zmq')
+// const Utils = require('./lib/utils')
+// const ManagePTXDB = require('./lib/ptxdb')
+// const Query = require('./lib/query')
+// const Blacklist = require('./lib/blacklist')
+
+import wlogger from '../wlogger.js'
+import LevelDb from './lib/level-db.js'
+import RPC from './lib/rpc.js'
+import DbBackup from './lib/db-backup.js'
+import Cache from './lib/cache.js'
+import Transaction from './lib/transaction.js'
+import FilterBlock from './lib/filter-block.js'
+import Genesis from './tx-types/genesis.js'
+import NftGenesis from './tx-types/nft-genesis.js'
+import Send from './tx-types/send.js'
+import Mint from './tx-types/mint.js'
+import StartStop from './lib/start-stop.js'
+import ZMQ from './lib/zmq.js'
+import Utils from './lib/utils.js'
+import ManagePTXDB from './lib/ptxdb.js'
+import Query from './lib/query.js'
+import Blacklist from './lib/blacklist.js'
+
+const EPOCH = 1000 // blocks between backups
+const RETRY_CNT = 10
 
 class SlpIndexer {
   constructor (localConfig = {}) {
@@ -662,4 +683,5 @@ class SlpIndexer {
   }
 }
 
-module.exports = SlpIndexer
+// module.exports = SlpIndexer
+export default SlpIndexer

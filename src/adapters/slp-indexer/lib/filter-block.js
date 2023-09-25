@@ -10,14 +10,19 @@
 */
 
 // Public npm libraries
-const PQueue = require('p-queue').default
-const pRetry = require('p-retry')
-const BigNumber = require('bignumber.js')
+// const PQueue = require('p-queue').default
+// const pRetry = require('p-retry')
+// const BigNumber = require('bignumber.js')
+import PQueue from 'p-queue'
+import pRetry from 'p-retry'
+import BigNumber from 'bignumber.js'
 
 // Local Libraries
 // const config = require('../../../config')
-const Utils = require('./utils')
-const Blacklist = require('./blacklist')
+// const Utils = require('./utils')
+// const Blacklist = require('./blacklist')
+import Utils from './utils.js'
+import Blacklist from './blacklist.js'
 
 class FilterBlock {
   constructor (localConfig = {}) {
@@ -612,4 +617,5 @@ class FilterBlock {
   }
 }
 
-module.exports = FilterBlock
+// module.exports = FilterBlock
+export default FilterBlock

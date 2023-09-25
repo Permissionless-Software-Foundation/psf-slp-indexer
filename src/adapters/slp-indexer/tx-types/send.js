@@ -19,10 +19,13 @@
 
 */
 
-const BigNumber = require('bignumber.js')
+// const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
-const IndexerUtils = require('../lib/utils')
-const DAG = require('../lib/dag')
+// const IndexerUtils = require('../lib/utils')
+// const DAG = require('../lib/dag')
+import IndexerUtils from '../lib/utils.js'
+import DAG from '../lib/dag.js'
 
 class Send {
   constructor (localConfig = {}) {
@@ -446,7 +449,7 @@ class Send {
 
       const utxo = {
         txid: txData.txid,
-        vout: vout,
+        vout,
         type: 'token',
         tokenType: slpData.tokenType,
         qty: slpAmountStr,
@@ -711,4 +714,5 @@ class Send {
   }
 }
 
-module.exports = Send
+// module.exports = Send
+export default Send

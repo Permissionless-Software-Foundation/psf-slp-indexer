@@ -82,4 +82,5 @@ class ManagePTXDB {
   }
 }
 
-module.exports = ManagePTXDB
+// module.exports = ManagePTXDB
+export default ManagePTXDB

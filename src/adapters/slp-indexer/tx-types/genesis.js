@@ -2,8 +2,11 @@
   A class library for processing Genesis SLP transactions
 */
 
-const IndexerUtils = require('../lib/utils')
-const BigNumber = require('bignumber.js')
+// const IndexerUtils = require('../lib/utils')
+// const BigNumber = require('bignumber.js')
+
+import IndexerUtils from '../lib/utils.js'
+import BigNumber from 'bignumber.js'
 
 class Genesis {
   constructor (localConfig = {}) {
@@ -287,4 +290,5 @@ class Genesis {
   }
 }
 
-module.exports = Genesis
+// module.exports = Genesis
+export default Genesis
