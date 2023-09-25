@@ -4,7 +4,6 @@
 
 // Global npm libraries
 import { assert } from 'chai'
-
 import sinon from 'sinon'
 
 // Local libraries
@@ -29,9 +28,8 @@ describe('#adapters', () => {
       uut.config.getJwtAtStartup = true
       uut.config.useIpfs = true
       uut.config.env = 'not-a-test'
-      sandbox.stub(uut.fullStackJwt, 'getJWT').resolves()
       sandbox.stub(uut.fullStackJwt, 'instanceBchjs').resolves()
-      sandbox.stub(uut.ipfs, 'start').resolves()
+      sandbox.stub(uut, 'startIndexer').returns()
 
       const result = await uut.start()
 
@@ -43,7 +41,7 @@ describe('#adapters', () => {
         // Force an error
         uut.config.getJwtAtStartup = false
         uut.config.env = 'dev'
-        sandbox.stub(uut.ipfs, 'start').rejects(new Error('test error'))
+        sandbox.stub(uut, 'startIndexer').throws(new Error('test error'))
 
         await uut.start()
 

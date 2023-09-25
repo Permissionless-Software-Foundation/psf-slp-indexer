@@ -114,6 +114,7 @@ class Server {
 
       // Start the SLP Indexer
       app.controllers.adapters.slpIndexer.start()
+      // app.controllers.adapters.start()
 
       // Display configuration settings
       console.log('\nConfiguration:')
