@@ -29,7 +29,7 @@ describe('#adapters', () => {
       uut.config.useIpfs = true
       uut.config.env = 'not-a-test'
       sandbox.stub(uut.fullStackJwt, 'instanceBchjs').resolves()
-      sandbox.stub(uut, 'startIndexer').returns()
+      sandbox.stub(uut, 'initIndexer').returns()
 
       const result = await uut.start()
 
@@ -41,7 +41,7 @@ describe('#adapters', () => {
         // Force an error
         uut.config.getJwtAtStartup = false
         uut.config.env = 'dev'
-        sandbox.stub(uut, 'startIndexer').throws(new Error('test error'))
+        sandbox.stub(uut, 'initIndexer').throws(new Error('test error'))
 
         await uut.start()
 

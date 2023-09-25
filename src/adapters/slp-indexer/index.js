@@ -58,7 +58,11 @@ const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10
 
 class SlpIndexer {
-  constructor (localConfig = {}) {
+  // constructor (localConfig = {}) {
+  //
+  // }
+
+  openDatabases() {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
     const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
