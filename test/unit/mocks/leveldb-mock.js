@@ -16,4 +16,4 @@ class MockLevel {
   }
 }
 
-module.exports = MockLevel
+export default MockLevel

@@ -3,16 +3,20 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
-const BigNumber = require('bignumber.js')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+// const cloneDeep = require('lodash.clonedeep')
+// const BigNumber = require('bignumber.js')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const Send = require('../../../../../src/adapters/slp-indexer/tx-types/send')
-const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/send-mock')
+import Send from '../../../../../src/adapters/slp-indexer/tx-types/send.js'
+import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/send-mock.js'
 
 describe('#send.js', () => {
   let uut, sandbox, mockData

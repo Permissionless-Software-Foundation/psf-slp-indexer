@@ -644,7 +644,7 @@ const tokenData01 = {
   txs: []
 }
 
-module.exports = {
+export default {
   twoTxDag01,
   twoTxDag02,
   twoTxDag03,

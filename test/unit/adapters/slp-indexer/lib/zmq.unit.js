@@ -2,11 +2,15 @@
   Unit tests for the zmq.js library
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+import { assert } from 'chai'
+import sinon from 'sinon'
 
-const ZMQ = require('../../../../../src/adapters/slp-indexer/lib/zmq')
-const mockData = require('../../../mocks/zmq-mocks')
+// const ZMQ = require('../../../../../src/adapters/slp-indexer/lib/zmq')
+// const mockData = require('../../../mocks/zmq-mocks')
+import ZMQ from '../../../../../src/adapters/slp-indexer/lib/zmq.js'
+import mockData from '../../../mocks/zmq-mocks.js'
 
 describe('#zmq.js', () => {
   let uut, sandbox

@@ -238,7 +238,7 @@ const genesisData02 = {
   }
 }
 
-module.exports = {
+export default {
   genesisData01,
   addrMock,
   genesisData02

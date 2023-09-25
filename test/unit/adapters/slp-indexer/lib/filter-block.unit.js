@@ -2,15 +2,23 @@
   Unit tests for the filter-block.js library
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+// const cloneDeep = require('lodash.clonedeep')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
 
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/filter-block-mock')
-const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
-const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-const FilterBlock = require('../../../../../src/adapters/slp-indexer/lib/filter-block')
+// const MockLevel = require('../../../../unit/mocks/leveldb-mock')
+// const mockDataLib = require('../../../../unit/mocks/filter-block-mock')
+// const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
+// const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
+// const FilterBlock = require('../../../../../src/adapters/slp-indexer/lib/filter-block')
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/filter-block-mock.js'
+import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
+import Transaction from '../../../../../src/adapters/slp-indexer/lib/transaction.js'
+import FilterBlock from '../../../../../src/adapters/slp-indexer/lib/filter-block.js'
 
 describe('#filter-block.js', () => {
   let uut, sandbox, mockData

@@ -3,12 +3,17 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+// const cloneDeep = require('lodash.clonedeep')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
 
-const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-const mockDataLib = require('../../../mocks/transaction-mock.js')
+// const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
+// const mockDataLib = require('../../../mocks/transaction-mock.js')
+import Transaction from '../../../../../src/adapters/slp-indexer/lib/transaction.js'
+import mockDataLib from '../../../mocks/transaction-mock.js'
 
 describe('#Transaction', () => {
   let uut

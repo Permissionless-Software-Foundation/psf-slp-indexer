@@ -77,4 +77,4 @@ const slpIndexer = {
   }
 }
 
-module.exports = { ipfs, localdb, slpIndexer }
+export default { ipfs, localdb, slpIndexer }

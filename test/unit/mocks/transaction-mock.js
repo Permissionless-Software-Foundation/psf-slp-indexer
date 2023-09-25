@@ -1230,7 +1230,7 @@ const nftGenesisTokenData02 = {
   qty: '5'
 }
 
-module.exports = {
+export default {
   nonSlpTxDetails,
   nonSLPTxDetailsWithOpReturn,
   slpTxDetails,
