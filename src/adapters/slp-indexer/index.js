@@ -62,7 +62,7 @@ class SlpIndexer {
   //
   // }
 
-  openDatabases() {
+  openDatabases () {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
     const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
