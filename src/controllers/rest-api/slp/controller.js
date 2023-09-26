@@ -331,7 +331,7 @@ class SlpRESTControllerLib {
         delete result.txs
       }
 
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       ctx.body = {
         tokenData: result
@@ -349,7 +349,7 @@ class SlpRESTControllerLib {
    * @apiDescription Get the indexer status
    *
    * @apiExample Example usage:
-   * curl -H "Content-Type: application/json" -X GET localhost:5001/slp/status
+   * curl -H "Content-Type: application/json" -X GET localhost:5020/slp/status
    *
    *
    * @apiSuccessExample {json} Success-Response:

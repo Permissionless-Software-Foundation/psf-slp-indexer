@@ -154,6 +154,53 @@ describe('#Slp-REST-Controller', () => {
       // Assert that expected properties exist in the returned data.
       assert.property(ctx.response.body, 'tokenData')
     })
+
+    it('should return not-available if token is in blacklist', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.adapters.slpIndexer.blacklist, 'checkBlacklist').returns(true)
+
+      ctx.request.body = {
+        tokenData: 'fake-token-id'
+      }
+
+      await uut.token(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that 'not-available' is returned for tokens in the blacklist.
+      assert.equal(ctx.response.body.tokenData.name, 'not-available')
+    })
+  })
+
+  describe('#GET /status', () => {
+    it('should return 422 status on biz logic error', async () => {
+      try {
+        await uut.status(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+
+    it('should return 200 status on success', async () => {
+      // Mock dependencies
+      uut.adapters.slpIndexer.statusDb = {
+        get: async () => {}
+      }
+      sandbox.stub(uut.adapters.slpIndexer.statusDb, 'get').resolves({ status: { startBlockHeight: 543376 } })
+
+      await uut.status(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that expected properties exist in the returned data.
+      assert.property(ctx.response.body, 'status')
+    })
   })
 
   describe('#handleError', () => {
