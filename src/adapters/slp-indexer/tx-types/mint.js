@@ -400,9 +400,6 @@ class Mint {
       const output = txData.vout[1]
       const value = output.value
 
-      console.log('mint.js/addTokensFromOutput() slpData: ', slpData)
-      console.log('mint.js/addTokensFromOutput() txData: ', txData)
-
       // Create a token UTXO.
       const utxo = {
         txid: txData.txid,
@@ -414,7 +411,9 @@ class Mint {
         address: recvrAddr,
         effectiveQty,
         decimals,
-        value
+        value,
+        tokenTicker: txData.tokenTicker,
+        tokenName: txData.tokenName
       }
       console.log(`mint.js/addTokensFromOutput() mint utxo: ${JSON.stringify(utxo, null, 2)}`)
 
