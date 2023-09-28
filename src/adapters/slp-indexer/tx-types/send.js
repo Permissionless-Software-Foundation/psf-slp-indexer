@@ -624,7 +624,10 @@ class Send {
           )
         }
 
-        console.log('txData: ', txData)
+        // console.log('txData: ', txData)
+        // Add details for on-screen debugging
+        utxoToDelete[0].tokenName = txData.tokenName
+        utxoToDelete[0].tokenTicker = txData.tokenTicker
         console.log(
           `send.js/subtractTokensFromInputAddr() Deleting input UTXO: ${JSON.stringify(utxoToDelete[0], null, 2)}`
         )
