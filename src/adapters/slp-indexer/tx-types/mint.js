@@ -78,7 +78,7 @@ class Mint {
         data.txData.isValidSlp = false
         await this.txDb.put(data.txData.txid, data.txData)
 
-        return
+        return false
       }
 
       console.log('isValid: ', isValid)
@@ -93,7 +93,7 @@ class Mint {
         data.txData.isValidSlp = false
         await this.txDb.put(data.txData.txid, data.txData)
 
-        return
+        return false
       }
 
       // Remove the minting baton from the input address.
@@ -282,7 +282,6 @@ class Mint {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -387,7 +386,6 @@ class Mint {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()

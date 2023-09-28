@@ -295,7 +295,7 @@ describe('#mint.js', () => {
 
       const result = await uut.processTx(mockData.mintData)
 
-      assert.equal(result, undefined)
+      assert.equal(result, false)
     })
 
     it('should successfully process Mint TX', async () => {
@@ -321,6 +321,18 @@ describe('#mint.js', () => {
         assert.include(err.message, 'Cannot read')
       }
     })
+
+    it('should exit if input tx has invalid mint baton', async () => {
+      // Force DAG validation to pass
+      sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
+
+      // Force baton input to fail
+      sandbox.stub(uut, 'findBatonInput').returns(null)
+
+      const result = await uut.processTx(mockData.mintData)
+
+      assert.equal(result, false)
+    })
   })
 
   describe('#findBatonInput', () => {
@@ -336,6 +348,17 @@ describe('#mint.js', () => {
       // console.log('result: ', result)
 
       assert.equal(result, null)
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        await uut.findBatonInput()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log('err: ', err)
+        assert.include(err.message, 'Cannot read')
+      }
     })
   })
 })
