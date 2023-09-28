@@ -400,6 +400,9 @@ class Mint {
       const output = txData.vout[1]
       const value = output.value
 
+      console.log('mint.js/addTokensFromOutput() slpData: ', slpData)
+      console.log('mint.js/addTokensFromOutput() txData: ', txData)
+
       // Create a token UTXO.
       const utxo = {
         txid: txData.txid,
@@ -413,7 +416,7 @@ class Mint {
         decimals,
         value
       }
-      console.log(`mint utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`mint.js/addTokensFromOutput() mint utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       addr.utxos.push(utxo)
       // this.util.addWithoutDuplicate(utxo, addr.utxos)
