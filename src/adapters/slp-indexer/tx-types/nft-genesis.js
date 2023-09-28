@@ -75,6 +75,10 @@ class NftGenesis {
         return false
       }
 
+      console.log('Valid NFT Genesis found. TXID: ', txid)
+      console.log('exiting')
+      process.exit(0)
+
       // Subtract the input UTXOs and balances from input addresses.
       const { spentBN, groupTokenId } = await this.subtractTokensFromInputAddr(data)
       console.log(`NFT TXID ${txid} spent ${spentBN.toString()} Group tokens.`)
