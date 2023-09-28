@@ -7,15 +7,6 @@
   - Add the token output quantities to each output address.
 
   Dev Notes:
-  - CT 10/25/21
-    TXID: c73a90412a96a59cd760bad25b6d81dd06bede58669ec1fa42eab0ca744d3b78
-    Caused the indexer to abort on the first time, due to 'UTXO not found' error,
-    but then passed on the second attempt. It's a simple chain of sends. I'm
-    unsure what is causing this issue, leads me to believe it's a race condition.
-    This TXID might be a good one to study?
-
-  - txid 4bc56e2c0358dbfa169e0feadf8edade0b76773f3bfad3f44b042e9bc5cd5d7f
-    A token by James Cramer that tripped the bug.
 
 */
 
@@ -58,6 +49,11 @@ class Send {
     // Encapsulate dependencies
     this.util = new IndexerUtils()
     this.dag = new DAG(localConfig)
+
+    // Bind 'this' object to all methods in this class.
+    this.processTx = this.processTx.bind(this)
+    this.processBurn = this.processBurn.bind(this)
+    this.reverseAddTokenFromOutput = this.reverseAddTokenFromOutput.bind(this)
   }
 
   // This is the top-level function. It calls all other subfunctions.
@@ -95,8 +91,7 @@ class Send {
       console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // Detect and process a 'controlled burn' transaction.
-      // const diffBN = await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
-      const diffBN = await this.processControlledBurn(spentBN, sentBN, data)
+      const diffBN = await this.processBurn(spentBN, sentBN, data)
       console.log(`TXID ${txid} difference is ${diffBN.toString()}`)
 
       // Update token stats
@@ -123,7 +118,7 @@ class Send {
 
       // Update the token data.
       const tokenData = await this.tokenDb.get(tokenId)
-      // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+      // console.log(`updateTokenStats() tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
       let txInfo = {}
 
@@ -170,7 +165,6 @@ class Send {
         // If the token is an NFT, save address of the current holder of the NFT.
         if (tokenData.type === 65) {
           const addr = txData.vout[1].scriptPubKey.addresses[0]
-          console.log('updateTokenStats() current NFT address: ', addr)
 
           tokenData.nftHolder = addr
         }
@@ -193,8 +187,8 @@ class Send {
   // spent (inputs) and sent (outputs). This info is used to detect a
   // 'controlled burn' for a token. If a burn is detected, it updates the
   // token stats.
-  async processControlledBurn (spentBN, sentBN, data) {
-    // async processControlledBurn (spentBN, sentBN, txid, tokenId) {
+  async processBurn (spentBN, sentBN, data) {
+    // async processBurn (spentBN, sentBN, txid, tokenId) {
     try {
       const { slpData, txData } = data
       const txid = txData.txid
@@ -261,7 +255,7 @@ class Send {
 
       return diffBN
     } catch (err) {
-      console.error('Error in processControlledBurn()')
+      console.error('Error in processBurn()')
       throw err
     }
   }
@@ -377,7 +371,6 @@ class Send {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -631,6 +624,7 @@ class Send {
           )
         }
 
+        console.log('txData: ', txData)
         console.log(
           `Deleting input UTXO: ${JSON.stringify(utxoToDelete[0], null, 2)}`
         )

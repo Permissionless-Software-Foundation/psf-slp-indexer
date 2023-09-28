@@ -1,12 +1,8 @@
 /*
-  Unit tests for GENESIS tx indexing library genesis.js
+  Unit tests for SEND tx indexing library send.js
 */
 
 // Public npm libraries
-// const assert = require('chai').assert
-// const sinon = require('sinon')
-// const cloneDeep = require('lodash.clonedeep')
-// const BigNumber = require('bignumber.js')
 import { assert } from 'chai'
 import sinon from 'sinon'
 import cloneDeep from 'lodash.clonedeep'
@@ -242,6 +238,23 @@ describe('#send.js', () => {
 
       assert.equal(result, '0')
     })
+
+    it('should skip an input if it was marked invalid', async () => {
+      // Force DAG validation to succeed
+      sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
+
+      // Force database to return a TX from the database.
+      sandbox.stub(uut.txDb, 'get').resolves(mockData.invalidTxFromDb01)
+
+      // Force database to return previous address data
+      sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData01)
+
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      result = result.toString()
+      // console.log('result: ', result)
+
+      assert.equal(result, '0')
+    })
   })
 
   describe('#addUtxoToOutputAddr', () => {
@@ -426,7 +439,7 @@ describe('#send.js', () => {
         .stub(uut, 'subtractTokensFromInputAddr')
         .resolves(new BigNumber(10))
       sandbox.stub(uut, 'addTokensFromOutput').resolves(new BigNumber(10))
-      sandbox.stub(uut, 'processControlledBurn').resolves(new BigNumber(0))
+      sandbox.stub(uut, 'processBurn').resolves(new BigNumber(0))
       sandbox.stub(uut, 'updateTokenStats').resolves()
 
       const result = await uut.processTx(mockData.sendData01)
@@ -457,8 +470,8 @@ describe('#send.js', () => {
     })
   })
 
-  describe('#processControlledBurn', () => {
-    it('should detect a burn and update token stats', async () => {
+  describe('#processBurn', () => {
+    it('should detect a controlled burn and update token stats', async () => {
       // Mock data
       const tokenData = {
         tokensInCirculationBN: new BigNumber(10000),
@@ -472,7 +485,7 @@ describe('#send.js', () => {
       const spentBN = new BigNumber(1000)
       const sentBN = new BigNumber(900)
 
-      const result = await uut.processControlledBurn(
+      const result = await uut.processBurn(
         spentBN,
         sentBN,
         mockData.sendData01
@@ -483,9 +496,35 @@ describe('#send.js', () => {
       assert.equal(tokenData.totalBurned.toString(), '100')
     })
 
+    it('should detect an uncontrolled burn and update token stats', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(0)
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+      sandbox.stub(uut, 'reverseAddTokenFromOutput').resolves()
+
+      const spentBN = new BigNumber(900)
+      const sentBN = new BigNumber(1000)
+
+      const result = await uut.processBurn(
+        spentBN,
+        sentBN,
+        mockData.sendData01
+      )
+      // console.log('result: ', result.toString())
+
+      assert.equal(result.toString(), '-100')
+      assert.equal(tokenData.totalBurned.toString(), '900')
+    })
+
     it('should catch and throw an error', async () => {
       try {
-        await uut.processControlledBurn()
+        await uut.processBurn()
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -530,7 +569,8 @@ describe('#send.js', () => {
       const tokenData = {
         tokensInCirculationBN: new BigNumber(10000),
         totalBurned: new BigNumber(100),
-        txs: []
+        txs: [],
+        type: 65
       }
 
       // Mock databases
@@ -554,6 +594,109 @@ describe('#send.js', () => {
       assert.equal(result.txs[0].qty, '1000')
       assert.equal(result.txs[0].burned, '100')
     })
+
+    it('should update token data for type 65 NFT send controlled burn', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(1),
+        totalBurned: new BigNumber(0),
+        txs: [],
+        type: 65
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(1)
+      const sentBN = new BigNumber(1)
+      const spentBN = new BigNumber(1)
+
+      const result = await uut.updateTokenStats(
+        mockData.nftSendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND-BURN')
+      assert.equal(result.txs[0].qty, '1')
+    })
+
+    it('should update token data for type 65 NFT send', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(1),
+        totalBurned: new BigNumber(0),
+        txs: [],
+        type: 65
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(0)
+      const sentBN = new BigNumber(1)
+      const spentBN = new BigNumber(1)
+
+      const result = await uut.updateTokenStats(
+        mockData.nftSendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND')
+      assert.equal(result.txs[0].qty, '1')
+    })
+
+    it('should update token data for type 65 NFT uncontrolled burn', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(1),
+        totalBurned: new BigNumber(0),
+        txs: [],
+        type: 65
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(-1)
+      const sentBN = new BigNumber(1)
+      const spentBN = new BigNumber(1)
+
+      const result = await uut.updateTokenStats(
+        mockData.nftSendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'BURN-UNCONTROLLED')
+      assert.equal(result.txs[0].qty, '0')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        // Force an error
+        // sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+
+        await uut.updateTokenStats()
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Cannot destructure property')
+      }
+    })
   })
 
   describe('#reverseAddTokenFromOutput', () => {
@@ -575,6 +718,17 @@ describe('#send.js', () => {
       // console.log('result: ', result.toString())
 
       assert.equal(result.toString(), '20')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        await uut.reverseAddTokenFromOutput()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot destructure property')
+      }
     })
   })
 })

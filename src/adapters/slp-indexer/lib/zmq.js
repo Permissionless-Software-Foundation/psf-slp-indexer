@@ -11,8 +11,6 @@ import zmq from 'zeromq'
 // Local libraries
 import config from '../../../../config/index.js'
 
-let _this
-
 class ZMQ {
   constructor () {
     // Encapsulate dependencies
@@ -24,7 +22,12 @@ class ZMQ {
     this.txQueue = []
     this.blockQueue = []
 
-    _this = this
+    // Bind 'this' object to subfunctions
+    this.connect = this.connect.bind(this)
+    this.disconnect = this.disconnect.bind(this)
+    this.decodeMsg = this.decodeMsg.bind(this)
+    this.getTx = this.getTx.bind(this)
+    this.getBlock = this.getBlock.bind(this)
   }
 
   // Connect to the ZMQ port of the full node.
@@ -52,28 +55,32 @@ class ZMQ {
   // Decode message coming through ZMQ connection.
   decodeMsg (topic, message) {
     try {
+      // console.log('topic: ', topic)
+
       const decoded = topic.toString('ascii')
-      // console.log('decoded message: ', decoded)
+      // console.log('decoded topic: ', decoded)
 
       if (decoded === 'rawtx') {
         // Process new transactions.
 
-        const txd = _this.bchZmqDecoder.decodeTransaction(message)
+        const txd = this.bchZmqDecoder.decodeTransaction(message)
         // console.log(`txd: ${JSON.stringify(txd, null, 2)}`)
         // console.log(`txd.format.txid: ${txd.format.txid}`)
-        _this.txQueue.push(txd.format.txid)
+        this.txQueue.push(txd.format.txid)
       } else if (decoded === 'rawblock') {
         // Process new blocks
 
-        const blk = _this.bchZmqDecoder.decodeBlock(message)
+        const blk = this.bchZmqDecoder.decodeBlock(message)
         console.log(`blk: ${JSON.stringify(blk, null, 2)}`)
-        _this.blockQueue.push(blk)
+        this.blockQueue.push(blk)
       }
 
       return true
     } catch (err) {
       console.error('Error in decodeMsg: ', err)
+
       // This is a top-level function. Do not throw an error.
+      return false
     }
   }
 
@@ -91,7 +98,7 @@ class ZMQ {
   // Get the next block in the queue
   getBlock () {
     // console.log(`this.blockQueue.length: ${this.blockQueue.length}`)
-    let nextBlock = _this.blockQueue.shift()
+    let nextBlock = this.blockQueue.shift()
 
     if (nextBlock === undefined) nextBlock = false
 

@@ -3,11 +3,9 @@
 */
 
 // Public npm libraries
-// const BigNumber = require('bignumber.js')
 import BigNumber from 'bignumber.js'
 
 // Local libraries
-// const IndexerUtils = require('../lib/utils')
 import IndexerUtils from '../lib/utils.js'
 
 class NftGenesis {
@@ -212,7 +210,6 @@ class NftGenesis {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -290,20 +287,23 @@ class NftGenesis {
 
       // TODO: I think this for-loop can be removed, since it's not possible for
       // an address to have an existing balance of an NFT.
-      // This function was copied send.js.
+      // This function was copied from send.js.
+      // To remove this for-loop, it should be commented out and an instance
+      // should be synced from genesis, then the NFT balances for an address
+      // can be compared between instances.
 
       // Token exists in the address object, update the balance.
-      for (let i = 0; i < addrObj.balances.length; i++) {
-        const thisBalance = addrObj.balances[i]
-        console.log(`thisBalance: ${JSON.stringify(thisBalance, null, 2)}`)
-
-        if (thisBalance.tokenId !== tokenId) continue
-
-        // bignumber.js addition.
-        thisBalance.qty = qty.plus(thisBalance.qty)
-
-        return true
-      }
+      // for (let i = 0; i < addrObj.balances.length; i++) {
+      //   const thisBalance = addrObj.balances[i]
+      //   console.log(`thisBalance: ${JSON.stringify(thisBalance, null, 2)}`)
+      //
+      //   if (thisBalance.tokenId !== tokenId) continue
+      //
+      //   // bignumber.js addition.
+      //   thisBalance.qty = qty.plus(thisBalance.qty)
+      //
+      //   return true
+      // }
     } catch (err) {
       console.error('Error in nftGenesis.updateBalanceFromGenesis()')
       throw err
@@ -356,6 +356,11 @@ class NftGenesis {
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
+
+        // Add properties desired when monitoring output on command line.
+        thisVin.tokenType = txData.tokenType
+        thisVin.tokenTicker = txData.tokenTicker
+        thisVin.tokenName = txData.tokenName
         console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // GENESIS must include spending a valid NFT1 parent token

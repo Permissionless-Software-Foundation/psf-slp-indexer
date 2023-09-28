@@ -133,7 +133,6 @@ class Genesis {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -215,7 +214,6 @@ class Genesis {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
