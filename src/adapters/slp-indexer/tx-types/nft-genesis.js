@@ -356,6 +356,11 @@ class NftGenesis {
       // from the addr database object.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
+
+        // Add properties desired when monitoring output on command line.
+        thisVin.tokenType = txData.tokenType
+        thisVin.tokenTicker = txData.tokenTicker
+        thisVin.tokenName = txData.tokenName
         console.log(`processing thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // GENESIS must include spending a valid NFT1 parent token
