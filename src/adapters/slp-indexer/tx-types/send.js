@@ -49,6 +49,11 @@ class Send {
     // Encapsulate dependencies
     this.util = new IndexerUtils()
     this.dag = new DAG(localConfig)
+
+    // Bind 'this' object to all methods in this class.
+    this.processTx = this.processTx.bind(this)
+    this.processBurn = this.processBurn.bind(this)
+    this.reverseAddTokenFromOutput = this.reverseAddTokenFromOutput.bind(this)
   }
 
   // This is the top-level function. It calls all other subfunctions.
@@ -86,7 +91,6 @@ class Send {
       console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // Detect and process a 'controlled burn' transaction.
-      // const diffBN = await this.processBurn(spentBN, sentBN, txid, tokenId)
       const diffBN = await this.processBurn(spentBN, sentBN, data)
       console.log(`TXID ${txid} difference is ${diffBN.toString()}`)
 
@@ -367,7 +371,6 @@ class Send {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()

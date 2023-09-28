@@ -238,6 +238,23 @@ describe('#send.js', () => {
 
       assert.equal(result, '0')
     })
+
+    it('should skip an input if it was marked invalid', async () => {
+      // Force DAG validation to succeed
+      sandbox.stub(uut.dag, 'crawlDag').resolves({ isValid: true })
+
+      // Force database to return a TX from the database.
+      sandbox.stub(uut.txDb, 'get').resolves(mockData.invalidTxFromDb01)
+
+      // Force database to return previous address data
+      sandbox.stub(uut.addrDb, 'get').resolves(mockData.addrData01)
+
+      let result = await uut.subtractTokensFromInputAddr(mockData.sendData01)
+      result = result.toString()
+      // console.log('result: ', result)
+
+      assert.equal(result, '0')
+    })
   })
 
   describe('#addUtxoToOutputAddr', () => {
@@ -454,7 +471,7 @@ describe('#send.js', () => {
   })
 
   describe('#processBurn', () => {
-    it('should detect a burn and update token stats', async () => {
+    it('should detect a controlled burn and update token stats', async () => {
       // Mock data
       const tokenData = {
         tokensInCirculationBN: new BigNumber(10000),
@@ -477,6 +494,32 @@ describe('#send.js', () => {
 
       assert.equal(result.toString(), '100')
       assert.equal(tokenData.totalBurned.toString(), '100')
+    })
+
+    it('should detect an uncontrolled burn and update token stats', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(10000),
+        totalBurned: new BigNumber(0)
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+      sandbox.stub(uut, 'reverseAddTokenFromOutput').resolves()
+
+      const spentBN = new BigNumber(900)
+      const sentBN = new BigNumber(1000)
+
+      const result = await uut.processBurn(
+        spentBN,
+        sentBN,
+        mockData.sendData01
+      )
+      // console.log('result: ', result.toString())
+
+      assert.equal(result.toString(), '-100')
+      assert.equal(tokenData.totalBurned.toString(), '900')
     })
 
     it('should catch and throw an error', async () => {
@@ -675,6 +718,17 @@ describe('#send.js', () => {
       // console.log('result: ', result.toString())
 
       assert.equal(result.toString(), '20')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        await uut.reverseAddTokenFromOutput()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot destructure property')
+      }
     })
   })
 })

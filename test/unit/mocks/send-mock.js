@@ -552,6 +552,85 @@ const nftSendData01 = {
   }
 }
 
+const invalidTxFromDb01 = {
+  txid: 'b4f7b84eb8c69b8a62140610ad51f8e0fcb310263afa9d0bc740fe7451ceddb9',
+  hash: 'b4f7b84eb8c69b8a62140610ad51f8e0fcb310263afa9d0bc740fe7451ceddb9',
+  version: 1,
+  size: 479,
+  locktime: 0,
+  vin: [
+    {
+      txid: 'c2fab06e94fd87b3509484e56315b9914167d3227fd63f480b756cf79502760f',
+      vout: 2,
+      scriptSig: [Object],
+      sequence: 4294967295,
+      address: 'bitcoincash:qrqac0du3cmc96y2nre7673ukzq8lm3udqcp78y339',
+      value: 0.00000546,
+      tokenQtyStr: '18998128',
+      tokenQty: 18998128,
+      tokenId: '07f5055b743215f55c0115d287f314134b9d3c31608cbbe6c81f17b9d9f80701'
+    },
+    {
+      txid: 'c0dd111d203e2cace8b2f39eca87e6c3b3f0e8ac7551ca0c023fd325d0c9340b',
+      vout: 1,
+      scriptSig: [Object],
+      sequence: 4294967295,
+      address: 'bitcoincash:qq2dhpgnfh57g7g52zcadjlxnt99kcr68uenlrkf2d',
+      value: 0.00143271,
+      tokenQty: 0,
+      tokenQtyStr: '0',
+      tokenId: null
+    }
+  ],
+  vout: [
+    {
+      value: 0,
+      n: 0,
+      scriptPubKey: [Object],
+      tokenQty: null,
+      tokenQtyStr: null
+    },
+    {
+      value: 0.00000546,
+      n: 1,
+      scriptPubKey: [Object],
+      tokenQtyStr: '20',
+      tokenQty: 20
+    },
+    {
+      value: 0.00000546,
+      n: 2,
+      scriptPubKey: [Object],
+      tokenQtyStr: '18998108',
+      tokenQty: 18998108
+    },
+    {
+      value: 0.00142244,
+      n: 3,
+      scriptPubKey: [Object],
+      tokenQty: null,
+      tokenQtyStr: null
+    }
+  ],
+  hex: '01000000020f760295f76c750b483fd67f22d3674191b91563e5849450b387fd946eb0fac2020000006a47304402200ccc9635d8f582814dbb79b10adf4c06fc058b18661a6e882e6577e987d7354d022000d9092394f47bd96275fb2eb9b396f83b750c8760d6160e0f310407287f163c4121020985608c75bb06ab0b76e60e48e2a660c687cea19e0fb9e11ead98111e7e34efffffffff0b34c9d025d33f020cca5175ace8f0b3c3e687ca9ef3b2e8ac2c3e201d11ddc0010000006a473044022003bd77f59f3148abc018ffa85e7d164f5219e2283576fa4aa63343be4709ed27022053c1a1e8fc0dfd461d1b248c26205d851b49f262c1515362a0bf55fe95a091ab412102fd3dce09147e95872aaad1a1a295d412d0977936a358a640f0e1a3c31523f4beffffffff040000000000000000406a04534c500001010453454e442007f5055b743215f55c0115d287f314134b9d3c31608cbbe6c81f17b9d9f8070108000000000bebc200080000acc96ac9960022020000000000001976a914c1dc3dbc8e3782e88a98f3ed7a3cb0807fee3c6888ac22020000000000001976a914c1dc3dbc8e3782e88a98f3ed7a3cb0807fee3c6888aca42b0200000000001976a91414db85134de9e4791450b1d6cbe69aca5b607a3f88ac00000000',
+  blockhash: '000000000000000001369f5383a456b0ce68b701a9f4ba630bd31d716ff72df7',
+  confirmations: 6549,
+  time: 1691704347,
+  blocktime: 1691704347,
+  blockheight: 805638,
+  isSlpTx: true,
+  tokenTxType: 'SEND',
+  tokenId: '07f5055b743215f55c0115d287f314134b9d3c31608cbbe6c81f17b9d9f80701',
+  tokenType: 1,
+  tokenTicker: 'SMPLUS',
+  tokenName: 'SM Plus',
+  tokenDecimals: 7,
+  tokenUri: 'https://metaversestudiosla.vhx.tv/',
+  tokenDocHash: '',
+  isValidSlp: false
+}
+
+
 export default {
   sendData01,
   addrData01,
@@ -562,5 +641,6 @@ export default {
   greaterOutputBurn,
   greaterOutputAddr01,
   greaterOutputAddr02,
-  nftSendData01
+  nftSendData01,
+  invalidTxFromDb01
 }
