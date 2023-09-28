@@ -422,7 +422,7 @@ describe('#send.js', () => {
         .stub(uut, 'subtractTokensFromInputAddr')
         .resolves(new BigNumber(10))
       sandbox.stub(uut, 'addTokensFromOutput').resolves(new BigNumber(10))
-      sandbox.stub(uut, 'processControlledBurn').resolves(new BigNumber(0))
+      sandbox.stub(uut, 'processBurn').resolves(new BigNumber(0))
       sandbox.stub(uut, 'updateTokenStats').resolves()
 
       const result = await uut.processTx(mockData.sendData01)
@@ -453,7 +453,7 @@ describe('#send.js', () => {
     })
   })
 
-  describe('#processControlledBurn', () => {
+  describe('#processBurn', () => {
     it('should detect a burn and update token stats', async () => {
       // Mock data
       const tokenData = {
@@ -468,7 +468,7 @@ describe('#send.js', () => {
       const spentBN = new BigNumber(1000)
       const sentBN = new BigNumber(900)
 
-      const result = await uut.processControlledBurn(
+      const result = await uut.processBurn(
         spentBN,
         sentBN,
         mockData.sendData01
@@ -481,7 +481,7 @@ describe('#send.js', () => {
 
     it('should catch and throw an error', async () => {
       try {
-        await uut.processControlledBurn()
+        await uut.processBurn()
 
         assert.fail('Unexpected code path')
       } catch (err) {

@@ -86,8 +86,8 @@ class Send {
       console.log(`TXID ${txid} sent ${sentBN.toString()} tokens.`)
 
       // Detect and process a 'controlled burn' transaction.
-      // const diffBN = await this.processControlledBurn(spentBN, sentBN, txid, tokenId)
-      const diffBN = await this.processControlledBurn(spentBN, sentBN, data)
+      // const diffBN = await this.processBurn(spentBN, sentBN, txid, tokenId)
+      const diffBN = await this.processBurn(spentBN, sentBN, data)
       console.log(`TXID ${txid} difference is ${diffBN.toString()}`)
 
       // Update token stats
@@ -183,8 +183,8 @@ class Send {
   // spent (inputs) and sent (outputs). This info is used to detect a
   // 'controlled burn' for a token. If a burn is detected, it updates the
   // token stats.
-  async processControlledBurn (spentBN, sentBN, data) {
-    // async processControlledBurn (spentBN, sentBN, txid, tokenId) {
+  async processBurn (spentBN, sentBN, data) {
+    // async processBurn (spentBN, sentBN, txid, tokenId) {
     try {
       const { slpData, txData } = data
       const txid = txData.txid
@@ -251,7 +251,7 @@ class Send {
 
       return diffBN
     } catch (err) {
-      console.error('Error in processControlledBurn()')
+      console.error('Error in processBurn()')
       throw err
     }
   }
