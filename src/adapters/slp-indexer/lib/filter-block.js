@@ -252,7 +252,8 @@ class FilterBlock {
 
           // If the address contains the burned UTXO.
           if (thisUtxo.txid === txid && thisUtxo.vout === vout) {
-            console.log(`Utxo found to remove: ${JSON.stringify(thisUtxo, null, 2)}`)
+            console.log('txDetails: ', txDetails)
+            console.log(`filter-block.js/deleteBurnedUtxos() Utxo found to remove: ${JSON.stringify(thisUtxo, null, 2)}`)
             // Remove the UTXO from the address.
             addrData.utxos = this.utils.removeUtxoFromArray(thisUtxo, addrData.utxos)
 
