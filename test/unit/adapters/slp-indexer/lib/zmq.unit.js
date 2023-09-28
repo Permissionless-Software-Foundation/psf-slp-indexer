@@ -2,13 +2,9 @@
   Unit tests for the zmq.js library
 */
 
-// const assert = require('chai').assert
-// const sinon = require('sinon')
 import { assert } from 'chai'
 import sinon from 'sinon'
 
-// const ZMQ = require('../../../../../src/adapters/slp-indexer/lib/zmq')
-// const mockData = require('../../../mocks/zmq-mocks')
 import ZMQ from '../../../../../src/adapters/slp-indexer/lib/zmq.js'
 import mockData from '../../../mocks/zmq-mocks.js'
 
@@ -67,6 +63,33 @@ describe('#zmq.js', () => {
 
       // Assert that the queue now has a transaction in it.
       assert.equal(uut.txQueue.length, 1)
+    })
+
+    it('should decode a new block', () => {
+      // Assert that the TX queue is empty at the start of the test.
+      assert.equal(uut.txQueue.length, 0)
+
+      const topic = Buffer.from(mockData.blockTopic, 'hex')
+      const message = Buffer.from(mockData.blockMsg, 'hex')
+
+      const result = uut.decodeMsg(topic, message)
+
+      assert.equal(result, true)
+
+      // Assert that the queue now has a transaction in it.
+      assert.equal(uut.blockQueue.length, 1)
+    })
+
+    it('should catch errors and return false', async () => {
+      const topic = Buffer.from(mockData.topic01, 'hex')
+      const message = Buffer.from(mockData.msg01, 'hex')
+
+      // Force an error
+      sandbox.stub(uut.bchZmqDecoder, 'decodeTransaction').throws(new Error('test error'))
+
+      const result = uut.decodeMsg(topic, message)
+
+      assert.equal(result, false)
     })
   })
 
