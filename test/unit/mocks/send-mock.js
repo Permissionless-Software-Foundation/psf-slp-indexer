@@ -445,6 +445,113 @@ const greaterOutputAddr02 = {
   ]
 }
 
+const nftSendData01 = {
+  "slpData": {
+    "tokenType": 65,
+    "txType": "SEND",
+    "tokenId": "90b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe91604070809674",
+    "amounts": [
+      "1"
+    ]
+  },
+  "blockHeight": 812387,
+  "txData": {
+    "txid": "3508ea57787f0444dcbcbd9280bb0825c35ef2edc22c514292df21ace938ec77",
+    "hash": "3508ea57787f0444dcbcbd9280bb0825c35ef2edc22c514292df21ace938ec77",
+    "version": 2,
+    "size": 437,
+    "locktime": 0,
+    "vin": [
+      {
+        "txid": "e7974ab92006d19767ca383ac4834fd7a72605f5ef7745e48b3be6b3cfaabbf0",
+        "vout": 2,
+        "scriptSig": {
+          "asm": "3044022045d8d7f143d2ce5c313af80fac1963dd7cabbe01dce26a65bf3ce06654f1e46602204739c27a43e99893bd7e98fd32af43b7deaf516fc0dc13058d919ffcde0dcdf1[ALL|FORKID] 023ed189c1d4c5a89f25ba53cc9d5d06c3e3abfcd323043bad67bdbb8b1a078c94",
+          "hex": "473044022045d8d7f143d2ce5c313af80fac1963dd7cabbe01dce26a65bf3ce06654f1e46602204739c27a43e99893bd7e98fd32af43b7deaf516fc0dc13058d919ffcde0dcdf14121023ed189c1d4c5a89f25ba53cc9d5d06c3e3abfcd323043bad67bdbb8b1a078c94"
+        },
+        "sequence": 4294967295,
+        "address": "bitcoincash:qzcrcjuqpwc9whmvpug7z425rnqxvx50ngl60rrjst",
+        "value": 0.04220655,
+        "tokenQty": 0,
+        "tokenQtyStr": "0",
+        "tokenId": null
+      },
+      {
+        "txid": "90b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe91604070809674",
+        "vout": 1,
+        "scriptSig": {
+          "asm": "3045022100f6ea20cea2b6cf58cb3666bd4550e3405ef9b48fd856d9122fe821e713490e9102204bb40ae39128d9fb3957267be23130fcb1147fd1416870209112a1cea130b51b[ALL|FORKID] 037a22c03e02f20d0e10f1dfe5ff0eae8da67da1d5862c7a7fe6e889f6da7d62f6",
+          "hex": "483045022100f6ea20cea2b6cf58cb3666bd4550e3405ef9b48fd856d9122fe821e713490e9102204bb40ae39128d9fb3957267be23130fcb1147fd1416870209112a1cea130b51b4121037a22c03e02f20d0e10f1dfe5ff0eae8da67da1d5862c7a7fe6e889f6da7d62f6"
+        },
+        "sequence": 4294967295,
+        "address": "bitcoincash:qpymkr6as34a7rxarlupa387m4azjl3tnv8649xu5j",
+        "value": 0.00000546,
+        "tokenQtyStr": "1",
+        "tokenQty": 1,
+        "tokenId": "90b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe91604070809674"
+      }
+    ],
+    "vout": [
+      {
+        "value": 0,
+        "n": 0,
+        "scriptPubKey": {
+          "asm": "OP_RETURN 5262419 65 1145980243 90b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe91604070809674 72057594037927936",
+          "hex": "6a04534c500001410453454e442090b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe91604070809674080000000000000001",
+          "type": "nulldata"
+        },
+        "tokenQty": null,
+        "tokenQtyStr": null
+      },
+      {
+        "value": 0.00000546,
+        "n": 1,
+        "scriptPubKey": {
+          "asm": "OP_DUP OP_HASH160 3fb679e9e8301eb4ec14321216f89e7e4fd8dea1 OP_EQUALVERIFY OP_CHECKSIG",
+          "hex": "76a9143fb679e9e8301eb4ec14321216f89e7e4fd8dea188ac",
+          "reqSigs": 1,
+          "type": "pubkeyhash",
+          "addresses": [
+            "bitcoincash:qqlmv70faqcpad8vzsepy9hcnelylkx75yl5998sr8"
+          ]
+        },
+        "tokenQtyStr": "1",
+        "tokenQty": 1
+      },
+      {
+        "value": 0.04218679,
+        "n": 2,
+        "scriptPubKey": {
+          "asm": "OP_DUP OP_HASH160 b03c4b800bb0575f6c0f11e155541cc0661a8f9a OP_EQUALVERIFY OP_CHECKSIG",
+          "hex": "76a914b03c4b800bb0575f6c0f11e155541cc0661a8f9a88ac",
+          "reqSigs": 1,
+          "type": "pubkeyhash",
+          "addresses": [
+            "bitcoincash:qzcrcjuqpwc9whmvpug7z425rnqxvx50ngl60rrjst"
+          ]
+        },
+        "tokenQty": null,
+        "tokenQtyStr": null
+      }
+    ],
+    "hex": "0200000002f0bbaacfb3e63b8be44577eff50526a7d74f83c43a38ca6797d10620b94a97e7020000006a473044022045d8d7f143d2ce5c313af80fac1963dd7cabbe01dce26a65bf3ce06654f1e46602204739c27a43e99893bd7e98fd32af43b7deaf516fc0dc13058d919ffcde0dcdf14121023ed189c1d4c5a89f25ba53cc9d5d06c3e3abfcd323043bad67bdbb8b1a078c94ffffffff74968070406091fe79780d0399d4bd178ed1f36122a0e1cb0fba708b24d1b890010000006b483045022100f6ea20cea2b6cf58cb3666bd4550e3405ef9b48fd856d9122fe821e713490e9102204bb40ae39128d9fb3957267be23130fcb1147fd1416870209112a1cea130b51b4121037a22c03e02f20d0e10f1dfe5ff0eae8da67da1d5862c7a7fe6e889f6da7d62f6ffffffff030000000000000000376a04534c500001410453454e442090b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe9160407080967408000000000000000122020000000000001976a9143fb679e9e8301eb4ec14321216f89e7e4fd8dea188ac375f4000000000001976a914b03c4b800bb0575f6c0f11e155541cc0661a8f9a88ac00000000",
+    "blockhash": "0000000000000000026845b659097c102817ada02a2217bcfc7efb1fad8913a9",
+    "confirmations": 259,
+    "time": 1695720407,
+    "blocktime": 1695720407,
+    "blockheight": 812387,
+    "isSlpTx": true,
+    "tokenTxType": "SEND",
+    "tokenId": "90b8d1248b70ba0fcbe1a02261f3d18e17bdd499030d7879fe91604070809674",
+    "tokenType": 65,
+    "tokenTicker": "SWEDC",
+    "tokenName": "Don't Matter Now Coin No. 958",
+    "tokenDecimals": 0,
+    "tokenUri": "https://collectible.sweet.io/series/31/958",
+    "tokenDocHash": "81eba18f950d91a09c7ffb4dc7b4a986580c9d1bab456a2daef51de712415489"
+  }
+}
+
 export default {
   sendData01,
   addrData01,
@@ -454,5 +561,6 @@ export default {
   sendData02,
   greaterOutputBurn,
   greaterOutputAddr01,
-  greaterOutputAddr02
+  greaterOutputAddr02,
+  nftSendData01
 }

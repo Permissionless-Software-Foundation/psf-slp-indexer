@@ -7,15 +7,6 @@
   - Add the token output quantities to each output address.
 
   Dev Notes:
-  - CT 10/25/21
-    TXID: c73a90412a96a59cd760bad25b6d81dd06bede58669ec1fa42eab0ca744d3b78
-    Caused the indexer to abort on the first time, due to 'UTXO not found' error,
-    but then passed on the second attempt. It's a simple chain of sends. I'm
-    unsure what is causing this issue, leads me to believe it's a race condition.
-    This TXID might be a good one to study?
-
-  - txid 4bc56e2c0358dbfa169e0feadf8edade0b76773f3bfad3f44b042e9bc5cd5d7f
-    A token by James Cramer that tripped the bug.
 
 */
 
@@ -123,7 +114,7 @@ class Send {
 
       // Update the token data.
       const tokenData = await this.tokenDb.get(tokenId)
-      // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+      // console.log(`updateTokenStats() tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
       let txInfo = {}
 
@@ -170,7 +161,6 @@ class Send {
         // If the token is an NFT, save address of the current holder of the NFT.
         if (tokenData.type === 65) {
           const addr = txData.vout[1].scriptPubKey.addresses[0]
-          console.log('updateTokenStats() current NFT address: ', addr)
 
           tokenData.nftHolder = addr
         }

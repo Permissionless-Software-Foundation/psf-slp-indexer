@@ -1,12 +1,8 @@
 /*
-  Unit tests for GENESIS tx indexing library genesis.js
+  Unit tests for SEND tx indexing library send.js
 */
 
 // Public npm libraries
-// const assert = require('chai').assert
-// const sinon = require('sinon')
-// const cloneDeep = require('lodash.clonedeep')
-// const BigNumber = require('bignumber.js')
 import { assert } from 'chai'
 import sinon from 'sinon'
 import cloneDeep from 'lodash.clonedeep'
@@ -530,7 +526,8 @@ describe('#send.js', () => {
       const tokenData = {
         tokensInCirculationBN: new BigNumber(10000),
         totalBurned: new BigNumber(100),
-        txs: []
+        txs: [],
+        type: 65
       }
 
       // Mock databases
@@ -553,6 +550,109 @@ describe('#send.js', () => {
       assert.equal(result.txs[0].type, 'SEND-BURN')
       assert.equal(result.txs[0].qty, '1000')
       assert.equal(result.txs[0].burned, '100')
+    })
+
+    it('should update token data for type 65 NFT send controlled burn', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(1),
+        totalBurned: new BigNumber(0),
+        txs: [],
+        type: 65
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(1)
+      const sentBN = new BigNumber(1)
+      const spentBN = new BigNumber(1)
+
+      const result = await uut.updateTokenStats(
+        mockData.nftSendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND-BURN')
+      assert.equal(result.txs[0].qty, '1')
+    })
+
+    it('should update token data for type 65 NFT send', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(1),
+        totalBurned: new BigNumber(0),
+        txs: [],
+        type: 65
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(0)
+      const sentBN = new BigNumber(1)
+      const spentBN = new BigNumber(1)
+
+      const result = await uut.updateTokenStats(
+        mockData.nftSendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'SEND')
+      assert.equal(result.txs[0].qty, '1')
+    })
+
+    it('should update token data for type 65 NFT uncontrolled burn', async () => {
+      // Mock data
+      const tokenData = {
+        tokensInCirculationBN: new BigNumber(1),
+        totalBurned: new BigNumber(0),
+        txs: [],
+        type: 65
+      }
+
+      // Mock databases
+      sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+      sandbox.stub(uut.tokenDb, 'put').resolves()
+
+      const diffBN = new BigNumber(-1)
+      const sentBN = new BigNumber(1)
+      const spentBN = new BigNumber(1)
+
+      const result = await uut.updateTokenStats(
+        mockData.nftSendData01,
+        diffBN,
+        spentBN,
+        sentBN
+      )
+      // console.log('result: ', result)
+
+      // Assert expected values
+      assert.equal(result.txs[0].type, 'BURN-UNCONTROLLED')
+      assert.equal(result.txs[0].qty, '0')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        // Force an error
+        // sandbox.stub(uut.tokenDb, 'get').resolves(tokenData)
+
+        await uut.updateTokenStats()
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Cannot destructure property')
+      }
     })
   })
 
