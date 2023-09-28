@@ -293,17 +293,17 @@ class NftGenesis {
       // can be compared between instances.
 
       // Token exists in the address object, update the balance.
-      for (let i = 0; i < addrObj.balances.length; i++) {
-        const thisBalance = addrObj.balances[i]
-        console.log(`thisBalance: ${JSON.stringify(thisBalance, null, 2)}`)
-
-        if (thisBalance.tokenId !== tokenId) continue
-
-        // bignumber.js addition.
-        thisBalance.qty = qty.plus(thisBalance.qty)
-
-        return true
-      }
+      // for (let i = 0; i < addrObj.balances.length; i++) {
+      //   const thisBalance = addrObj.balances[i]
+      //   console.log(`thisBalance: ${JSON.stringify(thisBalance, null, 2)}`)
+      //
+      //   if (thisBalance.tokenId !== tokenId) continue
+      //
+      //   // bignumber.js addition.
+      //   thisBalance.qty = qty.plus(thisBalance.qty)
+      //
+      //   return true
+      // }
     } catch (err) {
       console.error('Error in nftGenesis.updateBalanceFromGenesis()')
       throw err
