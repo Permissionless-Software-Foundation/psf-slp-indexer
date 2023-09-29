@@ -68,7 +68,7 @@ class Transaction {
 
       // Get TX data
       const txDetails = await this.getTxData(txid)
-      // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+      console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
       // Get the block height the transaction was mined in.
       if (!txDetails.blockhash) {
@@ -91,7 +91,7 @@ class Transaction {
 
       // Get Token Data
       const txTokenData = await this.getTokenInfo(txid)
-      // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+      console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
 
       // If not a token, return the tx data. Processing is complete.
       if (!txTokenData) return txDetails
@@ -103,7 +103,7 @@ class Transaction {
       // Get Genesis data
       // console.log(`txTokenData.tokenId: ${txTokenData.tokenId}`)
       const genesisData = await this.getTokenInfo(txTokenData.tokenId)
-      // console.log(`genesisData: ${JSON.stringify(genesisData, null, 2)}`)
+      console.log(`genesisData: ${JSON.stringify(genesisData, null, 2)}`)
 
       // Add token information to the tx details object.
       txDetails.tokenTxType = txTokenData.txType
@@ -121,6 +121,10 @@ class Transaction {
         finalTxDetails = await this.getTx01(txDetails, txTokenData)
       } else if (txDetails.tokenType === 65) {
         finalTxDetails = this.getNftTx(txDetails, txTokenData)
+        console.log('finalTxDetails: ', finalTxDetails)
+
+        console.log('NFT data found. Exiting.')
+        process.exit(0)
       }
 
       return finalTxDetails

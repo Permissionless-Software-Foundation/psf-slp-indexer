@@ -890,10 +890,10 @@ describe('#Transaction', () => {
     it('should calculate block height if TX has no blockhash', async () => {
       // For TX to not have a blockhash
       mockData.slpTxDetails.blockhash = undefined
-      
+
       // Mock dependencies
       sandbox.stub(uut, 'getTxData').resolves(mockData.slpTxDetails)
-      sandbox.stub(uut.rpc,'getBlockCount').resolves(603423)
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(603423)
       // sandbox.stub(uut.rpc, 'getBlockHeader').resolves({ height: 603424 })
       sandbox
         .stub(uut, 'getTokenInfo')
