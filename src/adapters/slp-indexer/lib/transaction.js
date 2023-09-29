@@ -8,8 +8,6 @@
 */
 
 // Public npm libraries
-// const BigNumber = require('bignumber.js')
-// const slpParser = require('slp-parser')
 import BigNumber from 'bignumber.js'
 import slpParser from 'slp-parser'
 

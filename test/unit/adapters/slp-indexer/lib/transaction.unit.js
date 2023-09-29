@@ -3,15 +3,10 @@
 */
 
 // Public npm libraries
-// const assert = require('chai').assert
-// const sinon = require('sinon')
-// const cloneDeep = require('lodash.clonedeep')
 import { assert } from 'chai'
 import sinon from 'sinon'
 import cloneDeep from 'lodash.clonedeep'
 
-// const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-// const mockDataLib = require('../../../mocks/transaction-mock.js')
 import Transaction from '../../../../../src/adapters/slp-indexer/lib/transaction.js'
 import mockDataLib from '../../../mocks/transaction-mock.js'
 
@@ -887,6 +882,67 @@ describe('#Transaction', () => {
       assert.equal(result.vin[1].tokenQtyStr, '0')
       assert.equal(result.vin[1].tokenQty, 0)
       assert.equal(result.vin[1].isMintBaton, true)
+    })
+
+    // I believe this use-case happens when the indexer is tracking transactions
+    // comming in on the ZMQ in real time. They have not been mined, so they
+    // have no blockhash.
+    it('should calculate block height if TX has no blockhash', async () => {
+      // For TX to not have a blockhash
+      mockData.slpTxDetails.blockhash = undefined
+      
+      // Mock dependencies
+      sandbox.stub(uut, 'getTxData').resolves(mockData.slpTxDetails)
+      sandbox.stub(uut.rpc,'getBlockCount').resolves(603423)
+      // sandbox.stub(uut.rpc, 'getBlockHeader').resolves({ height: 603424 })
+      sandbox
+        .stub(uut, 'getTokenInfo')
+        .onCall(0)
+        .resolves(mockData.mockOpReturnData01)
+        .onCall(1)
+        .resolves(mockData.mockOpReturnData02)
+        .onCall(2)
+        .resolves(mockData.mockOpReturnData03)
+        .onCall(3)
+        .resolves(false)
+
+      const txid =
+        '266844d53e46bbd7dd37134688dffea6e54d944edff27a0add63dd0908839bc1'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that there are stanardized properties.
+      assert.property(result, 'txid')
+      assert.property(result, 'vin')
+      assert.property(result, 'vout')
+      assert.property(result.vout[0], 'value')
+      assert.property(result.vout[1].scriptPubKey, 'addresses')
+
+      // Assert outputs have expected properties
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[1].tokenQtyStr, '1')
+      assert.equal(result.vout[2].tokenQty, 998833)
+      assert.equal(result.vout[2].tokenQtyStr, '998833')
+      assert.equal(result.vout[3].tokenQty, null)
+      assert.equal(result.vout[3].tokenQtyStr, null)
+
+      // Assert that inputs have expected properties
+      assert.equal(result.vin[0].tokenQtyStr, '998834')
+      assert.equal(result.vin[0].tokenQty, 998834)
+      assert.equal(
+        result.vin[0].tokenId,
+        '497291b8a1dfe69c8daea50677a3d31a5ef0e9484d8bebb610dac64bbc202fb7'
+      )
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+
+      // Assert blockheight is added
+      assert.equal(result.blockheight, 603424)
+      assert.equal(result.isSlpTx, true)
     })
   })
 
