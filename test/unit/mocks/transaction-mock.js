@@ -1230,6 +1230,172 @@ const nftGenesisTokenData02 = {
   qty: '5'
 }
 
+/*
+txDetails: {
+  "txid": "d9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456",
+  "hash": "d9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456",
+  "version": 1,
+  "size": 424,
+  "locktime": 613541,
+  "vin": [
+    {
+      "txid": "1134b8560fc3fc3c28ac517f4ef63922c7528c53c71637ab29fb6f0a1adeeafa",
+      "vout": 1,
+      "scriptSig": {
+        "asm": "a02886fb06a555cf16496e091bc0e938c8e96740cd41d2acef48d7bd6e7571ef08358ffc95c4189507708776cda95dd63b390b2b07597695f2c0b6d08c457886[ALL|FORKID] 027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5",
+        "hex": "41a02886fb06a555cf16496e091bc0e938c8e96740cd41d2acef48d7bd6e7571ef08358ffc95c4189507708776cda95dd63b390b2b07597695f2c0b6d08c4578864121027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5"
+      },
+      "sequence": 4294967294,
+      "address": "bitcoincash:qp39r6pxw8htwplf5rfejxtlzc6vu4p5vcwktmap3x",
+      "value": 0.00000546
+    },
+    {
+      "txid": "1134b8560fc3fc3c28ac517f4ef63922c7528c53c71637ab29fb6f0a1adeeafa",
+      "vout": 2,
+      "scriptSig": {
+        "asm": "bb1b05dab07024469fbe7b5ea05966dae0c8f13d82810359fbcab8b1ea05c217f015b3a7ce7585df6914e8c0ca047d9de5a3b2f8bad33e7ecbcee454e54a64a6[ALL|FORKID] 027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5",
+        "hex": "41bb1b05dab07024469fbe7b5ea05966dae0c8f13d82810359fbcab8b1ea05c217f015b3a7ce7585df6914e8c0ca047d9de5a3b2f8bad33e7ecbcee454e54a64a64121027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5"
+      },
+      "sequence": 4294967294,
+      "address": "bitcoincash:qp39r6pxw8htwplf5rfejxtlzc6vu4p5vcwktmap3x",
+      "value": 0.01199428
+    }
+  ],
+  "vout": [
+    {
+      "value": 0,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "OP_RETURN 5262419 65 1145980243 da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0 72057594037927936",
+        "hex": "6a04534c500001410453454e4420da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0080000000000000001",
+        "type": "nulldata"
+      }
+    },
+    {
+      "value": 0.00000546,
+      "n": 1,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 dd100e1d27f7c072cdf614801a04d4c3624ba72d OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914dd100e1d27f7c072cdf614801a04d4c3624ba72d88ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qrw3qrsaylmuqukd7c2gqxsy6npkyja895fgx88qr6"
+        ]
+      }
+    },
+    {
+      "value": 0.01199004,
+      "n": 2,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 dd100e1d27f7c072cdf614801a04d4c3624ba72d OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914dd100e1d27f7c072cdf614801a04d4c3624ba72d88ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qrw3qrsaylmuqukd7c2gqxsy6npkyja895fgx88qr6"
+        ]
+      }
+    }
+  ],
+  "hex": "0100000002faeade1a0a6ffb29ab3716c7538c52c72239f64e7f51ac283cfcc30f56b83411010000006441a02886fb06a555cf16496e091bc0e938c8e96740cd41d2acef48d7bd6e7571ef08358ffc95c4189507708776cda95dd63b390b2b07597695f2c0b6d08c4578864121027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5fefffffffaeade1a0a6ffb29ab3716c7538c52c72239f64e7f51ac283cfcc30f56b83411020000006441bb1b05dab07024469fbe7b5ea05966dae0c8f13d82810359fbcab8b1ea05c217f015b3a7ce7585df6914e8c0ca047d9de5a3b2f8bad33e7ecbcee454e54a64a64121027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5feffffff030000000000000000376a04534c500001410453454e4420da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e008000000000000000122020000000000001976a914dd100e1d27f7c072cdf614801a04d4c3624ba72d88ac9c4b1200000000001976a914dd100e1d27f7c072cdf614801a04d4c3624ba72d88aca55c0900",
+  "blockhash": "000000000000000002d6421daf0adc3b325292f37400506d02648d9018bfe14c",
+  "confirmations": 199339,
+  "time": 1576473899,
+  "blocktime": 1576473899
+}
+txTokenData: {
+  "tokenType": 65,
+  "txType": "SEND",
+  "tokenId": "da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0",
+  "amounts": [
+    "1"
+  ]
+}
+genesisData: {
+  "tokenType": 65,
+  "txType": "GENESIS",
+  "ticker": "picasho1/1",
+  "name": "picasho1/1",
+  "tokenId": "da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0",
+  "documentUri": "Ceci n'est pas un concombre",
+  "documentHash": "",
+  "decimals": 0,
+  "mintBatonVout": 0,
+  "qty": "1"
+}
+finalTxDetails:  {
+  txid: 'd9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456',
+  hash: 'd9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456',
+  version: 1,
+  size: 424,
+  locktime: 613541,
+  vin: [
+    {
+      txid: '1134b8560fc3fc3c28ac517f4ef63922c7528c53c71637ab29fb6f0a1adeeafa',
+      vout: 1,
+      scriptSig: [Object],
+      sequence: 4294967294,
+      address: 'bitcoincash:qp39r6pxw8htwplf5rfejxtlzc6vu4p5vcwktmap3x',
+      value: 0.00000546,
+      tokenQtyStr: '1',
+      tokenQty: 1,
+      tokenId: 'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0'
+    },
+    {
+      txid: '1134b8560fc3fc3c28ac517f4ef63922c7528c53c71637ab29fb6f0a1adeeafa',
+      vout: 2,
+      scriptSig: [Object],
+      sequence: 4294967294,
+      address: 'bitcoincash:qp39r6pxw8htwplf5rfejxtlzc6vu4p5vcwktmap3x',
+      value: 0.01199428,
+      tokenQtyStr: '0',
+      tokenQty: 0,
+      tokenId: 'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0'
+    }
+  ],
+  vout: [
+    {
+      value: 0,
+      n: 0,
+      scriptPubKey: [Object],
+      tokenQty: null,
+      tokenQtyStr: null
+    },
+    {
+      value: 0.00000546,
+      n: 1,
+      scriptPubKey: [Object],
+      tokenQtyStr: '1',
+      tokenQty: 1
+    },
+    {
+      value: 0.01199004,
+      n: 2,
+      scriptPubKey: [Object],
+      tokenQty: null,
+      tokenQtyStr: null
+    }
+  ],
+  hex: '0100000002faeade1a0a6ffb29ab3716c7538c52c72239f64e7f51ac283cfcc30f56b83411010000006441a02886fb06a555cf16496e091bc0e938c8e96740cd41d2acef48d7bd6e7571ef08358ffc95c4189507708776cda95dd63b390b2b07597695f2c0b6d08c4578864121027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5fefffffffaeade1a0a6ffb29ab3716c7538c52c72239f64e7f51ac283cfcc30f56b83411020000006441bb1b05dab07024469fbe7b5ea05966dae0c8f13d82810359fbcab8b1ea05c217f015b3a7ce7585df6914e8c0ca047d9de5a3b2f8bad33e7ecbcee454e54a64a64121027933929034fec3d5091f71d42f463c6188ff60b65af21020bf74443ab483a6b5feffffff030000000000000000376a04534c500001410453454e4420da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e008000000000000000122020000000000001976a914dd100e1d27f7c072cdf614801a04d4c3624ba72d88ac9c4b1200000000001976a914dd100e1d27f7c072cdf614801a04d4c3624ba72d88aca55c0900',
+  blockhash: '000000000000000002d6421daf0adc3b325292f37400506d02648d9018bfe14c',
+  confirmations: 199339,
+  time: 1576473899,
+  blocktime: 1576473899,
+  blockheight: 613542,
+  isSlpTx: true,
+  tokenTxType: 'SEND',
+  tokenId: 'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0',
+  tokenType: 65,
+  tokenTicker: 'picasho1/1',
+  tokenName: 'picasho1/1',
+  tokenDecimals: 0,
+  tokenUri: "Ceci n'est pas un concombre",
+  tokenDocHash: ''
+}
+
+*/
+
 export default {
   nonSlpTxDetails,
   nonSLPTxDetailsWithOpReturn,

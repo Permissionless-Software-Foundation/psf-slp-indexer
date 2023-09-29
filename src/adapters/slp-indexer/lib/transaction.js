@@ -120,7 +120,7 @@ class Transaction {
       if (txDetails.tokenType === 1 || txDetails.tokenType === 129) {
         finalTxDetails = await this.getTx01(txDetails, txTokenData)
       } else if (txDetails.tokenType === 65) {
-        finalTxDetails = this.getNftTx(txDetails, txTokenData)
+        finalTxDetails = await this.getNftTx(txDetails, txTokenData)
         console.log('finalTxDetails: ', finalTxDetails)
 
         console.log('NFT data found. Exiting.')
