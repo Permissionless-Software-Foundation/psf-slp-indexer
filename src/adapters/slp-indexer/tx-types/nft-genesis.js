@@ -1,5 +1,7 @@
 /*
   A class library for processing NFT (child) Genesis SLP transactions
+
+  First NFT tx occurs in block 589808 txid: 3b66b7e0f80473ae9e761892046b843689a1281405504ae6d93a30156aeefeda
 */
 
 // Public npm libraries
@@ -74,10 +76,6 @@ class NftGenesis {
 
         return false
       }
-
-      console.log('Valid NFT Genesis found. TXID: ', txid)
-      console.log('exiting')
-      process.exit(0)
 
       // Subtract the input UTXOs and balances from input addresses.
       const { spentBN, groupTokenId } = await this.subtractTokensFromInputAddr(data)

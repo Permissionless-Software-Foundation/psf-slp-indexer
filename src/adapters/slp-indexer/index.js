@@ -5,6 +5,7 @@
   - First Genesis tx occurs in block 543376, txid: 545cba6f72a08cbcb08c7d4e8166267942e8cb9a611328805c62fa538e861ba4
   - First Send tx occurs in block 543409, txid: 874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e
   - First Mint tx occurs in block 543614 txid: ee9d3cf5153599c134147e3fac9844c68e216843f4452a1ce15a29452af6db34
+  - First NFT tx occurs in block 589808 txid: 3b66b7e0f80473ae9e761892046b843689a1281405504ae6d93a30156aeefeda
 
   ToDo: Wrap rpc calls in processBlock() in a retry wrapper.
 
