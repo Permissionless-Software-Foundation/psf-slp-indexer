@@ -219,15 +219,15 @@ class Genesis {
         addr = this.util.getNewAddrObj()
       }
 
-      console.log('genesis.js/addBatonAddress() txData: ', txData)
-
       const utxo = {
         txid: txData.txid,
         vout: slpData.mintBatonVout,
         type: 'baton',
         tokenId: slpData.tokenId,
         address: recvrAddr,
-        tokenType: slpData.tokenType
+        tokenType: slpData.tokenType,
+        tokenName: txData.tokenName,
+        tokenTicker: txData.tokenTicker
       }
       addr.utxos.push(utxo)
       console.log(`genesis.js/addBatonAddress() mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)
