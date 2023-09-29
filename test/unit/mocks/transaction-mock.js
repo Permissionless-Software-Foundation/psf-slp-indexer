@@ -1230,8 +1230,8 @@ const nftGenesisTokenData02 = {
   qty: '5'
 }
 
-/*
-txDetails: {
+
+const nftTxDetails01 = {
   "txid": "d9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456",
   "hash": "d9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456",
   "version": 1,
@@ -1304,7 +1304,8 @@ txDetails: {
   "time": 1576473899,
   "blocktime": 1576473899
 }
-txTokenData: {
+
+const nftTxTokenData01 = {
   "tokenType": 65,
   "txType": "SEND",
   "tokenId": "da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0",
@@ -1312,7 +1313,8 @@ txTokenData: {
     "1"
   ]
 }
-genesisData: {
+
+const nftGenesisData01 = {
   "tokenType": 65,
   "txType": "GENESIS",
   "ticker": "picasho1/1",
@@ -1324,7 +1326,8 @@ genesisData: {
   "mintBatonVout": 0,
   "qty": "1"
 }
-finalTxDetails:  {
+
+const nftFinalTxDetails01 =  {
   txid: 'd9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456',
   hash: 'd9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456',
   version: 1,
@@ -1394,7 +1397,6 @@ finalTxDetails:  {
   tokenDocHash: ''
 }
 
-*/
 
 export default {
   nonSlpTxDetails,
@@ -1429,5 +1431,9 @@ export default {
   mockTxIn,
   nftGenesisTx01,
   nftGenesisTokenData01,
-  nftGenesisTokenData02
+  nftGenesisTokenData02,
+  nftTxDetails01,
+  nftTxTokenData01,
+  nftGenesisData01,
+  nftFinalTxDetails01  
 }

@@ -944,6 +944,55 @@ describe('#Transaction', () => {
       assert.equal(result.blockheight, 603424)
       assert.equal(result.isSlpTx, true)
     })
+
+    it('should get TX details for an NFT', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTxData').resolves(mockData.nftTxDetails01)
+      sandbox.stub(uut.rpc, 'getBlockHeader').resolves({ height: 613542 })
+      sandbox
+        .stub(uut, 'getTokenInfo')
+        .onCall(0)
+        .resolves(mockData.nftTxTokenData01)
+        .onCall(1)
+        .resolves(mockData.nftGenesisData01)
+      sandbox.stub(uut, 'getNftTx').resolves(mockData.nftFinalTxDetails01)
+
+      const txid =
+        'd9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that there are stanardized properties.
+      assert.property(result, 'txid')
+      assert.property(result, 'vin')
+      assert.property(result, 'vout')
+      assert.property(result.vout[0], 'value')
+      // assert.property(result.vout[1].scriptPubKey, 'addresses')
+
+      // Assert outputs have expected properties
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[1].tokenQtyStr, '1')
+      assert.equal(result.vout[2].tokenQty, null)
+      assert.equal(result.vout[2].tokenQtyStr, null)
+
+      // Assert that inputs have expected properties
+      assert.equal(result.vin[0].tokenQtyStr, '1')
+      assert.equal(result.vin[0].tokenQty, 1)
+      assert.equal(
+        result.vin[0].tokenId,
+        'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0'
+      )
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, 'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0')
+
+      // Assert blockheight is added
+      assert.equal(result.blockheight, 613542)
+      assert.equal(result.isSlpTx, true)
+    })
   })
 
   describe('#getTxWithRetry', () => {
