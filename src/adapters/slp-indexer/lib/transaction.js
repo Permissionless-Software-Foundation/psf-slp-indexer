@@ -131,6 +131,8 @@ class Transaction {
   }
 
   // Used for processing NFT (child) tokens.
+  // Note: It is not possible to 'mint' NFTs (type 65), only Group (type 128)
+  // can be minted.
   async getNftTx (txDetails, txTokenData) {
     // console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
 
@@ -178,9 +180,9 @@ class Transaction {
         //   `thisVout ${i}: ${JSON.stringify(txDetails.vout[i], null, 2)}`
         // )
       } else if (
-        txTokenData.txType === 'GENESIS' ||
-        txTokenData.txType === 'MINT'
+        txTokenData.txType === 'GENESIS'
       ) {
+        // console.log('txTokenData.txType: ', txTokenData.txType)
         // console.log(
         //   `output txTokenData: ${JSON.stringify(txTokenData, null, 2)}`
         // )
@@ -199,7 +201,7 @@ class Transaction {
             thisVout.isMintBaton = true
           }
         } else if (i === 1) {
-          // Only vout[1] of a Genesis or Mint transaction represents the tokens.
+          // Only vout[1] of a Genesis transaction represents the tokens.
           // Any other outputs in that transaction are normal BCH UTXOs.
 
           tokenQty = txTokenData.qty
@@ -216,12 +218,8 @@ class Transaction {
           thisVout.tokenQtyStr = realQty
           thisVout.tokenQty = parseFloat(realQty)
           // console.log(`thisVout[${i}]: ${JSON.stringify(thisVout, null, 2)}`)
-        } else if (i === txTokenData.mintBatonVout) {
-          // Optional Mint baton
-          thisVout.tokenQtyStr = '0'
-          thisVout.tokenQty = 0
-          thisVout.isMintBaton = true
         } else {
+          // Normal BCH output
           thisVout.tokenQtyStr = '0'
           thisVout.tokenQty = 0
         }
@@ -263,64 +261,7 @@ class Transaction {
         continue
       }
 
-      if (vinTokenData.txType === 'SEND') {
-        // console.log(
-        //   `SEND vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-        // )
-
-        const tokenQty = vinTokenData.amounts[thisVin.vout - 1]
-        // console.log(`tokenQty: ${JSON.stringify(tokenQty, null, 2)}`)
-
-        // Calculate the real quantity using a BigNumber, then convert it to a
-        // floating point number.
-        let realQty = new BigNumber(tokenQty).dividedBy(
-          10 ** parseInt(txDetails.tokenDecimals)
-        )
-
-        if (isNaN(realQty)) realQty = 0
-
-        realQty = realQty.toString()
-        // realQty = parseFloat(realQty)
-
-        thisVin.tokenQtyStr = realQty
-        thisVin.tokenQty = parseFloat(realQty)
-        thisVin.tokenId = vinTokenData.tokenId
-      } else if (vinTokenData.txType === 'MINT') {
-        // console.log(
-        //   `MINT vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-        // )
-
-        let tokenQty = 0 // Default value
-
-        // Only vout[1] of a Genesis transaction represents the tokens.
-        // Any other outputs in that transaction are normal BCH UTXOs.
-        if (thisVin.vout === 1) {
-          tokenQty = vinTokenData.qty
-          // console.log(`tokenQty: ${JSON.stringify(tokenQty, null, 2)}`)
-
-          // Calculate the real quantity using a BigNumber, then convert it to a
-          // floating point number.
-          let realQty = new BigNumber(tokenQty).dividedBy(
-            10 ** parseInt(txDetails.tokenDecimals)
-          )
-          realQty = realQty.toString()
-          // realQty = parseFloat(realQty)
-
-          thisVin.tokenQtyStr = realQty
-          thisVin.tokenQty = parseFloat(realQty)
-          thisVin.tokenId = vinTokenData.tokenId
-        } else if (thisVin.vout === vinTokenData.mintBatonVout) {
-          // Optional Mint baton
-          thisVin.tokenQtyStr = '0'
-          thisVin.tokenQty = 0
-          thisVin.tokenId = vinTokenData.tokenId
-          thisVin.isMintBaton = true
-        } else {
-          thisVin.tokenQtyStr = '0'
-          thisVin.tokenQty = 0
-          thisVin.tokenId = null
-        }
-      } else if (vinTokenData.txType === 'GENESIS') {
+      if (vinTokenData.txType === 'GENESIS') {
         // console.log(
         //   `GENESIS vinTokenData ${i}: ${JSON.stringify(
         //     vinTokenData,
@@ -348,13 +289,8 @@ class Transaction {
           thisVin.tokenQtyStr = realQty
           thisVin.tokenQty = parseFloat(realQty)
           thisVin.tokenId = vinTokenData.tokenId
-        } else if (thisVin.vout === vinTokenData.mintBatonVout) {
-          // Optional Mint baton
-          thisVin.tokenQtyStr = '0'
-          thisVin.tokenQty = 0
-          thisVin.tokenId = vinTokenData.tokenId
-          thisVin.isMintBaton = true
         } else {
+          // Normal BCH output
           thisVin.tokenQtyStr = '0'
           thisVin.tokenQty = 0
           thisVin.tokenId = null
@@ -363,6 +299,7 @@ class Transaction {
         console.log(
           `Unknown vinTokenData: ${JSON.stringify(vinTokenData, null, 2)}`
         )
+
         throw new Error('Unknown token type in input')
       }
     }

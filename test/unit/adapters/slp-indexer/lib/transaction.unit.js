@@ -382,6 +382,91 @@ describe('#Transaction', () => {
       assert.equal(result.vout[1].tokenQty, 1)
       assert.equal(result.vout[2].tokenQty, 0)
     })
+
+    it('should hydrate an NFT (child/type 65) Send Tx', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves({
+          tokenType: 65,
+          txType: 'GENESIS',
+          ticker: 'test',
+          name: 'test',
+          tokenId: 'c2ab27687de886ade3237d38c5f7b2af9b60ec5ca8c89623cd0b81ac7efec36d',
+          documentUri: 'ipfs://bafybeidy4nrqgsgcl44jlyvehnulngfzq564kc4bz6ni3cldoupwhwzzy4',
+          documentHash: '5126528223a04a49b8586608f8677ef0af0df9bc14f0044bd7395c76f5d1c039',
+          decimals: 0,
+          mintBatonVout: 0,
+          qty: '1'
+        })
+        .onCall(1).resolves({
+          tokenType: 65,
+          txType: 'SEND',
+          tokenId: '2adfd8afa3511725e0b882949c671f3fa234d9da848a900b819cc68e93af376f',
+          amounts: [
+            '1'
+          ]
+        })
+
+      const txDetails = mockData.nftSendTxDetails01
+      const txTokenData = mockData.nftSendTxTokenData01
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert expected properties and values exist.
+      assert.equal(result.isSlpTx, true)
+      assert.equal(result.tokenTxType, 'SEND')
+      assert.equal(result.tokenType, 65)
+      assert.equal(result.tokenDecimals, 0)
+      assert.property(result, 'tokenUri')
+      assert.property(result, 'tokenDocHash')
+      assert.property(result, 'tokenName')
+      assert.property(result, 'tokenTicker')
+    })
+
+    it('should throw error for unknown token type', async () => {
+      try {
+        const txDetails = mockData.nftSendTxDetails01
+        const txTokenData = mockData.nftSendTxTokenData01
+
+        // Force unknown token type
+        txTokenData.txType = 'UNKNOWN'
+
+        await uut.getNftTx(txDetails, txTokenData)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.message, 'Unknown SLP TX type for TX')
+      }
+    })
+
+    it('should throw error for unknown token input', async () => {
+      try {
+        // Mock dependencies
+        sandbox.stub(uut, 'getTokenInfo')
+          .onCall(0).resolves({
+            tokenType: 65,
+            txType: 'UNKNOWN',
+            ticker: 'test',
+            name: 'test',
+            tokenId: 'c2ab27687de886ade3237d38c5f7b2af9b60ec5ca8c89623cd0b81ac7efec36d',
+            documentUri: 'ipfs://bafybeidy4nrqgsgcl44jlyvehnulngfzq564kc4bz6ni3cldoupwhwzzy4',
+            documentHash: '5126528223a04a49b8586608f8677ef0af0df9bc14f0044bd7395c76f5d1c039',
+            decimals: 0,
+            mintBatonVout: 0,
+            qty: '1'
+          })
+
+        const txDetails = mockData.nftSendTxDetails01
+        const txTokenData = mockData.nftSendTxTokenData01
+
+        await uut.getNftTx(txDetails, txTokenData)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.message, 'Unknown token type in input')
+      }
+    })
   })
 
   describe('#get', () => {
