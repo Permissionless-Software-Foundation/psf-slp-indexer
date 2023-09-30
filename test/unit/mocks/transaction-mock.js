@@ -1499,6 +1499,131 @@ const nftSendTxTokenData01 = {
   ]
 }
 
+const nftGenesisTx03 = {
+  "txid": "83cdecea64f8d4e8efc3b6cd55afe2c66ae197ca6c0caaeb485e17b58a5b96cf",
+  "hash": "83cdecea64f8d4e8efc3b6cd55afe2c66ae197ca6c0caaeb485e17b58a5b96cf",
+  "version": 2,
+  "size": 526,
+  "locktime": 0,
+  "vin": [
+    {
+      "txid": "7d32fcc25a46fa538472db41c0078c9dce8af7167f04c2cc38aa6ad4fb5de44b",
+      "vout": 16,
+      "scriptSig": {
+        "asm": "3044022051a7d4e178f87a2426ea34954047188e96553fde1f48a6353b4f8cea2326157d022079256ac9a93f91218e7c7a5390005907cc9a81017fadb8a4562688b263d704de[ALL|FORKID] 034c0506d9b385070681fed0949128e6d80a029686aad92ac3ef37d09847eb11b7",
+        "hex": "473044022051a7d4e178f87a2426ea34954047188e96553fde1f48a6353b4f8cea2326157d022079256ac9a93f91218e7c7a5390005907cc9a81017fadb8a4562688b263d704de4121034c0506d9b385070681fed0949128e6d80a029686aad92ac3ef37d09847eb11b7"
+      },
+      "sequence": 4294967295,
+      "address": "bitcoincash:qpy0h7yfsug0vfecvlaa45vv5dzjvt59scdydey8dt",
+      "value": 0.00000546
+    },
+    {
+      "txid": "770348ecbdf5c791f848a7644741a73fcab24caba02c96e6f4137737310071cd",
+      "vout": 2,
+      "scriptSig": {
+        "asm": "3045022100c260db45cbcbfd1b46398b33f54f3c9bdbc93a7eddfa055428a6613d1594519c02202476b7538a07d32d002ca1817dfce36b280a39323d25b7af74a4f258dc6b0337[ALL|FORKID] 034e72bde1d0fe7d11ffdf8eb10089ac9bfd550501816518a9a3b4ab570be0c23f",
+        "hex": "483045022100c260db45cbcbfd1b46398b33f54f3c9bdbc93a7eddfa055428a6613d1594519c02202476b7538a07d32d002ca1817dfce36b280a39323d25b7af74a4f258dc6b03374121034e72bde1d0fe7d11ffdf8eb10089ac9bfd550501816518a9a3b4ab570be0c23f"
+      },
+      "sequence": 4294967295,
+      "address": "bitcoincash:qp6n0lr3atmg96yq92x58xeeq6guw2xtvv3tdryfrw",
+      "value": 0.00035947
+    }
+  ],
+  "vout": [
+    {
+      "value": 0,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "OP_RETURN 5262419 65 23443045060855111 288908203859 5465737420536572696573206334343936322023313937 68747470733a2f2f636f6c6c65637469626c652e73746167696e672e73776565742e696f2f7365726965732f3937332f313937 c7379405d99a421f54c6d6926b4a8dab7f100d8a2e92c721a80f36f081de24ce 0 0 72057594037927936",
+        "hex": "6a04534c500001410747454e455349530553574544431754657374205365726965732063343439363220233139373368747470733a2f2f636f6c6c65637469626c652e73746167696e672e73776565742e696f2f7365726965732f3937332f31393720c7379405d99a421f54c6d6926b4a8dab7f100d8a2e92c721a80f36f081de24ce01004c00080000000000000001",
+        "type": "nulldata"
+      }
+    },
+    {
+      "value": 0.00000546,
+      "n": 1,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 5ef290eb9d8acd970ce9384a5ba6a61e39c35f3c OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a9145ef290eb9d8acd970ce9384a5ba6a61e39c35f3c88ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qp009y8tnk9vm9cvayuy5kax5c0rns6l8ss5p7m9a7"
+        ]
+      }
+    },
+    {
+      "value": 0.00035397,
+      "n": 2,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 7537fc71eaf682e8802a8d439b390691c728cb63 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a9147537fc71eaf682e8802a8d439b390691c728cb6388ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qp6n0lr3atmg96yq92x58xeeq6guw2xtvv3tdryfrw"
+        ]
+      }
+    }
+  ],
+  "hex": "02000000024be45dfbd46aaa38ccc2047f16f78ace9d8c07c041db728453fa465ac2fc327d100000006a473044022051a7d4e178f87a2426ea34954047188e96553fde1f48a6353b4f8cea2326157d022079256ac9a93f91218e7c7a5390005907cc9a81017fadb8a4562688b263d704de4121034c0506d9b385070681fed0949128e6d80a029686aad92ac3ef37d09847eb11b7ffffffffcd710031377713f4e6962ca0ab4cb2ca3fa7414764a748f891c7f5bdec480377020000006b483045022100c260db45cbcbfd1b46398b33f54f3c9bdbc93a7eddfa055428a6613d1594519c02202476b7538a07d32d002ca1817dfce36b280a39323d25b7af74a4f258dc6b03374121034e72bde1d0fe7d11ffdf8eb10089ac9bfd550501816518a9a3b4ab570be0c23fffffffff030000000000000000906a04534c500001410747454e455349530553574544431754657374205365726965732063343439363220233139373368747470733a2f2f636f6c6c65637469626c652e73746167696e672e73776565742e696f2f7365726965732f3937332f31393720c7379405d99a421f54c6d6926b4a8dab7f100d8a2e92c721a80f36f081de24ce01004c0008000000000000000122020000000000001976a9145ef290eb9d8acd970ce9384a5ba6a61e39c35f3c88ac458a0000000000001976a9147537fc71eaf682e8802a8d439b390691c728cb6388ac00000000",
+  "blockhash": "0000000000000000006a2549f7a0a4d2cdbb90f01e356d6fedcabf98736d0198",
+  "confirmations": 886,
+  "time": 1695536918,
+  "blocktime": 1695536918,
+  "blockheight": 812057,
+  "isSlpTx": true,
+  "tokenTxType": "GENESIS",
+  "tokenId": "83cdecea64f8d4e8efc3b6cd55afe2c66ae197ca6c0caaeb485e17b58a5b96cf",
+  "tokenType": 65,
+  "tokenTicker": "SWEDC",
+  "tokenName": "Test Series c44962 #197",
+  "tokenDecimals": 0,
+  "tokenUri": "https://collectible.staging.sweet.io/series/973/197",
+  "tokenDocHash": "c7379405d99a421f54c6d6926b4a8dab7f100d8a2e92c721a80f36f081de24ce"
+}
+
+const nftGenesisTokenData03 = {
+  "tokenType": 65,
+  "txType": "GENESIS",
+  "ticker": "SWEDC",
+  "name": "Test Series c44962 #197",
+  "tokenId": "83cdecea64f8d4e8efc3b6cd55afe2c66ae197ca6c0caaeb485e17b58a5b96cf",
+  "documentUri": "https://collectible.staging.sweet.io/series/973/197",
+  "documentHash": "c7379405d99a421f54c6d6926b4a8dab7f100d8a2e92c721a80f36f081de24ce",
+  "decimals": 0,
+  "mintBatonVout": 0,
+  "qty": "1"
+}
+
+const nftGenesisVinData03 = {
+  "tokenType": 129,
+  "txType": "SEND",
+  "tokenId": "b31704bfd4beb029bf29bed36599745b3b20dbb0ce1ad4efe9aaa15d3719c44e",
+  "amounts": [
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "302"
+  ]
+}
+
+
 
 export default {
   nonSlpTxDetails,
@@ -1539,5 +1664,8 @@ export default {
   nftGenesisData01,
   nftFinalTxDetails01,
   nftSendTxDetails01,
-  nftSendTxTokenData01
+  nftSendTxTokenData01,
+  nftGenesisTx03,
+  nftGenesisTokenData03,
+  nftGenesisVinData03
 }

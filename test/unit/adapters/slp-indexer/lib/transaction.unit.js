@@ -467,6 +467,26 @@ describe('#Transaction', () => {
         assert.equal(err.message, 'Unknown token type in input')
       }
     })
+
+    it('should hydrate an NFT (child) Genesis Tx when Group token was a result of a SEND TX', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo').resolves(mockData.nftGenesisVinData03)
+
+      const txDetails = mockData.nftGenesisTx03
+      const txTokenData = mockData.nftGenesisTokenData03
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 1)
+      assert.equal(result.vin[0].tokenId, 'b31704bfd4beb029bf29bed36599745b3b20dbb0ce1ad4efe9aaa15d3719c44e')
+      assert.equal(result.vin[1].tokenQty, 1)
+      assert.equal(result.vin[1].tokenId, 'b31704bfd4beb029bf29bed36599745b3b20dbb0ce1ad4efe9aaa15d3719c44e')
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
+    })
   })
 
   describe('#get', () => {

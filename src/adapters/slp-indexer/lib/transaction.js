@@ -261,7 +261,26 @@ class Transaction {
         continue
       }
 
-      if (vinTokenData.txType === 'GENESIS') {
+      if (vinTokenData.txType === 'SEND') {
+        // console.log(
+        //   `SEND vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+        // )
+
+        const tokenQty = vinTokenData.amounts[thisVin.vout - 1]
+        // console.log(`tokenQty: ${JSON.stringify(tokenQty, null, 2)}`)
+
+        // Calculate the real quantity using a BigNumber, then convert it to a
+        // floating point number.
+        let realQty = new BigNumber(tokenQty).dividedBy(
+          10 ** parseInt(txDetails.tokenDecimals)
+        )
+        realQty = realQty.toString()
+        // realQty = parseFloat(realQty)
+
+        thisVin.tokenQtyStr = realQty
+        thisVin.tokenQty = parseFloat(realQty)
+        thisVin.tokenId = vinTokenData.tokenId
+      } else if (vinTokenData.txType === 'GENESIS') {
         // console.log(
         //   `GENESIS vinTokenData ${i}: ${JSON.stringify(
         //     vinTokenData,
