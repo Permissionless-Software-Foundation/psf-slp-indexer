@@ -249,6 +249,24 @@ describe('#Transaction', () => {
       assert.equal(data.mintBatonVout, 0)
       assert.equal(data.qty, '1')
     })
+
+    it('should clear the cache when it gets too big', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.rpc, 'getRawTransaction')
+        .resolves(mockData.sendTestInputTx01)
+
+      const txid =
+        '6bc111fbf5b118021d68355ca19a0e77fa358dd931f284b2550f79a51ab4792a'
+
+      // Force cache to be too big.
+      uut.tokenCacheCnt = 9999999
+
+      const result = await uut.decodeOpReturn(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.hasAllKeys(result, ['tokenType', 'txType', 'tokenId', 'amounts'])
+    })
   })
 
   describe('#_getInputAddrs', () => {
@@ -270,10 +288,7 @@ describe('#Transaction', () => {
     it('should catch and throw and error', async () => {
       try {
         // Force an error
-        // sandbox
-        //   .stub(uut.rpc, 'getRawTransaction')
-        //   .rejects(new Error('test error'))
-        sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
+        sandbox.stub(uut, 'getTxWithRetry').rejects(new Error('test error'))
 
         await uut._getInputAddrs(mockData.mockTxIn)
 
@@ -283,6 +298,16 @@ describe('#Transaction', () => {
 
         assert.equal(err.message, 'test error')
       }
+    })
+
+    it('should return an empty array when there is no txid', async () => {
+      // Force corner-case error
+      sandbox.stub(uut, 'getTxWithRetry').rejects(new Error('txid must be provided'))
+
+      const result = await uut._getInputAddrs(mockData.mockTxIn)
+
+      assert.isArray(result)
+      assert.equal(result.length, 0)
     })
   })
 
@@ -355,6 +380,14 @@ describe('#Transaction', () => {
 
     it('should return false when decodeOpReturn() throws an error', async () => {
       sandbox.stub(uut, 'decodeOpReturn').rejects(new Error('test error'))
+
+      const result = await uut.getTokenInfo('input-txid')
+
+      assert.equal(result, false)
+    })
+
+    it('should return false when token ID contains too many zeros', async () => {
+      sandbox.stub(uut, 'decodeOpReturn').resolves({ txid: 'sometxid', tokenId: '00000000' })
 
       const result = await uut.getTokenInfo('input-txid')
 
@@ -1124,6 +1157,33 @@ describe('#Transaction', () => {
         assert.include(err.message, 'test error')
       }
     })
+
+    it('should throw an error if txid is not provided', async () => {
+      try {
+        // Force an error
+        // sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
+
+        await uut.getTxWithRetry()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'txid string must be included.')
+      }
+    })
+
+    it('should clear tx cache when it gets too large', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.queue, 'addToQueue').resolves({ key: 'value' })
+
+      // Force cache count to be too large
+      uut.txCacheCnt = 9999999999
+
+      const result = await uut.getTxWithRetry('txid')
+      // console.log('result: ', result)
+
+      assert.property(result, 'key')
+    })
   })
 
   describe('#getTx01', () => {
@@ -1137,7 +1197,7 @@ describe('#Transaction', () => {
       const txTokenData = mockData.sendTxTokenData01
 
       const result = await uut.getTx01(txDetails, txTokenData)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       // Assert that the result has expected properties and values
       assert.equal(result.vout[0].tokenQty, null)

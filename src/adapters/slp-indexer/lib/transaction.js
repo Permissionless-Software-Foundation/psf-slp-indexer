@@ -15,9 +15,6 @@ import slpParser from 'slp-parser'
 import RPC from './rpc.js'
 import RetryQueue from './retry-queue.js'
 
-// Global pointer to instance of this class
-let _this
-
 class Transaction {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
@@ -31,7 +28,15 @@ class Transaction {
     this.txCache = {}
     this.txCacheCnt = 0
 
-    _this = this
+    // Bing 'this' object to all subfunctions
+    this.get = this.get.bind(this)
+    this.getNftTx = this.getNftTx.bind(this)
+    this.getTx01 = this.getTx01.bind(this)
+    this.getTokenInfo = this.getTokenInfo.bind(this)
+    this.decodeOpReturn = this.decodeOpReturn.bind(this)
+    this.getTxData = this.getTxData.bind(this)
+    this._getInputAddrs = this._getInputAddrs.bind(this)
+    this.getTxWithRetry = this.getTxWithRetry.bind(this)
   }
 
   /**
@@ -131,6 +136,8 @@ class Transaction {
   }
 
   // Used for processing NFT (child) tokens.
+  // This function hydrates the input and output data of a transaction with
+  // SLP-related information.
   // Note: It is not possible to 'mint' NFTs (type 65), only Group (type 128)
   // can be minted.
   async getNftTx (txDetails, txTokenData) {
@@ -329,6 +336,8 @@ class Transaction {
   }
 
   // Used for processing 'normal' Type 1 tokens, as well as Group NFT tokens.
+  // This function hydrates the input and output data of a transaction with
+  // SLP-related information.
   async getTx01 (txDetails, txTokenData) {
     // console.log('Entering getTx01()')
     // console.log(`getTx01() txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
@@ -640,10 +649,10 @@ class Transaction {
     }
 
     // Return results if they've been cached.
-    const cachedVal = _this.tokenCache[txid]
+    const cachedVal = this.tokenCache[txid]
     if (cachedVal) return cachedVal
 
-    // const txDetails = await _this.rpc.getRawTransaction(txid)
+    // const txDetails = await this.rpc.getRawTransaction(txid)
     // Auto-retry if call to full node fails.
     // const txDetails = await this.queue.addToQueue(
     //   this.rpc.getRawTransaction,
@@ -656,7 +665,7 @@ class Transaction {
     const opReturn = txDetails.vout[0].scriptPubKey.hex
     // console.log(`opReturn hex: ${opReturn}`)
 
-    const parsedData = _this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
+    const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
     // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
 
     // Convert Buffer data to hex strings or utf8 strings.
@@ -693,16 +702,16 @@ class Transaction {
     }
     // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
-    _this.tokenCache[txid] = tokenData
-    _this.tokenCacheCnt++
-    if (_this.tokenCacheCnt % 100 === 0) {
-      console.log(`decodeOpReturn cache has ${_this.tokenCacheCnt} cached txs`)
+    this.tokenCache[txid] = tokenData
+    this.tokenCacheCnt++
+    if (this.tokenCacheCnt % 100 === 0) {
+      console.log(`decodeOpReturn cache has ${this.tokenCacheCnt} cached txs`)
     }
 
     // Clear the token cache if it gets too big. Prevents memory leaks.
-    if (_this.tokenCacheCnt > 1000000) {
-      _this.tokenCache = {}
-      _this.tokenCacheCnt = 0
+    if (this.tokenCacheCnt > 1000000) {
+      this.tokenCache = {}
+      this.tokenCacheCnt = 0
     }
 
     return tokenData
@@ -773,7 +782,7 @@ class Transaction {
   // the address that generated that input UTXO.
   //
   // Assumes a single TX. Does not yet work with an array of TXs.
-  // This function returns an array of objects, each object if formated as follows:
+  // This function returns an array of objects, each object is formated as follows:
   // {
   //   vin: 0, // The position of the input for the given txid
   //   address: bitcoincash:qzhrpmu7nruyfcemeanqh5leuqcnf6zkjq4qm9nqh0
