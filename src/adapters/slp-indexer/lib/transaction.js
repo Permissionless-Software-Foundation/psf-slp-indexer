@@ -331,7 +331,8 @@ class Transaction {
   // Used for processing 'normal' Type 1 tokens, as well as Group NFT tokens.
   async getTx01 (txDetails, txTokenData) {
     // console.log('Entering getTx01()')
-    // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+    // console.log(`getTx01() txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+    // console.log(`getTx01() txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
     // Process TX Outputs
     // Add the token quantity to each output.
@@ -434,7 +435,7 @@ class Transaction {
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
       // console.log(
-      //         `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+      //         `getTx01() vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
       // )
 
       // Corner case: Ensure the token ID is the same.

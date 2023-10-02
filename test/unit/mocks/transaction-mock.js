@@ -1623,6 +1623,125 @@ const nftGenesisVinData03 = {
   ]
 }
 
+const sendTxTokenData01 = {
+  "tokenType": 1,
+  "txType": "SEND",
+  "tokenId": "792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70",
+  "amounts": [
+    "10000",
+    "9223372036854765808"
+  ]
+}
+
+const sendTxTokenDetails01 = {
+  "txid": "18c65448bb763ccfc1e9e3369587606f5fa8bac6e0f3de589bf94196aca18d42",
+  "hash": "18c65448bb763ccfc1e9e3369587606f5fa8bac6e0f3de589bf94196aca18d42",
+  "version": 1,
+  "size": 478,
+  "locktime": 0,
+  "vin": [
+    {
+      "txid": "792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70",
+      "vout": 1,
+      "scriptSig": {
+        "asm": "3044022043f898fbfc6e6d7aa2da2ae34d9ca429fb6e8cc571df18765f9bcaba99eacabc022051d24111be1b3ab46f0cecc1ab803bd9e94cc187e7ca437acfeb2b50bbcfac4c[ALL|FORKID] 0391a42c9894d14298b4f7ebde5703c35eb621b3e6bee5d77084430902bd1e0263",
+        "hex": "473044022043f898fbfc6e6d7aa2da2ae34d9ca429fb6e8cc571df18765f9bcaba99eacabc022051d24111be1b3ab46f0cecc1ab803bd9e94cc187e7ca437acfeb2b50bbcfac4c41210391a42c9894d14298b4f7ebde5703c35eb621b3e6bee5d77084430902bd1e0263"
+      },
+      "sequence": 4294967295,
+      "address": "bitcoincash:qryw2j5e380mk3q6ugvq2287xjxluff8dq4ulns0l4",
+      "value": 0.00000546
+    },
+    {
+      "txid": "5a9badc76a4cc5e36e58c4bc6c3b75a6fcff401c3335ae243485e042aad2701d",
+      "vout": 1,
+      "scriptSig": {
+        "asm": "3043021f69f1d3c72865abb929316603c90be727ee7182b5814da5f2cb9627a384f6940220427beae63887411f5fb4ef2113e54f05663a01e0d71496534cd4dc1092f54c50[ALL|FORKID] 02c24c7acb970193ff93b94a50926ea691c3707a196a8bf3408daec70f3817ee5a",
+        "hex": "463043021f69f1d3c72865abb929316603c90be727ee7182b5814da5f2cb9627a384f6940220427beae63887411f5fb4ef2113e54f05663a01e0d71496534cd4dc1092f54c50412102c24c7acb970193ff93b94a50926ea691c3707a196a8bf3408daec70f3817ee5a"
+      },
+      "sequence": 4294967295,
+      "address": "bitcoincash:qrfmvutyysfre5wxvv0wvhkxhrc8qwdkxuseg99xh3",
+      "value": 0.00009822
+    }
+  ],
+  "vout": [
+    {
+      "value": 0,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "OP_RETURN 5262419 1 1145980243 792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70 1163899028698562560 -8131530602194141055",
+        "hex": "6a04534c500001010453454e4420792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70080000000000002710087fffffffffffd8f0",
+        "type": "nulldata"
+      }
+    },
+    {
+      "value": 0.00000546,
+      "n": 1,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 c8e54a9989dfbb441ae2180528fe348dfe252768 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914c8e54a9989dfbb441ae2180528fe348dfe25276888ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qryw2j5e380mk3q6ugvq2287xjxluff8dq4ulns0l4"
+        ]
+      }
+    },
+    {
+      "value": 0.00000546,
+      "n": 2,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 c8e54a9989dfbb441ae2180528fe348dfe252768 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914c8e54a9989dfbb441ae2180528fe348dfe25276888ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qryw2j5e380mk3q6ugvq2287xjxluff8dq4ulns0l4"
+        ]
+      }
+    },
+    {
+      "value": 0.00008795,
+      "n": 3,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 d3b6716424123cd1c6631ee65ec6b8f07039b637 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914d3b6716424123cd1c6631ee65ec6b8f07039b63788ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qrfmvutyysfre5wxvv0wvhkxhrc8qwdkxuseg99xh3"
+        ]
+      }
+    }
+  ],
+  "hex": "010000000270ad818796224a3a30da3a86c196feed3a421a602784b2ac5f8d709afcf32f79010000006a473044022043f898fbfc6e6d7aa2da2ae34d9ca429fb6e8cc571df18765f9bcaba99eacabc022051d24111be1b3ab46f0cecc1ab803bd9e94cc187e7ca437acfeb2b50bbcfac4c41210391a42c9894d14298b4f7ebde5703c35eb621b3e6bee5d77084430902bd1e0263ffffffff1d70d2aa42e0853424ae35331c40fffca6753b6cbcc4586ee3c54c6ac7ad9b5a0100000069463043021f69f1d3c72865abb929316603c90be727ee7182b5814da5f2cb9627a384f6940220427beae63887411f5fb4ef2113e54f05663a01e0d71496534cd4dc1092f54c50412102c24c7acb970193ff93b94a50926ea691c3707a196a8bf3408daec70f3817ee5affffffff040000000000000000406a04534c500001010453454e4420792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70080000000000002710087fffffffffffd8f022020000000000001976a914c8e54a9989dfbb441ae2180528fe348dfe25276888ac22020000000000001976a914c8e54a9989dfbb441ae2180528fe348dfe25276888ac5b220000000000001976a914d3b6716424123cd1c6631ee65ec6b8f07039b63788ac00000000",
+  "blockhash": "000000000000000001c2cacaaeeeef83cf7330706c6734ac259a3e2b71039456",
+  "confirmations": 228,
+  "time": 1696115619,
+  "blocktime": 1696115619,
+  "blockheight": 813078,
+  "isSlpTx": true,
+  "tokenTxType": "SEND",
+  "tokenId": "792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70",
+  "tokenType": 1,
+  "tokenTicker": "Zapit (ZAPT)",
+  "tokenName": "Zapit (ZAPT)",
+  "tokenDecimals": 0,
+  "tokenUri": "https://zapit.io",
+  "tokenDocHash": ""
+}
+
+const sendVinTokenData01 = {
+  "tokenType": 1,
+  "txType": "GENESIS",
+  "ticker": "Zapit (ZAPT)",
+  "name": "Zapit (ZAPT)",
+  "tokenId": "792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70",
+  "documentUri": "https://zapit.io",
+  "documentHash": "",
+  "decimals": 0,
+  "mintBatonVout": 2,
+  "qty": "9223372036854775808"
+}
 
 
 export default {
@@ -1667,5 +1786,8 @@ export default {
   nftSendTxTokenData01,
   nftGenesisTx03,
   nftGenesisTokenData03,
-  nftGenesisVinData03
+  nftGenesisVinData03,
+  sendTxTokenData01,
+  sendTxTokenDetails01,
+  sendVinTokenData01
 }

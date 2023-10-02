@@ -1125,4 +1125,58 @@ describe('#Transaction', () => {
       }
     })
   })
+
+  describe('#getTx01', () => {
+    it('should get details on a normal SEND type 1 TX', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.sendVinTokenData01)
+        .onCall(1).resolves(false)
+
+      const txDetails = mockData.sendTxTokenDetails01
+      const txTokenData = mockData.sendTxTokenData01
+
+      const result = await uut.getTx01(txDetails, txTokenData)
+      console.log('result: ', result)
+
+      // Assert that the result has expected properties and values
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 10000)
+      assert.equal(result.vout[1].tokenQtyStr, '10000')
+      assert.equal(result.vout[2].tokenQty, 9223372036854766000)
+      assert.equal(result.vout[2].tokenQtyStr, '9223372036854765808')
+      assert.equal(result.vout[3].tokenQty, null)
+      assert.equal(result.vout[3].tokenQtyStr, null)
+
+      assert.equal(result.vin[0].tokenQtyStr, '9223372036854775808')
+      assert.equal(result.vin[0].tokenQty, 9223372036854776000)
+      assert.equal(result.vin[0].tokenId, '792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70')
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+    })
+
+    it('should throw error for unknown token type', async () => {
+      // Force unknown token type
+      mockData.sendVinTokenData01.txType = 'UNKNOWN'
+
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.sendVinTokenData01)
+        .onCall(1).resolves(false)
+
+      const txDetails = mockData.sendTxTokenDetails01
+      const txTokenData = mockData.sendTxTokenData01
+
+      try {
+        await uut.getTx01(txDetails, txTokenData)
+        // console.log('result: ', result)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.message, 'Unknown token type in input')
+      }
+    })
+  })
 })
