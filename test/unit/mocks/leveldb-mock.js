@@ -14,6 +14,14 @@ class MockLevel {
   del () {
     return {}
   }
+
+  createReadStream () {
+    const stream = {
+      on: () => {}
+    }
+
+    return stream
+  }
 }
 
 export default MockLevel
