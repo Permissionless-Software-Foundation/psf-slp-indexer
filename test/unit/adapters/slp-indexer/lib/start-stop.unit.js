@@ -2,12 +2,9 @@
   Unit tests for the start-stop.js library
 */
 
-// const assert = require('chai').assert
-// const sinon = require('sinon')
 import { assert } from 'chai'
 import sinon from 'sinon'
 
-// const StartStop = require('../../../../../src/adapters/slp-indexer/lib/start-stop')
 import StartStop from '../../../../../src/adapters/slp-indexer/lib/start-stop.js'
 
 describe('#start-stop', () => {
