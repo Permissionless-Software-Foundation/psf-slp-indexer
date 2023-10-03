@@ -49,6 +49,32 @@ describe('#start-stop', () => {
       assert.equal(result, true)
     })
   })
+
+  describe('#qDetected', () => {
+    it('should set the stop flag if the q key is detected', () => {
+      const key = {
+        name: 'q'
+      }
+
+      const result = uut.qDetected('', key)
+
+      assert.equal(result, true)
+      assert.equal(uut.stopIndexing, true)
+    })
+
+    it('should exit immediately if ctrl-c is detected', () => {
+      uut.process = mockProcess
+
+      const key = {
+        name: 'c',
+        ctrl: true
+      }
+
+      const result = uut.qDetected('', key)
+
+      assert.equal(result, true)
+    })
+  })
 })
 
 const mockProcess = {
