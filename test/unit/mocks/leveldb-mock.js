@@ -22,6 +22,10 @@ class MockLevel {
 
     return stream
   }
+
+  async close() {
+    return {}
+  }
 }
 
 export default MockLevel
