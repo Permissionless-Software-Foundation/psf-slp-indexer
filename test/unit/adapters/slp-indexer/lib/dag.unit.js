@@ -309,5 +309,22 @@ describe('#dag.js', () => {
       assert.equal(result.isValid, true)
       assert.equal(result.dag.length, 3)
     })
+
+    it('should use pre-cached, pre-validated parent TXs', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.cachedTx01)
+        .onCall(1).resolves(mockData.cachedTxParent01)
+
+      const txid = '874306bda204d3a5dd15e03ea5732cccdca4c33a52df35162cdd64e30ea7f04e'
+      const tokenId =
+        '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+
+      const result = await uut.crawlDag(txid, tokenId)
+      // console.log('result: ', result)
+
+      assert.equal(result.isValid, true)
+      assert.equal(result.dag.length, 2)
+    })
   })
 })
