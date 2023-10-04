@@ -3,13 +3,11 @@
 */
 
 // Global npm libraries
-// const assert = require('chai').assert
-// const sinon = require('sinon')
 import { assert } from 'chai'
 import sinon from 'sinon'
 
 import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
-import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import MockLevel from '../../../mocks/leveldb-mock.js'
 
 describe('#cache.js', () => {
   let uut, sandbox
