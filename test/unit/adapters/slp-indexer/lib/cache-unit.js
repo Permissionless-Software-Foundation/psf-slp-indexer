@@ -114,6 +114,31 @@ describe('#cache.js', () => {
       // console.log(`uut.cacheCnt: ${uut.cacheCnt}`)
       assert.equal(uut.cacheCnt, 100)
     })
+
+    it('should clear the cache when it gets too big', async () => {
+      sandbox.stub(uut.txDb, 'get').rejects(new Error('not in db'))
+
+      // Mock devDependencies
+      sandbox
+        .stub(uut.transaction, 'get')
+        .onCall(0)
+        .resolves({ blockheight: 543957 })
+        .onCall(1)
+        .rejects(new Error('Unexpected code path'))
+
+      const txid =
+        '6bc111fbf5b118021d68355ca19a0e77fa358dd931f284b2550f79a51ab4792a'
+
+      // Force count to be 99, so that it rolls over to 100.
+      uut.cacheCnt = 9999999999
+
+      await uut.get(txid)
+      // const result = await uut.get(txid)
+      // console.log('result: ', result)
+
+      // console.log(`uut.cacheCnt: ${uut.cacheCnt}`)
+      assert.equal(uut.cacheCnt, 0)
+    })
   })
 
   describe('#delete', () => {

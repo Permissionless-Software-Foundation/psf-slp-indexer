@@ -141,6 +141,9 @@ class FilterBlock {
 
           if (!result) {
             console.log(`deleteBurnedUtxos() errored on on txid ${txid}. Coinbase?`)
+
+            console.log('Exiting to capture test data.')
+            process.exit(0)
           }
         }
       }
@@ -569,7 +572,13 @@ class FilterBlock {
           slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }
+        // Dev Note: CT 10/04/23 I don't think this code paragraph is ever executed.
         for (let j = 0; j < independentTxids.length; j++) {
+          console.log('filter-block.js/filterAndSortSlpTxs2() independentTxids.length: ', independentTxids.length)
+          console.log('Analyize this TXID for creating a test case: ', independentTxids[j])
+          console.log('Exiting to capture test data.')
+          process.exit(0)
+
           slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }

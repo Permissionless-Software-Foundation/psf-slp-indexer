@@ -3,20 +3,12 @@
 */
 
 // Public npm libraries
-// const assert = require('chai').assert
-// const sinon = require('sinon')
-// const BCHJS = require('@psf/bch-js')
-// const cloneDeep = require('lodash.clonedeep')
 import { assert } from 'chai'
 import sinon from 'sinon'
 import BCHJS from '@psf/bch-js'
 import cloneDeep from 'lodash.clonedeep'
 
 // Local libraries
-// const DAG = require('../../../../../src/adapters/slp-indexer/lib/dag')
-// const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
-// const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-// const mockDataLib = require('../../../../unit/mocks/dag-mock')
 import DAG from '../../../../../src/adapters/slp-indexer/lib/dag.js'
 import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
 import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
