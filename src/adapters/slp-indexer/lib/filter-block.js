@@ -10,17 +10,11 @@
 */
 
 // Public npm libraries
-// const PQueue = require('p-queue').default
-// const pRetry = require('p-retry')
-// const BigNumber = require('bignumber.js')
 import PQueue from 'p-queue'
 import pRetry from 'p-retry'
 import BigNumber from 'bignumber.js'
 
 // Local Libraries
-// const config = require('../../../config')
-// const Utils = require('./utils')
-// const Blacklist = require('./blacklist')
 import Utils from './utils.js'
 import Blacklist from './blacklist.js'
 
@@ -332,10 +326,6 @@ class FilterBlock {
     }
   }
 
-  sleep (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
   // checkForParent(txid, blockheight) expects a transaction and
   // blockhight value as input.
   //
@@ -344,7 +334,7 @@ class FilterBlock {
   // - dag: []
   //
   // The `dag` property will contain a list of TXIDs of parent TXs in the same
-  // block as the given txid. It will be empty if there are not parents.
+  // block as the given txid. It will be empty if there are no parents.
   //
   // This function will recursively call itself, to traverse the DAG and find
   // all the parent UTXOs for that transaction. It will then
@@ -355,9 +345,7 @@ class FilterBlock {
       // console.log('txid: ', txid)
       // console.log(`chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`)
 
-      // await this.sleep(500)
-
-      // Default output object
+      // Init the output object
       const outObj = {
         hasParent: false,
         dag: []

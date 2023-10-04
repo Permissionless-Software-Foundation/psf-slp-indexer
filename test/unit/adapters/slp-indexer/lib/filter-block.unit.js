@@ -2,18 +2,10 @@
   Unit tests for the filter-block.js library
 */
 
-// const assert = require('chai').assert
-// const sinon = require('sinon')
-// const cloneDeep = require('lodash.clonedeep')
 import { assert } from 'chai'
 import sinon from 'sinon'
 import cloneDeep from 'lodash.clonedeep'
 
-// const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-// const mockDataLib = require('../../../../unit/mocks/filter-block-mock')
-// const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
-// const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-// const FilterBlock = require('../../../../../src/adapters/slp-indexer/lib/filter-block')
 import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
 import mockDataLib from '../../../../unit/mocks/filter-block-mock.js'
 import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
@@ -322,6 +314,25 @@ describe('#filter-block.js', () => {
       } catch (err) {
         assert.equal(err.message, 'test error')
       }
+    })
+
+    it('should skip a TX if the TXID already exists in the array', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.cache, 'get')
+        .onCall(0)
+        .resolves(mockData.twoTxDag01)
+        .onCall(1)
+        .resolves(mockData.twoTxDag01)
+
+      const txid =
+        'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
+
+      const result = await uut.checkForParent2(txid, 543413)
+      // console.log('result: ', result)
+
+      assert.equal(result.hasParent, true)
+      assert.equal(result.dag.length, 1)
     })
   })
 
