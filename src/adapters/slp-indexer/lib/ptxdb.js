@@ -21,6 +21,8 @@ class ManagePTXDB {
     // Add 'this' object to all subfunctions
     this.getAllTxs = this.getAllTxs.bind(this)
     this.cleanPTXDB = this.cleanPTXDB.bind(this)
+    this.readFromStream = this.readFromStream.bind(this)
+    this.endStream = this.endStream.bind(this)
   }
 
   // Return a promise, which resolves to true when all txs have been collected
