@@ -327,7 +327,7 @@ describe('#dag.js', () => {
       assert.equal(result.dag.length, 2)
     })
 
-    it("should exit immediately for genesis TX", async () => {
+    it('should exit immediately for genesis TX', async () => {
       // Mock dependencies
       sandbox.stub(uut.cache, 'get')
         .onCall(0).resolves(mockData.slpGenesisTxData01)
