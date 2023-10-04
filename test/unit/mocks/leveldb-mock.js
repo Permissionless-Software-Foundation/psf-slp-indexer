@@ -26,6 +26,10 @@ class MockLevel {
   async close() {
     return {}
   }
+
+  async open() {
+    return {}
+  }
 }
 
 export default MockLevel
