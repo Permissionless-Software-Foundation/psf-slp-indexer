@@ -63,7 +63,7 @@ class DAG {
           // console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
           console.log(`Large DAG detected: ${txidAry.length} txs`)
 
-          console.log('Stopping indexer to gather test data.')
+          console.log('4 Stopping indexer to gather test data.')
           process.exit(0)
         }
       }
@@ -73,9 +73,6 @@ class DAG {
       if (txid === tokenId) {
         // TODO: Should decodeOpReturn() be run on this txid, to ensure it
         // is valid via SLP OP_RETURN rules?
-
-        console.log('Stopping indexer to gather test data.')
-        process.exit(0)
 
         outObj.isValid = true
         outObj.dag = txidAry
@@ -144,7 +141,7 @@ class DAG {
           // up validation, which became much slower after taking the code out.
         } else if (parentTx.isValidSlp === false && txidAry.length > 30) {
           console.log('parentTx: ', parentTx)
-          console.log('Stopping indexer to gather test data.')
+          console.log('1 Stopping indexer to gather test data.')
           process.exit(0)
 
           endFound = false
@@ -172,7 +169,7 @@ class DAG {
           if (isNFT && !groupTokenOnVin0) {
             console.log('isNFT: ', isNFT)
             console.log('groupTokenOnVin0: ', groupTokenOnVin0)
-            console.log('Stopping indexer to gather test data.')
+            console.log('2 Stopping indexer to gather test data.')
             process.exit(0)
 
             endFound = true
@@ -206,7 +203,7 @@ class DAG {
           const DAG_CUTOFF = 300
           if (parentTx.isSlpTx && txidAry.length > DAG_CUTOFF && parentTx.isValidSlp) {
             console.log(`-->Large DAG cut-off at ${DAG_CUTOFF} transactions. Assumed valid.`)
-            console.log('Stopping indexer to gather test data.')
+            console.log('3 Stopping indexer to gather test data.')
             process.exit(0)
 
             endFound = true

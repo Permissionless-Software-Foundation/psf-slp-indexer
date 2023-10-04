@@ -326,5 +326,21 @@ describe('#dag.js', () => {
       assert.equal(result.isValid, true)
       assert.equal(result.dag.length, 2)
     })
+
+    it("should exit immediately for genesis TX", async () => {
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockData.slpGenesisTxData01)
+
+      const txid = '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+      const tokenId =
+        '323a1e35ae0b356316093d20f2d9fbc995d19314b5c0148b78dc8d9c0dab9d35'
+
+      const result = await uut.crawlDag(txid, tokenId)
+      // console.log('result: ', result)
+
+      assert.equal(result.isValid, true)
+      assert.equal(result.dag.length, 1)
+    })
   })
 })
