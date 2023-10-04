@@ -502,6 +502,7 @@ class FilterBlock {
       // Filter out all the non-SLP transactions.
       let { slpTxs, nonSlpTxs } = await this.filterSlpTxs(txids)
       console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
+      // console.log('nonSlpTxs: ', nonSlpTxs.length)
       // console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
 
       // No SLP txids in the array? Exit.
@@ -535,6 +536,8 @@ class FilterBlock {
         // Check if TX is part of a forward DAG
         if (slpTxs.length) {
           const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
+          // console.log('success: ', success)
+          // console.log('chainedArray: ', chainedArray)
           // const { success, chainedArray, unsortedArray } =
           //   await this.forwardDag(backDag, slpTxs)
 
@@ -574,11 +577,6 @@ class FilterBlock {
         }
         // Dev Note: CT 10/04/23 I don't think this code paragraph is ever executed.
         for (let j = 0; j < independentTxids.length; j++) {
-          console.log('filter-block.js/filterAndSortSlpTxs2() independentTxids.length: ', independentTxids.length)
-          console.log('Analyize this TXID for creating a test case: ', independentTxids[j])
-          console.log('Exiting to capture test data.')
-          process.exit(0)
-
           slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }
@@ -595,9 +593,9 @@ class FilterBlock {
       // For debugging:
       // console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
       // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
-      console.log(`independentTxids: ${independentTxids.length}`)
-      console.log(`sortedTxids: ${sortedTxids.length}`)
-      console.log(`nonSlpTxs: ${nonSlpTxs.length}`)
+      // console.log(`independentTxids: ${independentTxids.length}`)
+      // console.log(`sortedTxids: ${sortedTxids.length}`)
+      // console.log(`nonSlpTxs: ${nonSlpTxs.length}`)
 
       // Combine arrays with the independent txids first.
       let combined = independentTxids.concat(sortedTxids)

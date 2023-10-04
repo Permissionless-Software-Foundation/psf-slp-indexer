@@ -644,6 +644,17 @@ const tokenData01 = {
   txs: []
 }
 
+const slpTxs01 = [
+  "82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac",
+  "170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2",
+  "e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2",
+  "f56121d5a21a319204cf26ce68a6d607fefa02ba6ac42b4647fcad813b32d8b3",
+  "660057b446cc4c930493607aa02e943e4fe7c38ae0816797ff7234ba72fea50f",
+  "483d0198ed272bd0be7c6bbaf0e60340cce926f7d32143e2b09c5513922eaf87",
+  "234893177b18a95dbfc1eb855d69f1c9cc256a317a6c51be8fd1b9a38ae072ce",
+  "a333e7ebd34f0e24b567e99ed27241e3cfda5e9952cacdaa8fab31a7ee7e544d"
+]
+
 export default {
   twoTxDag01,
   twoTxDag02,
@@ -653,5 +664,6 @@ export default {
   forwardDagTx03,
   burnTx01,
   addrData01,
-  tokenData01
+  tokenData01,
+  slpTxs01
 }
