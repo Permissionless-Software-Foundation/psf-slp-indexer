@@ -520,6 +520,31 @@ describe('#Transaction', () => {
       assert.equal(result.vout[1].tokenQty, 1)
       assert.equal(result.vout[2].tokenQty, 0)
     })
+
+    it('should hydrate an NFT (child) Genesis Tx when Group token was a result of a MINT TX', async () => {
+      // Example TX: b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e
+      // Using Group Token ID: 112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be
+
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.nftGenesisFromGroupMintVin01)
+        .onCall(1).resolves(mockData.nftGenesisFromGroupMintVin02)
+
+      const txDetails = mockData.nftGenesisFromGroupMintTokenDetails01
+      const txTokenData = mockData.nftGenesisFromGroupMintTokenData01
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 1)
+      assert.equal(result.vin[0].tokenId, '112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
+    })
   })
 
   describe('#get', () => {

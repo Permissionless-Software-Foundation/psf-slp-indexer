@@ -141,10 +141,10 @@ class Transaction {
   // Note: It is not possible to 'mint' NFTs (type 65), only Group (type 128)
   // can be minted.
   async getNftTx (txDetails, txTokenData) {
-    // console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
+    console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
 
-    // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
-    // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+    console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+    console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
 
     // Process TX Outputs
     // Add the token quantity to each output.
@@ -238,11 +238,11 @@ class Transaction {
     // Process TX inputs
     for (let i = 0; i < txDetails.vin.length; i++) {
       const thisVin = txDetails.vin[i]
-      // console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
+      console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
 
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
-      // console.log(`vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`)
+      console.log(`vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`)
 
       // Is the input token ID the same? It should be for a SEND.
       const vinTokenIdIsTheSame = vinTokenData.tokenId === txDetails.tokenId
@@ -287,6 +287,50 @@ class Transaction {
         thisVin.tokenQtyStr = realQty
         thisVin.tokenQty = parseFloat(realQty)
         thisVin.tokenId = vinTokenData.tokenId
+
+        //
+      } else if (vinTokenData.txType === 'MINT') {
+        // This case is when the GROUP (129) token used to generate the NFT
+        // came from a MINT transaction to create a new GROUP token.
+        // Example TX: b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e
+        // Using Group Token ID: 112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be
+
+        console.log(
+          `MINT vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+        )
+
+        let tokenQty = 0 // Default value
+
+        // Only vout[1] of a Genesis transaction represents the tokens.
+        // Any other outputs in that transaction are normal BCH UTXOs.
+        if (thisVin.vout === 1) {
+          tokenQty = vinTokenData.qty
+          // console.log(`tokenQty: ${JSON.stringify(tokenQty, null, 2)}`)
+
+          // Calculate the real quantity using a BigNumber, then convert it to a
+          // floating point number.
+          let realQty = new BigNumber(tokenQty).dividedBy(
+            10 ** parseInt(txDetails.tokenDecimals)
+          )
+          realQty = realQty.toString()
+          // realQty = parseFloat(realQty)
+
+          thisVin.tokenQtyStr = realQty
+          thisVin.tokenQty = parseFloat(realQty)
+          thisVin.tokenId = vinTokenData.tokenId
+        } else if (thisVin.vout === vinTokenData.mintBatonVout) {
+          // Optional Mint baton
+          thisVin.tokenQtyStr = '0'
+          thisVin.tokenQty = 0
+          thisVin.tokenId = vinTokenData.tokenId
+          thisVin.isMintBaton = true
+        } else {
+          thisVin.tokenQtyStr = '0'
+          thisVin.tokenQty = 0
+          thisVin.tokenId = null
+        }
+
+        //
       } else if (vinTokenData.txType === 'GENESIS') {
         // console.log(
         //   `GENESIS vinTokenData ${i}: ${JSON.stringify(

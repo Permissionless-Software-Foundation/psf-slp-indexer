@@ -1743,6 +1743,122 @@ const sendVinTokenData01 = {
   "qty": "9223372036854775808"
 }
 
+const nftGenesisFromGroupMintVin01 = {
+  "tokenType": 129,
+  "txType": "SEND",
+  "tokenId": "112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be",
+  "amounts": [
+    "1",
+    "999998"
+  ]
+}
+
+const nftGenesisFromGroupMintVin02 = {
+  "tokenType": 129,
+  "txType": "MINT",
+  "tokenId": "112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be",
+  "mintBatonVout": 2,
+  "qty": "1000"
+}
+
+const nftGenesisFromGroupMintTokenData01 = {
+  "tokenType": 65,
+  "txType": "GENESIS",
+  "ticker": "NFT1 Child",
+  "name": "My NFT1 Child",
+  "tokenId": "b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e",
+  "documentUri": "",
+  "documentHash": "",
+  "decimals": 0,
+  "mintBatonVout": 0,
+  "qty": "1"
+}
+
+const nftGenesisFromGroupMintTokenDetails01 = {
+  "txid": "b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e",
+  "hash": "b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e",
+  "version": 2,
+  "size": 440,
+  "locktime": 0,
+  "vin": [
+    {
+      "txid": "89a35ae263ae87c7dcc2a67ed70643bf6854245f10e7f0ece6a815fd1f4ede05",
+      "vout": 1,
+      "scriptSig": {
+        "asm": "3045022100f6ac72165da5a5a23e18a33e9325430767ec885165dfb82484ccd1b7a0bddc48022007f83e983e338370f547d452d33a7b38ebff5f0aaed09003ebce2915c047e6bb[ALL|FORKID] 02e03a2d925cf5e79d567186e01f50ab1e081fb568837ac7610d89b885e6bc85e0",
+        "hex": "483045022100f6ac72165da5a5a23e18a33e9325430767ec885165dfb82484ccd1b7a0bddc48022007f83e983e338370f547d452d33a7b38ebff5f0aaed09003ebce2915c047e6bb412102e03a2d925cf5e79d567186e01f50ab1e081fb568837ac7610d89b885e6bc85e0"
+      },
+      "sequence": 4294967295,
+      "address": "bitcoincash:qrhvcy5xlegs858fjqf8ssl6a4f7wpstaqlsy4gusz",
+      "value": 0.00000546
+    },
+    {
+      "txid": "48db423a6ff59a7f07e1b6741ba77498a71c67c8dd1326b15495fd32f82ccf1d",
+      "vout": 3,
+      "scriptSig": {
+        "asm": "304402207860274924daba23137b2dac12a691603335ec19a80ffd485426c5723bff54000220369b32ab17692801bb9490fa2f5cc5acb56b23e41c7425e96c5f05e30e2a67d9[ALL|FORKID] 02e03a2d925cf5e79d567186e01f50ab1e081fb568837ac7610d89b885e6bc85e0",
+        "hex": "47304402207860274924daba23137b2dac12a691603335ec19a80ffd485426c5723bff54000220369b32ab17692801bb9490fa2f5cc5acb56b23e41c7425e96c5f05e30e2a67d9412102e03a2d925cf5e79d567186e01f50ab1e081fb568837ac7610d89b885e6bc85e0"
+      },
+      "sequence": 4294967295,
+      "address": "bitcoincash:qrhvcy5xlegs858fjqf8ssl6a4f7wpstaqlsy4gusz",
+      "value": 0.00005598
+    }
+  ],
+  "vout": [
+    {
+      "value": 0,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "OP_RETURN 5262419 65 23443045060855111 4e465431204368696c64 4d79204e465431204368696c64 0 0 0 0 72057594037927936",
+        "hex": "6a04534c500001410747454e455349530a4e465431204368696c640d4d79204e465431204368696c644c004c0001004c00080000000000000001",
+        "type": "nulldata"
+      }
+    },
+    {
+      "value": 0.00000546,
+      "n": 1,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 eecc1286fe5103d0e990127843faed53e7060be8 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914eecc1286fe5103d0e990127843faed53e7060be888ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qrhvcy5xlegs858fjqf8ssl6a4f7wpstaqlsy4gusz"
+        ]
+      }
+    },
+    {
+      "value": 0.00005156,
+      "n": 2,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 eecc1286fe5103d0e990127843faed53e7060be8 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a914eecc1286fe5103d0e990127843faed53e7060be888ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qrhvcy5xlegs858fjqf8ssl6a4f7wpstaqlsy4gusz"
+        ]
+      }
+    }
+  ],
+  "hex": "020000000205de4e1ffd15a8e6ecf0e7105f245468bf4306d77ea6c2dcc787ae63e25aa389010000006b483045022100f6ac72165da5a5a23e18a33e9325430767ec885165dfb82484ccd1b7a0bddc48022007f83e983e338370f547d452d33a7b38ebff5f0aaed09003ebce2915c047e6bb412102e03a2d925cf5e79d567186e01f50ab1e081fb568837ac7610d89b885e6bc85e0ffffffff1dcf2cf832fd9554b12613ddc8671ca79874a71b74b6e1077f9af56f3a42db48030000006a47304402207860274924daba23137b2dac12a691603335ec19a80ffd485426c5723bff54000220369b32ab17692801bb9490fa2f5cc5acb56b23e41c7425e96c5f05e30e2a67d9412102e03a2d925cf5e79d567186e01f50ab1e081fb568837ac7610d89b885e6bc85e0ffffffff0300000000000000003a6a04534c500001410747454e455349530a4e465431204368696c640d4d79204e465431204368696c644c004c0001004c0008000000000000000122020000000000001976a914eecc1286fe5103d0e990127843faed53e7060be888ac24140000000000001976a914eecc1286fe5103d0e990127843faed53e7060be888ac00000000",
+  "blockhash": "0000000000000000034c077673e0288d7c639c53304f60456eaf05a45b4b29f7",
+  "confirmations": 221747,
+  "time": 1563550792,
+  "blocktime": 1563550792,
+  "blockheight": 592010,
+  "isSlpTx": true,
+  "tokenTxType": "GENESIS",
+  "tokenId": "b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e",
+  "tokenType": 65,
+  "tokenTicker": "NFT1 Child",
+  "tokenName": "My NFT1 Child",
+  "tokenDecimals": 0,
+  "tokenUri": "",
+  "tokenDocHash": ""
+}
+
+
 
 export default {
   nonSlpTxDetails,
@@ -1789,5 +1905,9 @@ export default {
   nftGenesisVinData03,
   sendTxTokenData01,
   sendTxTokenDetails01,
-  sendVinTokenData01
+  sendVinTokenData01,
+  nftGenesisFromGroupMintVin01,
+  nftGenesisFromGroupMintVin02,
+  nftGenesisFromGroupMintTokenData01,
+  nftGenesisFromGroupMintTokenDetails01
 }

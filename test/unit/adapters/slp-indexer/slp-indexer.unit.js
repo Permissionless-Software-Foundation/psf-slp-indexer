@@ -5,13 +5,15 @@
 // Global npm libraries
 import { assert } from 'chai'
 import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
 
 // Local libraries
 import SlpIndexer from '../../../../src/adapters/slp-indexer/index.js'
 import MockLevel from '../../../unit/mocks/leveldb-mock.js'
+import mockTxLib from '../../mocks/transaction-mock.js'
 
 describe('#slpIndexer', () => {
-  let uut, sandbox
+  let uut, sandbox, mockTxData
 
   // Generate mock databases.
   function openMockDbs () {
@@ -36,6 +38,8 @@ describe('#slpIndexer', () => {
     uut = new SlpIndexer()
     const dbs = openMockDbs()
     uut.encapsulateDeps(dbs)
+
+    mockTxData = cloneDeep(mockTxLib)
 
     // Restore the sandbox before each test.
     sandbox = sinon.createSandbox()
@@ -265,6 +269,221 @@ describe('#slpIndexer', () => {
       } catch (err) {
         assert.include(err.message, 'Cannot destructure')
       }
+    })
+  })
+
+  describe('#handleProcessFailure', () => {
+    it('should roll back to the oldest parent TX blockhight', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get').resolves(mockTxData.genesisTestInputTx02)
+      sandbox.stub(uut.dbBackup, 'unzipDb').resolves()
+      sandbox.stub(uut.process, 'exit').returns()
+
+      const result = await uut.handleProcessFailure(603424, 'fake-txid', 'some error')
+
+      assert.equal(result, true)
+    })
+
+    it('should catch and report errors', async () => {
+      // Force error
+      sandbox.stub(uut.cache, 'get').rejects(new Error('test error'))
+
+      const result = await uut.handleProcessFailure()
+
+      assert.equal(result, false)
+    })
+  })
+
+  describe('#processSlpTxs', () => {
+    it('should process slp TXs in a block', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'processTx').resolves()
+
+      const blockHeight = 543413
+      const slpTxs = [
+        '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+      ]
+
+      const result = await uut.processSlpTxs(slpTxs, blockHeight)
+
+      assert.equal(result, true)
+    })
+
+    it('should skip errors in phase 2', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'processTx').rejects(new Error('test error'))
+      uut.indexState = 'phase2'
+
+      const blockHeight = 543413
+      const slpTxs = [
+        '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+      ]
+
+      const result = await uut.processSlpTxs(slpTxs, blockHeight)
+
+      assert.equal(result, null)
+    })
+
+    it('should throw error for unprocessible transactions', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'processTx').rejects(new Error('test error'))
+      sandbox.stub(uut, 'handleProcessFailure').resolves()
+      uut.RETRY_CNT = 0
+      uut.indexState = 'phase1'
+
+      const blockHeight = 543413
+      const slpTxs = [
+        '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+      ]
+
+      try {
+        await uut.processSlpTxs(slpTxs, blockHeight)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Failed to process TXID')
+      }
+    })
+
+    it('should catch, report, and throw errors', async () => {
+      try {
+        await uut.processSlpTxs()
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+  })
+
+  describe('#processBlock', () => {
+    it('should process txs in a block', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+      })
+      sandbox.stub(uut, 'processSlpTxs').resolves()
+      sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
+      sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 1)
+    })
+
+    it('should create a backup every epoch', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+      })
+      sandbox.stub(uut, 'processSlpTxs').resolves()
+      sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
+      sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+      sandbox.stub(uut.dbBackup, 'zipDb').resolves()
+
+      uut.indexState = 'phase1'
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 2)
+    })
+
+    it('should rollback to last ephoch when in phase 2 indexing', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+      })
+      sandbox.stub(uut, 'processSlpTxs').resolves()
+      sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
+      sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+      sandbox.stub(uut.dbBackup, 'unzipDb').resolves()
+      sandbox.stub(uut.process, 'exit').returns()
+
+      uut.indexState = 'phase2'
+
+      const result = await uut.processBlock(600001)
+
+      assert.equal(result, 3)
+    })
+
+    it('should catch, report, and throw errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut.rpc, 'getBlockHash').rejects(new Error('test error'))
+
+        await uut.processBlock(588923)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'test error')
+      }
+    })
+  })
+
+  describe('#start', () => {
+    it('should start indexing in phase1', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.startStop, 'initStartStop').returns()
+      sandbox.stub(uut, 'getStatus').resolves({
+        syncedBlockHeight: 566777,
+        chainBlockHeight: 566778
+      })
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(566778)
+      sandbox.stub(uut, 'processBlock').resolves()
+      sandbox.stub(uut.zmq, 'connect').resolves()
+      sandbox.stub(uut.zmq, 'getTx').returns(false)
+      sandbox.stub(uut.zmq, 'getBlock').returns(false)
+      sandbox.stub(uut.process, 'exit').returns()
+
+      // Force an error to exit the loop
+      sandbox.stub(uut.utils, 'sleep').rejects(new Error('test error'))
+
+      const result = await uut.start()
+
+      assert.equal(result, 0)
+    })
+
+    it('should stop indexing if the user hits the q button', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.startStop, 'initStartStop').returns()
+      sandbox.stub(uut, 'getStatus').resolves({
+        syncedBlockHeight: 566777,
+        chainBlockHeight: 566778
+      })
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(566778)
+      sandbox.stub(uut.startStop, 'stopStatus').returns(true)
+
+      sandbox.stub(uut.process, 'exit')
+        .onCall(0).throws(new Error('test error'))
+        .onCall(1).returns()
+
+      const result = await uut.start()
+
+      assert.equal(result, 0)
     })
   })
 })

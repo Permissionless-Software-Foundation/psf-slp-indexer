@@ -46,6 +46,15 @@ class SlpIndexer {
     this.openDatabases = this.openDatabases.bind(this)
     this.encapsulateDeps = this.encapsulateDeps.bind(this)
     this.start = this.start.bind(this)
+    this.handleProcessFailure = this.handleProcessFailure.bind(this)
+    this.processTx = this.processTx.bind(this)
+    this.processData = this.processData.bind(this)
+    this.getStatus = this.getStatus.bind(this)
+    this.processSlpTxs = this.processSlpTxs.bind(this)
+    this.processBlock = this.processBlock.bind(this)
+
+    // State
+    this.RETRY_CNT = RETRY_CNT
   }
 
   openDatabases () {
@@ -108,6 +117,7 @@ class SlpIndexer {
 
     // state
     this.indexState = 'phase0'
+    this.process = process
 
     return true
   }
@@ -152,7 +162,7 @@ class SlpIndexer {
               blockHeight - 1
             }`
           )
-          process.exit(0)
+          this.process.exit(0)
         }
 
         // Process all SLP txs in the block.
@@ -269,11 +279,10 @@ class SlpIndexer {
       console.log('Error in indexer: ', err)
       // Don't throw an error. This is a top-level function.
 
-      // console.log('Restoring backup of database.')
-      // await this.dbBackup.restoreDb()
+      // Exit if there is an error.
+      this.process.exit(0)
 
-      // For debugging purposes, exit if there is an error.
-      process.exit(0)
+      return 0
     }
   }
 
@@ -315,7 +324,7 @@ class SlpIndexer {
       console.log(
         `Indexing block ${blockHeight} with ${
           txs.length
-        } transactions. ${now.toLocaleString()}`
+        } transactions. Time now: ${now.toLocaleString()}`
       )
 
       // Filter and sort block transactions, to make indexing more efficient
@@ -359,6 +368,8 @@ class SlpIndexer {
         console.log(`this.indexState: ${this.indexState}`)
         console.log(`Creating zip archive of database at block ${blockHeight}`)
         await this.dbBackup.zipDb(blockHeight, EPOCH)
+
+        return 2
       } else if ((blockHeight - 1) % EPOCH === 0 && this.indexState === 'phase2') {
         // In phase 2 (ZMQ), roll back to the last backup and resync, to generate
         // a new backup. This prevents the backup file from being corrupted by ZMQ
@@ -373,8 +384,12 @@ class SlpIndexer {
         // restart it at a block height to resync and take a proper backup while
         // in phase1.
         console.log('Killing process, expecting process manager to restart this app.')
-        process.exit(0)
+        this.process.exit(0)
+
+        return 3
       }
+
+      return 1
     } catch (err) {
       console.error('Error in processBlock()')
       throw err
@@ -406,7 +421,8 @@ class SlpIndexer {
             console.log(
               'Skipping error because indexer is in phase 2, indexing the tip of the chain.'
             )
-            return
+
+            return null
           }
 
           console.log('----> HANDLING ERROR <----')
@@ -435,7 +451,7 @@ class SlpIndexer {
 
           console.log(`Error count for ${tx}: ${errObj[0].cnt}`)
 
-          const retryCnt = RETRY_CNT
+          const retryCnt = this.RETRY_CNT
           if (errObj[0].cnt > retryCnt) {
             await this.handleProcessFailure(blockHeight, tx, err.message)
             throw new Error(
@@ -446,6 +462,8 @@ class SlpIndexer {
 
         // Loop while there are still elements in the slpTxs array.
       } while (slpTxs.length)
+
+      return true
     } catch (err) {
       console.error('Error in processSlpTxs()')
       throw err
@@ -459,9 +477,9 @@ class SlpIndexer {
   async handleProcessFailure (blockHeight, tx, errMsg) {
     try {
       // Subtract one from the block height. This ensure we roll back to a block
-      // before where the problem  happened.
+      // before where the problem happened.
       // This protects against a corner-case where restoring from a problematic
-      // backup, causes the indexer to get stuck in a look trying to restore the
+      // backup, causes the indexer to get stuck in a loop, trying to restore the
       // same problematic backup over and over.
       blockHeight = blockHeight - 1
 
@@ -513,10 +531,14 @@ class SlpIndexer {
 
       // Kill the process, which will allow the app to shut down, and pm2 or Docker can
       // restart it at a block height prior to the problematic parent transaction.
-      process.exit(0)
+      this.process.exit(0)
+
+      return true
     } catch (err) {
       console.error('Error in handleProcessFailure: ', err)
+
       // Do not throw an error, as this is an error handlilng function.
+      return false
     }
   }
 
