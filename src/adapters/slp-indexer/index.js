@@ -41,9 +41,12 @@ const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10
 
 class SlpIndexer {
-  // constructor (localConfig = {}) {
-  //
-  // }
+  constructor (localConfig = {}) {
+    // Bind the 'this' object to all subfunctions.
+    this.openDatabases = this.openDatabases.bind(this)
+    this.encapsulateDeps = this.encapsulateDeps.bind(this)
+    this.start = this.start.bind(this)
+  }
 
   openDatabases () {
     // Open the indexer databases.
@@ -56,6 +59,13 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.pTxDb = pTxDb
     this.utxoDb = utxoDb
+
+    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
+  }
+
+  // Instantiate all dependency libraries and encapsulate them into the 'this' object.
+  encapsulateDeps (localConfig = {}) {
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = localConfig
 
     // Encapsulate dependencies
     this.rpc = new RPC()
@@ -99,7 +109,7 @@ class SlpIndexer {
     // state
     this.indexState = 'phase0'
 
-    // _this = this
+    return true
   }
 
   async start () {
@@ -525,8 +535,9 @@ class SlpIndexer {
 
         // If TXID exists in the DB, then it's been processed. Exit.
         console.log(`${tx} already processed. Skipping.`)
-        return
+        return false
       } catch (err) {
+        // console.log(err)
         /* exit quietly */
       }
 
@@ -559,7 +570,8 @@ class SlpIndexer {
           // Save the TX to the processed database.
           await this.pTxDb.put(tx, blockHeight)
 
-          throw new Error('TX is for token in blacklist')
+          // throw new Error('TX is for token in blacklist')
+          return txData
         }
 
         // Get the transaction information.
@@ -588,14 +600,16 @@ class SlpIndexer {
       await this.pTxDb.put(tx, blockHeight)
 
       // console.log(`Completed ${tx}`)
+
+      return true
     } catch (err) {
       console.error('Error in processTx()')
       throw err
     }
   }
 
-  // This function routes the data for further processing, based on the type of
-  // SLP transaction it is.
+  // This function routes the data for individual SLP transactions for further
+  // processing, based on the type of SLP transaction it is.
   async processData (data) {
     try {
       const { slpData, txData } = data
@@ -618,7 +632,7 @@ class SlpIndexer {
         txData.isValidSlp = null
         await this.txDb.put(txData.txid, txData)
 
-        return
+        return false
       }
 
       // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
@@ -662,7 +676,7 @@ class SlpIndexer {
       // Add the transaction to the database
       await this.txDb.put(txData.txid, txData)
 
-      //
+      return true
     } catch (err) {
       console.error('Error in processData(): ', err)
       throw err

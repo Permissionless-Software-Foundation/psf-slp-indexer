@@ -65,7 +65,8 @@ class Adapters {
   initIndexer () {
     console.log('Instantiating SlpIndexer() in adapters/index.js')
     // this.slpIndexer = new SlpIndexer()
-    this.slpIndexer.openDatabases()
+    const dbs = this.slpIndexer.openDatabases()
+    this.slpIndexer.encapsulateDeps(dbs)
   }
 }
 
