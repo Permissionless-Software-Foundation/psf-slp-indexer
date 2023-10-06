@@ -20,7 +20,6 @@ import cors from 'kcors'
 
 // Local libraries
 import config from '../config/index.js' // this first.
-import errorMiddleware from '../src/controllers/rest-api/middleware/error.js'
 import wlogger from '../src/adapters/wlogger.js'
 import Controllers from '../src/controllers/index.js'
 
@@ -46,7 +45,6 @@ class Server {
       app.use(convert(logger()))
       app.use(bodyParser())
       app.use(session())
-      app.use(errorMiddleware())
 
       // Used to generate the docs.
       app.use(mount('/', serve(`${process.cwd()}/docs`)))
