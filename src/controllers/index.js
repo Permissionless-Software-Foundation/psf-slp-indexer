@@ -26,11 +26,15 @@ class Controllers {
   // Spin up any adapter libraries that have async startup needs.
   async initAdapters () {
     await this.adapters.start()
+
+    return true
   }
 
   // Run any Use Cases to startup the app.
   async initUseCases () {
     await this.useCases.start()
+
+    return true
   }
 
   // Top-level function for this library.
@@ -43,6 +47,8 @@ class Controllers {
 
     // Attach the REST API Controllers associated with the boilerplate code to the Koa app.
     restControllers.attachRESTControllers(app)
+
+    return true
   }
 
   // Attach any other controllers other than REST API controllers.
