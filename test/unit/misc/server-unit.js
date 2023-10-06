@@ -44,7 +44,6 @@ describe('#server', () => {
 
     it('should exit on failure', async () => {
       // Force an error
-      // sandbox.stub(uut.mongoose, 'connect').rejects(new Error('test error'))
       sandbox.stub(uut.controllers, 'initAdapters').rejects(new Error('test error'))
 
       // Prevent default behavior of exiting the program.
