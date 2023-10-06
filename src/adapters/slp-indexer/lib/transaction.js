@@ -143,8 +143,8 @@ class Transaction {
   async getNftTx (txDetails, txTokenData) {
     console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
 
-    console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
-    console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+    // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+    // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
 
     // Process TX Outputs
     // Add the token quantity to each output.
@@ -238,11 +238,11 @@ class Transaction {
     // Process TX inputs
     for (let i = 0; i < txDetails.vin.length; i++) {
       const thisVin = txDetails.vin[i]
-      console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
+      // console.log(`thisVin[${i}]: ${JSON.stringify(thisVin, null, 2)}`)
 
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
-      console.log(`vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`)
+      // console.log(`vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`)
 
       // Is the input token ID the same? It should be for a SEND.
       const vinTokenIdIsTheSame = vinTokenData.tokenId === txDetails.tokenId
@@ -295,9 +295,9 @@ class Transaction {
         // Example TX: b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e
         // Using Group Token ID: 112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be
 
-        console.log(
-          `MINT vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
-        )
+        // console.log(
+        //   `MINT vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+        // )
 
         let tokenQty = 0 // Default value
 
