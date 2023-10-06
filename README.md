@@ -67,3 +67,7 @@ npm install
 ## License
 
 [GPLv2](./LICENSE.md)
+
+## Contributing
+
+Contribution are welcome! Check out the [Contribution guide](./CONTRIBUTING.md) for guidence on contributing to this repository.
