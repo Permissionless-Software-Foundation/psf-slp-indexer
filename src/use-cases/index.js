@@ -4,7 +4,6 @@
   https://troutsblog.com/blog/clean-architecture
 */
 
-
 class UseCases {
   constructor (localConfig = {}) {
     this.adapters = localConfig.adapters
