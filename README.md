@@ -19,7 +19,7 @@ This software is intended to be run inside a Docker container, controlled with D
 
 - Enter the `production/docker` directory.
 - Build the image with `docker-compose build --no-cache`
-- Ensure you have a BCHN full node running and fully synced.
+- Ensure you have a BCHN full node running and fully synced. [docker-bchn](https://github.com/Permissionless-Software-Foundation/docker-bchn) is recommended for running a full node.
 - Start the indexer with `docker-compose up -d`
 
 
@@ -27,7 +27,7 @@ This software is intended to be run inside a Docker container, controlled with D
 
 - Written in [standard JavaScript](https://www.npmjs.com/package/standard), using the [Clean Architecture](https://christroutner.github.io/trouts-blog/blog/clean-architecture) design pattern.
 - 100% unit test coverage. This allows for operational reliability and easy code collaboration.
-- [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) Licensed to encourage wide adoption and free use throughout the BCH ecosystem.
+- [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) Licensed to encourage wide adoption and free use throughout the crypto ecosystem.
 - [LevelDB](https://github.com/google/leveldb) used for fast, efficient indexing and querying.
 - Drastically reduced memory usage, compared to SLPDB.
 - Fast indexing using transaction maps.
@@ -43,7 +43,7 @@ This software is intended to be run inside a Docker container, controlled with D
 - node **^16.17.0**
 - npm **^8.15.0**
 
-### Installation
+### Dev Environment Installation
 
 Customize the [slp-indexer.sh](./slp-indexer.sh) bash shell script to point to the a BCH full node with the standard JSON RPC. [docker-bchn](https://github.com/Permissionless-Software-Foundation/docker-bchn) is recommended for running a full node.
 
