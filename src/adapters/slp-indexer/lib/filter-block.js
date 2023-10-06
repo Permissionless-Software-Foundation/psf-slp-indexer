@@ -142,6 +142,10 @@ class FilterBlock {
           if (!result) {
             console.log(`deleteBurnedUtxos() errored on on txid ${txid}. Coinbase?`)
 
+            // Dev note 10/6/23: This code path was created to handle a corner case,
+            // but it may no longer be necessary. This code is in place to detect
+            // the corner case and create mock data for unit tests. If this code
+            // path is no longer needed, it will be removed.
             console.log('Exiting to capture test data.')
             process.exit(0)
           }

@@ -63,6 +63,10 @@ class DAG {
           // console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
           console.log(`Large DAG detected: ${txidAry.length} txs`)
 
+          // Dev note 10/6/23: This code path was created to handle a corner case,
+          // but it may no longer be necessary. This code is in place to detect
+          // the corner case and create mock data for unit tests. If this code
+          // path is no longer needed, it will be removed.
           console.log('4 Stopping indexer to gather test data.')
           process.exit(0)
         }
@@ -140,6 +144,10 @@ class DAG {
           // have already been considered. This is in hope that it will speed
           // up validation, which became much slower after taking the code out.
         } else if (parentTx.isValidSlp === false && txidAry.length > 30) {
+          // Dev note 10/6/23: This code path was created to handle a corner case,
+          // but it may no longer be necessary. This code is in place to detect
+          // the corner case and create mock data for unit tests. If this code
+          // path is no longer needed, it will be removed.
           console.log('parentTx: ', parentTx)
           console.log('1 Stopping indexer to gather test data.')
           process.exit(0)
@@ -167,6 +175,10 @@ class DAG {
           const isNFT = parentTx.tokenType !== 1
           const groupTokenOnVin0 = parentTx.vin[0].tokenQty > 0
           if (isNFT && !groupTokenOnVin0) {
+            // Dev note 10/6/23: This code path was created to handle a corner case,
+            // but it may no longer be necessary. This code is in place to detect
+            // the corner case and create mock data for unit tests. If this code
+            // path is no longer needed, it will be removed.
             console.log('isNFT: ', isNFT)
             console.log('groupTokenOnVin0: ', groupTokenOnVin0)
             console.log('2 Stopping indexer to gather test data.')
@@ -203,6 +215,11 @@ class DAG {
           const DAG_CUTOFF = 300
           if (parentTx.isSlpTx && txidAry.length > DAG_CUTOFF && parentTx.isValidSlp) {
             console.log(`-->Large DAG cut-off at ${DAG_CUTOFF} transactions. Assumed valid.`)
+
+          // Dev note 10/6/23: This code path was created to handle a corner case,
+          // but it may no longer be necessary. This code is in place to detect
+          // the corner case and create mock data for unit tests. If this code
+          // path is no longer needed, it will be removed.
             console.log('3 Stopping indexer to gather test data.')
             process.exit(0)
 
