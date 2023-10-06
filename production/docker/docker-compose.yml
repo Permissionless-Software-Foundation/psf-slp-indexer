@@ -3,16 +3,6 @@
 version: '3.9'
 
 services:
-  mongo-slp-indexer:
-    image: mongo:4.2.0
-    container_name: mongo-slp-indexer
-    ports:
-      - '5555:27017' # <host port>:<container port>
-    volumes:
-      - ../data/database:/data/db
-    command: mongod --logpath=/dev/null # -- quiet
-    restart: always
-
   slp-indexer:
     build: .
     container_name: slp-indexer
@@ -22,11 +12,12 @@ services:
         max-size: '10m'
         max-file: '10'
     #mem_limit: 500mb
-    links:
-      - mongo-slp-indexer
+    #links:
+    #  - mongo-slp-indexer
     ports:
       - '5010:5010' # <host port>:<container port>
     volumes:
       - ../data/ipfsdata:/home/safeuser/psf-slp-indexer/.ipfsdata
       - ../data/leveldb:/home/safeuser/psf-slp-indexer/leveldb
+      - ./start-production.sh:/home/safeuser/psf-slp-indexer/start-production.sh
     restart: always

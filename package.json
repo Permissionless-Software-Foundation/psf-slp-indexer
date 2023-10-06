@@ -1,15 +1,14 @@
 {
   "name": "psf-slp-indexer",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Indexer for validating SLP transactions. Uses LevelDB.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node --max_old_space_size=16000 index.js",
     "test": "npm run test:all",
-    "test:all": "export SVC_ENV=test && c8 --reporter=text mocha --exit --timeout 15000 --recursive test/unit test/e2e/automated/",
+    "test:all": "export SVC_ENV=test && c8 --reporter=text mocha --exit --timeout 15000 --recursive test/unit/",
     "test:unit": "export SVC_ENV=test && c8 --reporter=text mocha --exit --timeout 15000 --recursive test/unit/",
-    "test:e2e:auto": "export SVC_ENV=test && mocha --exit --timeout 15000 test/e2e/automated/",
     "test:temp": "export SVC_ENV=test && mocha --exit --timeout 15000 -g '#rate-limit' test/unit/json-rpc/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",

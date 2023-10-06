@@ -10,9 +10,8 @@ import BCHJS from '@psf/bch-js'
 // Load individual adapter libraries.
 import IPFSAdapter from './ipfs/index.js'
 
-import LocalDB from './localdb/index.js'
+// import LocalDB from './localdb/index.js'
 import LogsAPI from './logapi.js'
-import Passport from './passport.js'
 import Nodemailer from './nodemailer.js'
 
 // const { wlogger } = require('./wlogger')
@@ -26,9 +25,7 @@ class Adapters {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.ipfs = new IPFSAdapter()
-    this.localdb = new LocalDB()
     this.logapi = new LogsAPI()
-    this.passport = new Passport()
     this.nodemailer = new Nodemailer()
     this.jsonFiles = new JSONFiles()
     this.bchjs = new BCHJS()
