@@ -22,25 +22,10 @@ This software is intended to be run inside a Docker container, controlled with D
 - Ensure you have a BCHN full node running and fully synced.
 - Start the indexer with `docker-compose up -d`
 
-## Development Status
-
-Current status: **Beta**
-
-This project is using conventional development milestones:
-- Alpha = Under active development. Bugs are expected, things are expected to break.
-- Beta = Some bugs still exist, but code is mature enough for careful roll-out into production.
-- Production = Code has been heavily tested and code commits have slowed in frequency. App is ready for normal operators.
-
-Regular status updates will be reported at the [bi-weekly PSF Technical Steering Committee meetings](https://github.com/Permissionless-Software-Foundation/TSC/issues). Updates will also be reported in [this Telegram channel](https://t.me/psf_slp).
-
-**See the [developer documentation](./dev-docs) for more information.**
-
-
-
 
 ## Features
 
-- Written in [standard JavaScript](https://www.npmjs.com/package/standard), using the [Clean Architecture](https://troutsblog.com/blog/clean-architecture) design pattern.
+- Written in [standard JavaScript](https://www.npmjs.com/package/standard), using the [Clean Architecture](https://christroutner.github.io/trouts-blog/blog/clean-architecture) design pattern.
 - 100% unit test coverage. This allows for operational reliability and easy code collaboration.
 - [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) Licensed to encourage wide adoption and free use throughout the BCH ecosystem.
 - [LevelDB](https://github.com/google/leveldb) used for fast, efficient indexing and querying.
@@ -48,15 +33,19 @@ Regular status updates will be reported at the [bi-weekly PSF Technical Steering
 - Fast indexing using transaction maps.
 - Docker container for easy deployment and horizontal scaling.
 
-## Requirements
+## Development Environment
+
+**See the [developer documentation](./dev-docs) for more information.**
+
+### Requirements
 
 - Ubuntu Linux OS v20.4+
-- node **^14.17.0**
-- npm **^7.13.0**
+- node **^16.17.0**
+- npm **^8.15.0**
 
-## Installation
+### Installation
 
-Customize the [slp-indexer.sh](./slp-indexer.sh) bash shell script to point to the a BCH full node with the standard JSON RPC. [docker-bchn](https://github.com/Permissionless-Software-Foundation/docker-bchn) is recommended.
+Customize the [slp-indexer.sh](./slp-indexer.sh) bash shell script to point to the a BCH full node with the standard JSON RPC. [docker-bchn](https://github.com/Permissionless-Software-Foundation/docker-bchn) is recommended for running a full node.
 
 ```
 git clone https://github.com/Permissionless-Software-Foundation/psf-slp-indexer

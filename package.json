@@ -1,6 +1,6 @@
 {
   "name": "psf-slp-indexer",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Indexer for validating SLP transactions. Uses LevelDB.",
   "main": "index.js",
   "type": "module",
