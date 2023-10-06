@@ -55,6 +55,8 @@ class SlpIndexer {
 
     // State
     this.RETRY_CNT = RETRY_CNT
+    this.indexState = 'phase0'
+    this.loopCnt = 0
   }
 
   openDatabases () {
@@ -115,8 +117,8 @@ class SlpIndexer {
     this.blacklist = new Blacklist()
     this.retryQueue = new RetryQueue()
 
-    // state
-    this.indexState = 'phase0'
+    // Used to control program flow during testing, to override the default
+    // behavior of process.exit().
     this.process = process
 
     return true
@@ -213,8 +215,6 @@ class SlpIndexer {
       await this.zmq.connect()
       console.log('Connected to ZMQ port of full node.')
 
-      let loopCnt = 0
-
       // Enter permanent loop, processing ZMQ input.
       do {
         // TODO: add getBlockCounty to a auto-retry in case it fails.
@@ -248,8 +248,6 @@ class SlpIndexer {
           blockHeight = blockHeader.height
           console.log(`processing block ${blockHeight}`)
 
-          // process.exit(0)
-
           // Update the status DB.
           status.syncedBlockHeight = blockHeight
           status.chainBlockHeight = blockHeight
@@ -259,21 +257,17 @@ class SlpIndexer {
           await this.processBlock(blockHeight)
         }
 
-        // Check for block re-org. Roll back database if one is encountered.
-
-        // Every 10 blocks, make a backup.
-
-        // Wait a few seconds between loops.
-        await this.utils.sleep(50)
-
         // Periodically print to the console to indicate that the ZMQ is being
         // monitored.
-        loopCnt++
-        if (loopCnt > 100) {
-          loopCnt = 0
+        this.loopCnt++
+        if (this.loopCnt > 100) {
+          this.loopCnt = 0
           const now = new Date()
           console.log(`Checked ZMQ. ${now.toLocaleString()}, block height: ${blockHeight}`)
         }
+
+        // Wait a few seconds between loops.
+        await this.utils.sleep(50)
       } while (1)
     } catch (err) {
       console.log('Error in indexer: ', err)
@@ -498,7 +492,7 @@ class SlpIndexer {
       // (oldest) block height.
       for (let i = 0; i < txData.vin.length; i++) {
         const thisVin = txData.vin[i]
-        // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
+        console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
 
         // Skip any non-token inputs.
         if (!thisVin.tokenQty && !thisVin.isMintBaton) continue
@@ -506,14 +500,7 @@ class SlpIndexer {
         // Get parent TX data
         const parentTxData = await this.cache.get(thisVin.txid)
 
-        // Get the block height of that transaction.
-        // const parentBlockhash = parentTxData.blockhash
-        // const parentBlockHeader = await this.rpc.getBlockHeader(parentBlockhash)
-
         // Find and track the oldest parent block height.
-        // if (parentBlockHeader.height < targetBlockHeight) {
-        //   targetBlockHeight = parentBlockHeader.height
-        // }
         if (parentTxData.blockheight < targetBlockHeight) {
           targetBlockHeight = parentTxData.blockheight
         }

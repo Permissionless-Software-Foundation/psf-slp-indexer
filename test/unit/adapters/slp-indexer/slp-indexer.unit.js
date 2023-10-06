@@ -243,6 +243,22 @@ describe('#slpIndexer', () => {
       assert.equal(result.isValidSlp, null)
     })
 
+    it('should exit quietly if there is an error checking the blacklist', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.pTxDb, 'get').rejects(new Error('Entry not found'))
+      sandbox.stub(uut.transaction, 'decodeOpReturn').rejects(new Error('test error'))
+      // sandbox.stub(uut.blacklist, 'checkBlacklist').returns(true)
+
+      const inData = {
+        tx: 'fake-txid',
+        blockHeight: 600000
+      }
+
+      const result = await uut.processTx(inData)
+
+      assert.equal(result.isValidSlp, null)
+    })
+
     it('should identify SLP txs and route them to processData()', async () => {
       // Mock dependencies
       sandbox.stub(uut.pTxDb, 'get').rejects(new Error('Entry not found'))
@@ -291,6 +307,23 @@ describe('#slpIndexer', () => {
       const result = await uut.handleProcessFailure()
 
       assert.equal(result, false)
+    })
+
+    it('should loop through parent txs', async () => {
+      // Force desired code path
+      mockTxData.genesisTestInputTx02.vin[0].tokenQty = 5
+      mockTxData.nftGenesisTx01.blockheight = 602345
+
+      // Mock dependencies
+      sandbox.stub(uut.cache, 'get')
+        .onCall(0).resolves(mockTxData.genesisTestInputTx02)
+        .onCall(1).resolves(mockTxData.nftGenesisTx01)
+      sandbox.stub(uut.dbBackup, 'unzipDb').resolves()
+      sandbox.stub(uut.process, 'exit').returns()
+
+      const result = await uut.handleProcessFailure(603424, 'fake-txid', 'some error')
+
+      assert.equal(result, true)
     })
   })
 
@@ -480,6 +513,100 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.process, 'exit')
         .onCall(0).throws(new Error('test error'))
         .onCall(1).returns()
+
+      const result = await uut.start()
+
+      assert.equal(result, 0)
+    })
+
+    it('should process a ZMQ transaction in phase 2', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.startStop, 'initStartStop').returns()
+      sandbox.stub(uut, 'getStatus').resolves({
+        syncedBlockHeight: 566777,
+        chainBlockHeight: 566778
+      })
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(566778)
+      sandbox.stub(uut, 'processBlock').resolves()
+      sandbox.stub(uut.zmq, 'connect').resolves()
+      sandbox.stub(uut.zmq, 'getTx').returns({})
+      sandbox.stub(uut, 'processTx').resolves()
+      sandbox.stub(uut.zmq, 'getBlock').returns(false)
+      sandbox.stub(uut.process, 'exit').returns()
+
+      // Force an error to exit the loop
+      sandbox.stub(uut.utils, 'sleep').rejects(new Error('test error'))
+
+      const result = await uut.start()
+
+      assert.equal(result, 0)
+    })
+
+    it('should exit quiety if there is an error processes a ZMQ transaction in phase 2', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.startStop, 'initStartStop').returns()
+      sandbox.stub(uut, 'getStatus').resolves({
+        syncedBlockHeight: 566777,
+        chainBlockHeight: 566778
+      })
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(566778)
+      sandbox.stub(uut, 'processBlock').resolves()
+      sandbox.stub(uut.zmq, 'connect').resolves()
+      sandbox.stub(uut.zmq, 'getTx').returns({})
+      sandbox.stub(uut, 'processTx').rejects(new Error('test error'))
+      sandbox.stub(uut.zmq, 'getBlock').returns(false)
+      sandbox.stub(uut.process, 'exit').returns()
+
+      // Force an error to exit the loop
+      sandbox.stub(uut.utils, 'sleep').rejects(new Error('test error'))
+
+      const result = await uut.start()
+
+      assert.equal(result, 0)
+    })
+
+    it('should process a ZMQ block in phase 2', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.startStop, 'initStartStop').returns()
+      sandbox.stub(uut, 'getStatus').resolves({
+        syncedBlockHeight: 566777,
+        chainBlockHeight: 566778
+      })
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(566778)
+      sandbox.stub(uut, 'processBlock').resolves()
+      sandbox.stub(uut.zmq, 'connect').resolves()
+      sandbox.stub(uut.zmq, 'getTx').returns(false)
+      sandbox.stub(uut.zmq, 'getBlock').returns({ hash: 'fake-hash' })
+      sandbox.stub(uut.rpc, 'getBlockHeader').resolves({ height: 566778 })
+      sandbox.stub(uut.process, 'exit').returns()
+
+      // Force an error to exit the loop
+      sandbox.stub(uut.utils, 'sleep').rejects(new Error('test error'))
+
+      const result = await uut.start()
+
+      assert.equal(result, 0)
+    })
+
+    it('In phase 2, it should report every 100 checks of the ZMQ queue', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.startStop, 'initStartStop').returns()
+      sandbox.stub(uut, 'getStatus').resolves({
+        syncedBlockHeight: 566777,
+        chainBlockHeight: 566778
+      })
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(566778)
+      sandbox.stub(uut, 'processBlock').resolves()
+      sandbox.stub(uut.zmq, 'connect').resolves()
+      sandbox.stub(uut.zmq, 'getTx').returns(false)
+      sandbox.stub(uut, 'processTx').resolves()
+      sandbox.stub(uut.zmq, 'getBlock').returns(false)
+      sandbox.stub(uut.process, 'exit').returns()
+
+      // Force an error to exit the loop
+      sandbox.stub(uut.utils, 'sleep').rejects(new Error('test error'))
+
+      uut.loopCnt = 100
 
       const result = await uut.start()
 
