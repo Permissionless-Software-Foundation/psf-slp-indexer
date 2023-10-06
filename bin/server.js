@@ -13,28 +13,21 @@ import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import convert from 'koa-convert'
 import logger from 'koa-logger'
-import mongoose from 'mongoose'
 import session from 'koa-generic-session'
-import passport from 'koa-passport'
 import mount from 'koa-mount'
 import serve from 'koa-static'
 import cors from 'kcors'
 
 // Local libraries
 import config from '../config/index.js' // this first.
-
-import AdminLib from '../src/adapters/admin.js'
 import errorMiddleware from '../src/controllers/rest-api/middleware/error.js'
 import wlogger from '../src/adapters/wlogger.js'
 import Controllers from '../src/controllers/index.js'
-import { applyPassportMods } from '../config/passport.js'
 
 class Server {
   constructor () {
     // Encapsulate dependencies
-    this.adminLib = new AdminLib()
     this.controllers = new Controllers()
-    this.mongoose = mongoose
     this.config = config
     this.process = process
   }
@@ -44,17 +37,6 @@ class Server {
       // Create a Koa instance.
       const app = new Koa()
       app.keys = [this.config.session]
-
-      // Connect to the Mongo Database.
-      this.mongoose.Promise = global.Promise
-      this.mongoose.set('useCreateIndex', true) // Stop deprecation warning.
-      console.log(
-        `Connecting to MongoDB with this connection string: ${this.config.database}`
-      )
-      await this.mongoose.connect(this.config.database, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-      })
 
       console.log(`Starting environment: ${this.config.env}`)
       console.log(`Debug level: ${this.config.debugLevel}`)
@@ -71,12 +53,6 @@ class Server {
 
       // Mount the page for displaying logs.
       app.use(mount('/logs', serve(`${process.cwd()}/config/logs`)))
-
-      // User Authentication
-      // require('../config/passport')
-      applyPassportMods(passport)
-      app.use(passport.initialize())
-      app.use(passport.session())
 
       // Enable CORS for testing
       // THIS IS A SECURITY RISK. COMMENT OUT FOR PRODUCTION
@@ -101,10 +77,6 @@ class Server {
 
       this.server = await app.listen(this.config.port)
       console.log(`Server started on ${this.config.port}`)
-
-      // Create the system admin user.
-      const success = await this.adminLib.createSystemUser()
-      if (success) console.log('System admin user created.')
 
       // Attach the other IPFS controllers.
       // Skip if this is a test environment.

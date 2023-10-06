@@ -7,8 +7,8 @@
 // Public npm libraries.
 
 // Local libraries
-import AuthRESTController from './auth/index.js'
-import UserRouter from './users/index.js'
+// import AuthRESTController from './auth/index.js'
+// import UserRouter from './users/index.js'
 import ContactRESTController from './contact/index.js'
 import LogsRESTController from './logs/index.js'
 import SlpRESTController from './slp/index.js'
@@ -39,12 +39,12 @@ class RESTControllers {
     }
 
     // Attach the REST API Controllers associated with the /auth route
-    const authRESTController = new AuthRESTController(dependencies)
-    authRESTController.attach(app)
+    // const authRESTController = new AuthRESTController(dependencies)
+    // authRESTController.attach(app)
 
     // Attach the REST API Controllers associated with the /user route
-    const userRouter = new UserRouter(dependencies)
-    userRouter.attach(app)
+    // const userRouter = new UserRouter(dependencies)
+    // userRouter.attach(app)
 
     // Attach the REST API Controllers associated with the /contact route
     const contactRESTController = new ContactRESTController(dependencies)
