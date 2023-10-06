@@ -45,6 +45,16 @@ describe('#start-stop', () => {
 
       assert.equal(result, true)
     })
+
+    it('should set raw mode if stdin is TTY', () => {
+      // mock process so that test completes.
+      uut.process = mockProcess
+      uut.process.stdin.isTTY = true
+
+      const result = uut.initStartStop()
+
+      assert.equal(result, true)
+    })
   })
 
   describe('#qDetected', () => {

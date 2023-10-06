@@ -52,4 +52,16 @@ describe('#adapters', () => {
       }
     })
   })
+
+  describe('#initIndexer', () => {
+    it('should initialize the indexer', () => {
+      // Mock dependencies
+      sandbox.stub(uut.slpIndexer, 'openDatabases').returns()
+      sandbox.stub(uut.slpIndexer, 'encapsulateDeps').returns()
+
+      const result = uut.initIndexer()
+
+      assert.equal(result, true)
+    })
+  })
 })

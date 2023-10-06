@@ -46,6 +46,8 @@ class RESTControllers {
 
     const slpRESTController = new SlpRESTController(dependencies)
     slpRESTController.attach(app)
+
+    return true
   }
 }
 
