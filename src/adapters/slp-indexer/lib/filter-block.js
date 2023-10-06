@@ -10,17 +10,11 @@
 */
 
 // Public npm libraries
-// const PQueue = require('p-queue').default
-// const pRetry = require('p-retry')
-// const BigNumber = require('bignumber.js')
 import PQueue from 'p-queue'
 import pRetry from 'p-retry'
 import BigNumber from 'bignumber.js'
 
 // Local Libraries
-// const config = require('../../../config')
-// const Utils = require('./utils')
-// const Blacklist = require('./blacklist')
 import Utils from './utils.js'
 import Blacklist from './blacklist.js'
 
@@ -147,6 +141,9 @@ class FilterBlock {
 
           if (!result) {
             console.log(`deleteBurnedUtxos() errored on on txid ${txid}. Coinbase?`)
+
+            console.log('Exiting to capture test data.')
+            process.exit(0)
           }
         }
       }
@@ -252,7 +249,8 @@ class FilterBlock {
 
           // If the address contains the burned UTXO.
           if (thisUtxo.txid === txid && thisUtxo.vout === vout) {
-            console.log(`Utxo found to remove: ${JSON.stringify(thisUtxo, null, 2)}`)
+            console.log(`filter-block.js/deleteBurnedUtxos() Utxo found to remove: ${JSON.stringify(thisUtxo, null, 2)}`)
+
             // Remove the UTXO from the address.
             addrData.utxos = this.utils.removeUtxoFromArray(thisUtxo, addrData.utxos)
 
@@ -331,10 +329,6 @@ class FilterBlock {
     }
   }
 
-  sleep (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-
   // checkForParent(txid, blockheight) expects a transaction and
   // blockhight value as input.
   //
@@ -343,7 +337,7 @@ class FilterBlock {
   // - dag: []
   //
   // The `dag` property will contain a list of TXIDs of parent TXs in the same
-  // block as the given txid. It will be empty if there are not parents.
+  // block as the given txid. It will be empty if there are no parents.
   //
   // This function will recursively call itself, to traverse the DAG and find
   // all the parent UTXOs for that transaction. It will then
@@ -354,9 +348,7 @@ class FilterBlock {
       // console.log('txid: ', txid)
       // console.log(`chainedTxids: ${JSON.stringify(chainedTxids, null, 2)}`)
 
-      // await this.sleep(500)
-
-      // Default output object
+      // Init the output object
       const outObj = {
         hasParent: false,
         dag: []
@@ -510,6 +502,7 @@ class FilterBlock {
       // Filter out all the non-SLP transactions.
       let { slpTxs, nonSlpTxs } = await this.filterSlpTxs(txids)
       console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
+      // console.log('nonSlpTxs: ', nonSlpTxs.length)
       // console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
 
       // No SLP txids in the array? Exit.
@@ -543,6 +536,8 @@ class FilterBlock {
         // Check if TX is part of a forward DAG
         if (slpTxs.length) {
           const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
+          // console.log('success: ', success)
+          // console.log('chainedArray: ', chainedArray)
           // const { success, chainedArray, unsortedArray } =
           //   await this.forwardDag(backDag, slpTxs)
 
@@ -580,6 +575,7 @@ class FilterBlock {
           slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
         }
+        // Dev Note: CT 10/04/23 I don't think this code paragraph is ever executed.
         for (let j = 0; j < independentTxids.length; j++) {
           slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
           // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
@@ -597,9 +593,9 @@ class FilterBlock {
       // For debugging:
       // console.log(`independentTxids: ${JSON.stringify(independentTxids, null, 2)}`)
       // console.log(`sortedTxids: ${JSON.stringify(sortedTxids, null, 2)}`)
-      console.log(`independentTxids: ${independentTxids.length}`)
-      console.log(`sortedTxids: ${sortedTxids.length}`)
-      console.log(`nonSlpTxs: ${nonSlpTxs.length}`)
+      // console.log(`independentTxids: ${independentTxids.length}`)
+      // console.log(`sortedTxids: ${sortedTxids.length}`)
+      // console.log(`nonSlpTxs: ${nonSlpTxs.length}`)
 
       // Combine arrays with the independent txids first.
       let combined = independentTxids.concat(sortedTxids)

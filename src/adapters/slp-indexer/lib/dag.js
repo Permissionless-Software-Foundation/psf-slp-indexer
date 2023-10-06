@@ -62,6 +62,9 @@ class DAG {
         if (txidAry.length % 10 === 0) {
           // console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
           console.log(`Large DAG detected: ${txidAry.length} txs`)
+
+          console.log('4 Stopping indexer to gather test data.')
+          process.exit(0)
         }
       }
 
@@ -109,9 +112,6 @@ class DAG {
         // Phase 2b: Evaluate cached pre-evaluated parents.
         // If the parent TX is a valid SLP tx that has already been evaluated.
         if (parentTx.isValidSlp) {
-          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-          // console.log(`parentTX TXID: ${parentTx.txid}`)
-
           // Ensure this input is either a token or a minting baton.
           const vinIsTokenOrBaton = !!thisVin.tokenQty || thisVin.isMintBaton
           // console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
@@ -133,12 +133,17 @@ class DAG {
             outObj.dag = txidAry
             return outObj
           }
+
           // }
           // CT 12-21-21 - This was leading to false negatives in the Spice token.
           // CT 01-02-22 - Adding additional constraint that several parents
           // have already been considered. This is in hope that it will speed
           // up validation, which became much slower after taking the code out.
         } else if (parentTx.isValidSlp === false && txidAry.length > 30) {
+          console.log('parentTx: ', parentTx)
+          console.log('1 Stopping indexer to gather test data.')
+          process.exit(0)
+
           endFound = false
           outObj.dag = txidAry
           return outObj
@@ -162,6 +167,11 @@ class DAG {
           const isNFT = parentTx.tokenType !== 1
           const groupTokenOnVin0 = parentTx.vin[0].tokenQty > 0
           if (isNFT && !groupTokenOnVin0) {
+            console.log('isNFT: ', isNFT)
+            console.log('groupTokenOnVin0: ', groupTokenOnVin0)
+            console.log('2 Stopping indexer to gather test data.')
+            process.exit(0)
+
             endFound = true
             outObj.isValid = false
             outObj.dag = []
@@ -193,6 +203,8 @@ class DAG {
           const DAG_CUTOFF = 300
           if (parentTx.isSlpTx && txidAry.length > DAG_CUTOFF && parentTx.isValidSlp) {
             console.log(`-->Large DAG cut-off at ${DAG_CUTOFF} transactions. Assumed valid.`)
+            console.log('3 Stopping indexer to gather test data.')
+            process.exit(0)
 
             endFound = true
             outObj.isValid = true

@@ -225,10 +225,12 @@ class Genesis {
         type: 'baton',
         tokenId: slpData.tokenId,
         address: recvrAddr,
-        tokenType: slpData.tokenType
+        tokenType: slpData.tokenType,
+        tokenName: txData.tokenName,
+        tokenTicker: txData.tokenTicker
       }
       addr.utxos.push(utxo)
-      console.log(`mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`genesis.js/addBatonAddress() mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       // Add the txid to the transaction history.
       const txObj = {

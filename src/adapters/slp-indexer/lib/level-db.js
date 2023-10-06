@@ -3,7 +3,6 @@
 */
 
 // Public npm libraries.
-// const level = require('level')
 import level from 'level'
 
 // Hack to get __dirname back.

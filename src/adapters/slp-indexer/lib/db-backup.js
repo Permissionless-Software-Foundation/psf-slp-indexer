@@ -127,6 +127,8 @@ class DbBackup {
 
       // const deleteBackup = parseInt(process.env.DELETE_BACKUP)
       const backupQty = this.config.backupQty
+      console.log('backupQty: ', backupQty)
+      console.log('epoch: ', epoch)
       if (backupQty && epoch) {
         // Delete the oldest backup.
         const oldHeight = height - (epoch * backupQty)
@@ -143,6 +145,8 @@ class DbBackup {
       await this.statusDb.open()
       await this.pTxDb.open()
       await this.utxoDb.open()
+
+      return true
     } catch (err) {
       console.error('Error in zipDb')
       throw err
@@ -176,8 +180,12 @@ class DbBackup {
 
       // Restore the backup
       this.shell.exec('./restore-auto.sh')
+
+      return true
     } catch (err) {
       console.error('Error in unzipDb: ', err)
+
+      return false
     }
   }
 }

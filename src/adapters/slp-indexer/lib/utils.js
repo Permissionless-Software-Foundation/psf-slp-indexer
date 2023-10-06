@@ -4,7 +4,6 @@
 */
 
 // Global npm libraries
-// const BigNumber = require('bignumber.js')
 import BigNumber from 'bignumber.js'
 
 class IndexerUtils {

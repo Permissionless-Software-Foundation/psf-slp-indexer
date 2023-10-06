@@ -131,7 +131,7 @@ describe('#retry-queue.js', () => {
       assert.equal(funcHandle.callCount, 1)
     })
 
-    it('should catch and throw an error', async () => {
+    it('should handle http 500 error when TXID does not exist', async () => {
       try {
         // Mock for ignore sleep time
         sandbox.stub(uut, 'sleep').resolves({})
@@ -139,15 +139,17 @@ describe('#retry-queue.js', () => {
         const inputTest = 'test'
 
         const funcHandle = () => {
-          throw new Error('test error')
+          throw new Error('some error 500 http status')
         }
 
+        sandbox.stub(uut.queue, 'add').rejects(new Error('some error 500 http status'))
+
         uut.attempts = 1
-        await uut.retryWrapper(funcHandle, inputTest)
+        await uut.addToQueue(funcHandle, inputTest)
 
         assert.fail('unexpected code path')
       } catch (err) {
-        assert.include(err.message, 'test error')
+        assert.include(err.message, '500')
       }
     })
   })

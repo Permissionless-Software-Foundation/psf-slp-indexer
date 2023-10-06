@@ -411,9 +411,11 @@ class Mint {
         address: recvrAddr,
         effectiveQty,
         decimals,
-        value
+        value,
+        tokenTicker: txData.tokenTicker,
+        tokenName: txData.tokenName
       }
-      console.log(`mint utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`mint.js/addTokensFromOutput() mint utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       addr.utxos.push(utxo)
       // this.util.addWithoutDuplicate(utxo, addr.utxos)

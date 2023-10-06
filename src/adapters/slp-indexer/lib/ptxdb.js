@@ -1,8 +1,9 @@
 /*
   This library contains utility functions for cleaning up the processed tx db.
+  'processed' transactions are txs that have already been processed. This lets
+  the indexer safely transition between phase 1 (bulk indexing) and phase 2
+  (ZMQ real-time indexing), and maintain a consistent state.
 */
-
-let _this
 
 class ManagePTXDB {
   constructor (localConfig = {}) {
@@ -17,24 +18,33 @@ class ManagePTXDB {
     this.keys = []
     this.cleanCnt = 0
 
-    _this = this
+    // Add 'this' object to all subfunctions
+    this.getAllTxs = this.getAllTxs.bind(this)
+    this.cleanPTXDB = this.cleanPTXDB.bind(this)
+    this.readFromStream = this.readFromStream.bind(this)
+    this.endStream = this.endStream.bind(this)
   }
 
   // Return a promise, which resolves to true when all txs have been collected
   // from the database and stored in this.keys array.
-  getAllTxs () {
+  getAllTxs (isTest = false) {
     return new Promise((resolve) => {
       const stream = this.pTxDb.createReadStream()
 
-      stream.on('data', function (data) {
-        // console.log(data.key, ' = ', data.value)
-        _this.keys.push(data.key)
-      })
+      stream.on('data', this.readFromStream)
 
-      stream.on('end', function () {
-        return resolve(true)
-      })
+      stream.on('end', this.endStream(resolve))
+
+      if (isTest) return resolve(true)
     })
+  }
+
+  readFromStream (data) {
+    this.keys.push(data.key)
+  }
+
+  endStream (resolve) {
+    return resolve(true)
   }
 
   // Remove entries in the DB that are old and not needed.
@@ -82,5 +92,4 @@ class ManagePTXDB {
   }
 }
 
-// module.exports = ManagePTXDB
 export default ManagePTXDB

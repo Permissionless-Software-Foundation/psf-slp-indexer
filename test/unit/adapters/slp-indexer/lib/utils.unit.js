@@ -3,16 +3,11 @@
 */
 
 // Global npm libraries
-// const assert = require('chai').assert
-// const sinon = require('sinon')
-// const cloneDeep = require('lodash.clonedeep')
 import { assert } from 'chai'
 import sinon from 'sinon'
 import cloneDeep from 'lodash.clonedeep'
 
 // local libraries
-// const IndexerUtils = require('../../../../../src/adapters/slp-indexer/lib/utils')
-// const mockDataLib = require('../../../mocks/utils-mock.js')
 import IndexerUtils from '../../../../../src/adapters/slp-indexer/lib/utils.js'
 import mockDataLib from '../../../mocks/utils-mock.js'
 
@@ -90,6 +85,8 @@ describe('#utils.js', () => {
     it('should catch and throw errors', () => {
       try {
         uut.removeUtxoFromArray()
+
+        assert.fail('Unexpected result')
       } catch (err) {
         // console.log(err)
         assert.include(err.message, 'Cannot read')
@@ -140,6 +137,17 @@ describe('#utils.js', () => {
       assert.equal(result.length, 1)
       assert.equal(result[0].qty, '10000')
     })
+
+    it('should catch and throw errors', () => {
+      try {
+        uut.subtractUtxoBalance()
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot read')
+      }
+    })
   })
 
   describe('#subtractBurnedTokens', () => {
@@ -152,6 +160,39 @@ describe('#utils.js', () => {
 
       assert.equal(result.tokensInCirculationStr, '10100')
       assert.equal(result.totalBurned, '9900')
+    })
+
+    it('should handle a mint baton', () => {
+      const utxoObj = mockData.balance01.utxos[0]
+      const tokenData = mockData.tokenData01
+
+      // Force mint baton
+      utxoObj.type = 'baton'
+
+      const result = uut.subtractBurnedTokens(utxoObj, tokenData)
+      // console.log('result: ', result)
+
+      assert.equal(result.mintBatonIsActive, false)
+    })
+
+    it('should catch and throw errors', () => {
+      try {
+        uut.subtractBurnedTokens()
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+  })
+
+  describe('#sleep', () => {
+    it('should sleep for 1 ms', async () => {
+      await uut.sleep(1)
+
+      // Resolving without an error is a pass.
+      assert.isOk(true)
     })
   })
 })
