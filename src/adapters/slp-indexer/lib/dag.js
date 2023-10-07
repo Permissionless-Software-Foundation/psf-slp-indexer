@@ -31,8 +31,9 @@ class DAG {
         throw new Error('tokenId required to crawl DAG')
       }
 
-      // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       // console.log(`crawling TXID ${txid}, endFound: ${endFound}`)
+      // console.log(`tokenId: ${tokenId}`)
+      // console.log('txidAry: ', txidAry)
 
       // Set default value for the output object.
       const outObj = {
@@ -170,19 +171,13 @@ class DAG {
 
           //
         } else if (parentTx.txid === tokenId) {
-          // Handle corner case with NFTs. 3/11/22 CT
-          // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+          // Handle corner case with NFTs. This is when the Genesis TX does
+          // not originate from a Group (Type 128) token.
           const isNFT = parentTx.tokenType !== 1
           const groupTokenOnVin0 = parentTx.vin[0].tokenQty > 0
           if (isNFT && !groupTokenOnVin0) {
-            // Dev note 10/6/23: This code path was created to handle a corner case,
-            // but it may no longer be necessary. This code is in place to detect
-            // the corner case and create mock data for unit tests. If this code
-            // path is no longer needed, it will be removed.
-            console.log('isNFT: ', isNFT)
-            console.log('groupTokenOnVin0: ', groupTokenOnVin0)
-            console.log('2 Stopping indexer to gather test data.')
-            process.exit(0)
+            // Corner case expressed in this transaction:
+            // TXID: 6d68a7ffbb63ef851c43025f801a1d365cddda50b00741bca022c743d74cd61a
 
             endFound = true
             outObj.isValid = false
