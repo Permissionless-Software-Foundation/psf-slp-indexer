@@ -146,8 +146,8 @@ class FilterBlock {
             // but it may no longer be necessary. This code is in place to detect
             // the corner case and create mock data for unit tests. If this code
             // path is no longer needed, it will be removed.
-            console.log('Exiting to capture test data.')
-            process.exit(0)
+            // console.log('Exiting to capture test data.')
+            // process.exit(0)
           }
         }
       }
