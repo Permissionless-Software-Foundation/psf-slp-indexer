@@ -68,8 +68,8 @@ class DAG {
           // but it may no longer be necessary. This code is in place to detect
           // the corner case and create mock data for unit tests. If this code
           // path is no longer needed, it will be removed.
-          console.log('4 Stopping indexer to gather test data.')
-          process.exit(0)
+          // console.log('4 Stopping indexer to gather test data.')
+          // process.exit(0)
         }
       }
 
@@ -149,9 +149,9 @@ class DAG {
           // but it may no longer be necessary. This code is in place to detect
           // the corner case and create mock data for unit tests. If this code
           // path is no longer needed, it will be removed.
-          console.log('parentTx: ', parentTx)
-          console.log('1 Stopping indexer to gather test data.')
-          process.exit(0)
+          // console.log('parentTx: ', parentTx)
+          // console.log('1 Stopping indexer to gather test data.')
+          // process.exit(0)
 
           endFound = false
           outObj.dag = txidAry
@@ -215,8 +215,8 @@ class DAG {
             // but it may no longer be necessary. This code is in place to detect
             // the corner case and create mock data for unit tests. If this code
             // path is no longer needed, it will be removed.
-            console.log('3 Stopping indexer to gather test data.')
-            process.exit(0)
+            // console.log('3 Stopping indexer to gather test data.')
+            // process.exit(0)
 
             endFound = true
             outObj.isValid = true
