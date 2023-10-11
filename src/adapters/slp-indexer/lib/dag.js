@@ -68,8 +68,13 @@ class DAG {
           // but it may no longer be necessary. This code is in place to detect
           // the corner case and create mock data for unit tests. If this code
           // path is no longer needed, it will be removed.
-          console.log('4 Stopping indexer to gather test data.')
-          process.exit(0)
+          // console.log('4 Stopping indexer to gather test data.')
+          // process.exit(0)
+
+          // Dev Note: 10/11/23: This block was actuated naturally in block 727321.
+          // It seems to be triggered by a lot of zero-conf chained transactions,
+          // where its trying to find the proper DAG to follow within the current
+          // block.
         }
       }
 
