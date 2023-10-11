@@ -75,6 +75,10 @@ class DAG {
           // It seems to be triggered by a lot of zero-conf chained transactions,
           // where its trying to find the proper DAG to follow within the current
           // block.
+          // This code block is triggered when a UTXO can not be
+          // found in the database. The indexer moves on to the next SLP TX
+          // that needs to be validated. Depending on the order within a block,
+          // and the number of zero-conf txs, it can trigger this block a lot.
         }
       }
 

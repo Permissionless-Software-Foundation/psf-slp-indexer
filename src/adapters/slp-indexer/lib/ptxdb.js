@@ -63,7 +63,7 @@ class ManagePTXDB {
         try {
           value = await this.pTxDb.get(thisKey)
         } catch (err) {
-          console.log(`Warning: Could not find ${thisKey} in pTxDb`)
+          // console.log(`Warning: Could not find ${thisKey} in pTxDb`)
 
           // Skip if value can't be found.
           continue
