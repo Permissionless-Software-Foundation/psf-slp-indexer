@@ -25,7 +25,7 @@ class RetryQueue {
 
     // Note: Retry has exponential back-off, so 6-10 is the right number.
     this.attempts = 6
-    this.retryPeriod = 1000
+    this.retryPeriod = 3000
 
     // Bind 'this' object to all subfunctions
     this.addToQueue = this.addToQueue.bind(this)
