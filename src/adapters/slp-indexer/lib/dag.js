@@ -59,29 +59,6 @@ class DAG {
         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       }
 
-      if (txidAry.length > 50) {
-        if (txidAry.length % 10 === 0) {
-          // console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
-          console.log(`Large DAG detected: ${txidAry.length} txs`)
-
-          // Dev note 10/6/23: This code path was created to handle a corner case,
-          // but it may no longer be necessary. This code is in place to detect
-          // the corner case and create mock data for unit tests. If this code
-          // path is no longer needed, it will be removed.
-          // console.log('4 Stopping indexer to gather test data.')
-          // process.exit(0)
-
-          // Dev Note: 10/11/23: This block was actuated naturally in block 727321.
-          // It seems to be triggered by a lot of zero-conf chained transactions,
-          // where its trying to find the proper DAG to follow within the current
-          // block.
-          // This code block is triggered when a UTXO can not be
-          // found in the database. The indexer moves on to the next SLP TX
-          // that needs to be validated. Depending on the order within a block,
-          // and the number of zero-conf txs, it can trigger this block a lot.
-        }
-      }
-
       // If this is the genesis TX, then exit immediately.
       // This happens when evaluating the first send TX after a genesis TX.
       if (txid === tokenId) {
@@ -147,24 +124,6 @@ class DAG {
             outObj.dag = txidAry
             return outObj
           }
-
-          // }
-          // CT 12-21-21 - This was leading to false negatives in the Spice token.
-          // CT 01-02-22 - Adding additional constraint that several parents
-          // have already been considered. This is in hope that it will speed
-          // up validation, which became much slower after taking the code out.
-        } else if (parentTx.isValidSlp === false && txidAry.length > 30) {
-          // Dev note 10/6/23: This code path was created to handle a corner case,
-          // but it may no longer be necessary. This code is in place to detect
-          // the corner case and create mock data for unit tests. If this code
-          // path is no longer needed, it will be removed.
-          console.log('parentTx: ', parentTx)
-          console.log('1 Stopping indexer to gather test data.')
-          process.exit(0)
-
-          endFound = false
-          outObj.dag = txidAry
-          return outObj
         }
 
         // Phase 2c: Evaluate un-cached, un-evaluated parent
@@ -212,26 +171,6 @@ class DAG {
           // console.log(`--->txData.isValidSlp: ${txData.isValidSlp}`)
           // console.log(`parentTx.txid: ${parentTx.txid}`)
           // console.log(`--->parentTx.isValidSlp ${parentTx.isValidSlp}`)
-
-          // If the DAG grows beyond a certain cut-off point, and it hasn't been
-          // invalidated prior to that point, then assume it's valid. This reduces
-          // excessive computing from really large DAGs.
-          const DAG_CUTOFF = 300
-          if (parentTx.isSlpTx && txidAry.length > DAG_CUTOFF && parentTx.isValidSlp) {
-            console.log(`-->Large DAG cut-off at ${DAG_CUTOFF} transactions. Assumed valid.`)
-
-            // Dev note 10/6/23: This code path was created to handle a corner case,
-            // but it may no longer be necessary. This code is in place to detect
-            // the corner case and create mock data for unit tests. If this code
-            // path is no longer needed, it will be removed.
-            console.log('3 Stopping indexer to gather test data.')
-            process.exit(0)
-
-            endFound = true
-            outObj.isValid = true
-            outObj.dag = txidAry
-            return outObj
-          }
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
