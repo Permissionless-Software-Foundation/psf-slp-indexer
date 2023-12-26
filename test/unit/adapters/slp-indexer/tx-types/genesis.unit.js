@@ -20,8 +20,9 @@ describe('#genesis.js', () => {
     const addrDb = new MockLevel()
     const tokenDb = new MockLevel()
     const utxoDb = new MockLevel()
+    const statusDb = new MockLevel()
 
-    uut = new Genesis({ addrDb, tokenDb, utxoDb })
+    uut = new Genesis({ addrDb, tokenDb, utxoDb, statusDb })
 
     mockData = cloneDeep(mockDataLib)
 
@@ -63,6 +64,20 @@ describe('#genesis.js', () => {
         assert.fail('Unexpected code path')
       } catch (err) {
         assert.equal(err.message, 'Instance of utxo DB required when instantiating genesis.js')
+      }
+    })
+
+    it('should throw error if status DB is not passed in', () => {
+      try {
+        const addrDb = new MockLevel()
+        const tokenDb = new MockLevel()
+        const utxoDb = new MockLevel()
+
+        uut = new Genesis({ addrDb, tokenDb, utxoDb })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.equal(err.message, 'Instance of status DB required when instantiating genesis.js')
       }
     })
   })

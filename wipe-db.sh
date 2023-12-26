@@ -7,3 +7,4 @@ rm -r leveldb/current/txs
 rm -r leveldb/backup
 rm -r leveldb/current/ptxs
 rm -r leveldb/current/utxos
+rm -f leveldb/current/claims

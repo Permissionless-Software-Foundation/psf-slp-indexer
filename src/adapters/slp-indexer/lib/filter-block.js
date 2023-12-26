@@ -495,89 +495,91 @@ class FilterBlock {
       // Filter out all the non-SLP transactions.
       let { slpTxs, nonSlpTxs } = await this.filterSlpTxs(txids)
       console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
-      // console.log('nonSlpTxs: ', nonSlpTxs.length)
+      console.log(`filterAndSortSlpTxs2() a non-slp txs: ${nonSlpTxs.length}`)
       // console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
 
       // No SLP txids in the array? Exit.
-      if (!slpTxs.length) return []
+      // if (!slpTxs.length) return []
 
       let sortedTxids = []
       const independentTxids = []
       // let i = 0
 
-      // Loop while there are entries in the slpTxs array. This loop will remove
-      // entries from the array until it's empty.
-      do {
-        // const txid = slpTxs[0]
-        const txid = slpTxs.shift()
-        // console.log(`start loop slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-        // console.log(`i: ${i}, txid: ${txid}`)
-        // i++
+      if (slpTxs.length) {
+        // Loop while there are entries in the slpTxs array. This loop will remove
+        // entries from the array until it's empty.
+        do {
+          // const txid = slpTxs[0]
+          const txid = slpTxs.shift()
+          // console.log(`start loop slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+          // console.log(`i: ${i}, txid: ${txid}`)
+          // i++
 
-        // Check if TX is part of a backwards DAG
-        const { hasParent, dag: backDag } = await this.checkForParent2(
-          txid,
-          blockHeight
-        )
-        // console.log(`hasParent: ${hasParent}`)
-        // console.log(`backDag: ${JSON.stringify(backDag, null, 2)}`)
-        // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+          // Check if TX is part of a backwards DAG
+          const { hasParent, dag: backDag } = await this.checkForParent2(
+            txid,
+            blockHeight
+          )
+          // console.log(`hasParent: ${hasParent}`)
+          // console.log(`backDag: ${JSON.stringify(backDag, null, 2)}`)
+          // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
 
-        let sortedArray = backDag
-        let hasChild = false
+          let sortedArray = backDag
+          let hasChild = false
 
-        // Check if TX is part of a forward DAG
-        if (slpTxs.length) {
-          const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
-          // console.log('success: ', success)
-          // console.log('chainedArray: ', chainedArray)
-          // const { success, chainedArray, unsortedArray } =
-          //   await this.forwardDag(backDag, slpTxs)
+          // Check if TX is part of a forward DAG
+          if (slpTxs.length) {
+            const { success, chainedArray } = await this.forwardDag(backDag, slpTxs)
+            // console.log('success: ', success)
+            // console.log('chainedArray: ', chainedArray)
+            // const { success, chainedArray, unsortedArray } =
+            //   await this.forwardDag(backDag, slpTxs)
 
-          sortedArray = chainedArray
-          hasChild = success
+            sortedArray = chainedArray
+            hasChild = success
 
-          // console.log(`hasChild: ${hasChild}`)
-          // console.log(`chainedArray: ${JSON.stringify(chainedArray, null, 2)}`)
+            // console.log(`hasChild: ${hasChild}`)
+            // console.log(`chainedArray: ${JSON.stringify(chainedArray, null, 2)}`)
+            // console.log(
+            //   `unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`
+            // )
+          }
+
+          // If TX does not have a backward or forward DAG in the block, then it
+          // is truely independent.
+          if (!hasParent && !hasChild) {
+            independentTxids.push(txid)
+            continue
+          }
+
+          // If the current TXID has a parent or a child, then the chainedArray
+          // will have a list of sorted TXIDs.
+          if (hasParent || hasChild) {
+            // Add the chained Array to the sortedTxids array.
+            sortedTxids = sortedTxids.concat(sortedArray)
+
+            // Remove duplicate entries from the sortedTxid array.
+            // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
+            sortedTxids = [...new Set(sortedTxids)]
+          }
+
+          // Ensure that any txids in sortedTxids or independentTxids are
+          // removed from the slpTxs array, before continuing the loop.
+          for (let j = 0; j < sortedTxids.length; j++) {
+            slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
+            // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+          }
+          // Dev Note: CT 10/04/23 I don't think this code paragraph is ever executed.
+          for (let j = 0; j < independentTxids.length; j++) {
+            slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
+            // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+          }
+
           // console.log(
-          //   `unsortedArray: ${JSON.stringify(unsortedArray, null, 2)}`
+          //   `slpTxs after removing elems: ${JSON.stringify(slpTxs, null, 2)}`
           // )
-        }
-
-        // If TX does not have a backward or forward DAG in the block, then it
-        // is truely independent.
-        if (!hasParent && !hasChild) {
-          independentTxids.push(txid)
-          continue
-        }
-
-        // If the current TXID has a parent or a child, then the chainedArray
-        // will have a list of sorted TXIDs.
-        if (hasParent || hasChild) {
-          // Add the chained Array to the sortedTxids array.
-          sortedTxids = sortedTxids.concat(sortedArray)
-
-          // Remove duplicate entries from the sortedTxid array.
-          // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
-          sortedTxids = [...new Set(sortedTxids)]
-        }
-
-        // Ensure that any txids in independentTxids or independentTxids are
-        // removed from the slpTxs array, before continuing the loop.
-        for (let j = 0; j < sortedTxids.length; j++) {
-          slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
-          // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-        }
-        // Dev Note: CT 10/04/23 I don't think this code paragraph is ever executed.
-        for (let j = 0; j < independentTxids.length; j++) {
-          slpTxs = slpTxs.filter((x) => x !== sortedTxids[j])
-          // console.log(`filter ${j} slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
-        }
-
-        // console.log(
-        //   `slpTxs after removing elems: ${JSON.stringify(slpTxs, null, 2)}`
-        // )
-      } while (slpTxs.length)
+        } while (slpTxs.length)
+      }
 
       // The slpTxs array is empty. Each entry has landed in one of the two
       // arrays below.

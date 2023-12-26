@@ -52,4 +52,7 @@ mkdir leveldb/backup
 mkdir leveldb/zips
 cp restore-auto.sh leveldb/zips/
 
+# SSP-API
+export SSP_API_URL=http://172.17.0.1:5020
+
 npm start

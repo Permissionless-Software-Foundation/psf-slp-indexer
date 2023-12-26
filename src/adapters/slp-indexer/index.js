@@ -62,7 +62,7 @@ class SlpIndexer {
   openDatabases () {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, claimDb } =
       this.levelDb.openDbs()
     this.addrDb = addrDb
     this.tokenDb = tokenDb
@@ -70,13 +70,14 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.pTxDb = pTxDb
     this.utxoDb = utxoDb
+    this.claimDb = claimDb
 
     return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
   }
 
   // Instantiate all dependency libraries and encapsulate them into the 'this' object.
   encapsulateDeps (localConfig = {}) {
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = localConfig
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, claimDb } = localConfig
 
     // Encapsulate dependencies
     this.rpc = new RPC()
@@ -86,7 +87,8 @@ class SlpIndexer {
       txDb,
       statusDb,
       pTxDb,
-      utxoDb
+      utxoDb,
+      claimDb
     })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
@@ -98,7 +100,7 @@ class SlpIndexer {
       utxoDb,
       txDb
     })
-    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb })
+    this.genesis = new Genesis({ addrDb, tokenDb, utxoDb, statusDb })
     this.nftGenesis = new NftGenesis({
       addrDb,
       tokenDb,
@@ -180,8 +182,8 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 769587)
-      // } while (blockHeight < 739707)
+      // } while (blockHeight < 774849)
+      // } while (blockHeight < 775501)
       // console.log('Target block height reached.')
       // process.exit(0)
 
@@ -217,7 +219,7 @@ class SlpIndexer {
 
       // Enter permanent loop, processing ZMQ input.
       do {
-        // TODO: add getBlockCounty to a auto-retry in case it fails.
+        // TODO: add getBlockCount to a auto-retry in case it fails.
         blockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
         // console.log('Current chain block height: ', blockHeight)
         // console.log(`status.syncedBlockHeight: ${status.syncedBlockHeight}`)
@@ -330,6 +332,7 @@ class SlpIndexer {
       const slpTxs = filteredTxs.combined
       const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      console.log('processBlock() nonSlpTxs: ', nonSlpTxs.length)
 
       // If the block has no txs after filtering for SLP txs, then skip processing.
       if (slpTxs && slpTxs.length) {
@@ -349,6 +352,37 @@ class SlpIndexer {
             console.log(
               `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
             )
+          }
+        }
+      }
+
+      // Check each of the non-SLP transaction to see if it matches the profile
+      // of a claim.
+      if (nonSlpTxs && nonSlpTxs.length) {
+        for (let i = 0; i < nonSlpTxs.length; i++) {
+          const thisTxid = nonSlpTxs[i]
+
+          // Check if this transaction is a Claim.
+          const isClaim = await this.transaction.isClaim(thisTxid)
+          if (isClaim) {
+            // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
+
+            // Get the current claim data for this token. Create it if it doesn't exist.
+            let tokenClaims = []
+            try {
+              tokenClaims = await this.claimDb.get(isClaim.about)
+            } catch (err) {
+              tokenClaims = []
+            }
+
+            // Skip this claim if it does not have an 'about' target.
+            if (!isClaim.about) continue
+
+            // Add the claim to the array of claims for this token.
+            tokenClaims.push(isClaim)
+
+            // Save the claim to the database.
+            await this.claimDb.put(isClaim.about, tokenClaims)
           }
         }
       }

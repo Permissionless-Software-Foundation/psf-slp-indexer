@@ -6,10 +6,13 @@
 
 // Public npm libraries.
 
-// Local libraries
+// Load the REST API Controllers.
+// const AuthRESTController = require('./auth')
+// const UserRouter = require('./users')
 import ContactRESTController from './contact/index.js'
 import LogsRESTController from './logs/index.js'
 import SlpRESTController from './slp/index.js'
+import SspRESTController from './ssp/index.js'
 
 class RESTControllers {
   constructor (localConfig = {}) {
@@ -46,6 +49,9 @@ class RESTControllers {
 
     const slpRESTController = new SlpRESTController(dependencies)
     slpRESTController.attach(app)
+
+    const sspRESTController = new SspRESTController(dependencies)
+    sspRESTController.attach(app)
 
     return true
   }

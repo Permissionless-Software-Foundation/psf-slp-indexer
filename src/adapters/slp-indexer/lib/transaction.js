@@ -10,10 +10,16 @@
 // Public npm libraries
 import BigNumber from 'bignumber.js'
 import slpParser from 'slp-parser'
+import BCHJS from '@psf/bch-js'
+import axios from 'axios'
 
 // Local libraries
 import RPC from './rpc.js'
 import RetryQueue from './retry-queue.js'
+import config from '../../../../config/index.js'
+
+// Global pointer to instance of this class
+let _this
 
 class Transaction {
   constructor (localConfig = {}) {
@@ -21,6 +27,9 @@ class Transaction {
     this.rpc = new RPC()
     this.slpParser = slpParser
     this.queue = new RetryQueue()
+    this.bchjs = new BCHJS()
+    this.axios = axios
+    this.config = config
 
     // State
     this.tokenCache = {}
@@ -916,6 +925,95 @@ class Transaction {
     } catch (err) {
       console.error('Error in getTxWithRetry()')
       throw err
+    }
+  }
+
+  // Checks to see if a TX is a claim as per PS006.
+  async isClaim (txid) {
+    try {
+      // Validate the txid input.
+      if (!txid || txid === '' || typeof txid !== 'string') {
+        throw new Error('txid string must be included.')
+      }
+
+      // Return results if they've been cached.
+      const cachedVal = _this.tokenCache[txid]
+      if (cachedVal) return cachedVal
+
+      const txDetails = await this.getTxWithRetry(txid)
+      // console.log('txDetails: ', txDetails)
+
+      // SLP spec expects OP_RETURN to be the first output of the transaction.
+      const opReturn = txDetails.vout[0].scriptPubKey.hex
+      // console.log(`txid ${txid}, opReturn hex: ${opReturn}`)
+
+      const firstFourBytes = opReturn.slice(0, 12)
+      // console.log(`opReturn firstFourBytes: ${firstFourBytes}`)
+
+      // If the HEX of the OP_RETURN matches the signature of a claim.
+      if (firstFourBytes.includes('6a0400504d00')) {
+        // console.log('---->PING<-----')
+
+        // Decode the hex into normal text.
+        const script = this.bchjs.Script.toASM(
+          Buffer.from(opReturn, 'hex')
+        ).split(' ')
+        console.log(`script: ${JSON.stringify(script, null, 2)}`)
+
+        // Convert the type to a number
+        let type = Buffer.from(script[2]).toString()
+        console.log('type: ', type)
+        type = parseInt(type, 16)
+        console.log('type number: ', type)
+
+        // Catch corner-case of older, ill-formed claim transactions.
+        if (type > 200) return false
+
+        const about = Buffer.from(script[3], 'hex').toString()
+        // console.log(`about: ${store.toString()}`)
+
+        const content = Buffer.from(script[4], 'hex').toString()
+        // console.log(`content: ${content.toString()}`)
+
+        console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
+
+        const retObj = {
+          txid,
+          type,
+          about,
+          content
+        }
+        console.log(`Claim found: ${JSON.stringify(retObj, null, 2)}`)
+
+        // Make a webhook call to ssp-api to tell it a new claim has been found.
+        try {
+          this.webhookNewClaim(retObj)
+        } catch (err) {}
+
+        // Return the decoded claim data.
+        return retObj
+      }
+
+      // No claim found, return false.
+      return false
+    } catch (err) {
+      console.error('Error in transaction.js/isClaim()')
+      throw err
+    }
+  }
+
+  // Generate a webhook to pass new claim data to the ssp-api.
+  async webhookNewClaim (claim) {
+    try {
+      const url = `${this.config.sspUrl}/webhook/claim`
+
+      await this.axios.post(url, claim)
+
+      return true
+    } catch (err) {
+      console.error('Error in transaction.webhookNewClaim(): ', err)
+      // throw err
+      console.log('Skipping error and continuing processing. Check ssp-api')
     }
   }
 }

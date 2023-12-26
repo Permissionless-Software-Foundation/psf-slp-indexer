@@ -2,11 +2,13 @@
   A class library for processing Genesis SLP transactions
 */
 
-// const IndexerUtils = require('../lib/utils')
-// const BigNumber = require('bignumber.js')
-
-import IndexerUtils from '../lib/utils.js'
+// Global npm libraries
 import BigNumber from 'bignumber.js'
+import axios from 'axios'
+
+// Local libraries
+import IndexerUtils from '../lib/utils.js'
+import config from '../../../../config/index.js'
 
 class Genesis {
   constructor (localConfig = {}) {
@@ -29,9 +31,17 @@ class Genesis {
         'Instance of utxo DB required when instantiating genesis.js'
       )
     }
+    this.statusDb = localConfig.statusDb
+    if (!this.statusDb) {
+      throw new Error(
+        'Instance of status DB required when instantiating genesis.js'
+      )
+    }
 
     // Encapsulate dependencies
     this.util = new IndexerUtils()
+    this.axios = axios
+    this.config = config
   }
 
   // Primary function. Processes GENESIS transaction.
@@ -99,6 +109,28 @@ class Genesis {
       // Add NFT array for Group tokens
       if (slpData.tokenType === 129) {
         token.nfts = []
+
+        // Detect if this token is a potential PS006 simple-store-protocol store
+        token.isSsp = false
+        if (slpData.ticker.includes('SSP')) {
+          token.isSsp = true
+
+          // Get the list of known SSP tokens from the status DB. Create it if
+          // it doesn't exist.
+          let sspList = []
+          try {
+            sspList = await this.statusDb.get('sspList')
+          } catch (err) {
+            sspList = []
+          }
+
+          // Add the token to the list
+          sspList.push(slpData.tokenId)
+          await this.statusDb.put('sspList', sspList)
+
+          // Generate webhook to the ssp-api
+          await this.webhookNewToken(token)
+        }
       }
 
       console.log(`token Genesis: ${JSON.stringify(token, null, 2)}`)
@@ -110,6 +142,19 @@ class Genesis {
     } catch (err) {
       console.error('Error in genesis.addTokenToDB()')
       throw err
+    }
+  }
+
+  // Generate a webhook to pass new SSP token data to the ssp-api.
+  async webhookNewToken (token) {
+    try {
+      const url = `${this.config.sspUrl}/webhook/token`
+
+      await this.axios.post(url, token)
+    } catch (err) {
+      console.error('Error in genesis.webhookNewToken(): ', err)
+      console.log('skipping error and continuing processing. Check ssp-api.')
+      // throw err
     }
   }
 
