@@ -2,8 +2,11 @@
   top-level IPFS library that combines the individual IPFS-based libraries.
 */
 
-const IpfsAdapter = require('./ipfs')
-const IpfsCoordAdapter = require('./ipfs-coord')
+// Local libraries
+import IpfsAdapter from './ipfs.js'
+
+import IpfsCoordAdapter from './ipfs-coord.js'
+import config from '../../../config/index.js'
 
 class IPFS {
   constructor (localConfig = {}) {
@@ -11,6 +14,7 @@ class IPFS {
     this.ipfsAdapter = new IpfsAdapter()
     this.IpfsCoordAdapter = IpfsCoordAdapter
     this.process = process
+    this.config = config
 
     this.ipfsCoordAdapter = {} // placeholder
 
@@ -31,10 +35,15 @@ class IPFS {
 
       // Start ipfs-coord
       this.ipfsCoordAdapter = new this.IpfsCoordAdapter({
-        ipfs: this.ipfs
+        ipfs: this.ipfs,
+        tcpPort: this.config.ipfsTcpPort,
+        wsPort: this.config.ipfsWsPort
       })
       await this.ipfsCoordAdapter.start()
       console.log('ipfs-coord is ready.')
+
+      // Subscribe to the chat pubsub channel
+      await this.ipfsCoordAdapter.subscribeToChat()
 
       return true
     } catch (err) {
@@ -51,4 +60,4 @@ class IPFS {
   }
 }
 
-module.exports = IPFS
+export default IPFS

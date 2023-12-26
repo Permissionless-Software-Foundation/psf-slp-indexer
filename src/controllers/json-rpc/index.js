@@ -3,13 +3,12 @@
 */
 
 // Public npm libraries
-const jsonrpc = require('jsonrpc-lite')
+import jsonrpc from 'jsonrpc-lite'
 
 // Local support libraries
-const { wlogger } = require('../../adapters/wlogger')
-const UserController = require('./users')
-const AuthController = require('./auth')
-const AboutController = require('./about')
+import wlogger from '../../adapters/wlogger.js'
+
+import AboutController from './about/index.js'
 
 let _this
 
@@ -32,8 +31,6 @@ class JSONRPC {
     // Encapsulate dependencies
     this.ipfsCoord = this.adapters.ipfs.ipfsCoordAdapter.ipfsCoord
     this.jsonrpc = jsonrpc
-    this.userController = new UserController(localConfig)
-    this.authController = new AuthController(localConfig)
     this.aboutController = new AboutController()
 
     // Cache to store IDs of processed JSON RPC commands. Used to prevent
@@ -101,12 +98,12 @@ class JSONRPC {
 
       // Route the command to the appropriate route handler.
       switch (parsedData.payload.method) {
-        case 'users':
-          retObj = await _this.userController.userRouter(parsedData)
-          break
-        case 'auth':
-          retObj = await _this.authController.authRouter(parsedData)
-          break
+        // case 'users':
+        //   retObj = await _this.userController.userRouter(parsedData)
+        //   break
+        // case 'auth':
+        //   retObj = await _this.authController.authRouter(parsedData)
+        //   break
         case 'about':
           retObj = await _this.aboutController.aboutRouter(parsedData)
       }
@@ -190,4 +187,4 @@ class JSONRPC {
   }
 }
 
-module.exports = JSONRPC
+export default JSONRPC

@@ -3,14 +3,22 @@
 */
 
 // Public NPM libraries
-const mongoose = require('mongoose')
-const axios = require('axios').default
+import mongoose from 'mongoose'
+import axios from 'axios'
 
 // Local libraries
-const config = require('../../config')
-const User = require('../../src/adapters/localdb/models/users')
+import config from '../../config/index.js'
+import User from '../../src/adapters/localdb/models/users.js'
+import JsonFiles from '../../src/adapters/json-files.js'
+
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+
+const jsonFiles = new JsonFiles()
 
 const LOCALHOST = `http://localhost:${config.port}`
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 // Remove all collections from the DB.
 async function cleanDb () {
@@ -110,9 +118,11 @@ async function loginTestUser () {
 
 async function loginAdminUser () {
   try {
-    const FILENAME = `../../config/system-user-${config.env}.json`
-    const adminUserData = require(FILENAME)
-    console.log(`adminUserData: ${JSON.stringify(adminUserData, null, 2)}`)
+    const FILENAME = `${__dirname.toString()}../../config/system-user-${config.env}.json`
+    // console.log('FILENAME: ', FILENAME)
+
+    const adminUserData = await jsonFiles.readJSON(FILENAME)
+    // console.log(`adminUserData: ${JSON.stringify(adminUserData, null, 2)}`)
 
     const options = {
       method: 'POST',
@@ -149,8 +159,9 @@ async function getAdminJWT () {
     // process.env.KOA_ENV = process.env.KOA_ENV || 'dev'
     // console.log(`env: ${process.env.KOA_ENV}`)
 
-    const FILENAME = `../../config/system-user-${config.env}.json`
-    const adminUserData = require(FILENAME)
+    const FILENAME = `${__dirname.toString()}../../config/system-user-${config.env}.json`
+    // console.log('FILENAME: ', FILENAME)
+    const adminUserData = await jsonFiles.readJSON(FILENAME)
     // console.log(`adminUserData: ${JSON.stringify(adminUserData, null, 2)}`)
 
     return adminUserData.token
@@ -160,7 +171,7 @@ async function getAdminJWT () {
   }
 }
 
-module.exports = {
+export default {
   cleanDb,
   createUser,
   loginTestUser,

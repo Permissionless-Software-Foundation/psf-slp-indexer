@@ -4,7 +4,8 @@
 */
 
 // Local libraries
-const Transaction = require('./transaction')
+// const Transaction = require('./transaction'
+import Transaction from './transaction.js'
 
 class Cache {
   constructor (localConfig = {}) {
@@ -80,4 +81,5 @@ class Cache {
   }
 }
 
-module.exports = Cache
+// module.exports = Cache
+export default Cache

@@ -2,7 +2,7 @@
   Mock data for nft-genesis.unit.js
 */
 
-const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 const nftGenesisTx01 = {
   txid: '91884ea8e320ac9d133c09cfed84c1d7c063f07f5f2370d018f41018dc68a3e6',
@@ -309,7 +309,7 @@ const slpData01 = {
   qty: '1'
 }
 
-module.exports = {
+export default {
   nftGenesisTx01,
   groupTx01,
   addrData01,

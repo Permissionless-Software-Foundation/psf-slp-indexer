@@ -3,7 +3,8 @@
 */
 
 // local libraries
-const config = require('../../../../config')
+// const config = require('../../../../config')
+import config from '../../../../config/index.js'
 
 class Blacklist {
   constructor () {
@@ -38,4 +39,5 @@ class Blacklist {
   }
 }
 
-module.exports = Blacklist
+// module.exports = Blacklist
+export default Blacklist

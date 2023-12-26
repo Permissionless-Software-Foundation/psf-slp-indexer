@@ -4,7 +4,7 @@
 /* eslint no-useless-catch: 0 */
 
 // Local libraries
-const RateLimitLib = require('koa2-ratelimit').RateLimit
+import { RateLimit as RateLimitLib } from 'koa2-ratelimit'
 
 class RateLimit {
   constructor (options) {
@@ -80,4 +80,4 @@ class RateLimit {
   }
 }
 
-module.exports = RateLimit
+export default RateLimit

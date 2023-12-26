@@ -9,11 +9,14 @@
 */
 
 // Public npm libraries
-const BigNumber = require('bignumber.js')
+// const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const IndexerUtils = require('../lib/utils')
-const DAG = require('../lib/dag')
+// const IndexerUtils = require('../lib/utils')
+// const DAG = require('../lib/dag')
+import IndexerUtils from '../lib/utils.js'
+import DAG from '../lib/dag.js'
 
 class Mint {
   constructor (localConfig = {}) {
@@ -75,7 +78,7 @@ class Mint {
         data.txData.isValidSlp = false
         await this.txDb.put(data.txData.txid, data.txData)
 
-        return
+        return false
       }
 
       console.log('isValid: ', isValid)
@@ -90,7 +93,7 @@ class Mint {
         data.txData.isValidSlp = false
         await this.txDb.put(data.txData.txid, data.txData)
 
-        return
+        return false
       }
 
       // Remove the minting baton from the input address.
@@ -279,7 +282,6 @@ class Mint {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -384,7 +386,6 @@ class Mint {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -410,9 +411,11 @@ class Mint {
         address: recvrAddr,
         effectiveQty,
         decimals,
-        value
+        value,
+        tokenTicker: txData.tokenTicker,
+        tokenName: txData.tokenName
       }
-      console.log(`mint utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`mint.js/addTokensFromOutput() mint utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       addr.utxos.push(utxo)
       // this.util.addWithoutDuplicate(utxo, addr.utxos)
@@ -443,4 +446,5 @@ class Mint {
   }
 }
 
-module.exports = Mint
+// module.exports = Mint
+export default Mint

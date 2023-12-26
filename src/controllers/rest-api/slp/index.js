@@ -3,11 +3,10 @@
 */
 
 // Public npm libraries.
-const Router = require('koa-router')
+import Router from 'koa-router'
 
 // Local libraries.
-const SlpRESTControllerLib = require('./controller')
-const Validators = require('../middleware/validators')
+import SlpRESTControllerLib from './controller.js'
 
 // let _this
 
@@ -34,7 +33,7 @@ class SlpRouter {
 
     // Encapsulate dependencies.
     this.slpRESTController = new SlpRESTControllerLib(dependencies)
-    this.validators = new Validators()
+    // this.validators = new Validators()
 
     // Instantiate the router and set the base route.
     const baseUrl = '/slp'
@@ -62,4 +61,5 @@ class SlpRouter {
   }
 }
 
-module.exports = SlpRouter
+// module.exports = SlpRouter
+export default SlpRouter

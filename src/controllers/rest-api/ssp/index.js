@@ -3,11 +3,11 @@
 */
 
 // Public npm libraries.
-const Router = require('koa-router')
+import Router from 'koa-router'
 
 // Local libraries.
-const SspRESTControllerLib = require('./controller')
-const Validators = require('../middleware/validators')
+import SspRESTControllerLib from './controller.js'
+// import Validators from '../middleware/validators'
 
 // let _this
 
@@ -34,7 +34,7 @@ class SspRouter {
 
     // Encapsulate dependencies.
     this.sspRESTController = new SspRESTControllerLib(dependencies)
-    this.validators = new Validators()
+    // this.validators = new Validators()
 
     // Instantiate the router and set the base route.
     const baseUrl = '/ssp'
@@ -63,4 +63,5 @@ class SspRouter {
   }
 }
 
-module.exports = SspRouter
+// module.exports = SspRouter
+export default SspRouter

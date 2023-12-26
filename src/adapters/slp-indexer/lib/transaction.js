@@ -8,15 +8,15 @@
 */
 
 // Public npm libraries
-const BigNumber = require('bignumber.js')
-const slpParser = require('slp-parser')
-const BCHJS = require('@psf/bch-js')
-const axios = require('axios')
+import BigNumber from 'bignumber.js'
+import slpParser from 'slp-parser'
+import BCHJS from '@psf/bch-js'
+import axios from 'axios'
 
 // Local libraries
-const RPC = require('./rpc')
-const RetryQueue = require('./retry-queue')
-const config = require('../../../../config')
+import RPC from './rpc.js'
+import RetryQueue from './retry-queue.js'
+import config from '../../../../config/index.js'
 
 // Global pointer to instance of this class
 let _this
@@ -37,7 +37,15 @@ class Transaction {
     this.txCache = {}
     this.txCacheCnt = 0
 
-    _this = this
+    // Bing 'this' object to all subfunctions
+    this.get = this.get.bind(this)
+    this.getNftTx = this.getNftTx.bind(this)
+    this.getTx01 = this.getTx01.bind(this)
+    this.getTokenInfo = this.getTokenInfo.bind(this)
+    this.decodeOpReturn = this.decodeOpReturn.bind(this)
+    this.getTxData = this.getTxData.bind(this)
+    this._getInputAddrs = this._getInputAddrs.bind(this)
+    this.getTxWithRetry = this.getTxWithRetry.bind(this)
   }
 
   /**
@@ -126,7 +134,7 @@ class Transaction {
       if (txDetails.tokenType === 1 || txDetails.tokenType === 129) {
         finalTxDetails = await this.getTx01(txDetails, txTokenData)
       } else if (txDetails.tokenType === 65) {
-        finalTxDetails = this.getNftTx(txDetails, txTokenData)
+        finalTxDetails = await this.getNftTx(txDetails, txTokenData)
       }
 
       return finalTxDetails
@@ -137,8 +145,12 @@ class Transaction {
   }
 
   // Used for processing NFT (child) tokens.
+  // This function hydrates the input and output data of a transaction with
+  // SLP-related information.
+  // Note: It is not possible to 'mint' NFTs (type 65), only Group (type 128)
+  // can be minted.
   async getNftTx (txDetails, txTokenData) {
-    // console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
+    console.log(`Processing NFT (child) with txid ${txDetails.txid}`)
 
     // console.log(`txDetails: ${JSON.stringify(txDetails, null, 2)}`)
     // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
@@ -184,9 +196,9 @@ class Transaction {
         //   `thisVout ${i}: ${JSON.stringify(txDetails.vout[i], null, 2)}`
         // )
       } else if (
-        txTokenData.txType === 'GENESIS' ||
-        txTokenData.txType === 'MINT'
+        txTokenData.txType === 'GENESIS'
       ) {
+        // console.log('txTokenData.txType: ', txTokenData.txType)
         // console.log(
         //   `output txTokenData: ${JSON.stringify(txTokenData, null, 2)}`
         // )
@@ -205,7 +217,7 @@ class Transaction {
             thisVout.isMintBaton = true
           }
         } else if (i === 1) {
-          // Only vout[1] of a Genesis or Mint transaction represents the tokens.
+          // Only vout[1] of a Genesis transaction represents the tokens.
           // Any other outputs in that transaction are normal BCH UTXOs.
 
           tokenQty = txTokenData.qty
@@ -222,12 +234,8 @@ class Transaction {
           thisVout.tokenQtyStr = realQty
           thisVout.tokenQty = parseFloat(realQty)
           // console.log(`thisVout[${i}]: ${JSON.stringify(thisVout, null, 2)}`)
-        } else if (i === txTokenData.mintBatonVout) {
-          // Optional Mint baton
-          thisVout.tokenQtyStr = '0'
-          thisVout.tokenQty = 0
-          thisVout.isMintBaton = true
         } else {
+          // Normal BCH output
           thisVout.tokenQtyStr = '0'
           thisVout.tokenQty = 0
         }
@@ -282,16 +290,20 @@ class Transaction {
         let realQty = new BigNumber(tokenQty).dividedBy(
           10 ** parseInt(txDetails.tokenDecimals)
         )
-
-        if (isNaN(realQty)) realQty = 0
-
         realQty = realQty.toString()
         // realQty = parseFloat(realQty)
 
         thisVin.tokenQtyStr = realQty
         thisVin.tokenQty = parseFloat(realQty)
         thisVin.tokenId = vinTokenData.tokenId
+
+        //
       } else if (vinTokenData.txType === 'MINT') {
+        // This case is when the GROUP (129) token used to generate the NFT
+        // came from a MINT transaction to create a new GROUP token.
+        // Example TX: b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e
+        // Using Group Token ID: 112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be
+
         // console.log(
         //   `MINT vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
         // )
@@ -326,6 +338,8 @@ class Transaction {
           thisVin.tokenQty = 0
           thisVin.tokenId = null
         }
+
+        //
       } else if (vinTokenData.txType === 'GENESIS') {
         // console.log(
         //   `GENESIS vinTokenData ${i}: ${JSON.stringify(
@@ -354,13 +368,8 @@ class Transaction {
           thisVin.tokenQtyStr = realQty
           thisVin.tokenQty = parseFloat(realQty)
           thisVin.tokenId = vinTokenData.tokenId
-        } else if (thisVin.vout === vinTokenData.mintBatonVout) {
-          // Optional Mint baton
-          thisVin.tokenQtyStr = '0'
-          thisVin.tokenQty = 0
-          thisVin.tokenId = vinTokenData.tokenId
-          thisVin.isMintBaton = true
         } else {
+          // Normal BCH output
           thisVin.tokenQtyStr = '0'
           thisVin.tokenQty = 0
           thisVin.tokenId = null
@@ -369,6 +378,7 @@ class Transaction {
         console.log(
           `Unknown vinTokenData: ${JSON.stringify(vinTokenData, null, 2)}`
         )
+
         throw new Error('Unknown token type in input')
       }
     }
@@ -379,9 +389,12 @@ class Transaction {
   }
 
   // Used for processing 'normal' Type 1 tokens, as well as Group NFT tokens.
+  // This function hydrates the input and output data of a transaction with
+  // SLP-related information.
   async getTx01 (txDetails, txTokenData) {
     // console.log('Entering getTx01()')
-    // console.log(`txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+    // console.log(`getTx01() txTokenData: ${JSON.stringify(txTokenData, null, 2)}`)
+    // console.log(`getTx01() txDetails: ${JSON.stringify(txDetails, null, 2)}`)
 
     // Process TX Outputs
     // Add the token quantity to each output.
@@ -484,7 +497,7 @@ class Transaction {
       // console.log(`thisVin.txid: ${thisVin.txid}`)
       const vinTokenData = await this.getTokenInfo(thisVin.txid)
       // console.log(
-      //         `vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
+      //         `getTx01() vinTokenData ${i}: ${JSON.stringify(vinTokenData, null, 2)}`
       // )
 
       // Corner case: Ensure the token ID is the same.
@@ -689,10 +702,10 @@ class Transaction {
     }
 
     // Return results if they've been cached.
-    const cachedVal = _this.tokenCache[txid]
+    const cachedVal = this.tokenCache[txid]
     if (cachedVal) return cachedVal
 
-    // const txDetails = await _this.rpc.getRawTransaction(txid)
+    // const txDetails = await this.rpc.getRawTransaction(txid)
     // Auto-retry if call to full node fails.
     // const txDetails = await this.queue.addToQueue(
     //   this.rpc.getRawTransaction,
@@ -705,7 +718,7 @@ class Transaction {
     const opReturn = txDetails.vout[0].scriptPubKey.hex
     // console.log(`opReturn hex: ${opReturn}`)
 
-    const parsedData = _this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
+    const parsedData = this.slpParser.parseSLP(Buffer.from(opReturn, 'hex'))
     // console.log(`parsedData: ${JSON.stringify(parsedData, null, 2)}`)
 
     // Convert Buffer data to hex strings or utf8 strings.
@@ -742,16 +755,16 @@ class Transaction {
     }
     // console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
 
-    _this.tokenCache[txid] = tokenData
-    _this.tokenCacheCnt++
-    if (_this.tokenCacheCnt % 100 === 0) {
-      console.log(`decodeOpReturn cache has ${_this.tokenCacheCnt} cached txs`)
+    this.tokenCache[txid] = tokenData
+    this.tokenCacheCnt++
+    if (this.tokenCacheCnt % 100 === 0) {
+      console.log(`decodeOpReturn cache has ${this.tokenCacheCnt} cached txs`)
     }
 
     // Clear the token cache if it gets too big. Prevents memory leaks.
-    if (_this.tokenCacheCnt > 1000000) {
-      _this.tokenCache = {}
-      _this.tokenCacheCnt = 0
+    if (this.tokenCacheCnt > 1000000) {
+      this.tokenCache = {}
+      this.tokenCacheCnt = 0
     }
 
     return tokenData
@@ -822,7 +835,7 @@ class Transaction {
   // the address that generated that input UTXO.
   //
   // Assumes a single TX. Does not yet work with an array of TXs.
-  // This function returns an array of objects, each object if formated as follows:
+  // This function returns an array of objects, each object is formated as follows:
   // {
   //   vin: 0, // The position of the input for the given txid
   //   address: bitcoincash:qzhrpmu7nruyfcemeanqh5leuqcnf6zkjq4qm9nqh0
@@ -1005,4 +1018,5 @@ class Transaction {
   }
 }
 
-module.exports = Transaction
+// module.exports = Transaction
+export default Transaction

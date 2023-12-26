@@ -2,10 +2,14 @@
   Unit tests for rpc.js library
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+import { assert } from 'chai'
+import sinon from 'sinon'
 
-const RPC = require('../../../../../src/adapters/slp-indexer/lib/rpc')
+// const RPC = require('../../../../../src/adapters/slp-indexer/lib/rpc')
+import RPC from '../../../../../src/adapters/slp-indexer/lib/rpc.js'
+
 let uut
 let sandbox
 

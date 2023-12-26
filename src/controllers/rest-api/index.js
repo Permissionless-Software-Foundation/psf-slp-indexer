@@ -7,12 +7,12 @@
 // Public npm libraries.
 
 // Load the REST API Controllers.
-const AuthRESTController = require('./auth')
-const UserRouter = require('./users')
-const ContactRESTController = require('./contact')
-const LogsRESTController = require('./logs')
-const SlpRESTController = require('./slp')
-const SspRESTController = require('./ssp')
+// const AuthRESTController = require('./auth')
+// const UserRouter = require('./users')
+import ContactRESTController from './contact/index.js'
+import LogsRESTController from './logs/index.js'
+import SlpRESTController from './slp/index.js'
+import SspRESTController from './ssp/index.js'
 
 class RESTControllers {
   constructor (localConfig = {}) {
@@ -39,14 +39,6 @@ class RESTControllers {
       useCases: this.useCases
     }
 
-    // Attach the REST API Controllers associated with the /auth route
-    const authRESTController = new AuthRESTController(dependencies)
-    authRESTController.attach(app)
-
-    // Attach the REST API Controllers associated with the /user route
-    const userRouter = new UserRouter(dependencies)
-    userRouter.attach(app)
-
     // Attach the REST API Controllers associated with the /contact route
     const contactRESTController = new ContactRESTController(dependencies)
     contactRESTController.attach(app)
@@ -60,7 +52,9 @@ class RESTControllers {
 
     const sspRESTController = new SspRESTController(dependencies)
     sspRESTController.attach(app)
+
+    return true
   }
 }
 
-module.exports = RESTControllers
+export default RESTControllers

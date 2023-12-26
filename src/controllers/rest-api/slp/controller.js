@@ -3,12 +3,13 @@
 */
 
 // Local libraries
-const config = require('../../../../config')
+// const config = require('../../../../config')
+import config from '../../../../config/index.js'
 // const { wlogger } = require('../../../adapters/wlogger')
 
 let _this
 
-class UserRESTControllerLib {
+class SlpRESTControllerLib {
   constructor (localConfig = {}) {
     // Dependency Injection.
     this.adapters = localConfig.adapters
@@ -330,7 +331,7 @@ class UserRESTControllerLib {
         delete result.txs
       }
 
-      console.log(`result: ${JSON.stringify(result, null, 2)}`)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       ctx.body = {
         tokenData: result
@@ -348,7 +349,7 @@ class UserRESTControllerLib {
    * @apiDescription Get the indexer status
    *
    * @apiExample Example usage:
-   * curl -H "Content-Type: application/json" -X GET localhost:5001/slp/status
+   * curl -H "Content-Type: application/json" -X GET localhost:5020/slp/status
    *
    *
    * @apiSuccessExample {json} Success-Response:
@@ -403,4 +404,5 @@ class UserRESTControllerLib {
   }
 }
 
-module.exports = UserRESTControllerLib
+// module.exports = UserRESTControllerLib
+export default SlpRESTControllerLib

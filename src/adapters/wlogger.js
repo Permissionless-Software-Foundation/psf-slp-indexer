@@ -6,10 +6,17 @@
 
 'use strict'
 
-const winston = require('winston')
-require('winston-daily-rotate-file')
+// Global npm libraries
+import winston from 'winston'
+import 'winston-daily-rotate-file'
 
-const config = require('../../config')
+// Local libraries
+import config from '../../config/index.js'
+
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 class Wlogger {
   constructor (localConfig = {}) {
@@ -46,6 +53,10 @@ class Wlogger {
         this.transport
       ]
     })
+
+    // Bind 'this' object to all subfunctions.
+    this.notifyRotation = this.notifyRotation.bind(this)
+    this.outputToConsole = this.outputToConsole.bind(this)
   }
 
   notifyRotation (oldFilename, newFilename) {
@@ -69,4 +80,5 @@ logger.outputToConsole()
 
 const wlogger = logger.wlogger
 
-module.exports = { wlogger, Wlogger }
+export { wlogger as default, Wlogger }
+// export default wlogger

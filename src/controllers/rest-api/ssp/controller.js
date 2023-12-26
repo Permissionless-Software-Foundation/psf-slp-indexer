@@ -3,7 +3,7 @@
 */
 
 // Local libraries
-const config = require('../../../../config')
+import config from '../../../../config/index.js'
 // const { wlogger } = require('../../../adapters/wlogger')
 
 let _this
@@ -154,4 +154,5 @@ class SspRESTControllerLib {
   }
 }
 
-module.exports = SspRESTControllerLib
+// module.exports = SspRESTControllerLib
+export default SspRESTControllerLib

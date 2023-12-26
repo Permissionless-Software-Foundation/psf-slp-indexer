@@ -3,10 +3,10 @@
 */
 
 // Public npm libraries
-// const assert = require('chai').assert
-const sinon = require('sinon')
+import { assert } from 'chai'
+import sinon from 'sinon'
 
-const Controllers = require('../../../src/controllers')
+import Controllers from '../../../src/controllers/index.js'
 
 describe('#Controllers', () => {
   let uut
@@ -28,11 +28,48 @@ describe('#Controllers', () => {
         attachRPCRouter: () => {}
       }
 
+      // Mock the timer controllers
+      sandbox.stub(uut.timerControllers, 'startTimers').returns()
+
       const app = {
         use: () => {}
       }
 
       await uut.attachControllers(app)
+    })
+  })
+
+  describe('#initAdapters', () => {
+    it('should initialize adapters', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.adapters, 'start').resolves()
+
+      const result = await uut.initAdapters()
+
+      assert.equal(result, true)
+    })
+  })
+
+  describe('#initUseCases', () => {
+    it('should initialize use cases', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.useCases, 'start').resolves()
+
+      const result = await uut.initUseCases()
+
+      assert.equal(result, true)
+    })
+  })
+
+  describe('#attachRESTControllers', () => {
+    it('should attach REST controllers', () => {
+      const app = {
+        use: () => {}
+      }
+
+      const result = uut.attachRESTControllers(app)
+
+      assert.equal(result, true)
     })
   })
 })

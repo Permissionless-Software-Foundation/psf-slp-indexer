@@ -5,9 +5,8 @@
 */
 
 // Public npm libraries
-const readline = require('readline')
-
-let _this
+// const readline = require('readline')
+import readline from 'readline'
 
 class StartStop {
   constructor () {
@@ -16,7 +15,10 @@ class StartStop {
 
     this.stopIndexing = false
 
-    _this = this
+    // Bind 'this' object to all subfunctions.
+    this.initStartStop = this.initStartStop.bind(this)
+    this.stopStatus = this.stopStatus.bind(this)
+    this.qDetected = this.qDetected.bind(this)
   }
 
   // Returns the value of the stopIndexing state variable.
@@ -35,23 +37,46 @@ class StartStop {
       this.process.stdin.setRawMode(true)
     }
 
-    this.process.stdin.on('keypress', (str, key) => {
-      if (key.name === 'q') {
-        console.log(
-          'q key detected. Will stop indexing after processing current block.'
-        )
-        _this.stopIndexing = true
-      }
+    this.process.stdin.on('keypress', this.qDetected)
+    // this.process.stdin.on('keypress', (str, key) => {
+    //   if (key.name === 'q') {
+    //     console.log(
+    //       'q key detected. Will stop indexing after processing current block.'
+    //     )
+    //     this.stopIndexing = true
+    //   }
 
-      // Exit immediately if Ctrl+C is pressed.
-      if (key.ctrl && key.name === 'c') {
-        this.process.exit(0)
-      }
-    })
+    //   // Exit immediately if Ctrl+C is pressed.
+    //   if (key.ctrl && key.name === 'c') {
+    //     this.process.exit(0)
+    //   }
+    // })
 
     // Return true to signal the function exited successfully.
+    //   return true
+    // }
+
+    return true
+  }
+
+  // This is a callback function that is called by the keypress event. It checks
+  // to see if the 'q' key has been pressed.
+  qDetected (str, key) {
+    if (key.name === 'q') {
+      console.log(
+        'q key detected. Will stop indexing after processing current block.'
+      )
+      this.stopIndexing = true
+    }
+
+    // Exit immediately if Ctrl+C is pressed.
+    if (key.ctrl && key.name === 'c') {
+      this.process.exit(0)
+    }
+
     return true
   }
 }
 
-module.exports = StartStop
+// module.exports = StartStop
+export default StartStop

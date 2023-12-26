@@ -2,15 +2,15 @@
   Unit tests for the filter-block.js library
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
 
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/filter-block-mock')
-const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
-const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-const FilterBlock = require('../../../../../src/adapters/slp-indexer/lib/filter-block')
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/filter-block-mock.js'
+import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
+import Transaction from '../../../../../src/adapters/slp-indexer/lib/transaction.js'
+import FilterBlock from '../../../../../src/adapters/slp-indexer/lib/filter-block.js'
 
 describe('#filter-block.js', () => {
   let uut, sandbox, mockData
@@ -315,6 +315,25 @@ describe('#filter-block.js', () => {
         assert.equal(err.message, 'test error')
       }
     })
+
+    it('should skip a TX if the TXID already exists in the array', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.cache, 'get')
+        .onCall(0)
+        .resolves(mockData.twoTxDag01)
+        .onCall(1)
+        .resolves(mockData.twoTxDag01)
+
+      const txid =
+        'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
+
+      const result = await uut.checkForParent2(txid, 543413)
+      // console.log('result: ', result)
+
+      assert.equal(result.hasParent, true)
+      assert.equal(result.dag.length, 1)
+    })
   })
 
   describe('#forwardDag', () => {
@@ -433,6 +452,56 @@ describe('#filter-block.js', () => {
       } catch (err) {
         assert.include(err.message, 'test error')
       }
+    })
+
+    it('should remove independent TXs from the slp tx array', async () => {
+      // force cache to get data from the full node.
+      sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
+
+      const blockHeight = 543413
+      const txs = [
+        '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2',
+        '82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac',
+        'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
+      ]
+
+      // Mock dependencies
+      sandbox.stub(uut, 'filterSlpTxs').resolves({ slpTxs: mockData.slpTxs01, nonSlpTxs: [] })
+      sandbox
+        .stub(uut, 'checkForParent2')
+        .onCall(0)
+        .resolves({ hasParent: false, dag: ['82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac'] })
+        .onCall(1)
+        .resolves({ hasParent: false, dag: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'] })
+      sandbox
+        .stub(uut, 'forwardDag')
+        .onCall(0)
+        .resolves({
+          success: false,
+          chainedArray: ['82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac']
+        })
+        .onCall(1)
+        .resolves({
+          success: true,
+          chainedArray: [
+            '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2',
+            'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2',
+            'f56121d5a21a319204cf26ce68a6d607fefa02ba6ac42b4647fcad813b32d8b3',
+            '660057b446cc4c930493607aa02e943e4fe7c38ae0816797ff7234ba72fea50f',
+            '483d0198ed272bd0be7c6bbaf0e60340cce926f7d32143e2b09c5513922eaf87',
+            '234893177b18a95dbfc1eb855d69f1c9cc256a317a6c51be8fd1b9a38ae072ce',
+            'a333e7ebd34f0e24b567e99ed27241e3cfda5e9952cacdaa8fab31a7ee7e544d'
+          ]
+        })
+
+      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      // console.log('combined: ', combined)
+      // console.log('nonSlpTxs: ', nonSlpTxs)
+
+      assert.equal(combined.length, 8)
+      assert.include(combined[0], '82a9') // Independent tx
+      assert.include(combined[2], 'e5ff') // newest chained tx
+      assert.isArray(nonSlpTxs)
     })
   })
 

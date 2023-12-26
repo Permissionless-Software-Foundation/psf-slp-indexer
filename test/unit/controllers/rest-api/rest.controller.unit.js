@@ -3,14 +3,13 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
+import { assert } from 'chai'
+import sinon from 'sinon'
 
 // Local libraries
-const RESTControllers = require('../../../../src/controllers/rest-api/')
-// const mockContext = require('../../../unit/mocks/ctx-mock').context
-const adapters = require('../../mocks/adapters')
-const UseCasesMock = require('../../mocks/use-cases')
+import RESTControllers from '../../../../src/controllers/rest-api/index.js'
+import adapters from '../../mocks/adapters/index.js'
+import UseCasesMock from '../../mocks/use-cases/index.js'
 
 describe('#RESTControllers', () => {
   let uut
@@ -59,6 +58,18 @@ describe('#RESTControllers', () => {
           'Instance of Use Cases library required when instantiating REST Controller libraries.'
         )
       }
+    })
+  })
+
+  describe('#attachRESTControllers', () => {
+    it('should attach controllers to the app', () => {
+      const app = {
+        use: () => {}
+      }
+
+      const result = uut.attachRESTControllers(app)
+
+      assert.equal(result, true)
     })
   })
 })

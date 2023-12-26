@@ -3,15 +3,15 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
-const BigNumber = require('bignumber.js')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const Genesis = require('../../../../../src/adapters/slp-indexer/tx-types/genesis')
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/genesis-mock')
+import Genesis from '../../../../../src/adapters/slp-indexer/tx-types/genesis.js'
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/genesis-mock.js'
 
 describe('#genesis.js', () => {
   let uut, sandbox, mockData
@@ -114,6 +114,16 @@ describe('#genesis.js', () => {
       assert.equal(result.mintBatonIsActive, false)
       assert.equal(result.blockCreated, 600518)
       assert.equal(result.totalBurned, 0)
+    })
+
+    it('should add an NFT array for Group tokens', async () => {
+      mockData.genesisData01.slpData.tokenType = 129
+      const result = await uut.addTokenToDB(mockData.genesisData01)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that expected values exist.
+      assert.property(result, 'nfts')
+      assert.isArray(result.nfts)
     })
   })
 

@@ -4,8 +4,6 @@
   https://troutsblog.com/blog/clean-architecture
 */
 
-const UserUseCases = require('./user')
-
 class UseCases {
   constructor (localConfig = {}) {
     this.adapters = localConfig.adapters
@@ -14,10 +12,15 @@ class UseCases {
         'Instance of adapters must be passed in when instantiating Use Cases library.'
       )
     }
+  }
 
-    // console.log('use-cases/index.js localConfig: ', localConfig)
-    this.user = new UserUseCases(localConfig)
+  // Run any startup Use Cases at the start of the app.
+  async start () {
+    // try {
+    console.log('Async Use Cases have been started.')
+
+    return true
   }
 }
 
-module.exports = UseCases
+export default UseCases

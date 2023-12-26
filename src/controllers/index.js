@@ -6,33 +6,35 @@
 
 // Public npm libraries.
 
-// Load the Clean Architecture Adapters library
-const Adapters = require('../adapters')
-
-// Load the JSON RPC Controller.
-const JSONRPC = require('./json-rpc')
-
-// Load the Clean Architecture Use Case libraries.
-const UseCases = require('../use-cases')
-// const useCases = new UseCases({ adapters })
-
-// Load the REST API Controllers.
-const RESTControllers = require('./rest-api')
+// Local libraries
+import Adapters from '../adapters/index.js'
+// import JSONRPC from './json-rpc/index.js'
+import UseCases from '../use-cases/index.js'
+import RESTControllers from './rest-api/index.js'
+import TimerControllers from './timer-controllers.js'
+import config from '../../config/index.js'
 
 class Controllers {
   constructor (localConfig = {}) {
+    // Encapsulate dependencies
     this.adapters = new Adapters()
     this.useCases = new UseCases({ adapters: this.adapters })
+    this.timerControllers = new TimerControllers({ adapters: this.adapters, useCases: this.useCases })
+    this.config = config
   }
 
-  async attachControllers (app) {
-    // Wait for any startup processes to complete for the Adapters libraries.
+  // Spin up any adapter libraries that have async startup needs.
+  async initAdapters () {
     await this.adapters.start()
 
-    // Attach the REST controllers to the Koa app.
-    // this.attachRESTControllers(app)
+    return true
+  }
 
-    // this.attachRPCControllers()
+  // Run any Use Cases to startup the app.
+  async initUseCases () {
+    await this.useCases.start()
+
+    return true
   }
 
   // Top-level function for this library.
@@ -45,20 +47,36 @@ class Controllers {
 
     // Attach the REST API Controllers associated with the boilerplate code to the Koa app.
     restControllers.attachRESTControllers(app)
+
+    return true
+  }
+
+  // Attach any other controllers other than REST API controllers.
+  async attachControllers (app) {
+    // Wait for any startup processes to complete for the Adapters libraries.
+    // await this.adapters.start()
+
+    if (this.config.useIpfs) {
+      // Attach JSON RPC controllers
+      this.attachRPCControllers()
+    }
+
+    // Attach and start the timer controllers
+    this.timerControllers.startTimers()
   }
 
   // Add the JSON RPC router to the ipfs-coord adapter.
   attachRPCControllers () {
-    const jsonRpcController = new JSONRPC({
-      adapters: this.adapters,
-      useCases: this.useCases
-    })
-
-    // Attach the input of the JSON RPC router to the output of ipfs-coord.
-    this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(
-      jsonRpcController.router
-    )
+    // const jsonRpcController = new JSONRPC({
+    //   adapters: this.adapters,
+    //   useCases: this.useCases
+    // })
+    //
+    // // Attach the input of the JSON RPC router to the output of ipfs-coord.
+    // this.adapters.ipfs.ipfsCoordAdapter.attachRPCRouter(
+    //   jsonRpcController.router
+    // )
   }
 }
 
-module.exports = Controllers
+export default Controllers

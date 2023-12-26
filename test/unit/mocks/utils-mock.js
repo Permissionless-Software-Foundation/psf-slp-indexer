@@ -51,7 +51,7 @@ const tokenData01 = {
   blockCreated: 716085
 }
 
-module.exports = {
+export default {
   balance01,
   tokenData01
 }

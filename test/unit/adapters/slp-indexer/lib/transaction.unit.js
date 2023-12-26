@@ -3,12 +3,12 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
 
-const Transaction = require('../../../../../src/adapters/slp-indexer/lib/transaction')
-const mockDataLib = require('../../../mocks/transaction-mock.js')
+import Transaction from '../../../../../src/adapters/slp-indexer/lib/transaction.js'
+import mockDataLib from '../../../mocks/transaction-mock.js'
 
 describe('#Transaction', () => {
   let uut
@@ -249,6 +249,24 @@ describe('#Transaction', () => {
       assert.equal(data.mintBatonVout, 0)
       assert.equal(data.qty, '1')
     })
+
+    it('should clear the cache when it gets too big', async () => {
+      // Mock dependencies
+      sandbox
+        .stub(uut.rpc, 'getRawTransaction')
+        .resolves(mockData.sendTestInputTx01)
+
+      const txid =
+        '6bc111fbf5b118021d68355ca19a0e77fa358dd931f284b2550f79a51ab4792a'
+
+      // Force cache to be too big.
+      uut.tokenCacheCnt = 9999999
+
+      const result = await uut.decodeOpReturn(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      assert.hasAllKeys(result, ['tokenType', 'txType', 'tokenId', 'amounts'])
+    })
   })
 
   describe('#_getInputAddrs', () => {
@@ -270,10 +288,7 @@ describe('#Transaction', () => {
     it('should catch and throw and error', async () => {
       try {
         // Force an error
-        // sandbox
-        //   .stub(uut.rpc, 'getRawTransaction')
-        //   .rejects(new Error('test error'))
-        sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
+        sandbox.stub(uut, 'getTxWithRetry').rejects(new Error('test error'))
 
         await uut._getInputAddrs(mockData.mockTxIn)
 
@@ -283,6 +298,16 @@ describe('#Transaction', () => {
 
         assert.equal(err.message, 'test error')
       }
+    })
+
+    it('should return an empty array when there is no txid', async () => {
+      // Force corner-case error
+      sandbox.stub(uut, 'getTxWithRetry').rejects(new Error('txid must be provided'))
+
+      const result = await uut._getInputAddrs(mockData.mockTxIn)
+
+      assert.isArray(result)
+      assert.equal(result.length, 0)
     })
   })
 
@@ -360,6 +385,14 @@ describe('#Transaction', () => {
 
       assert.equal(result, false)
     })
+
+    it('should return false when token ID contains too many zeros', async () => {
+      sandbox.stub(uut, 'decodeOpReturn').resolves({ txid: 'sometxid', tokenId: '00000000' })
+
+      const result = await uut.getTokenInfo('input-txid')
+
+      assert.equal(result, false)
+    })
   })
 
   describe('#getNftTx', () => {
@@ -378,6 +411,164 @@ describe('#Transaction', () => {
       assert.equal(result.vin[0].tokenId, mockData.nftGenesisTokenData02.tokenId)
       assert.equal(result.vin[1].tokenQty, 0)
       assert.equal(result.vin[1].tokenId, null)
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
+    })
+
+    it('should hydrate an NFT (child/type 65) Send Tx', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves({
+          tokenType: 65,
+          txType: 'GENESIS',
+          ticker: 'test',
+          name: 'test',
+          tokenId: 'c2ab27687de886ade3237d38c5f7b2af9b60ec5ca8c89623cd0b81ac7efec36d',
+          documentUri: 'ipfs://bafybeidy4nrqgsgcl44jlyvehnulngfzq564kc4bz6ni3cldoupwhwzzy4',
+          documentHash: '5126528223a04a49b8586608f8677ef0af0df9bc14f0044bd7395c76f5d1c039',
+          decimals: 0,
+          mintBatonVout: 0,
+          qty: '1'
+        })
+        .onCall(1).resolves({
+          tokenType: 65,
+          txType: 'SEND',
+          tokenId: '2adfd8afa3511725e0b882949c671f3fa234d9da848a900b819cc68e93af376f',
+          amounts: [
+            '1'
+          ]
+        })
+
+      const txDetails = mockData.nftSendTxDetails01
+      const txTokenData = mockData.nftSendTxTokenData01
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert expected properties and values exist.
+      assert.equal(result.isSlpTx, true)
+      assert.equal(result.tokenTxType, 'SEND')
+      assert.equal(result.tokenType, 65)
+      assert.equal(result.tokenDecimals, 0)
+      assert.property(result, 'tokenUri')
+      assert.property(result, 'tokenDocHash')
+      assert.property(result, 'tokenName')
+      assert.property(result, 'tokenTicker')
+    })
+
+    it('should throw error for unknown token type', async () => {
+      try {
+        const txDetails = mockData.nftSendTxDetails01
+        const txTokenData = mockData.nftSendTxTokenData01
+
+        // Force unknown token type
+        txTokenData.txType = 'UNKNOWN'
+
+        await uut.getNftTx(txDetails, txTokenData)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.message, 'Unknown SLP TX type for TX')
+      }
+    })
+
+    it('should throw error for unknown token input', async () => {
+      try {
+        // Mock dependencies
+        sandbox.stub(uut, 'getTokenInfo')
+          .onCall(0).resolves({
+            tokenType: 65,
+            txType: 'UNKNOWN',
+            ticker: 'test',
+            name: 'test',
+            tokenId: 'c2ab27687de886ade3237d38c5f7b2af9b60ec5ca8c89623cd0b81ac7efec36d',
+            documentUri: 'ipfs://bafybeidy4nrqgsgcl44jlyvehnulngfzq564kc4bz6ni3cldoupwhwzzy4',
+            documentHash: '5126528223a04a49b8586608f8677ef0af0df9bc14f0044bd7395c76f5d1c039',
+            decimals: 0,
+            mintBatonVout: 0,
+            qty: '1'
+          })
+
+        const txDetails = mockData.nftSendTxDetails01
+        const txTokenData = mockData.nftSendTxTokenData01
+
+        await uut.getNftTx(txDetails, txTokenData)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.message, 'Unknown token type in input')
+      }
+    })
+
+    it('should hydrate an NFT (child) Genesis Tx when Group token was a result of a SEND TX', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo').resolves(mockData.nftGenesisVinData03)
+
+      const txDetails = mockData.nftGenesisTx03
+      const txTokenData = mockData.nftGenesisTokenData03
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 1)
+      assert.equal(result.vin[0].tokenId, 'b31704bfd4beb029bf29bed36599745b3b20dbb0ce1ad4efe9aaa15d3719c44e')
+      assert.equal(result.vin[1].tokenQty, 1)
+      assert.equal(result.vin[1].tokenId, 'b31704bfd4beb029bf29bed36599745b3b20dbb0ce1ad4efe9aaa15d3719c44e')
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
+    })
+
+    it('should hydrate an NFT (child) Genesis Tx when Group token was a result of a MINT TX', async () => {
+      // Example TX: b219ba0a7e712345abeadd979db1783b19f4643374a6efc6ad61c7913de9528e
+      // Using Group Token ID: 112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be
+
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.nftGenesisFromGroupMintVin01)
+        .onCall(1).resolves(mockData.nftGenesisFromGroupMintVin02)
+
+      const txDetails = mockData.nftGenesisFromGroupMintTokenDetails01
+      const txTokenData = mockData.nftGenesisFromGroupMintTokenData01
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.equal(result.vin[0].tokenQty, 1)
+      assert.equal(result.vin[0].tokenId, '112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+      assert.equal(result.vout[0].isMintBaton, true)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[2].tokenQty, 0)
+    })
+
+    it('should hydrate an NFT (child) Genesis Tx when Group token has a mint baton', async () => {
+      // This is not a real-world test. It's simply exercising the different code paths.
+
+      // Customizine mock data to force the desired code path
+      mockData.nftGenesisFromGroupMintVin02.mintBatonVout = 3
+      mockData.nftGenesisFromGroupMintVin01.txType = 'MINT'
+
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.nftGenesisFromGroupMintVin01)
+        .onCall(1).resolves(mockData.nftGenesisFromGroupMintVin02)
+
+      const txDetails = mockData.nftGenesisFromGroupMintTokenDetails01
+      const txTokenData = mockData.nftGenesisFromGroupMintTokenData01
+
+      const result = await uut.getNftTx(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that properties unique to an NFT Genesis TX exist in the output.
+      assert.isNaN(result.vin[0].tokenQty)
+      assert.equal(result.vin[0].tokenId, '112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, '112f967519e18083c8e4bd7ba67ebc04d72aaaa941826d38655c53d677e6a5be')
       assert.equal(result.vout[0].isMintBaton, true)
       assert.equal(result.vout[1].tokenQty, 1)
       assert.equal(result.vout[2].tokenQty, 0)
@@ -883,6 +1074,116 @@ describe('#Transaction', () => {
       assert.equal(result.vin[1].tokenQty, 0)
       assert.equal(result.vin[1].isMintBaton, true)
     })
+
+    // I believe this use-case happens when the indexer is tracking transactions
+    // comming in on the ZMQ in real time. They have not been mined, so they
+    // have no blockhash.
+    it('should calculate block height if TX has no blockhash', async () => {
+      // For TX to not have a blockhash
+      mockData.slpTxDetails.blockhash = undefined
+
+      // Mock dependencies
+      sandbox.stub(uut, 'getTxData').resolves(mockData.slpTxDetails)
+      sandbox.stub(uut.rpc, 'getBlockCount').resolves(603423)
+      // sandbox.stub(uut.rpc, 'getBlockHeader').resolves({ height: 603424 })
+      sandbox
+        .stub(uut, 'getTokenInfo')
+        .onCall(0)
+        .resolves(mockData.mockOpReturnData01)
+        .onCall(1)
+        .resolves(mockData.mockOpReturnData02)
+        .onCall(2)
+        .resolves(mockData.mockOpReturnData03)
+        .onCall(3)
+        .resolves(false)
+
+      const txid =
+        '266844d53e46bbd7dd37134688dffea6e54d944edff27a0add63dd0908839bc1'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that there are stanardized properties.
+      assert.property(result, 'txid')
+      assert.property(result, 'vin')
+      assert.property(result, 'vout')
+      assert.property(result.vout[0], 'value')
+      assert.property(result.vout[1].scriptPubKey, 'addresses')
+
+      // Assert outputs have expected properties
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[1].tokenQtyStr, '1')
+      assert.equal(result.vout[2].tokenQty, 998833)
+      assert.equal(result.vout[2].tokenQtyStr, '998833')
+      assert.equal(result.vout[3].tokenQty, null)
+      assert.equal(result.vout[3].tokenQtyStr, null)
+
+      // Assert that inputs have expected properties
+      assert.equal(result.vin[0].tokenQtyStr, '998834')
+      assert.equal(result.vin[0].tokenQty, 998834)
+      assert.equal(
+        result.vin[0].tokenId,
+        '497291b8a1dfe69c8daea50677a3d31a5ef0e9484d8bebb610dac64bbc202fb7'
+      )
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+
+      // Assert blockheight is added
+      assert.equal(result.blockheight, 603424)
+      assert.equal(result.isSlpTx, true)
+    })
+
+    it('should get TX details for an NFT', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTxData').resolves(mockData.nftTxDetails01)
+      sandbox.stub(uut.rpc, 'getBlockHeader').resolves({ height: 613542 })
+      sandbox
+        .stub(uut, 'getTokenInfo')
+        .onCall(0)
+        .resolves(mockData.nftTxTokenData01)
+        .onCall(1)
+        .resolves(mockData.nftGenesisData01)
+      sandbox.stub(uut, 'getNftTx').resolves(mockData.nftFinalTxDetails01)
+
+      const txid =
+        'd9eee23870c82ac0054442146c7de9e3985d70096ba2b913a29672b0376b8456'
+
+      const result = await uut.get(txid)
+      // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+      // Assert that there are stanardized properties.
+      assert.property(result, 'txid')
+      assert.property(result, 'vin')
+      assert.property(result, 'vout')
+      assert.property(result.vout[0], 'value')
+      // assert.property(result.vout[1].scriptPubKey, 'addresses')
+
+      // Assert outputs have expected properties
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 1)
+      assert.equal(result.vout[1].tokenQtyStr, '1')
+      assert.equal(result.vout[2].tokenQty, null)
+      assert.equal(result.vout[2].tokenQtyStr, null)
+
+      // Assert that inputs have expected properties
+      assert.equal(result.vin[0].tokenQtyStr, '1')
+      assert.equal(result.vin[0].tokenQty, 1)
+      assert.equal(
+        result.vin[0].tokenId,
+        'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0'
+      )
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, 'da879a9b4d54372db011f254554172a0b4b81a8124bfdfd06ec916f5326948e0')
+
+      // Assert blockheight is added
+      assert.equal(result.blockheight, 613542)
+      assert.equal(result.isSlpTx, true)
+    })
   })
 
   describe('#getTxWithRetry', () => {
@@ -907,6 +1208,87 @@ describe('#Transaction', () => {
       } catch (err) {
         // console.log(err)
         assert.include(err.message, 'test error')
+      }
+    })
+
+    it('should throw an error if txid is not provided', async () => {
+      try {
+        // Force an error
+        // sandbox.stub(uut.queue, 'addToQueue').rejects(new Error('test error'))
+
+        await uut.getTxWithRetry()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'txid string must be included.')
+      }
+    })
+
+    it('should clear tx cache when it gets too large', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.queue, 'addToQueue').resolves({ key: 'value' })
+
+      // Force cache count to be too large
+      uut.txCacheCnt = 9999999999
+
+      const result = await uut.getTxWithRetry('txid')
+      // console.log('result: ', result)
+
+      assert.property(result, 'key')
+    })
+  })
+
+  describe('#getTx01', () => {
+    it('should get details on a normal SEND type 1 TX', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.sendVinTokenData01)
+        .onCall(1).resolves(false)
+
+      const txDetails = mockData.sendTxTokenDetails01
+      const txTokenData = mockData.sendTxTokenData01
+
+      const result = await uut.getTx01(txDetails, txTokenData)
+      // console.log('result: ', result)
+
+      // Assert that the result has expected properties and values
+      assert.equal(result.vout[0].tokenQty, null)
+      assert.equal(result.vout[0].tokenQtyStr, null)
+      assert.equal(result.vout[1].tokenQty, 10000)
+      assert.equal(result.vout[1].tokenQtyStr, '10000')
+      assert.equal(result.vout[2].tokenQty, 9223372036854766000)
+      assert.equal(result.vout[2].tokenQtyStr, '9223372036854765808')
+      assert.equal(result.vout[3].tokenQty, null)
+      assert.equal(result.vout[3].tokenQtyStr, null)
+
+      assert.equal(result.vin[0].tokenQtyStr, '9223372036854775808')
+      assert.equal(result.vin[0].tokenQty, 9223372036854776000)
+      assert.equal(result.vin[0].tokenId, '792ff3fc9a708d5facb28427601a423aedfe96c1863ada303a4a22968781ad70')
+      assert.equal(result.vin[1].tokenQtyStr, '0')
+      assert.equal(result.vin[1].tokenQty, 0)
+      assert.equal(result.vin[1].tokenId, null)
+    })
+
+    it('should throw error for unknown token type', async () => {
+      // Force unknown token type
+      mockData.sendVinTokenData01.txType = 'UNKNOWN'
+
+      // Mock dependencies
+      sandbox.stub(uut, 'getTokenInfo')
+        .onCall(0).resolves(mockData.sendVinTokenData01)
+        .onCall(1).resolves(false)
+
+      const txDetails = mockData.sendTxTokenDetails01
+      const txTokenData = mockData.sendTxTokenData01
+
+      try {
+        await uut.getTx01(txDetails, txTokenData)
+        // console.log('result: ', result)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.equal(err.message, 'Unknown token type in input')
       }
     })
   })

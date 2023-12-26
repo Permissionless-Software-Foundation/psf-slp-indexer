@@ -3,15 +3,17 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
+import { assert } from 'chai'
+
+import sinon from 'sinon'
 
 // Local support libraries
 // const testUtils = require('../../utils/test-utils')
 
 // Unit under test (uut)
-const UseCases = require('../../../src/use-cases')
-const adapters = require('../mocks/adapters')
+import UseCases from '../../../src/use-cases/index.js'
+
+import adapters from '../mocks/adapters/index.js'
 
 describe('#use-cases', () => {
   let uut
@@ -46,5 +48,18 @@ describe('#use-cases', () => {
         )
       }
     })
+  })
+
+  describe('#start', () => {
+    it('should initialize async use cases', async () => {
+      const result = await uut.start()
+
+      assert.equal(result, true)
+    })
+
+    // it('should catch and throw errors', async () => {
+    //   // Force an error
+    //   sandbox.stub()
+    // })
   })
 })

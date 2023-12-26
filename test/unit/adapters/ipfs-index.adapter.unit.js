@@ -2,12 +2,12 @@
   Unit tests for the index.js file for the IPFS and ipfs-coord libraries.
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
+import { assert } from 'chai'
 
-const IPFSLib = require('../../../src/adapters/ipfs')
-const IPFSMock = require('../mocks/ipfs-mock')
-const IPFSCoordMock = require('../mocks/ipfs-coord-mock')
+import sinon from 'sinon'
+import IPFSLib from '../../../src/adapters/ipfs/index.js'
+// import create from '../mocks/ipfs-mock.js'
+import IPFSCoordMock from '../mocks/ipfs-coord-mock.js'
 
 describe('#IPFS-adapter-index', () => {
   let uut
@@ -24,7 +24,9 @@ describe('#IPFS-adapter-index', () => {
   describe('#start', () => {
     it('should return a promise that resolves into an instance of IPFS.', async () => {
       // Mock dependencies.
-      uut.ipfsAdapter = new IPFSMock()
+      uut.ipfsAdapter = {
+        start: async () => {}
+      }
       uut.IpfsCoordAdapter = IPFSCoordMock
 
       const result = await uut.start()

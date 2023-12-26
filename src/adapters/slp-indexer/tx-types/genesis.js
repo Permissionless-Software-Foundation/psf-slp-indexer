@@ -3,12 +3,12 @@
 */
 
 // Global npm libraries
-const IndexerUtils = require('../lib/utils')
-const BigNumber = require('bignumber.js')
-const axios = require('axios')
+import BigNumber from 'bignumber.js'
+import axios from 'axios'
 
 // Local libraries
-const config = require('../../../../config')
+import IndexerUtils from '../lib/utils.js'
+import config from '../../../../config/index.js'
 
 class Genesis {
   constructor (localConfig = {}) {
@@ -178,7 +178,6 @@ class Genesis {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -260,7 +259,6 @@ class Genesis {
       try {
         // Address exists in the database
         addr = await this.addrDb.get(recvrAddr)
-        // console.log('addr exists in the database: ', addr)
       } catch (err) {
         // New address.
         addr = this.util.getNewAddrObj()
@@ -272,10 +270,12 @@ class Genesis {
         type: 'baton',
         tokenId: slpData.tokenId,
         address: recvrAddr,
-        tokenType: slpData.tokenType
+        tokenType: slpData.tokenType,
+        tokenName: txData.tokenName,
+        tokenTicker: txData.tokenTicker
       }
       addr.utxos.push(utxo)
-      console.log(`mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)
+      console.log(`genesis.js/addBatonAddress() mint baton utxo: ${JSON.stringify(utxo, null, 2)}`)
 
       // Add the txid to the transaction history.
       const txObj = {
@@ -335,4 +335,5 @@ class Genesis {
   }
 }
 
-module.exports = Genesis
+// module.exports = Genesis
+export default Genesis

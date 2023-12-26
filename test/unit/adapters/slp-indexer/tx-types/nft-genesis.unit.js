@@ -3,16 +3,16 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
-const cloneDeep = require('lodash.clonedeep')
-const BigNumber = require('bignumber.js')
+import { assert } from 'chai'
+import sinon from 'sinon'
+import cloneDeep from 'lodash.clonedeep'
+import BigNumber from 'bignumber.js'
 
 // Local libraries
-const NftGenesis = require('../../../../../src/adapters/slp-indexer/tx-types/nft-genesis')
-const MockLevel = require('../../../../unit/mocks/leveldb-mock')
-const mockDataLib = require('../../../../unit/mocks/nft-genesis-mock')
-const Cache = require('../../../../../src/adapters/slp-indexer/lib/cache')
+import NftGenesis from '../../../../../src/adapters/slp-indexer/tx-types/nft-genesis.js'
+import MockLevel from '../../../../unit/mocks/leveldb-mock.js'
+import mockDataLib from '../../../../unit/mocks/nft-genesis-mock.js'
+import Cache from '../../../../../src/adapters/slp-indexer/lib/cache.js'
 
 describe('#nft-genesis.js', () => {
   let uut, sandbox, mockData
@@ -273,12 +273,16 @@ describe('#nft-genesis.js', () => {
 
   describe('#addTokenToDB', () => {
     it('should add a new token to the database', async () => {
+      // Mock input data
       const data = {
         slpData: mockData.slpData01,
         blockHeight: 730295
       }
 
-      const result = await uut.addTokenToDB(data)
+      // Mock Group token from database
+      sandbox.stub(uut.tokenDb, 'get').resolves({ nfts: [] })
+
+      const result = await uut.addTokenToDB(data, '123')
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       // Assert that expected values exist.
@@ -344,20 +348,26 @@ describe('#nft-genesis.js', () => {
       assert.equal(result.balances.length, 1)
     })
 
-    //   // Corner case based on TXID:
-    //   // 8a2aa5bb691a0ba15cce0d2a5b4aade6f43d39e10dc0a10d89dd6e7938a10c63
-    //   it('should handle corner case', async () => {
-    //     // Force code to generate new address.
-    //     sandbox.stub(uut.addrDb, 'get').rejects(new Error('not in db'))
-    //
-    //     // Force corner case by deleting scriptPubKey.
-    //     delete mockData.genesisData01.txData.vout[1].scriptPubKey
-    //
-    //     const result = await uut.addReceiverAddress(mockData.genesisData01)
-    //     // console.log('result: ', result)
-    //
-    //     assert.equal(result, true)
-    //   })
+    // Corner case based on TXID:
+    // 8a2aa5bb691a0ba15cce0d2a5b4aade6f43d39e10dc0a10d89dd6e7938a10c63
+    it('should handle corner case', async () => {
+      // Force code to generate new address.
+      sandbox.stub(uut.addrDb, 'get').rejects(new Error('not in db'))
+
+      // Force corner case by deleting scriptPubKey.
+      delete mockData.nftGenesisTx01.vout[1].scriptPubKey
+
+      const data = {
+        slpData: mockData.slpData01,
+        blockHeight: 730295,
+        txData: mockData.nftGenesisTx01
+      }
+
+      const result = await uut.addReceiverAddress(data)
+      // console.log('result: ', result)
+
+      assert.equal(result, true)
+    })
 
     it('should catch and throw errors', async () => {
       try {
@@ -368,6 +378,28 @@ describe('#nft-genesis.js', () => {
         // console.log(err)
         assert.include(err.message, 'Cannot destructure property')
       }
+    })
+
+    it('should get reciever addresses from database', async () => {
+      // Force code to generate new address.
+      sandbox.stub(uut.addrDb, 'get').resolves({
+        utxos: [],
+        txs: [],
+        balances: []
+      })
+
+      const data = {
+        slpData: mockData.slpData01,
+        blockHeight: 730295,
+        txData: mockData.nftGenesisTx01
+      }
+
+      const result = await uut.addReceiverAddress(data)
+      // console.log('result: ', result)
+
+      assert.equal(result.utxos.length, 1)
+      assert.equal(result.txs.length, 1)
+      assert.equal(result.balances.length, 1)
     })
   })
 

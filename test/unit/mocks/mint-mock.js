@@ -2,7 +2,7 @@
   Mock data for the mint.js library and mint.unit.js unit tests.
 */
 
-const BigNumber = require('bignumber.js')
+import BigNumber from 'bignumber.js'
 
 const mintData = {
   slpData: {
@@ -331,7 +331,7 @@ const invalidMintData01 = {
   }
 }
 
-module.exports = {
+export default {
   mintData,
   mintAddrDb01,
   mintAddrDb02,

@@ -7,10 +7,17 @@
 */
 
 // Global npm librares
-const shell = require('shelljs')
+// const shell = require('shelljs')
+import shell from 'shelljs'
 
 // Local libraries
-const config = require('../../../../config')
+// const config = require('../../../../config')
+import config from '../../../../config/index.js'
+
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const dbDir = `${__dirname.toString()}/../../../../leveldb`
 
@@ -126,6 +133,8 @@ class DbBackup {
 
       // const deleteBackup = parseInt(process.env.DELETE_BACKUP)
       const backupQty = this.config.backupQty
+      console.log('backupQty: ', backupQty)
+      console.log('epoch: ', epoch)
       if (backupQty && epoch) {
         // Delete the oldest backup.
         const oldHeight = height - (epoch * backupQty)
@@ -143,6 +152,8 @@ class DbBackup {
       await this.pTxDb.open()
       await this.utxoDb.open()
       await this.claimDb.open()
+
+      return true
     } catch (err) {
       console.error('Error in zipDb')
       throw err
@@ -177,10 +188,15 @@ class DbBackup {
 
       // Restore the backup
       this.shell.exec('./restore-auto.sh')
+
+      return true
     } catch (err) {
       console.error('Error in unzipDb: ', err)
+
+      return false
     }
   }
 }
 
-module.exports = DbBackup
+// module.exports = DbBackup
+export default DbBackup

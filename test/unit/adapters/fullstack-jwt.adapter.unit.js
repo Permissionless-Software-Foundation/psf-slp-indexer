@@ -3,10 +3,10 @@
 
 */
 
-const assert = require('chai').assert
-const sinon = require('sinon')
+import { assert } from 'chai'
 
-const FullStackJWT = require('../../../src/adapters/fullstack-jwt')
+import sinon from 'sinon'
+import FullStackJWT from '../../../src/adapters/fullstack-jwt.js'
 
 describe('#FullStackJWT', () => {
   let sandbox

@@ -31,8 +31,9 @@ class DAG {
         throw new Error('tokenId required to crawl DAG')
       }
 
-      // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
       // console.log(`crawling TXID ${txid}, endFound: ${endFound}`)
+      // console.log(`tokenId: ${tokenId}`)
+      // console.log('txidAry: ', txidAry)
 
       // Set default value for the output object.
       const outObj = {
@@ -56,13 +57,6 @@ class DAG {
         // Add it to the beginning of the array.
         txidAry.unshift(txData.txid)
         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
-      }
-
-      if (txidAry.length > 50) {
-        if (txidAry.length % 10 === 0) {
-          // console.log(`Large DAG detected: ${JSON.stringify(txidAry, null, 2)}`)
-          console.log(`Large DAG detected: ${txidAry.length} txs`)
-        }
       }
 
       // If this is the genesis TX, then exit immediately.
@@ -109,9 +103,6 @@ class DAG {
         // Phase 2b: Evaluate cached pre-evaluated parents.
         // If the parent TX is a valid SLP tx that has already been evaluated.
         if (parentTx.isValidSlp) {
-          // console.log(`thisVin: ${JSON.stringify(thisVin, null, 2)}`)
-          // console.log(`parentTX TXID: ${parentTx.txid}`)
-
           // Ensure this input is either a token or a minting baton.
           const vinIsTokenOrBaton = !!thisVin.tokenQty || thisVin.isMintBaton
           // console.log(`vinIsTokenOrBaton: ${JSON.stringify(vinIsTokenOrBaton, null, 2)}`)
@@ -133,15 +124,6 @@ class DAG {
             outObj.dag = txidAry
             return outObj
           }
-          // }
-          // CT 12-21-21 - This was leading to false negatives in the Spice token.
-          // CT 01-02-22 - Adding additional constraint that several parents
-          // have already been considered. This is in hope that it will speed
-          // up validation, which became much slower after taking the code out.
-        } else if (parentTx.isValidSlp === false && txidAry.length > 30) {
-          endFound = false
-          outObj.dag = txidAry
-          return outObj
         }
 
         // Phase 2c: Evaluate un-cached, un-evaluated parent
@@ -157,11 +139,14 @@ class DAG {
 
           //
         } else if (parentTx.txid === tokenId) {
-          // Handle corner case with NFTs. 3/11/22 CT
-          // console.log(`parentTx: ${JSON.stringify(parentTx, null, 2)}`)
+          // Handle corner case with NFTs. This is when the Genesis TX does
+          // not originate from a Group (Type 128) token.
           const isNFT = parentTx.tokenType !== 1
           const groupTokenOnVin0 = parentTx.vin[0].tokenQty > 0
           if (isNFT && !groupTokenOnVin0) {
+            // Corner case expressed in this transaction:
+            // TXID: 6d68a7ffbb63ef851c43025f801a1d365cddda50b00741bca022c743d74cd61a
+
             endFound = true
             outObj.isValid = false
             outObj.dag = []
@@ -186,19 +171,6 @@ class DAG {
           // console.log(`--->txData.isValidSlp: ${txData.isValidSlp}`)
           // console.log(`parentTx.txid: ${parentTx.txid}`)
           // console.log(`--->parentTx.isValidSlp ${parentTx.isValidSlp}`)
-
-          // If the DAG grows beyond a certain cut-off point, and it hasn't been
-          // invalidated prior to that point, then assume it's valid. This reduces
-          // excessive computing from really large DAGs.
-          const DAG_CUTOFF = 300
-          if (parentTx.isSlpTx && txidAry.length > DAG_CUTOFF && parentTx.isValidSlp) {
-            console.log(`-->Large DAG cut-off at ${DAG_CUTOFF} transactions. Assumed valid.`)
-
-            endFound = true
-            outObj.isValid = true
-            outObj.dag = txidAry
-            return outObj
-          }
 
           // Recursively call this function to follow the DAG to the first parent
           // in this block.
@@ -227,4 +199,5 @@ class DAG {
   }
 }
 
-module.exports = DAG
+// module.exports = DAG
+export default DAG

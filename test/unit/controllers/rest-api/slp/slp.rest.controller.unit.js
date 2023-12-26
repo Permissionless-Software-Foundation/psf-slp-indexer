@@ -3,19 +3,22 @@
 */
 
 // Public npm libraries
-const assert = require('chai').assert
-const sinon = require('sinon')
+// const assert = require('chai').assert
+// const sinon = require('sinon')
+import { assert } from 'chai'
+import sinon from 'sinon'
 
 // Local support libraries
-const adapters = require('../../../mocks/adapters')
-const UseCasesMock = require('../../../mocks/use-cases')
+import adapters from '../../../mocks/adapters/index.js'
+import UseCasesMock from '../../../mocks/use-cases/index.js'
 
-const SlpController = require('../../../../../src/controllers/rest-api/slp/controller')
+import SlpController from '../../../../../src/controllers/rest-api/slp/controller.js'
+
+import { context } from '../../../../unit/mocks/ctx-mock.js'
 let uut
 let sandbox
 let ctx
-
-const mockContext = require('../../../../unit/mocks/ctx-mock').context
+const mockContext = context
 
 describe('#Slp-REST-Controller', () => {
   // const testUser = {}
@@ -150,6 +153,53 @@ describe('#Slp-REST-Controller', () => {
 
       // Assert that expected properties exist in the returned data.
       assert.property(ctx.response.body, 'tokenData')
+    })
+
+    it('should return not-available if token is in blacklist', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.adapters.slpIndexer.blacklist, 'checkBlacklist').returns(true)
+
+      ctx.request.body = {
+        tokenData: 'fake-token-id'
+      }
+
+      await uut.token(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that 'not-available' is returned for tokens in the blacklist.
+      assert.equal(ctx.response.body.tokenData.name, 'not-available')
+    })
+  })
+
+  describe('#GET /status', () => {
+    it('should return 422 status on biz logic error', async () => {
+      try {
+        await uut.status(ctx)
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        // console.log(err)
+        assert.equal(err.status, 422)
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+
+    it('should return 200 status on success', async () => {
+      // Mock dependencies
+      uut.adapters.slpIndexer.statusDb = {
+        get: async () => {}
+      }
+      sandbox.stub(uut.adapters.slpIndexer.statusDb, 'get').resolves({ status: { startBlockHeight: 543376 } })
+
+      await uut.status(ctx)
+
+      // Assert the expected HTTP response
+      assert.equal(ctx.status, 200)
+
+      // Assert that expected properties exist in the returned data.
+      assert.property(ctx.response.body, 'status')
     })
   })
 

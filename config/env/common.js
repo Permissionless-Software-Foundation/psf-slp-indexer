@@ -5,15 +5,22 @@
 
 /* eslint  no-unneeded-ternary:0 */
 
+// Hack to get __dirname back.
+// https://blog.logrocket.com/alternatives-dirname-node-js-es-modules/
+import * as url from 'url'
+
 // Get the version from the package.json file.
-const pkgInfo = require('../../package.json')
+import { readFileSync } from 'fs'
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+const pkgInfo = JSON.parse(readFileSync(`${__dirname.toString()}/../../package.json`))
+
 const version = pkgInfo.version
 
 const ipfsCoordName = process.env.COORD_NAME
   ? process.env.COORD_NAME
   : 'psf-slp-indexer'
 
-module.exports = {
+export default {
   // Configure TCP port.
   port: process.env.PORT || 5021,
 
@@ -47,6 +54,7 @@ module.exports = {
     : 'demo',
 
   // IPFS settings.
+  useIpfs: process.env.DISABLE_IPFS ? false : true, // Disable IPFS flag
   isCircuitRelay: process.env.ENABLE_CIRCUIT_RELAY ? true : false,
   // SSL domain used for websocket connection via browsers.
   crDomain: process.env.CR_DOMAIN ? process.env.CR_DOMAIN : '',
@@ -108,5 +116,7 @@ module.exports = {
   backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5,
 
   // SSP-API settings
-  sspUrl: process.env.SSP_API_URL ? process.env.SSP_API_URL : 'http://localhost:5020'
+  sspUrl: process.env.SSP_API_URL ? process.env.SSP_API_URL : 'http://localhost:5021',
+
+  chatPubSubChan: 'psf-ipfs-chat-001'
 }

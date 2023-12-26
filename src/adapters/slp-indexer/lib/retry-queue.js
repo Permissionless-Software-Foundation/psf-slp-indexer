@@ -9,24 +9,29 @@
   pay-to-write-access-controller.js depends on this library.
 */
 
-const PQueue = require('p-queue').default
-const pRetry = require('p-retry')
+// Global npm libraries
+import PQueue from 'p-queue'
+import pRetry from 'p-retry'
 
-// const pRetry = require('p-retry')
-
-let _this
+// Local libraries
+import Util from './utils.js'
 
 class RetryQueue {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.queue = new PQueue({ concurrency: 1 })
     this.pRetry = pRetry
+    this.util = new Util()
 
     // Note: Retry has exponential back-off, so 6-10 is the right number.
     this.attempts = 6
-    this.retryPeriod = 1000
+    this.retryPeriod = 3000
 
-    _this = this
+    // Bind 'this' object to all subfunctions
+    this.addToQueue = this.addToQueue.bind(this)
+    this.retryWrapper = this.retryWrapper.bind(this)
+    this.handleValidationError = this.handleValidationError.bind(this)
+    this.sleep = this.util.sleep
   }
 
   // Add an async function to the queue, and execute it with the input object.
@@ -41,11 +46,13 @@ class RetryQueue {
         throw new Error('input object is required')
       }
 
-      const returnVal = await _this.queue.add(() =>
-        _this.retryWrapper(funcHandle, inputObj)
+      const returnVal = await this.queue.add(() =>
+        this.retryWrapper(funcHandle, inputObj)
       )
       return returnVal
     } catch (err) {
+      console.log('addToQueue() err: ', err)
+
       if (err.message.includes('500')) {
         console.log('Error code 500 typically indicates a TXID that does not exist. This is expected, and indexing can continue.')
       } else {
@@ -79,7 +86,7 @@ class RetryQueue {
           return await funcHandle(inputObj)
         },
         {
-          onFailedAttempt: _this.handleValidationError,
+          onFailedAttempt: this.handleValidationError,
           retries: this.attempts // Retry 5 times
         }
       )
@@ -93,21 +100,20 @@ class RetryQueue {
   // It tracks the number of retries until it fails.
   async handleValidationError (error) {
     try {
+      // console.log('handleValidationError() error: ', error)
+
       const errorMsg = `Attempt ${error.attemptNumber} to validate entry. There are ${error.retriesLeft} retries left. Waiting before trying again.`
       console.log(errorMsg)
 
-      const SLEEP_TIME = _this.retryPeriod
+      const SLEEP_TIME = this.retryPeriod
       console.log(`Waiting ${SLEEP_TIME} milliseconds before trying again.\n`)
-      await _this.sleep(SLEEP_TIME) // 30 sec
+      await this.sleep(SLEEP_TIME) // 30 sec
     } catch (err) {
       console.error('Error in handleValidationError()')
       throw err
     }
   }
-
-  sleep (ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-  }
 }
 
-module.exports = RetryQueue
+// module.exports = RetryQueue
+export default RetryQueue
