@@ -1858,6 +1858,53 @@ const nftGenesisFromGroupMintTokenDetails01 = {
   "tokenDocHash": ""
 }
 
+const validPinClaim01 = {
+  "txid": "09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905",
+  "hash": "09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905",
+  "version": 2,
+  "size": 300,
+  "locktime": 0,
+  "vin": [
+    {
+      "txid": "a73c26e7dc3151cfc1be195fbcea52c9c9824d0498f131a6ae5fe7dc76b2d941",
+      "vout": 1,
+      "scriptSig": {
+        "asm": "3045022100c0f1a2063c92a867ae4ed0d93ed77ebffaf4f29e86418f6bfba946af888ab6a8022036e7f64e198fa5bcb78bd54d54393c425f3eb5f3826d294e33f927d91c0c8ded[ALL|FORKID] 03f53bbb3db54948e111c3399a8b2c513b7458c089b126505a155f7fe914572c83",
+        "hex": "483045022100c0f1a2063c92a867ae4ed0d93ed77ebffaf4f29e86418f6bfba946af888ab6a8022036e7f64e198fa5bcb78bd54d54393c425f3eb5f3826d294e33f927d91c0c8ded412103f53bbb3db54948e111c3399a8b2c513b7458c089b126505a155f7fe914572c83"
+      },
+      "sequence": 4294967295
+    }
+  ],
+  "vout": [
+    {
+      "value": 0,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "OP_RETURN 20736 5bfcdca588830245dcd9353f45bb1d06640d7fada0000160ae2789a887b23766 6261667962656963643435356c3763366d78696f677074716367366d64343734716d7a7a6d7a6f62677a753476666d7334776e656b326878677579",
+        "hex": "6a0400510000205bfcdca588830245dcd9353f45bb1d06640d7fada0000160ae2789a887b237663b6261667962656963643435356c3763366d78696f677074716367366d64343734716d7a7a6d7a6f62677a753476666d7334776e656b326878677579",
+        "type": "nulldata"
+      }
+    },
+    {
+      "value": 0.00214982,
+      "n": 1,
+      "scriptPubKey": {
+        "asm": "OP_DUP OP_HASH160 2c88bc64964beefe8abac0e63337ed2272790b59 OP_EQUALVERIFY OP_CHECKSIG",
+        "hex": "76a9142c88bc64964beefe8abac0e63337ed2272790b5988ac",
+        "reqSigs": 1,
+        "type": "pubkeyhash",
+        "addresses": [
+          "bitcoincash:qqkg30ryje97al52htqwvveha538y7gttywut3cdqv"
+        ]
+      }
+    }
+  ],
+  "hex": "020000000141d9b276dce75faea631f198044d82c9c952eabc5f19bec1cf5131dce7263ca7010000006b483045022100c0f1a2063c92a867ae4ed0d93ed77ebffaf4f29e86418f6bfba946af888ab6a8022036e7f64e198fa5bcb78bd54d54393c425f3eb5f3826d294e33f927d91c0c8ded412103f53bbb3db54948e111c3399a8b2c513b7458c089b126505a155f7fe914572c83ffffffff020000000000000000636a0400510000205bfcdca588830245dcd9353f45bb1d06640d7fada0000160ae2789a887b237663b6261667962656963643435356c3763366d78696f677074716367366d64343734716d7a7a6d7a6f62677a753476666d7334776e656b326878677579c6470300000000001976a9142c88bc64964beefe8abac0e63337ed2272790b5988ac00000000",
+  "blockhash": "000000000000000001130367df363e416850c4d1dffd244685da52e524f0f398",
+  "confirmations": 15,
+  "time": 1703639914,
+  "blocktime": 1703639914
+}
 
 
 export default {
@@ -1909,5 +1956,6 @@ export default {
   nftGenesisFromGroupMintVin01,
   nftGenesisFromGroupMintVin02,
   nftGenesisFromGroupMintTokenData01,
-  nftGenesisFromGroupMintTokenDetails01
+  nftGenesisFromGroupMintTokenDetails01,
+  validPinClaim01
 }

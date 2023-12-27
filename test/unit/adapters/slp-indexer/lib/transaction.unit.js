@@ -1292,4 +1292,48 @@ describe('#Transaction', () => {
       }
     })
   })
+
+  describe('#isPinClaim', () => {
+    it('should return data about valid Pin Claim', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.validPinClaim01)
+
+      const txid = '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
+
+      const result = await uut.isPinClaim(txid)
+      // console.log('result: ', result)
+
+      // Assert that the returned object has the expected properties
+      assert.property(result, 'proofOfBurnTxid')
+      assert.property(result, 'cid')
+      assert.property(result, 'claimTxid')
+
+      // Assert the expected values
+      assert.equal(result.proofOfBurnTxid, '5bfcdca588830245dcd9353f45bb1d06640d7fada0000160ae2789a887b23766')
+      assert.equal(result.cid, 'bafybeicd455l7c6mxiogptqcg6md474qmzzmzobgzu4vfms4wnek2hxguy')
+      assert.equal(result.claimTxid, '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905')
+    })
+
+    it('should throw error if txid is not included', async () => {
+      try {
+        await uut.isPinClaim()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'txid string must be included.')
+      }
+    })
+
+    it('should return false for non-claim TX', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.nonSlpTxDetails)
+
+      const txid = '2b37bdb3b63dd0bca720437754a36671431a950e684b64c44ea910ea9d5297c7'
+
+      const result = await uut.isPinClaim(txid)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+  })
 })

@@ -10,6 +10,7 @@
 // Public npm libraries
 import BigNumber from 'bignumber.js'
 import slpParser from 'slp-parser'
+import BCHJS from '@psf/bch-js'
 
 // Local libraries
 import RPC from './rpc.js'
@@ -21,6 +22,7 @@ class Transaction {
     this.rpc = new RPC()
     this.slpParser = slpParser
     this.queue = new RetryQueue()
+    this.bchjs = new BCHJS()
 
     // State
     this.tokenCache = {}
@@ -37,6 +39,7 @@ class Transaction {
     this.getTxData = this.getTxData.bind(this)
     this._getInputAddrs = this._getInputAddrs.bind(this)
     this.getTxWithRetry = this.getTxWithRetry.bind(this)
+    this.isPinClaim = this.isPinClaim.bind(this)
   }
 
   /**
@@ -915,6 +918,55 @@ class Transaction {
       return txData
     } catch (err) {
       console.error('Error in getTxWithRetry()')
+      throw err
+    }
+  }
+
+  // Returns false if the TXID is not a Pin Claim.
+  // Otherwise returns an object with information decoded from the OP_RETURN
+  async isPinClaim (txid) {
+    try {
+      // Validate the txid input.
+      if (!txid || txid === '' || typeof txid !== 'string') {
+        throw new Error('txid string must be included.')
+      }
+
+      const txDetails = await this.getTxWithRetry(txid)
+      // console.log('txDetails: ', JSON.stringify(txDetails, null, 2))
+
+      // SLP spec expects OP_RETURN to be the first output of the transaction.
+      const opReturn = txDetails.vout[0].scriptPubKey.hex
+      // console.log(`txid ${txid}, opReturn hex: ${opReturn}`)
+
+      const firstFourBytes = opReturn.slice(0, 12)
+      // console.log(`opReturn firstFourBytes: ${firstFourBytes}`)
+
+      // If the HEX of the OP_RETURN matches the signature of a claim.
+      if (firstFourBytes.includes('6a0400510000')) {
+        // Decode the hex into normal text.
+        const script = this.bchjs.Script.toASM(
+          Buffer.from(opReturn, 'hex')
+        ).split(' ')
+        // console.log(`script: ${JSON.stringify(script, null, 2)}`)
+
+        const proofOfBurnTxid = script[2]
+        const cid = Buffer.from(script[3], 'hex').toString()
+        // console.log('proof of burn TXID: ', proofOfBurnTxid)
+        // console.log('CID to pin: ', cid)
+
+        const retObj = {
+          proofOfBurnTxid,
+          cid,
+          claimTxid: txid
+        }
+
+        return retObj
+      }
+
+      // No claim found, return false.
+      return false
+    } catch (err) {
+      console.error('Error in transaction.js/isPinClaim()')
       throw err
     }
   }
