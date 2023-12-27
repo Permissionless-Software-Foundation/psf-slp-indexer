@@ -20,7 +20,8 @@ describe('#db-backup', () => {
     const statusDb = new MockLevel()
     const pTxDb = new MockLevel()
     const utxoDb = new MockLevel()
-    const localConfig = { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
+    const pinClaimDb = new MockLevel()
+    const localConfig = { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb }
 
     uut = new DbBackup(localConfig)
   })

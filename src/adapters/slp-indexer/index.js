@@ -62,7 +62,7 @@ class SlpIndexer {
   openDatabases () {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb } =
       this.levelDb.openDbs()
     this.addrDb = addrDb
     this.tokenDb = tokenDb
@@ -70,13 +70,14 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.pTxDb = pTxDb
     this.utxoDb = utxoDb
+    this.pinClaimDb = pinClaimDb
 
-    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
+    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb }
   }
 
   // Instantiate all dependency libraries and encapsulate them into the 'this' object.
   encapsulateDeps (localConfig = {}) {
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = localConfig
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb } = localConfig
 
     // Encapsulate dependencies
     this.rpc = new RPC()
@@ -86,7 +87,8 @@ class SlpIndexer {
       txDb,
       statusDb,
       pTxDb,
-      utxoDb
+      utxoDb,
+      pinClaimDb
     })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
@@ -349,6 +351,25 @@ class SlpIndexer {
             console.log(
               `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
             )
+          }
+        }
+      }
+
+      // Check each of the non-SLP transaction to see if it matches the profile
+      // of a claim.
+      if (nonSlpTxs && nonSlpTxs.length) {
+        for (let i = 0; i < nonSlpTxs.length; i++) {
+          const thisTxid = nonSlpTxs[i]
+
+          // Check if this transaction is a Claim.
+          const isClaim = await this.transaction.isPinClaim(thisTxid)
+          if (isClaim) {
+            // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
+
+            // Store the claim in the database.
+            await this.claimDb.put(thisTxid, isClaim)
+
+            // TODO: Trigger webhook
           }
         }
       }
