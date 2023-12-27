@@ -947,11 +947,23 @@ class Transaction {
         const script = this.bchjs.Script.toASM(
           Buffer.from(opReturn, 'hex')
         ).split(' ')
-        // console.log(`script: ${JSON.stringify(script, null, 2)}`)
+        console.log(`script: ${JSON.stringify(script, null, 2)}`)
 
-        const proofOfBurnTxid = script[2]
-        const cid = Buffer.from(script[3], 'hex').toString()
-        // console.log('proof of burn TXID: ', proofOfBurnTxid)
+        let proofOfBurnTxid
+        if (script[2]) {
+          proofOfBurnTxid = script[2]
+          // console.log('proof of burn TXID: ', proofOfBurnTxid)
+        } else {
+          return false
+        }
+
+        let cid
+        if (script[3]) {
+          cid = Buffer.from(script[3], 'hex').toString()
+        } else {
+          return false
+        }
+
         // console.log('CID to pin: ', cid)
 
         const retObj = {

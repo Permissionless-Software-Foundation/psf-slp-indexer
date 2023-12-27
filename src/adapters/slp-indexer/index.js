@@ -182,10 +182,10 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 769587)
+      // } while (blockHeight < 825470)
       // } while (blockHeight < 739707)
-      // console.log('Target block height reached.')
-      // process.exit(0)
+      console.log('Target block height reached.')
+      process.exit(0)
 
       // Debugging: state the current state of the indexer.
       console.log(`Leaving ${this.indexState}`)
@@ -323,12 +323,15 @@ class SlpIndexer {
         } transactions. Time now: ${now.toLocaleString()}`
       )
 
+      // console.log('txs: ', txs)
+      // console.log('blockHeight: ', blockHeight)
       // Filter and sort block transactions, to make indexing more efficient
       // and easier to debug.
       const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2(
         txs,
         blockHeight
       )
+      // console.log('filteredTxs: ', filteredTxs)
       const slpTxs = filteredTxs.combined
       const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
@@ -357,17 +360,20 @@ class SlpIndexer {
 
       // Check each of the non-SLP transaction to see if it matches the profile
       // of a claim.
+      // console.log('nonSlpTxs: ', nonSlpTxs)
       if (nonSlpTxs && nonSlpTxs.length) {
         for (let i = 0; i < nonSlpTxs.length; i++) {
           const thisTxid = nonSlpTxs[i]
 
           // Check if this transaction is a Claim.
           const isClaim = await this.transaction.isPinClaim(thisTxid)
+          console.log(`TX ${thisTxid} is pin claim: ${!!isClaim}`)
           if (isClaim) {
+            console.log(`Claim found: ${JSON.stringify(isClaim, null, 2)}`)
             // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
 
             // Store the claim in the database.
-            await this.claimDb.put(thisTxid, isClaim)
+            await this.pinClaimDb.put(thisTxid, isClaim)
 
             // TODO: Trigger webhook
           }
