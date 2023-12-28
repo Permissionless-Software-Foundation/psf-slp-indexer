@@ -70,9 +70,9 @@ async function start () {
     // Add the OP_RETURN to the transaction.
     const script = [
       bchjs.Script.opcodes.OP_RETURN,
-      Buffer.from('00510000', 'hex'), // Makes message comply with the memo.cash protocol.
-      Buffer.from(POB_TXID, 'hex'),
-      Buffer.from(CID)
+      Buffer.from('00510000', 'hex') // Makes message comply with the memo.cash protocol.
+      // Buffer.from(POB_TXID, 'hex'),
+      // Buffer.from(CID)
     ]
 
     // Compile the script array into a bitcoin-compliant hex encoded string.

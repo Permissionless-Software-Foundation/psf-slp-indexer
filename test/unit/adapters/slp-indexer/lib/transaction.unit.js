@@ -1335,5 +1335,29 @@ describe('#Transaction', () => {
 
       assert.equal(result, false)
     })
+
+    it('should return false for 1st invalid pin claim', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.invalidPinClaim01)
+
+      const txid = 'a73c26e7dc3151cfc1be195fbcea52c9c9824d0498f131a6ae5fe7dc76b2d941'
+
+      const result = await uut.isPinClaim(txid)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+
+    it('should return false for 2nd invalid pin claim', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.invalidPinClaim02)
+
+      const txid = '26febcc05f93188acfeecef76f02688bd68d7617f388518af758695029f49b47'
+
+      const result = await uut.isPinClaim(txid)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
   })
 })

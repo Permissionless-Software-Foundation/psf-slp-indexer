@@ -23,6 +23,7 @@ describe('#slpIndexer', () => {
     const statusDb = new MockLevel()
     const pTxDb = new MockLevel()
     const utxoDb = new MockLevel()
+    const pinClaimDb = new MockLevel()
 
     uut.addrDb = addrDb
     uut.tokenDb = tokenDb
@@ -30,8 +31,9 @@ describe('#slpIndexer', () => {
     uut.statusDb = statusDb
     uut.pTxDb = pTxDb
     uut.utxoDb = utxoDb
+    uut.pinClaimDb = pinClaimDb
 
-    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
+    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb }
   }
 
   beforeEach(() => {
@@ -49,7 +51,7 @@ describe('#slpIndexer', () => {
 
   describe('#openDatabases', () => {
     it('should open and then close databases', async () => {
-      const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = uut.openDatabases()
+      const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb } = uut.openDatabases()
 
       await addrDb.close()
       await tokenDb.close()
@@ -57,6 +59,7 @@ describe('#slpIndexer', () => {
       await statusDb.close()
       await pTxDb.close()
       await utxoDb.close()
+      await pinClaimDb.close()
     })
   })
 
@@ -474,6 +477,32 @@ describe('#slpIndexer', () => {
       } catch (err) {
         assert.include(err.message, 'test error')
       }
+    })
+
+    it('should process Pin Claim txs', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: [],
+        nonSlpTxs: ['09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905']
+      })
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves({
+        cid: 'test-cid'
+      })
+      sandbox.stub(uut.pinClaimDb, 'put').resolves()
+      // sandbox.stub(uut, 'processSlpTxs').resolves()
+      // sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
+      // sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 1)
     })
   })
 
