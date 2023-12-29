@@ -383,7 +383,7 @@ class SlpIndexer {
               this.webhook.webhookNewClaim(isClaim)
             } catch (err) {
               /* exit quietly */
-              // console.log('Error trying to execute webhook: ', err)
+              console.log('Error trying to execute webhook: ', err)
             }
           }
         }

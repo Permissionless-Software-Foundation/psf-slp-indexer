@@ -496,6 +496,31 @@ describe('#slpIndexer', () => {
         cid: 'test-cid'
       })
       sandbox.stub(uut.pinClaimDb, 'put').resolves()
+      sandbox.stub(uut.webhook, 'webhookNewClaim').resolves()
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 1)
+    })
+
+    it('should ignore Pin Claim webhook errors', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: [],
+        nonSlpTxs: ['09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905']
+      })
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves({
+        cid: 'test-cid'
+      })
+      sandbox.stub(uut.pinClaimDb, 'put').resolves()
+      sandbox.stub(uut.webhook, 'webhookNewClaim').throws(new Error('test error'))
 
       const result = await uut.processBlock(600000)
 

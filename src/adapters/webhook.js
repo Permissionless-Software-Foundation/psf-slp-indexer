@@ -29,6 +29,7 @@ class Webhook {
       console.error('Error in webhookNewClaim(): ', err)
       // throw err
       console.log('Skipping error and continuing processing. Check ipfs-file-pin-service')
+      return false
     }
   }
 }
