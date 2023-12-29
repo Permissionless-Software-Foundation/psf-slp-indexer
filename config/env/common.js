@@ -115,5 +115,8 @@ export default {
   // Number of backups to retain.
   backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5,
 
-  chatPubSubChan: 'psf-ipfs-chat-001'
+  chatPubSubChan: 'psf-ipfs-chat-001',
+
+  // ipfs-file-pin-service settings
+  pinUrl: process.env.PIN_API_URL ? process.env.PIN_API_URL : 'http://localhost:5031'
 }

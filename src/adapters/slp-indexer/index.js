@@ -36,6 +36,7 @@ import Utils from './lib/utils.js'
 import ManagePTXDB from './lib/ptxdb.js'
 import Query from './lib/query.js'
 import Blacklist from './lib/blacklist.js'
+import Webhook from '../webhook.js'
 
 const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10
@@ -118,6 +119,7 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.blacklist = new Blacklist()
     this.retryQueue = new RetryQueue()
+    this.webhook = new Webhook()
 
     // Used to control program flow during testing, to override the default
     // behavior of process.exit().
@@ -367,7 +369,7 @@ class SlpIndexer {
 
           // Check if this transaction is a Claim.
           const isClaim = await this.transaction.isPinClaim(thisTxid)
-          console.log(`TX ${thisTxid} is pin claim: ${!!isClaim}`)
+          // console.log(`TX ${thisTxid} is pin claim: ${!!isClaim}`)
           if (isClaim) {
             console.log(`Claim found: ${JSON.stringify(isClaim, null, 2)}`)
             // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
@@ -375,7 +377,14 @@ class SlpIndexer {
             // Store the claim in the database.
             await this.pinClaimDb.put(thisTxid, isClaim)
 
-            // TODO: Trigger webhook
+            // Trigger webhook
+            try {
+              // Trigger webhook. Do not wait, so that code execution is not blocked.
+              this.webhook.webhookNewClaim(isClaim)
+            } catch (err) {
+              /* exit quietly */
+              // console.log('Error trying to execute webhook: ', err)
+            }
           }
         }
       }

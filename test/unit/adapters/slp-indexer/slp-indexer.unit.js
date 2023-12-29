@@ -496,9 +496,6 @@ describe('#slpIndexer', () => {
         cid: 'test-cid'
       })
       sandbox.stub(uut.pinClaimDb, 'put').resolves()
-      // sandbox.stub(uut, 'processSlpTxs').resolves()
-      // sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
-      // sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
 
       const result = await uut.processBlock(600000)
 
