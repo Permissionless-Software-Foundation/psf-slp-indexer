@@ -45,6 +45,8 @@ export RPC_PASS=password
 # Delete backups as it syncs.
 export DELETE_BACKUP=1
 
+export PIN_API_URL=http://172.17.0.1:5031
+
 # make directories
 mkdir leveldb
 mkdir leveldb/current
