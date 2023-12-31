@@ -633,6 +633,27 @@ class SlpIndexer {
       } catch (err) {
         /* exit quietly */
         // console.log(err)
+
+        // TODO: check if this TX is a Pin Claim.
+        // Check if this transaction is a Claim.
+        const isClaim = await this.transaction.isPinClaim(tx)
+        // console.log(`TX ${tx.txid} is pin claim: ${!!isClaim}`)
+        if (isClaim) {
+          console.log(`Claim found: ${JSON.stringify(isClaim, null, 2)}`)
+          // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
+
+          // Store the claim in the database.
+          await this.pinClaimDb.put(tx, isClaim)
+
+          // Trigger webhook
+          try {
+            // Trigger webhook. Do not wait, so that code execution is not blocked.
+            this.webhook.webhookNewClaim(isClaim)
+          } catch (err) {
+            /* exit quietly */
+            console.log('Error trying to execute webhook: ', err)
+          }
+        }
       }
 
       // Process the identified SLP transaction.
