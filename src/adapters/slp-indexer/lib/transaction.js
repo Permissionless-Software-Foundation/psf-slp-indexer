@@ -964,12 +964,20 @@ class Transaction {
           return false
         }
 
+        let filename
+        if (script[4]) {
+          filename = Buffer.from(script[4], 'hex').toString()
+        } else {
+          return false
+        }
+
         // console.log('CID to pin: ', cid)
 
         const retObj = {
           proofOfBurnTxid,
           cid,
-          claimTxid: txid
+          claimTxid: txid,
+          filename
         }
 
         return retObj
