@@ -284,8 +284,8 @@ describe('#slpIndexer', () => {
       // Mock dependencies
       sandbox.stub(uut.pTxDb, 'get').rejects(new Error('Entry not found'))
       sandbox.stub(uut.transaction, 'decodeOpReturn').rejects(new Error('test error'))
-      sandbox.stub(uut.transaction,'isPinClaim').resolves({})
-      sandbox.stub(uut.webhook,'webhookNewClaim').returns()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves({})
+      sandbox.stub(uut.webhook, 'webhookNewClaim').returns()
       // sandbox.stub(uut.pinClaimDb,'put')
       // sandbox.stub(uut.blacklist, 'checkBlacklist').returns(false)
       // sandbox.stub(uut.cache, 'get').resolves({})
