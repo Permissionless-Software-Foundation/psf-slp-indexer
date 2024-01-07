@@ -250,7 +250,7 @@ describe('#slpIndexer', () => {
       // Mock dependencies
       sandbox.stub(uut.pTxDb, 'get').rejects(new Error('Entry not found'))
       sandbox.stub(uut.transaction, 'decodeOpReturn').rejects(new Error('test error'))
-      // sandbox.stub(uut.blacklist, 'checkBlacklist').returns(true)
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       const inData = {
         tx: 'fake-txid',
@@ -409,6 +409,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut, 'processSlpTxs').resolves()
       sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       const result = await uut.processBlock(600000)
 
@@ -432,6 +433,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
       sandbox.stub(uut.dbBackup, 'zipDb').resolves()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       uut.indexState = 'phase1'
 
@@ -458,6 +460,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
       sandbox.stub(uut.dbBackup, 'unzipDb').resolves()
       sandbox.stub(uut.process, 'exit').returns()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       uut.indexState = 'phase2'
 

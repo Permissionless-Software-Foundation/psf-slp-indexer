@@ -1298,7 +1298,7 @@ describe('#Transaction', () => {
       // Mock dependencies and force desired code path
       sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.validPinClaim01)
 
-      const txid = '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
+      const txid = '1e3a17f945fcf6c718c6463d878f4a2bd647324a9111d17c38ac2bd7fb154b88'
 
       const result = await uut.isPinClaim(txid)
       // console.log('result: ', result)
@@ -1309,9 +1309,9 @@ describe('#Transaction', () => {
       assert.property(result, 'claimTxid')
 
       // Assert the expected values
-      assert.equal(result.proofOfBurnTxid, '5bfcdca588830245dcd9353f45bb1d06640d7fada0000160ae2789a887b23766')
-      assert.equal(result.cid, 'bafybeicd455l7c6mxiogptqcg6md474qmzzmzobgzu4vfms4wnek2hxguy')
-      assert.equal(result.claimTxid, '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905')
+      assert.equal(result.proofOfBurnTxid, 'abd03cd5a2d0bceb206ffcab6ca4d84bd70745c771433e0d7e467c153c295182')
+      assert.equal(result.cid, 'bafkreihhjukasxdhdr4m75kz2pn2voswetczoh2qvokbp26n62wjfkxcde')
+      assert.equal(result.claimTxid, '1e3a17f945fcf6c718c6463d878f4a2bd647324a9111d17c38ac2bd7fb154b88')
     })
 
     it('should throw error if txid is not included', async () => {
@@ -1353,6 +1353,18 @@ describe('#Transaction', () => {
       sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.invalidPinClaim02)
 
       const txid = '26febcc05f93188acfeecef76f02688bd68d7617f388518af758695029f49b47'
+
+      const result = await uut.isPinClaim(txid)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+
+    it('should return false if Pin Claim is missing filename', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.invalidPinClaim03)
+
+      const txid = '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
 
       const result = await uut.isPinClaim(txid)
       // console.log('result: ', result)
