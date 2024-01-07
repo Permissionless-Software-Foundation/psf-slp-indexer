@@ -649,10 +649,7 @@ class SlpIndexer {
           try {
             // Trigger webhook. Do not wait, so that code execution is not blocked.
             this.webhook.webhookNewClaim(isClaim)
-          } catch (err) {
-            /* exit quietly */
-            console.log('Error trying to execute webhook: ', err)
-          }
+          } catch (err) { /* exit quietly */ }
         }
       }
 
