@@ -973,11 +973,19 @@ class Transaction {
 
         // console.log('CID to pin: ', cid)
 
+        // Get address of first input to TX.
+        // Get the TX parent of the first input to the transaction.
+        const parentTx = await this.getTxWithRetry(txDetails.vin[0].txid)
+        console.log('parentTx: ', JSON.stringify(parentTx, null, 2))
+        const address = parentTx.vout[txDetails.vin[0].vout].scriptPubKey.addresses[0]
+        console.log('address: ', address)
+
         const retObj = {
           proofOfBurnTxid,
           cid,
           claimTxid: txid,
-          filename
+          filename,
+          address
         }
 
         return retObj

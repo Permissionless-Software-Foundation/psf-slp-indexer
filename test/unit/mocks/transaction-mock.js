@@ -2050,6 +2050,88 @@ const invalidPinClaim03 = {
   "blocktime": 1703639914
 }
 
+const claimParent01 = {
+    "blockhash": "0000000000000000006ff965c9156d7bf41aa6e8c7baac1f61e1c571e301226e",
+    "blocktime": 1704592931,
+    "confirmations": 7265,
+    "hash": "abd03cd5a2d0bceb206ffcab6ca4d84bd70745c771433e0d7e467c153c295182",
+    "hex": "02000000021a2c4a9d13b4c18ac172daf2edd1e516f6df19cf9b11ec5f57b6fe97c180b1b1010000006a473044022079a2222a3d4b6795ba3d4a44df59a29edc988beb43a2d6f26c324221233a9a6902203918e7dbeeeeb3b7c10a9f94f91180cc7d606edbd260333569bd9e230c64136041210364b5cbeb7d467a9ea0d75545b96ea81bf05ff6c4f9efa68eb3598d81e6f5fb3bffffffff72b0af9d94660b8eca86774b19da11eaf78e4585baecfdced13dbffb6c3ca44e020000006a47304402202562e2497b6eb03a23f229e7eb580ff2d1f9675d68883541fefc12fd5d4dfaab02203c72845567f718a4d520a4d1994ffd68572a83e7123a06d6fb12541034ad531141210364b5cbeb7d467a9ea0d75545b96ea81bf05ff6c4f9efa68eb3598d81e6f5fb3bffffffff040000000000000000376a04534c500001010453454e442038e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b008000000000beb967b22020000000000001976a9142d29bee58eba7675a7f4b7c243fcc3344a84828d88acd0070000000000001976a914203b64bfbaa9e58333295b621159ddebc591ecb188acc7200300000000001976a9142d29bee58eba7675a7f4b7c243fcc3344a84828d88ac00000000",
+    "locktime": 0,
+    "size": 470,
+    "time": 1704592931,
+    "txid": "abd03cd5a2d0bceb206ffcab6ca4d84bd70745c771433e0d7e467c153c295182",
+    "version": 2,
+    "vin": [
+      {
+        "scriptSig": {
+          "asm": "3044022079a2222a3d4b6795ba3d4a44df59a29edc988beb43a2d6f26c324221233a9a6902203918e7dbeeeeb3b7c10a9f94f91180cc7d606edbd260333569bd9e230c641360[ALL|FORKID] 0364b5cbeb7d467a9ea0d75545b96ea81bf05ff6c4f9efa68eb3598d81e6f5fb3b",
+          "hex": "473044022079a2222a3d4b6795ba3d4a44df59a29edc988beb43a2d6f26c324221233a9a6902203918e7dbeeeeb3b7c10a9f94f91180cc7d606edbd260333569bd9e230c64136041210364b5cbeb7d467a9ea0d75545b96ea81bf05ff6c4f9efa68eb3598d81e6f5fb3b"
+        },
+        "sequence": 4294967295,
+        "txid": "b1b180c197feb6575fec119bcf19dff616e5d1edf2da72c18ac1b4139d4a2c1a",
+        "vout": 1
+      },
+      {
+        "scriptSig": {
+          "asm": "304402202562e2497b6eb03a23f229e7eb580ff2d1f9675d68883541fefc12fd5d4dfaab02203c72845567f718a4d520a4d1994ffd68572a83e7123a06d6fb12541034ad5311[ALL|FORKID] 0364b5cbeb7d467a9ea0d75545b96ea81bf05ff6c4f9efa68eb3598d81e6f5fb3b",
+          "hex": "47304402202562e2497b6eb03a23f229e7eb580ff2d1f9675d68883541fefc12fd5d4dfaab02203c72845567f718a4d520a4d1994ffd68572a83e7123a06d6fb12541034ad531141210364b5cbeb7d467a9ea0d75545b96ea81bf05ff6c4f9efa68eb3598d81e6f5fb3b"
+        },
+        "sequence": 4294967295,
+        "txid": "4ea43c6cfbbf3dd1cefdecba85458ef7ea11da194b7786ca8e0b66949dafb072",
+        "vout": 2
+      }
+    ],
+    "vout": [
+      {
+        "n": 0,
+        "scriptPubKey": {
+          "asm": "OP_RETURN 5262419 1 1145980243 38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0 8905563745648902144",
+          "hex": "6a04534c500001010453454e442038e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b008000000000beb967b",
+          "type": "nulldata"
+        },
+        "value": 0
+      },
+      {
+        "n": 1,
+        "scriptPubKey": {
+          "addresses": [
+            "bitcoincash:qqkjn0h936a8vad87jmuyslucv6y4pyz357wne8zlj"
+          ],
+          "asm": "OP_DUP OP_HASH160 2d29bee58eba7675a7f4b7c243fcc3344a84828d OP_EQUALVERIFY OP_CHECKSIG",
+          "hex": "76a9142d29bee58eba7675a7f4b7c243fcc3344a84828d88ac",
+          "reqSigs": 1,
+          "type": "pubkeyhash"
+        },
+        "value": 0.00000546
+      },
+      {
+        "n": 2,
+        "scriptPubKey": {
+          "addresses": [
+            "bitcoincash:qqsrke9lh257tqen99dkyy2emh4uty0vky9y0z0lsr"
+          ],
+          "asm": "OP_DUP OP_HASH160 203b64bfbaa9e58333295b621159ddebc591ecb1 OP_EQUALVERIFY OP_CHECKSIG",
+          "hex": "76a914203b64bfbaa9e58333295b621159ddebc591ecb188ac",
+          "reqSigs": 1,
+          "type": "pubkeyhash"
+        },
+        "value": 0.00002
+      },
+      {
+        "n": 3,
+        "scriptPubKey": {
+          "addresses": [
+            "bitcoincash:qqkjn0h936a8vad87jmuyslucv6y4pyz357wne8zlj"
+          ],
+          "asm": "OP_DUP OP_HASH160 2d29bee58eba7675a7f4b7c243fcc3344a84828d OP_EQUALVERIFY OP_CHECKSIG",
+          "hex": "76a9142d29bee58eba7675a7f4b7c243fcc3344a84828d88ac",
+          "reqSigs": 1,
+          "type": "pubkeyhash"
+        },
+        "value": 0.00204999
+      }
+    ]
+  }
 
 export default {
   nonSlpTxDetails,
@@ -2104,5 +2186,6 @@ export default {
   validPinClaim01,
   invalidPinClaim01,
   invalidPinClaim02,
-  invalidPinClaim03
+  invalidPinClaim03,
+  claimParent01
 }

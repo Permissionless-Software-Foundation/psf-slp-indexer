@@ -1296,7 +1296,9 @@ describe('#Transaction', () => {
   describe('#isPinClaim', () => {
     it('should return data about valid Pin Claim', async () => {
       // Mock dependencies and force desired code path
-      sandbox.stub(uut, 'getTxWithRetry').resolves(mockData.validPinClaim01)
+      sandbox.stub(uut, 'getTxWithRetry')
+        .onCall(0).resolves(mockData.validPinClaim01)
+        .onCall(1).resolves(mockData.claimParent01)
 
       const txid = '1e3a17f945fcf6c718c6463d878f4a2bd647324a9111d17c38ac2bd7fb154b88'
 
