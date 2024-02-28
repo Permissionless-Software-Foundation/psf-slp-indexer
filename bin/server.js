@@ -39,6 +39,7 @@ class Server {
 
       console.log(`Starting environment: ${this.config.env}`)
       console.log(`Debug level: ${this.config.debugLevel}`)
+      console.log(`Version 3.0.7`)
 
       // MIDDLEWARE START
 
