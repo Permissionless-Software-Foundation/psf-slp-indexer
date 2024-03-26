@@ -33,7 +33,7 @@ WORKDIR /home/safeuser
 #RUN runuser -l safeuser -c "npm config set prefix '~/.npm-global'"
 
 # Update to the latest version of npm.
-RUN npm install -g npm@8.3.0
+#RUN npm install -g npm@8.3.0
 
 # npm mirror to prevent direct dependency on npm.
 RUN npm set registry http://94.130.170.209:4873/
