@@ -9,7 +9,7 @@ MAINTAINER Chris Troutner <chris.troutner@gmail.com>
 
 #Update the OS and install any OS packages needed.
 RUN apt-get update
-RUN apt-get install -y sudo git curl nano gnupg wget zip unzip
+RUN apt-get install -y sudo git curl nano gnupg wget zip unzip python3
 
 #Install Node and NPM
 RUN sudo apt-get install -y ca-certificates curl gnupg
