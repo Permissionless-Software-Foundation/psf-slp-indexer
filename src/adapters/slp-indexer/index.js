@@ -361,9 +361,10 @@ class SlpIndexer {
         // Progressively processes TXs in the array.
         await this.processSlpTxs(slpTxs, blockHeight)
 
-        // Do a second round of this.filterBlock.deleteBurnedUtxos() for
-        // all non-SLP transactions. Handles corner-case where a token UTXO
-        // is burned in the same block that it was created.
+        // Run all non-SLP TXs through deleteBurnedUtxos().
+        // This solves for the following corner cases:
+        // - A SLP UTXO was used as the input for a non-SLP UTXO.
+        // - A token UTXO is burned in the same block that it was created.
         for (let i = 0; i < nonSlpTxs.length; i++) {
           const thisTxid = nonSlpTxs[i]
           const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)

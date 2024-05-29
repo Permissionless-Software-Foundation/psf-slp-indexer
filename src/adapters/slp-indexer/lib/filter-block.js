@@ -135,9 +135,12 @@ class FilterBlock {
           // Non-token TX
           nonSlpTxs.push(txid)
 
+          // CT 5-28-24: This code should no longer be needed.
+          // nonSlpTxs are sent through deleteBurnedUtxos() in the main library
+          // after the block is sorted and filtered.
           // Check if any input UTXOs are in the database. If so, delete them,
           // since they are officially burned.
-          await this.deleteBurnedUtxos(txid)
+          // await this.deleteBurnedUtxos(txid)
         }
       }
 
