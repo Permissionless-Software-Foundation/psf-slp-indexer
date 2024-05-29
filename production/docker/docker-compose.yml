@@ -3,6 +3,16 @@
 version: '3.9'
 
 services:
+  mongo-slp-support:
+    image: mongo:4.2.0
+    container_name: mongo-ipfs-service
+    ports:
+      - '5555:27017' # <host port>:<container port>
+    volumes:
+      - ../data/database:/data/db
+    command: mongod --logpath=/dev/null # -- quiet
+    restart: always
+
   slp-indexer:
     build: .
     container_name: slp-indexer
@@ -20,4 +30,25 @@ services:
       - ../data/ipfsdata:/home/safeuser/psf-slp-indexer/.ipfsdata
       - ../data/leveldb:/home/safeuser/psf-slp-indexer/leveldb
       - ./start-production.sh:/home/safeuser/psf-slp-indexer/start-production.sh
+    restart: always
+
+  slp-support:
+    build: ./slp-support-api/
+    #image: christroutner/ipfs-service-provider:v5.0.1
+    container_name: slp-support
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '10'
+    #mem_limit: 4000mb
+    links:
+      - mongo-slp-support
+    ports:
+      - '5019:5019' # <host port>:<container port>
+      - '4001:4001'
+      - '4003:4003'
+    volumes:
+      - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
+      - ./start-production.sh:/home/safeuser/ipfs-service-provider/start-production.sh
     restart: always

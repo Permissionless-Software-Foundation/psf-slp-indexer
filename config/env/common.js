@@ -116,5 +116,7 @@ export default {
 
   chatPubSubChan: 'psf-ipfs-chat-001',
 
-  useSlpSupportApi: process.env.USE_SLP_SUPPORT_API ? true : false
+  // Optional slp-support-api for parallel processing of blocks.
+  useSlpSupportApi: process.env.USE_SLP_SUPPORT_API ? true : false,
+  supportApiUrl: process.env.SLP_SUPPORT_URL ? process.env.SLP_SUPPORT_URL : 'http://localhost:5019'
 }
