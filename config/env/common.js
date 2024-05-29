@@ -90,7 +90,6 @@ export default {
 
   // RPC connection information, used by the SLP indexer to communicate with the
   // full node.
-  // rpcUri: process.env.RPC_URI ? process.env.RPC_URI : '192.168.0.5:8332',
   rpcIp: process.env.RPC_IP ? process.env.RPC_IP : '172.17.0.1',
   rpcPort: process.env.RPC_PORT ? process.env.RPC_PORT : '8332',
   zmqPort: process.env.ZMQ_PORT ? process.env.ZMQ_PORT : '28332',
@@ -115,5 +114,7 @@ export default {
   // Number of backups to retain.
   backupQty: process.env.BACKUP_QTY ? parseInt(process.env.BACKUP_QTY) : 5,
 
-  chatPubSubChan: 'psf-ipfs-chat-001'
+  chatPubSubChan: 'psf-ipfs-chat-001',
+
+  useSlpSupportApi: process.env.USE_SLP_SUPPORT_API ? true : false
 }

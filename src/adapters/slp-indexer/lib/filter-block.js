@@ -488,15 +488,17 @@ class FilterBlock {
   // Background: This filtering and sorting needs to be done prior to trying to
   // put new entries into the database. This input validation and pre-processing
   // makes the database processing much faster and less error prone.
-  async filterAndSortSlpTxs2 (txids, blockHeight) {
+  async filterAndSortSlpTxs2 (inObj = {}) {
     try {
+      const { txids, blockHeight } = inObj
+
       console.log(`txids before filtering: ${txids.length}`)
 
       // Filter out all the non-SLP transactions.
-      let { slpTxs, nonSlpTxs } = await this.filterSlpTxs(txids)
+      const filteredData = await this.filterSlpTxs(txids)
+      let slpTxs = filteredData.slpTxs
+      const nonSlpTxs = filteredData.nonSlpTxs
       console.log(`txs in slpTxs prior to sorting: ${slpTxs.length}`)
-      // console.log('nonSlpTxs: ', nonSlpTxs.length)
-      // console.log(`slpTxs prior to sorting: ${JSON.stringify(slpTxs, null, 2)}`)
 
       // No SLP txids in the array? Exit.
       if (!slpTxs.length) return []
