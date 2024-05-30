@@ -332,7 +332,7 @@ class SlpIndexer {
         // Use the SLP Support API to filter the block.
         // console.log('Using SLP Support API to filter and sort block.')
 
-        const result = await this.axios.post(`${this.config.supportApiUrl}/slp/filterBlock'`, {
+        const result = await this.axios.post(`${this.config.supportApiUrl}/slp/filterBlock`, {
           txids: txs,
           blockHeight
         })

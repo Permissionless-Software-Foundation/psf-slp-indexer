@@ -49,6 +49,6 @@ services:
       - '4001:4001'
       - '4003:4003'
     volumes:
-      - ../data/ipfsdata:/home/safeuser/ipfs-service-provider/.ipfsdata
-      - ./start-production.sh:/home/safeuser/ipfs-service-provider/start-production.sh
+      - ../data/ipfsdata:/home/safeuser/slp-support-api/.ipfsdata
+      - ./slp-support-api/start-production.sh:/home/safeuser/slp-support-api/start-production.sh
     restart: always
