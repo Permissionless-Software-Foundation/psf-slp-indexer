@@ -475,6 +475,62 @@ describe('#slpIndexer', () => {
         assert.include(err.message, 'test error')
       }
     })
+
+    it('should hand off block pre-processing to support API in phase2', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      // Mock support API.
+      sandbox.stub(uut.axios, 'post').resolves({ data: {
+        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+      }})
+      sandbox.stub(uut, 'processSlpTxs').resolves()
+      sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
+      sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+
+      // Force phase2 processing and config to use support API.
+      uut.indexState = 'phase2'
+      uut.config.useSlpSupportApi = true
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 1)
+    })
+
+    it('should still rollback to last epoch in phase 2 when using support API', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      // Mock support API.
+      sandbox.stub(uut.axios, 'post').resolves({ data: {
+        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+      }})
+      sandbox.stub(uut, 'processSlpTxs').resolves()
+      sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
+      sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+      sandbox.stub(uut.dbBackup, 'unzipDb').resolves()
+      sandbox.stub(uut.process, 'exit').returns()
+
+      // Force phase2 processing and config to use support API.
+      uut.indexState = 'phase2'
+      uut.config.useSlpSupportApi = true
+
+      const result = await uut.processBlock(600001)
+
+      assert.equal(result, 3)
+    })
   })
 
   describe('#start', () => {

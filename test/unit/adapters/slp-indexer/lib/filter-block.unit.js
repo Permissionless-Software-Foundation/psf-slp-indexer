@@ -395,30 +395,30 @@ describe('#filter-block.js', () => {
       sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
 
       const blockHeight = 543413
-      const txs = [
+      const txids = [
         '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2',
         '82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac',
         'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
       ]
 
       // Mock dependencies
-      sandbox.stub(uut, 'filterSlpTxs').resolves({ slpTxs: txs, nonSlpTxs: [] })
+      sandbox.stub(uut, 'filterSlpTxs').resolves({ slpTxs: txids, nonSlpTxs: [] })
       sandbox
         .stub(uut, 'checkForParent2')
         .onCall(0)
-        .resolves({ hasParent: false, dag: [txs[0]] })
+        .resolves({ hasParent: false, dag: [txids[0]] })
         .onCall(1)
-        .resolves({ hasParent: false, dag: [txs[1]] })
+        .resolves({ hasParent: false, dag: [txids[1]] })
       sandbox
         .stub(uut, 'forwardDag')
         .onCall(0)
         .resolves({
           success: true,
-          chainedArray: [txs[0], txs[2]],
-          unsortedArray: [txs[1]]
+          chainedArray: [txids[0], txids[2]],
+          unsortedArray: [txids[1]]
         })
 
-      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2({txids, blockHeight})
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(combined.length, 3)
@@ -429,9 +429,9 @@ describe('#filter-block.js', () => {
 
     it('should return an empty array if given an empty array', async () => {
       const blockHeight = 543413
-      const txs = []
+      const txids = []
 
-      const result = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      const result = await uut.filterAndSortSlpTxs2({txids, blockHeight})
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.isArray(result)
@@ -444,9 +444,9 @@ describe('#filter-block.js', () => {
         sandbox.stub(uut, 'filterSlpTxs').rejects(new Error('test error'))
 
         const blockHeight = 543413
-        const txs = []
+        const txids = []
 
-        await uut.filterAndSortSlpTxs2(txs, blockHeight)
+        await uut.filterAndSortSlpTxs2({txids, blockHeight})
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -459,7 +459,7 @@ describe('#filter-block.js', () => {
       sandbox.stub(uut.cache.txDb, 'get').rejects(new Error('no entry'))
 
       const blockHeight = 543413
-      const txs = [
+      const txids = [
         '170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2',
         '82a9c47118dd221bf528e8b9ee9daef626ca52fb824b92cbe52a83e87afb0fac',
         'e5ff3083cd2dcf87a40a4a4a478349a394c1a1eeffe4857c2a173b183fdd42a2'
@@ -494,7 +494,7 @@ describe('#filter-block.js', () => {
           ]
         })
 
-      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2(txs, blockHeight)
+      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2({txids, blockHeight})
       // console.log('combined: ', combined)
       // console.log('nonSlpTxs: ', nonSlpTxs)
 

@@ -341,6 +341,25 @@ class SlpIndexer {
         nonSlpTxs = filteredData.nonSlpTxs
         // console.log('SLP support slpTxs: ', slpTxs)
         // console.log('SLP support nonSlpTxs: ', nonSlpTxs)
+
+        if ((blockHeight - 1) % EPOCH === 0) {
+          // In phase 2 (ZMQ), roll back to the last backup and resync, to generate
+          // a new backup. This prevents the backup file from being corrupted by ZMQ
+          // transaction processing while in phase2.
+
+          const rollbackHeight = blockHeight - 1 - EPOCH
+
+          // Roll back the database to the last epoch.
+          await this.dbBackup.unzipDb(rollbackHeight)
+
+          // Kill the process, which will allow the app to shut down, and pm2 or Docker can
+          // restart it at a block height to resync and take a proper backup while
+          // in phase1.
+          console.log('Killing process, expecting process manager to restart this app.')
+          this.process.exit(0)
+
+          return 3
+        }
       } else {
         // Default usage, the indexer filters the block.
         console.log('Using native block filtering and sorting.')
