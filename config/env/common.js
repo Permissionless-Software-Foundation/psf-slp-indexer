@@ -118,5 +118,8 @@ export default {
 
   // Optional slp-support-api for parallel processing of blocks.
   useSlpSupportApi: process.env.USE_SLP_SUPPORT_API ? true : false,
-  supportApiUrl: process.env.SLP_SUPPORT_URL ? process.env.SLP_SUPPORT_URL : 'http://localhost:5019'
+  supportApiUrl: process.env.SLP_SUPPORT_URL ? process.env.SLP_SUPPORT_URL : 'http://localhost:5019',
+
+  // Max size of in-memory caches. Effects memory usage.
+  cacheSize: process.env.CACHE_SIZE ? parseInt(process.env.CACHE_SIZE) : 100000
 }
