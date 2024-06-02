@@ -418,7 +418,7 @@ describe('#filter-block.js', () => {
           unsortedArray: [txids[1]]
         })
 
-      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2({txids, blockHeight})
+      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2({ txids, blockHeight })
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.equal(combined.length, 3)
@@ -431,7 +431,7 @@ describe('#filter-block.js', () => {
       const blockHeight = 543413
       const txids = []
 
-      const result = await uut.filterAndSortSlpTxs2({txids, blockHeight})
+      const result = await uut.filterAndSortSlpTxs2({ txids, blockHeight })
       // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
       assert.isArray(result)
@@ -446,7 +446,7 @@ describe('#filter-block.js', () => {
         const blockHeight = 543413
         const txids = []
 
-        await uut.filterAndSortSlpTxs2({txids, blockHeight})
+        await uut.filterAndSortSlpTxs2({ txids, blockHeight })
 
         assert.fail('Unexpected code path')
       } catch (err) {
@@ -494,7 +494,7 @@ describe('#filter-block.js', () => {
           ]
         })
 
-      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2({txids, blockHeight})
+      const { combined, nonSlpTxs } = await uut.filterAndSortSlpTxs2({ txids, blockHeight })
       // console.log('combined: ', combined)
       // console.log('nonSlpTxs: ', nonSlpTxs)
 

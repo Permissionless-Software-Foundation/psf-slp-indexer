@@ -486,10 +486,12 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.rpc, 'getBlockHash').resolves()
       sandbox.stub(uut.rpc, 'getBlock').resolves(block)
       // Mock support API.
-      sandbox.stub(uut.axios, 'post').resolves({ data: {
-        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
-        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
-      }})
+      sandbox.stub(uut.axios, 'post').resolves({
+        data: {
+          combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+          nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+        }
+      })
       sandbox.stub(uut, 'processSlpTxs').resolves()
       sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
@@ -513,10 +515,12 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.rpc, 'getBlockHash').resolves()
       sandbox.stub(uut.rpc, 'getBlock').resolves(block)
       // Mock support API.
-      sandbox.stub(uut.axios, 'post').resolves({ data: {
-        combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
-        nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
-      }})
+      sandbox.stub(uut.axios, 'post').resolves({
+        data: {
+          combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
+          nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
+        }
+      })
       sandbox.stub(uut, 'processSlpTxs').resolves()
       sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
