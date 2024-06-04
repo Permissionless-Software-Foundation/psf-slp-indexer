@@ -487,7 +487,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.rpc, 'getBlock').resolves(block)
       // Mock support API.
       // sandbox.stub(uut.axios, 'post').resolves({
-      sandbox.stub(uut.retryQueue,'addToQueue').resolves({
+      sandbox.stub(uut.retryQueue, 'addToQueue').resolves({
         data: {
           combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
           nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
@@ -517,7 +517,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.rpc, 'getBlock').resolves(block)
       // Mock support API.
       // sandbox.stub(uut.axios, 'post').resolves({
-      sandbox.stub(uut.retryQueue,'addToQueue').resolves({
+      sandbox.stub(uut.retryQueue, 'addToQueue').resolves({
         data: {
           combined: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2'],
           nonSlpTxs: ['170147548aad6de7c1df686c56e4846e0936c4573411b604a18d0ec76482dde2']
