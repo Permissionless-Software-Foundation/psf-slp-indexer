@@ -219,6 +219,9 @@ class FilterBlock {
 
         // Use utxoDb to lookup the address associated with the UTXO.
         const addr = await this.getAddressFromTxid(txid, vout)
+
+        // If no address is returned, then this Vin is not associated with an
+        // SLP transaction.
         if (!addr) continue
 
         // Try to get the address from the database.
