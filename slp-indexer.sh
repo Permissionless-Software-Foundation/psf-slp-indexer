@@ -11,6 +11,8 @@ export RPC_PASS=password
 ## backup zip files.
 #export DELETE_BACKUP=1
 
+export USE_SLP_SUPPORT_API=true
+
 # Normal indexing, scanning every block and starting at SLP genesis.
 npm start
 

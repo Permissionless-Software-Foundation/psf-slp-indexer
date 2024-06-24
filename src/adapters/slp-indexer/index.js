@@ -15,8 +15,8 @@
 // Number of retries before exiting the indexer
 
 // Global npm libraries
-// const RetryQueue = require('@chris.troutner/retry-queue-commonjs')
 import RetryQueue from '@chris.troutner/retry-queue-commonjs'
+import axios from 'axios'
 
 // Local libraries
 import wlogger from '../wlogger.js'
@@ -36,6 +36,7 @@ import Utils from './lib/utils.js'
 import ManagePTXDB from './lib/ptxdb.js'
 import Query from './lib/query.js'
 import Blacklist from './lib/blacklist.js'
+import config from '../../../config/index.js'
 
 const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10
@@ -116,6 +117,8 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.blacklist = new Blacklist()
     this.retryQueue = new RetryQueue()
+    this.config = config
+    this.axios = axios
 
     // Used to control program flow during testing, to override the default
     // behavior of process.exit().
@@ -321,15 +324,66 @@ class SlpIndexer {
         } transactions. Time now: ${now.toLocaleString()}`
       )
 
+      let slpTxs, nonSlpTxs
+
       // Filter and sort block transactions, to make indexing more efficient
       // and easier to debug.
-      const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2(
-        txs,
-        blockHeight
-      )
-      const slpTxs = filteredTxs.combined
-      const nonSlpTxs = filteredTxs.nonSlpTxs
-      // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      if (this.config.useSlpSupportApi && this.indexState === 'phase2') {
+        // Use the SLP Support API to filter the block.
+        // console.log('Using SLP Support API to filter and sort block.')
+
+        const result = await this.retryQueue.addToQueue(this.axios, {
+          method: 'post',
+          url: `${this.config.supportApiUrl}/slp/filterBlock`,
+          data: {
+            txids: txs,
+            blockHeight
+          }
+        })
+
+        // const result = await this.axios.post(`${this.config.supportApiUrl}/slp/filterBlock`, {
+        //   txids: txs,
+        //   blockHeight
+        // })
+        const filteredData = result.data
+        slpTxs = filteredData.slpTxs
+        nonSlpTxs = filteredData.nonSlpTxs
+        // console.log('SLP support slpTxs: ', slpTxs)
+        // console.log('SLP support nonSlpTxs: ', nonSlpTxs)
+
+        // CT 6/6/24 - I think this code was redundent, so I commented it out.
+        // I think I copied it here because I thought it would get skipped, but
+        // it does not.
+        // if ((blockHeight - 1) % EPOCH === 0) {
+        //   // In phase 2 (ZMQ), roll back to the last backup and resync, to generate
+        //   // a new backup. This prevents the backup file from being corrupted by ZMQ
+        //   // transaction processing while in phase2.
+        //
+        //   const rollbackHeight = blockHeight - 1 - EPOCH
+        //
+        //   // Roll back the database to the last epoch.
+        //   await this.dbBackup.unzipDb(rollbackHeight)
+        //
+        //   // Kill the process, which will allow the app to shut down, and pm2 or Docker can
+        //   // restart it at a block height to resync and take a proper backup while
+        //   // in phase1.
+        //   console.log('Killing process, expecting process manager to restart this app.')
+        //   this.process.exit(0)
+        //
+        //   return 3
+        // }
+      } else {
+        // Default usage, the indexer filters the block.
+        console.log('Using native block filtering and sorting.')
+
+        const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2({
+          txids: txs,
+          blockHeight
+        })
+        slpTxs = filteredTxs.combined
+        nonSlpTxs = filteredTxs.nonSlpTxs
+        // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
+      }
 
       // If the block has no txs after filtering for SLP txs, then skip processing.
       if (slpTxs && slpTxs.length) {
@@ -338,9 +392,10 @@ class SlpIndexer {
         // Progressively processes TXs in the array.
         await this.processSlpTxs(slpTxs, blockHeight)
 
-        // Do a second round of this.filterBlock.deleteBurnedUtxos() for
-        // all non-SLP transactions. Handles corner-case where a token UTXO
-        // is burned in the same block that it was created.
+        // Run all non-SLP TXs through deleteBurnedUtxos().
+        // This solves for the following corner cases:
+        // - A SLP UTXO was used as the input for a non-SLP UTXO.
+        // - A token UTXO is burned in the same block that it was created.
         for (let i = 0; i < nonSlpTxs.length; i++) {
           const thisTxid = nonSlpTxs[i]
           const burnResult = await this.filterBlock.deleteBurnedUtxos(thisTxid)

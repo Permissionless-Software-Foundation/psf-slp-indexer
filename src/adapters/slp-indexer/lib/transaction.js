@@ -14,6 +14,7 @@ import slpParser from 'slp-parser'
 // Local libraries
 import RPC from './rpc.js'
 import RetryQueue from './retry-queue.js'
+import config from '../../../../config/index.js'
 
 class Transaction {
   constructor (localConfig = {}) {
@@ -21,6 +22,7 @@ class Transaction {
     this.rpc = new RPC()
     this.slpParser = slpParser
     this.queue = new RetryQueue()
+    this.config = config
 
     // State
     this.tokenCache = {}
@@ -753,7 +755,7 @@ class Transaction {
     }
 
     // Clear the token cache if it gets too big. Prevents memory leaks.
-    if (this.tokenCacheCnt > 1000000) {
+    if (this.tokenCacheCnt > this.config.cacheSize) {
       this.tokenCache = {}
       this.tokenCacheCnt = 0
     }
@@ -907,7 +909,7 @@ class Transaction {
       }
 
       // Clear the token cache if it gets too big. Prevents memory leaks.
-      if (this.txCacheCnt > 1000000) {
+      if (this.txCacheCnt > this.config.cacheSize) {
         this.txCache = {}
         this.txCacheCnt = 0
       }
