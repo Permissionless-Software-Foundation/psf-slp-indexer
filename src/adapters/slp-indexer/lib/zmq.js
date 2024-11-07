@@ -6,7 +6,7 @@
 
 // Public npm libraries
 import BitcoinCashZmqDecoder from '@psf/bitcoincash-zmq-decoder'
-import zmq from 'zeromq'
+import * as zmq from 'zeromq'
 
 // Local libraries
 import config from '../../../../config/index.js'
@@ -14,7 +14,8 @@ import config from '../../../../config/index.js'
 class ZMQ {
   constructor () {
     // Encapsulate dependencies
-    this.sock = zmq.socket('sub')
+    // this.sock = zmq.socket('sub')
+    this.sock = new zmq.Subscriber()
     this.bchZmqDecoder = new BitcoinCashZmqDecoder('mainnet')
     this.config = config
 
@@ -24,6 +25,7 @@ class ZMQ {
 
     // Bind 'this' object to subfunctions
     this.connect = this.connect.bind(this)
+    this.monitorZmq = this.monitorZmq.bind(this)
     this.disconnect = this.disconnect.bind(this)
     this.decodeMsg = this.decodeMsg.bind(this)
     this.getTx = this.getTx.bind(this)
@@ -37,12 +39,33 @@ class ZMQ {
       this.sock.subscribe('raw')
 
       // Send incoming messages to the decodeMsg() function.
-      this.sock.on('message', this.decodeMsg)
+      // this.sock.on('message', this.decodeMsg)
+
+      // Do not await. Fire and forget.
+      this.monitorZmq()
 
       // Return true to signal that the function has completed successfully.
       return true
     } catch (err) {
       console.error('Error in zmq.js/connect()')
+      throw err
+    }
+  }
+
+  async monitorZmq () {
+    try {
+      for await (const [topic, msg] of this.sock) {
+        // console.log(
+        //   "received a message related to:",
+        //   topic,
+        //   "containing message:",
+        //   msg,
+        // )
+
+        this.decodeMsg(topic, msg)
+      }
+    } catch (err) {
+      console.error('Error in zmq.js/monitorZmq()')
       throw err
     }
   }
@@ -67,6 +90,7 @@ class ZMQ {
         // console.log(`txd: ${JSON.stringify(txd, null, 2)}`)
         // console.log(`txd.format.txid: ${txd.format.txid}`)
         this.txQueue.push(txd.format.txid)
+        // console.log(`txQueue length: ${this.txQueue.length}`)
       } else if (decoded === 'rawblock') {
         // Process new blocks
 
