@@ -18,17 +18,21 @@ describe('#zmq.js', () => {
   })
 
   afterEach(() => {
-    uut.disconnect() // Ensure the socket is disconnected.
+    // uut.disconnect() // Ensure the socket is disconnected.
 
     sandbox.restore()
   })
 
   describe('#connect', () => {
     it('should initialize a connection', async () => {
+      console.log('uut.sock: ', uut.sock)
+
       // Mock network calls.
-      sandbox.stub(uut.sock, 'connect').returns()
-      sandbox.stub(uut.sock, 'subscribe').returns()
-      sandbox.stub(uut.sock, 'on').returns()
+      uut.sock = {
+        connect: () => {},
+        subscribe: () => {}
+      }
+      sandbox.stub(uut, 'monitorZmq').returns()
 
       const result = await uut.connect()
 
@@ -38,7 +42,9 @@ describe('#zmq.js', () => {
     it('should catch and throw an error', async () => {
       try {
         // Force and error
-        sandbox.stub(uut.sock, 'connect').throws(new Error('test error'))
+        uut.sock = {
+          connect: () => { throw new Error('test error') }
+        }
 
         await uut.connect()
 

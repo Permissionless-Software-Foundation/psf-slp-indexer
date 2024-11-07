@@ -4,15 +4,15 @@
 #IMAGE BUILD COMMANDS
 # ct-base-ubuntu = ubuntu 18.04 + nodejs v10 LTS
 #FROM christroutner/ct-base-ubuntu
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 MAINTAINER Chris Troutner <chris.troutner@gmail.com>
 
 #Update the OS and install any OS packages needed.
 RUN apt-get update
-RUN apt-get install -y sudo git curl nano gnupg wget zip unzip
+RUN apt-get install -y sudo git curl nano gnupg wget zip unzip python3
 
 #Install Node and NPM
-RUN curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
 RUN apt-get install -y nodejs build-essential
 
@@ -33,15 +33,17 @@ WORKDIR /home/safeuser
 #RUN runuser -l safeuser -c "npm config set prefix '~/.npm-global'"
 
 # Update to the latest version of npm.
-RUN npm install -g npm@8.3.0
+#RUN npm install -g npm@8.3.0
 
 # npm mirror to prevent direct dependency on npm.
-RUN npm set registry http://94.130.170.209:4873/
+#RUN npm set registry http://94.130.170.209:4873/
 
 # Switch to user account.
 #USER safeuser
 # Prep 'sudo' commands.
 #RUN echo 'abcd8765' | sudo -S pwd
+
+#RUN npm install -g node-gyp
 
 # Clone the rest.bitcoin.com repository
 WORKDIR /home/safeuser
