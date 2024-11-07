@@ -43,7 +43,7 @@ WORKDIR /home/safeuser
 # Prep 'sudo' commands.
 #RUN echo 'abcd8765' | sudo -S pwd
 
-RUN npm install -g node-gyp
+#RUN npm install -g node-gyp
 
 # Clone the rest.bitcoin.com repository
 WORKDIR /home/safeuser
@@ -54,7 +54,7 @@ RUN git clone https://github.com/Permissionless-Software-Foundation/psf-slp-inde
 WORKDIR /home/safeuser/psf-slp-indexer
 
 # For development: switch to unstable branch
-#RUN git checkout ct-unstable
+RUN git checkout ct-unstable
 
 # Install dependencies
 RUN npm install
