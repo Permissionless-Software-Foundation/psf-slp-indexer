@@ -6,20 +6,22 @@ This application crawls the Bitcoin Cash (BCH) blockchain and indexes SLP token 
 
 This indexer is one part of a collection of blockchain infrastructure. To understand how all the pieces fit together, read the [Cash Stack Documentation](https://cashstack.info).
 
-If you have question or need help, ask in the [community support Telegram channel](https://t.me/psf_slp).
+If you have question or need help, ask in the [community support Telegram channel](https://t.me/bch_js_toolkit).
 
 ## Videos
 
 - [Installing the psf-slp-indexer](https://youtu.be/5gF4ON9lRHI)
+  - Note: The 'CashStrap' databases are no longer available. You'll need to sync from genesis.
 - [Additional Infrastructure Videos](https://psfoundation.cash/video/) in the 'Dev Ops & Infrastructure' section.
 
 ## Installation and Usage
 
-This software is intended to be run inside a Docker container, controlled with Docker Compose, on a Ubuntu 20 OS.
+This software is intended to be run inside a Docker container, controlled with Docker Compose, on a Ubuntu Linux OS.
 
+- Ensure you have a BCHN full node running and **fully synced**. [docker-bchn](https://github.com/Permissionless-Software-Foundation/docker-bchn) is recommended for running a full node.
 - Enter the `production/docker` directory.
+- Customize the `start-production.sh` file to match your full node settings
 - Build the image with `docker-compose build --no-cache`
-- Ensure you have a BCHN full node running and fully synced. [docker-bchn](https://github.com/Permissionless-Software-Foundation/docker-bchn) is recommended for running a full node.
 - Start the indexer with `docker-compose up -d`
 
 
@@ -30,7 +32,6 @@ This software is intended to be run inside a Docker container, controlled with D
 - [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) Licensed to encourage wide adoption and free use throughout the crypto ecosystem.
 - [LevelDB](https://github.com/google/leveldb) used for fast, efficient indexing and querying.
 - Drastically reduced memory usage, compared to SLPDB.
-- Fast indexing using transaction maps.
 - Docker container for easy deployment and horizontal scaling.
 
 ## Development Environment
