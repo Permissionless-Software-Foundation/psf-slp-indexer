@@ -40,7 +40,7 @@ class Query {
 
       return result
     } catch (err) {
-      console.log('Error in getTx()')
+      console.log('Error in getTx(): ', err)
       throw err
     }
   }
