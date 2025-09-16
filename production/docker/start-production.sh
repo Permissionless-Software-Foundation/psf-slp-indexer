@@ -45,6 +45,10 @@ export RPC_PASS=password
 # Delete backups as it syncs.
 export DELETE_BACKUP=1
 
+# Config support API usage.
+export USE_SLP_SUPPORT_API=true
+export SLP_SUPPORT_URL=http://172.17.0.1:5019
+
 # make directories
 mkdir leveldb
 mkdir leveldb/current

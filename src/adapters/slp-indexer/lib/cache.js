@@ -4,8 +4,8 @@
 */
 
 // Local libraries
-// const Transaction = require('./transaction'
 import Transaction from './transaction.js'
+import config from '../../../../config/index.js'
 
 class Cache {
   constructor (localConfig = {}) {
@@ -18,6 +18,7 @@ class Cache {
 
     // Encapsulate dependencies
     this.transaction = new Transaction(localConfig)
+    this.config = config
 
     this.cache = {}
     this.cacheCnt = 0
@@ -67,7 +68,7 @@ class Cache {
     }
 
     // Flush the cache once it gets too big, to same on memory.
-    if (this.cacheCnt > 1000000) {
+    if (this.cacheCnt > this.config.cacheSize) {
       this.cache = {}
       this.cacheCnt = 0
     }
