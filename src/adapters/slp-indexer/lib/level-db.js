@@ -64,13 +64,19 @@ class LevelDb {
       valueEncoding: 'json'
     })
 
+    // Pin Claims are on-chain payments for pinning IPFS content.
+    this.pinClaimDb = this.level(`${__dirname.toString()}/../../../../leveldb/current/pinClaim`, {
+      valueEncoding: 'json'
+    })
+
     return {
       addrDb: this.addrDb,
       txDb: this.txDb,
       tokenDb: this.tokenDb,
       statusDb: this.statusDb,
       pTxDb: this.pTxDb,
-      utxoDb: this.utxoDb
+      utxoDb: this.utxoDb,
+      pinClaimDb: this.pinClaimDb
     }
   }
 
@@ -82,6 +88,7 @@ class LevelDb {
     await this.statusDb.close()
     await this.pTxDb.close()
     await this.utxoDb.close()
+    await this.pinClaimDb.close()
 
     // Signal that the databases were close successfully.
     return true

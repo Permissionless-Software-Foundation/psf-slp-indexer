@@ -36,6 +36,7 @@ import Utils from './lib/utils.js'
 import ManagePTXDB from './lib/ptxdb.js'
 import Query from './lib/query.js'
 import Blacklist from './lib/blacklist.js'
+import Webhook from '../webhook.js'
 
 const EPOCH = 1000 // blocks between backups
 const RETRY_CNT = 10
@@ -62,7 +63,7 @@ class SlpIndexer {
   openDatabases () {
     // Open the indexer databases.
     this.levelDb = new LevelDb()
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } =
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb } =
       this.levelDb.openDbs()
     this.addrDb = addrDb
     this.tokenDb = tokenDb
@@ -70,13 +71,14 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.pTxDb = pTxDb
     this.utxoDb = utxoDb
+    this.pinClaimDb = pinClaimDb
 
-    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
+    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb }
   }
 
   // Instantiate all dependency libraries and encapsulate them into the 'this' object.
   encapsulateDeps (localConfig = {}) {
-    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = localConfig
+    const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb } = localConfig
 
     // Encapsulate dependencies
     this.rpc = new RPC()
@@ -86,7 +88,8 @@ class SlpIndexer {
       txDb,
       statusDb,
       pTxDb,
-      utxoDb
+      utxoDb,
+      pinClaimDb
     })
     this.cache = new Cache({ txDb })
     this.transaction = new Transaction({ txDb })
@@ -116,6 +119,7 @@ class SlpIndexer {
     this.statusDb = statusDb
     this.blacklist = new Blacklist()
     this.retryQueue = new RetryQueue()
+    this.webhook = new Webhook()
 
     // Used to control program flow during testing, to override the default
     // behavior of process.exit().
@@ -180,7 +184,7 @@ class SlpIndexer {
         blockHeight++
         biggestBlockHeight = await this.retryQueue.addToQueue(this.rpc.getBlockCount, {})
       } while (blockHeight <= biggestBlockHeight)
-      // } while (blockHeight < 769587)
+      // } while (blockHeight < 825470)
       // } while (blockHeight < 739707)
       // console.log('Target block height reached.')
       // process.exit(0)
@@ -321,12 +325,15 @@ class SlpIndexer {
         } transactions. Time now: ${now.toLocaleString()}`
       )
 
+      // console.log('txs: ', txs)
+      // console.log('blockHeight: ', blockHeight)
       // Filter and sort block transactions, to make indexing more efficient
       // and easier to debug.
       const filteredTxs = await this.filterBlock.filterAndSortSlpTxs2(
         txs,
         blockHeight
       )
+      // console.log('filteredTxs: ', filteredTxs)
       const slpTxs = filteredTxs.combined
       const nonSlpTxs = filteredTxs.nonSlpTxs
       // console.log(`slpTxs: ${JSON.stringify(slpTxs, null, 2)}`)
@@ -349,6 +356,35 @@ class SlpIndexer {
             console.log(
               `deleteBurnedUtxos() errored on on txid ${thisTxid}. Coinbase?`
             )
+          }
+        }
+      }
+
+      // Check each of the non-SLP transaction to see if it matches the profile
+      // of a claim.
+      // console.log('nonSlpTxs: ', nonSlpTxs)
+      if (nonSlpTxs && nonSlpTxs.length) {
+        for (let i = 0; i < nonSlpTxs.length; i++) {
+          const thisTxid = nonSlpTxs[i]
+
+          // Check if this transaction is a Claim.
+          const isClaim = await this.transaction.isPinClaim(thisTxid)
+          // console.log(`TX ${thisTxid} is pin claim: ${!!isClaim}`)
+          if (isClaim) {
+            console.log(`Claim found: ${JSON.stringify(isClaim, null, 2)}`)
+            // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
+
+            // Store the claim in the database.
+            await this.pinClaimDb.put(thisTxid, isClaim)
+
+            // Trigger webhook
+            try {
+              // Trigger webhook. Do not wait, so that code execution is not blocked.
+              this.webhook.webhookNewClaim(isClaim)
+            } catch (err) {
+              /* exit quietly */
+              console.log('Error trying to execute webhook: ', err)
+            }
           }
         }
       }
@@ -597,6 +633,24 @@ class SlpIndexer {
       } catch (err) {
         /* exit quietly */
         // console.log(err)
+
+        // TODO: check if this TX is a Pin Claim.
+        // Check if this transaction is a Claim.
+        const isClaim = await this.transaction.isPinClaim(tx)
+        // console.log(`TX ${tx.txid} is pin claim: ${!!isClaim}`)
+        if (isClaim) {
+          console.log(`Claim found: ${JSON.stringify(isClaim, null, 2)}`)
+          // console.log(`Claim key: ${isClaim.about}, value: ${JSON.stringify(isClaim, null, 2)}`)
+
+          // Store the claim in the database.
+          await this.pinClaimDb.put(tx, isClaim)
+
+          // Trigger webhook
+          try {
+            // Trigger webhook. Do not wait, so that code execution is not blocked.
+            this.webhook.webhookNewClaim(isClaim)
+          } catch (err) { /* exit quietly */ }
+        }
       }
 
       // Process the identified SLP transaction.

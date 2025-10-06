@@ -2,9 +2,11 @@
   Unit tests for the IPFS Adapter.
 */
 
+// Global npm libraries
 import { assert } from 'chai'
-
 import sinon from 'sinon'
+
+// Local libraries
 import IPFSCoordAdapter from '../../../src/adapters/ipfs/ipfs-coord.js'
 import create from '../mocks/ipfs-mock.js'
 import IPFSCoordMock from '../mocks/ipfs-coord-mock.js'

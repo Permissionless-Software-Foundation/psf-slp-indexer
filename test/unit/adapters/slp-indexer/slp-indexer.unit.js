@@ -23,6 +23,7 @@ describe('#slpIndexer', () => {
     const statusDb = new MockLevel()
     const pTxDb = new MockLevel()
     const utxoDb = new MockLevel()
+    const pinClaimDb = new MockLevel()
 
     uut.addrDb = addrDb
     uut.tokenDb = tokenDb
@@ -30,8 +31,9 @@ describe('#slpIndexer', () => {
     uut.statusDb = statusDb
     uut.pTxDb = pTxDb
     uut.utxoDb = utxoDb
+    uut.pinClaimDb = pinClaimDb
 
-    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb }
+    return { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb }
   }
 
   beforeEach(() => {
@@ -49,7 +51,7 @@ describe('#slpIndexer', () => {
 
   describe('#openDatabases', () => {
     it('should open and then close databases', async () => {
-      const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb } = uut.openDatabases()
+      const { addrDb, tokenDb, txDb, statusDb, pTxDb, utxoDb, pinClaimDb } = uut.openDatabases()
 
       await addrDb.close()
       await tokenDb.close()
@@ -57,6 +59,7 @@ describe('#slpIndexer', () => {
       await statusDb.close()
       await pTxDb.close()
       await utxoDb.close()
+      await pinClaimDb.close()
     })
   })
 
@@ -247,7 +250,7 @@ describe('#slpIndexer', () => {
       // Mock dependencies
       sandbox.stub(uut.pTxDb, 'get').rejects(new Error('Entry not found'))
       sandbox.stub(uut.transaction, 'decodeOpReturn').rejects(new Error('test error'))
-      // sandbox.stub(uut.blacklist, 'checkBlacklist').returns(true)
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       const inData = {
         tx: 'fake-txid',
@@ -265,6 +268,27 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.transaction, 'decodeOpReturn').resolves({ tokenId: 'fake-tokenid' })
       sandbox.stub(uut.blacklist, 'checkBlacklist').returns(false)
       sandbox.stub(uut.cache, 'get').resolves({})
+      sandbox.stub(uut, 'processData').resolves()
+
+      const inData = {
+        tx: 'fake-txid',
+        blockHeight: 600000
+      }
+
+      const result = await uut.processTx(inData)
+
+      assert.equal(result, true)
+    })
+
+    it('should identify and process Pin Claims', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.pTxDb, 'get').rejects(new Error('Entry not found'))
+      sandbox.stub(uut.transaction, 'decodeOpReturn').rejects(new Error('test error'))
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves({})
+      sandbox.stub(uut.webhook, 'webhookNewClaim').returns()
+      // sandbox.stub(uut.pinClaimDb,'put')
+      // sandbox.stub(uut.blacklist, 'checkBlacklist').returns(false)
+      // sandbox.stub(uut.cache, 'get').resolves({})
       sandbox.stub(uut, 'processData').resolves()
 
       const inData = {
@@ -406,6 +430,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut, 'processSlpTxs').resolves()
       sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       const result = await uut.processBlock(600000)
 
@@ -429,6 +454,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.filterBlock, 'deleteBurnedUtxos').resolves(false)
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
       sandbox.stub(uut.dbBackup, 'zipDb').resolves()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       uut.indexState = 'phase1'
 
@@ -455,6 +481,7 @@ describe('#slpIndexer', () => {
       sandbox.stub(uut.managePtxdb, 'cleanPTXDB').resolves()
       sandbox.stub(uut.dbBackup, 'unzipDb').resolves()
       sandbox.stub(uut.process, 'exit').returns()
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves(false)
 
       uut.indexState = 'phase2'
 
@@ -474,6 +501,54 @@ describe('#slpIndexer', () => {
       } catch (err) {
         assert.include(err.message, 'test error')
       }
+    })
+
+    it('should process Pin Claim txs', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: [],
+        nonSlpTxs: ['09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905']
+      })
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves({
+        cid: 'test-cid'
+      })
+      sandbox.stub(uut.pinClaimDb, 'put').resolves()
+      sandbox.stub(uut.webhook, 'webhookNewClaim').resolves()
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 1)
+    })
+
+    it('should ignore Pin Claim webhook errors', async () => {
+      // Mock dependencies
+      const block = {
+        tx: [
+          '09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905'
+        ]
+      }
+      sandbox.stub(uut.rpc, 'getBlockHash').resolves()
+      sandbox.stub(uut.rpc, 'getBlock').resolves(block)
+      sandbox.stub(uut.filterBlock, 'filterAndSortSlpTxs2').resolves({
+        combined: [],
+        nonSlpTxs: ['09555a14fd2de71a54c0317a8a22ae17bc43512116b063e263e41b3fc94f8905']
+      })
+      sandbox.stub(uut.transaction, 'isPinClaim').resolves({
+        cid: 'test-cid'
+      })
+      sandbox.stub(uut.pinClaimDb, 'put').resolves()
+      sandbox.stub(uut.webhook, 'webhookNewClaim').throws(new Error('test error'))
+
+      const result = await uut.processBlock(600000)
+
+      assert.equal(result, 1)
     })
   })
 

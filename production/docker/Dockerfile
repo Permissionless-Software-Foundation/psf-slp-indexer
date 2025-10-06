@@ -17,20 +17,20 @@ RUN bash nodesource_setup.sh
 RUN apt-get install -y nodejs build-essential
 
 #Create the user 'safeuser' and add them to the sudo group.
-#RUN useradd -ms /bin/bash safeuser
-#RUN adduser safeuser sudo
+RUN useradd -ms /bin/bash safeuser
+RUN adduser safeuser sudo
 
 #Set password to 'password' change value below if you want a different password
-#RUN echo safeuser:password | chpasswd
+RUN echo safeuser:password | chpasswd
 
 #Set the working directory to be the home directory
 WORKDIR /home/safeuser
 
 #Setup NPM for non-root global install
-#RUN mkdir /home/safeuser/.npm-global
-#RUN chown -R safeuser .npm-global
-#RUN echo "export PATH=~/.npm-global/bin:$PATH" >> /home/safeuser/.profile
-#RUN runuser -l safeuser -c "npm config set prefix '~/.npm-global'"
+RUN mkdir /home/safeuser/.npm-global
+RUN chown -R safeuser .npm-global
+RUN echo "export PATH=~/.npm-global/bin:$PATH" >> /home/safeuser/.profile
+RUN runuser -l safeuser -c "npm config set prefix '~/.npm-global'"
 
 # Update to the latest version of npm.
 #RUN npm install -g npm@8.3.0
@@ -54,7 +54,7 @@ RUN git clone https://github.com/Permissionless-Software-Foundation/psf-slp-inde
 WORKDIR /home/safeuser/psf-slp-indexer
 
 # For development: switch to unstable branch
-#RUN git checkout ct-unstable
+RUN git checkout pin-ipfs
 
 # Install dependencies
 RUN npm install
